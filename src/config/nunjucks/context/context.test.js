@@ -48,19 +48,8 @@ describe('context and cache', () => {
           assetPath: '/public/assets',
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
-          navigation: [
-            {
-              current: true,
-              text: 'Home',
-              href: '/'
-            },
-            {
-              current: false,
-              text: 'About',
-              href: '/about'
-            }
-          ],
-          serviceName: 'ahwr-backoffice-ui',
+          navigation: [],
+          serviceName: 'Get funding to improve animal health and welfare',
           serviceUrl: '/'
         })
       })
@@ -137,19 +126,8 @@ describe('context and cache', () => {
           assetPath: '/public/assets',
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
-          navigation: [
-            {
-              current: true,
-              text: 'Home',
-              href: '/'
-            },
-            {
-              current: false,
-              text: 'About',
-              href: '/about'
-            }
-          ],
-          serviceName: 'ahwr-backoffice-ui',
+          navigation: [],
+          serviceName: 'Get funding to improve animal health and welfare',
           serviceUrl: '/'
         })
       })

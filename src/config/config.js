@@ -44,7 +44,7 @@ export const config = convict({
   serviceName: {
     doc: 'Applications Service Name',
     format: String,
-    default: 'ahwr-backoffice-ui'
+    default: 'Get funding to improve animal health and welfare'
   },
   root: {
     doc: 'Project root',

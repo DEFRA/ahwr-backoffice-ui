@@ -23,7 +23,9 @@ describe('#errors', () => {
     })
 
     expect(result).toEqual(
-      expect.stringContaining('Page not found | ahwr-backoffice-ui')
+      expect.stringContaining(
+        'Page not found | Get funding to improve animal health and welfare'
+      )
     )
     expect(statusCode).toBe(statusCodes.notFound)
   })

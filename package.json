@@ -1,6 +1,6 @@
 {
   "name": "ahwr-backoffice-ui",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Back office of the health and welfare of your livestock",
   "sideEffects": false,
   "main": "src/index.js",
