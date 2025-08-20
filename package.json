@@ -1,6 +1,6 @@
 {
   "name": "ahwr-backoffice-ui",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Back office of the health and welfare of your livestock",
   "sideEffects": false,
   "main": "src/index.js",
@@ -50,6 +50,7 @@
     "cssnano": "7.0.7",
     "cssnano-preset-default": "7.0.7",
     "date-fns": "4.1.0",
+    "ffc-ahwr-common-library": "2.3.0",
     "global-agent": "3.0.0",
     "govuk-frontend": "5.11.0",
     "hapi-pino": "12.1.0",
