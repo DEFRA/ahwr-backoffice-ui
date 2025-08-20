@@ -20,7 +20,7 @@ describe('#homeController', () => {
     })
 
     expect(result).toEqual(
-      expect.stringContaining('Claims, Agreements and Flags')
+      expect.stringContaining('Claim number:')
     )
     expect(statusCode).toBe(statusCodes.ok)
   })

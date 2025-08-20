@@ -1,12 +1,150 @@
 {% extends 'layouts/page.njk' %}
 
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+{% endblock %}
 {% block content %}{{ appHeading({text: heading}) }}
 
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <div class="govuk-body" data-testid="app-page-body">
-        <p>TODO add backoffice page for demo</p>
+    <div class="govuk-grid-column-full">
+      <hr class="govuk-!-margin-0">
+      <div class="govuk-grid-row govuk-!-padding-top-3 govuk-!-padding-bottom-4">
+        <div class="govuk-grid-column-two-thirds">
+          <h1 class="govuk-heading-l{% if isFlagged %} flagged-item{% endif %}">
+            Claim number: {{ reference }}{% if isFlagged %} 🚩{% endif %}
+          </h1>
+          <h1 class="govuk-caption-l">Claim by <a class="govuk-link" href="/agreement/{{ applicationReference }}/claims?page={{ page }}&returnPage=view-claim&reference={{ reference }}">{{ title }}</a></h1>
+        </div>
+        <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+          <span class="app-long-tag"><div class="govuk-tag govuk-!-margin-top-1 govuk-!-margin-bottom-3 govuk-!-text-align-left {{ status.tagClass }}">{{ status.normalType }}</div></span>
+          <h1 class="govuk-caption-l"><a class="govuk-link" href="/claims">Back to all claims</a></h1>
+        </div>
       </div>
+      <hr>
+    </div>
+    <div class="govuk-grid-column-full">
+      {% if errors.length %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: errors
+        }) }}
+      {% endif %}
+      <dl class="govuk-summary-list">
+        {% for item in applicationSummaryDetails %}
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key {% if item.flagged %} flagged-item{% endif %}">{{ item.key.text }}</dt>
+              <dd class="govuk-summary-list__value{% if item.flagged %} flagged-item{% endif %}">{{ item.value.text }}</dd>
+            </div>
+        {% endfor %}
+        {% if herdBreakdown %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Number of herds and flocks
+            </dt>
+            <dl class="govuk-summary-list govuk-!-margin-bottom-0">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Beef cattle
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  {{ herdBreakdown.beef }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Dairy cattle
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  {{ herdBreakdown.dairy }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Sheep
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  {{ herdBreakdown.sheep }}
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row no-line-break">
+                <dt class="govuk-summary-list__key">
+                  Pigs
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  {{ herdBreakdown.pigs }}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        {% endif %}
+      </dl>
+      {% if moveToInCheckForm %}
+        {% include "./includes/move-to-in-check-form.njk" %}
+      {% endif %}
+      {% if recommendToPayForm %}
+        {% include "./includes/recommend-to-pay-form.njk" %}
+      {% endif %}
+      {% if recommendToRejectForm %}
+        {% include "./includes/recommend-to-reject-form.njk" %}
+      {% endif %}
+      {% if authoriseForm %}
+        {% include "./includes/authorise-form.njk" %}
+      {% endif %}
+      {% if rejectForm %}
+        {% include "./includes/reject-form.njk" %}
+      {% endif %}
+      {% if updateStatusForm %}
+        {% include "./includes/update-status-form.njk" %}
+      {% endif %}
+      {% if updateVetsNameForm %}
+        {% include "./includes/update-vets-name-form.njk" %}
+      {% endif %}
+      {% if updateVetRCVSNumberForm %}
+        {% include "./includes/update-vet-rcvs-number-form.njk" %}
+      {% endif %}
+      {% if updateDateOfVisitForm %}
+        {% include "./includes/update-date-of-visit-form.njk" %}
+      {% endif %}
+    </div>
+    <div class="govuk-grid-column-full">
+      {% set claimHTML %}
+        <h2 class="govuk-heading-l govuk-!-margin-bottom-5">Claim details</h2>
+        {{ govukSummaryList({ rows: claimSummaryDetails }) }}
+      {% endset -%}
+      {{ govukTabs({
+          items: [
+            {
+              label: "Claim",
+              id: "claim",
+              panel: {
+                html: claimHTML
+              }
+            },
+            {
+              label: "History",
+              id: "history",
+              panel: {
+                html: ''
+              }
+            }
+          ]
+        })
+      }}
+      {% if moveToInCheckAction %}
+        {% include "./includes/move-to-in-check-action.njk" %}
+      {% endif %}
+      {% if recommendAction %}
+        {% include "./includes/recommend-action.njk" %}
+      {% endif %}
+      {% if authoriseAction %}
+        {% include "./includes/authorise-action.njk" %}
+      {% endif %}
+      {% if rejectAction %}
+        {% include "./includes/reject-action.njk" %}
+      {% endif %}
     </div>
   </div>
 
