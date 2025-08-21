@@ -137,6 +137,12 @@ export const config = convict({
         format: Number,
         default: fourHoursMs,
         env: 'SESSION_CACHE_TTL'
+      },
+      apiEndpointApplication: {
+        doc: 'AHWR application backend endpoint',
+        format: String,
+        default: '',
+        env: 'AHWR_APPLICATION_BACKEND_URL'
       }
     },
     cookie: {

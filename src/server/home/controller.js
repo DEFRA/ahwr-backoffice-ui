@@ -1,27 +1,25 @@
+import { config } from '../../config/config.js'
 import {
   formatStatusId,
   upperFirstLetter,
   formattedDateToUk
 } from '../common/helpers/display-helper.js'
 import { getStyleClassByStatus } from '../common/constants/status.js'
+import { fetch } from 'undici'
 
-/**
- * A GDS styled example home page controller.
- * Provided as an example, remove or modify as required.
- */
 export const homeController = {
-  handler(request, h) {
+  async handler(request, h) {
     return h.view('home/index', {
       pageTitle: 'Administration - View Claim',
       heading: '',
-      ...getPageData(request.params.reference ?? 'REBC-AAAA-AAA2')
+      ...(await getPageData(request.query.reference ?? 'REBC-AAAA-AAAA'))
     })
   }
 }
 
-const getPageData = (claimReference) => {
-  const application = getApplicationFromBackend(claimReference)
-  const claim = getClaimFromBackend(claimReference)
+const getPageData = async (claimReference) => {
+  const application = await getApplicationFromBackend()
+  const claim = await getClaimFromBackend(claimReference)
 
   return {
     backLink: 'bar',
@@ -50,46 +48,22 @@ const getPageData = (claimReference) => {
   }
 }
 
-const getApplicationFromBackend = (claimReference) => {
-  // TO DO get from backend service
-  return {
-    reference: 'IAHW-AAAA-AAAA',
-    data: {
-      organisation: {
-        name: 'MRS I KING',
-        farmerName: 'Michael Ann Murza',
-        email: 'michaelmurzac@azrumleahcimn.com.test',
-        sbi: 107597689,
-        address: 'WARRINGTON,EX6 7XE,United Kingdom',
-        orgEmail: '	mrsruthlotterp@rettolhtursrmn.com.test'
-      }
-    },
-    createdAt: new Date()
-  }
+const getApplicationFromBackend = async () => {
+  const response = await fetch(
+    `${config.get('session.cache.apiEndpointApplication')}/application`
+  )
+  const responseJson = await response.json()
+
+  return responseJson.data
 }
 
-const getClaimFromBackend = (claimReference) => {
-  // TO DO get from backend service
-  return {
-    reference: claimReference,
-    statusId: 9,
-    createdAt: new Date(),
-    data: {
-      typeOfLivestock: 'beef',
-      dateOfVisit: new Date(),
-      dateOfTesting: new Date(),
-      isReview: true,
-      herdName: 'beef',
-      herdCph: '11/111/1111',
-      isOnlyHerd: 'Yes',
-      herdReasons: ['onlyHerd'],
-      speciesNumbers: 'yes',
-      vetsName: 'Hope',
-      vetRCVSNumber: '1122334',
-      laboratoryURN: '887760',
-      testResults: 'positive'
-    }
-  }
+const getClaimFromBackend = async (claimReference) => {
+  const response = await fetch(
+    `${config.get('session.cache.apiEndpointApplication')}/claim/${claimReference}`
+  )
+  const responseJson = await response.json()
+
+  return responseJson.data
 }
 
 const applicationSummaryDetails = (application) => {
