@@ -26,12 +26,12 @@ describe('#homeController', () => {
     fetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: () => Promise.resolve({ message: 'success', data: application })
+      json: () => Promise.resolve(application)
     })
     fetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: () => Promise.resolve({ message: 'success', data: claim })
+      json: () => Promise.resolve(claim)
     })
 
     const { result, statusCode } = await server.inject({

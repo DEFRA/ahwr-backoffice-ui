@@ -12,7 +12,10 @@ export const homeController = {
     return h.view('home/index', {
       pageTitle: 'Administration - View Claim',
       heading: '',
-      ...(await getPageData(request.query.reference ?? 'REBC-AAAA-AAAA', request.query.applicationReference ?? 'IAHW-AAAA-AAAA'))
+      ...(await getPageData(
+        request.query.reference ?? 'REBC-AAAA-AAAA',
+        request.query.applicationReference ?? 'IAHW-AAAA-AAAA'
+      ))
     })
   }
 }
