@@ -12,13 +12,16 @@ export const homeController = {
     return h.view('home/index', {
       pageTitle: 'Administration - View Claim',
       heading: '',
-      ...(await getPageData(request.query.reference ?? 'REBC-AAAA-AAAA'))
+      ...(await getPageData(
+        request.query.reference ?? 'REBC-AAAA-AAAA',
+        request.query.applicationReference ?? 'IAHW-AAAA-AAAA'
+      ))
     })
   }
 }
 
-const getPageData = async (claimReference) => {
-  const application = await getApplicationFromBackend()
+const getPageData = async (claimReference, applicationReference) => {
+  const application = await getApplicationFromBackend(applicationReference)
   const claim = await getClaimFromBackend(claimReference)
 
   return {
@@ -48,22 +51,18 @@ const getPageData = async (claimReference) => {
   }
 }
 
-const getApplicationFromBackend = async () => {
+const getApplicationFromBackend = async (applicationReference) => {
   const response = await fetch(
-    `${config.get('session.cache.apiEndpointApplication')}/application`
+    `${config.get('session.cache.apiEndpointApplication')}/api/application/get/${applicationReference}`
   )
-  const responseJson = await response.json()
-
-  return responseJson.data
+  return await response.json()
 }
 
 const getClaimFromBackend = async (claimReference) => {
   const response = await fetch(
-    `${config.get('session.cache.apiEndpointApplication')}/claim/${claimReference}`
+    `${config.get('session.cache.apiEndpointApplication')}/api/claim/get-by-reference/${claimReference}`
   )
-  const responseJson = await response.json()
-
-  return responseJson.data
+  return await response.json()
 }
 
 const applicationSummaryDetails = (application) => {
