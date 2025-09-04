@@ -1,10 +1,10 @@
-import { config } from '../../config/config.js'
+import { config } from '../../../config/config.js'
 import {
   formatStatusId,
   upperFirstLetter,
   formattedDateToUk
-} from '../common/helpers/display-helper.js'
-import { getStyleClassByStatus } from '../common/constants/status.js'
+} from '../../common/helpers/display-helper.js'
+import { getStyleClassByStatus } from '../../common/constants/status.js'
 import { fetch } from 'undici'
 
 export const homeController = {
@@ -53,14 +53,14 @@ const getPageData = async (claimReference, applicationReference) => {
 
 const getApplicationFromBackend = async (applicationReference) => {
   const response = await fetch(
-    `${config.get('session.cache.apiEndpointApplication')}/api/application/get/${applicationReference}`
+    `${config.get('session.cache.apiEndpointApplication')}/application/get/${applicationReference}`
   )
   return await response.json()
 }
 
 const getClaimFromBackend = async (claimReference) => {
   const response = await fetch(
-    `${config.get('session.cache.apiEndpointApplication')}/api/claim/get-by-reference/${claimReference}`
+    `${config.get('session.cache.apiEndpointApplication')}/claim/get-by-reference/${claimReference}`
   )
   return await response.json()
 }

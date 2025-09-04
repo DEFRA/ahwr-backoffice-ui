@@ -12,6 +12,14 @@ import { requestLogger } from './common/helpers/logging/request-logger.js'
 import { sessionCache } from './common/helpers/session-cache/session-cache.js'
 import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
 import { secureContext } from '@defra/hapi-secure-context'
+// import { authPlugin } from '../plugins/auth.js'
+// import { cookiePlugin } from '../plugins/cookies.js'
+// import { crumbPlugin } from '../plugins/crumb.js'
+// import { errorPagesPlugin } from '../plugins/error-pages.js'
+// import { headerPlugin } from '../plugins/header.js'
+// import { loggerPlugin } from '../plugins/logger.js'
+// import { sessionPlugin } from '../plugins/session.js'
+// import { inertPlugin } from '../plugins/inert.js'
 
 export async function createServer() {
   setupProxy()
@@ -52,6 +60,7 @@ export async function createServer() {
     }
   })
   await server.register([
+    // TODO 1061 await server.register(authPlugin)
     requestLogger,
     requestTracing,
     secureContext,
@@ -59,6 +68,13 @@ export async function createServer() {
     sessionCache,
     nunjucksConfig,
     router // Register all the controllers/routes defined in src/server/router.js
+    // crumbPlugin,
+    // inertPlugin,
+    // sessionPlugin,
+    // cookiePlugin,
+    // errorPagesPlugin,
+    // loggerPlugin,
+    // headerPlugin
   ])
 
   server.ext('onPreResponse', catchAll)

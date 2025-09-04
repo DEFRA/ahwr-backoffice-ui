@@ -8,6 +8,8 @@ import { context } from './context/context.js'
 import * as filters from './filters/filters.js'
 import * as globals from './globals/globals.js'
 
+import getMOJFilters from '@ministryofjustice/frontend/moj/filters/all.js'
+
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const nunjucksEnvironment = nunjucks.configure(
   [
@@ -33,6 +35,30 @@ export const nunjucksConfig = {
         compile(src, options) {
           const template = nunjucks.compile(src, options.environment)
           return (ctx) => template.render(ctx)
+        },
+        prepare: (options, next) => {
+          const nunjucksAppEnv = nunjucks.configure(
+            [
+              path.join(options.relativeTo || process.cwd(), options.path),
+              'node_modules/govuk-frontend/dist',
+              'node_modules/@ministryofjustice/frontend/'
+            ],
+            {
+              autoescape: true,
+              watch: false
+            }
+          )
+
+          // Add filters from MOJ Frontend
+          let mojFilters = getMOJFilters()
+
+          mojFilters = Object.assign(mojFilters)
+          Object.keys(mojFilters).forEach(function (filterName) {
+            nunjucksAppEnv.addFilter(filterName, mojFilters[filterName])
+          })
+
+          options.compileOptions.environment = nunjucksAppEnv
+          return next()
         }
       }
     },
@@ -40,7 +66,7 @@ export const nunjucksConfig = {
       environment: nunjucksEnvironment
     },
     relativeTo: path.resolve(dirname, '../..'),
-    path: 'server',
+    path: 'server/views',
     isCached: config.get('isProduction'),
     context
   }

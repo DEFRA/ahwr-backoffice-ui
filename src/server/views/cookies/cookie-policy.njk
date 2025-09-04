@@ -1,0 +1,64 @@
+{% extends './layouts/layout.njk' %}
+
+{% block pageTitle %}Cookies - Administration of the health and welfare of your livestock - GOV.UK{% endblock %}
+
+{% block beforeContent %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "/"
+  }) }}
+{% endblock %}
+
+{% block content %}
+
+  {% if updated %}
+    {% set html %}
+      <p class="govuk-notification-banner__heading">You’ve set your cookie preferences.</p>
+    {% endset %}
+
+    {{ govukNotificationBanner({
+      type: "success",
+      html: html
+    }) }}
+  {% endif %}
+
+  <h1 class="govuk-heading-l">Cookies on Administration of the health and welfare of your livestock service</h1>
+
+  <p class="govuk-body">Cookies are small files saved on your phone, tablet or computer when you visit a website.</p>
+
+  <p class="govuk-body">We use cookies to make this site work and collect information about how you use our service.</p>
+
+  <h3 class="govuk-heading-m">Essential cookies</h3>
+
+  <p class="govuk-body">Essential cookies keep your information secure while you use this service. We do not need to ask permission to use them.</p>
+
+  {{ govukTable({
+    caption: "Essential cookies",
+    captionClasses: "govuk-table__caption--m",
+    head: [
+      {
+        text: "Name"
+      },
+      {
+        text: "Purpose"
+      },
+      {
+        text: "Expires"
+      }
+    ],
+    rows: [
+      [
+        {
+          text: "cookies_policy"
+        },
+        {
+          text: "Saves your cookie consent settings"
+        },
+        {
+          text: "1 year"
+        }
+      ]
+    ]
+  }) }}
+
+{% endblock %}
