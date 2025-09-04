@@ -1,0 +1,56 @@
+{% from "govuk/components/cookie-banner/macro.njk" import govukCookieBanner %}
+<noscript>
+  {{ govukCookieBanner({
+  ariaLabel: "Administration of the health and welfare of your livestock",
+  messages: [
+    {
+      headingText: "Administration of the health and welfare of your livestock",
+      text: "We use cookies to make this service work. To accept or reject cookies, turn on JavaScript in your browser settings or reload this page."
+    }
+  ]
+}) }}
+</noscript>
+<div class="js-cookies-container">
+  <input type="hidden" name="crumbBanner" id="crumbBanner" value="{{ crumb }}" autocomplete="off"/>
+  {% set html %}
+  <p class="govuk-body">We use some essential cookies to make this service work.</p>
+  {% endset %}
+  {% set acceptHtml %}
+  <p class="govuk-body">You’ve accepted cookies.</p>
+  {% endset %}
+  {{ govukCookieBanner({
+    ariaLabel: "Administration of the health and welfare of your livestock",
+    classes: "js-cookies-banner",
+    messages: [
+      {
+        headingText: "Administration of the health and welfare of your livestock",
+        html: html,
+        classes: "js-question-banner",
+        actions: [
+          {
+            text: "Accept cookies",
+            type: "button",
+            name: "cookies",
+            value: "accept",
+            classes: "js-cookies-button-accept"
+          },
+          {
+            text: "View cookies",
+            href: "/cookies"
+          }
+        ]
+      },{
+        html: acceptHtml,
+        role: "alert",
+        hidden: true,
+        classes: "js-cookies-accepted",
+        actions: [
+          {
+            text: "Hide cookie message",
+            classes: "js-hide"
+          }
+        ]
+      }
+    ]
+  }) }}
+</div>

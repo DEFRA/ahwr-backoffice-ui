@@ -9,3 +9,4 @@ coverage
 .cache
 .envrc
 tsconfig.tsbuildinfo
+src/frontend/dist/
