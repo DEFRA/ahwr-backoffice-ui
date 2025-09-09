@@ -1,25 +1,23 @@
 import Joi from 'joi'
-import { permissions } from '../auth/permissions.js'
-import { config } from '../config/index.js'
+// import { permissions } from '../auth/permissions.js'
+// import { config } from '../config/index.js'
 import { setAppSearch, getAppSearch } from '../session/index.js'
 import { sessionKeys } from '../session/keys.js'
 import { viewModel } from './models/application-list.js'
 import { searchValidation } from '../lib/search-validation.js'
 import { generateNewCrumb } from './utils/crumb-cache.js'
 
-const { administrator, processor, user, recommender, authoriser } = permissions
-const { displayPageSize } = config
+// const { administrator, processor, user, recommender, authoriser } = permissions
+const { displayPageSize } = { displayPageSize: 10 } // TODO 1061 config
 const viewTemplate = 'agreements'
 const currentPath = `/${viewTemplate}`
 
-export const agreementsRoutes = [
+export const agreements = [
   {
     method: 'GET',
     path: currentPath,
     options: {
-      auth: {
-        scope: [administrator, processor, user, recommender, authoriser]
-      },
+      // TODO 1061 auth: { scope: [administrator, processor, user, recommender, authoriser] },
       validate: {
         query: Joi.object({
           page: Joi.number().greater(0).default(1),
@@ -36,9 +34,7 @@ export const agreementsRoutes = [
     method: 'GET',
     path: `${currentPath}/clear`,
     options: {
-      auth: {
-        scope: [administrator, processor, user, recommender, authoriser]
-      },
+      // TODO 1061 auth: { scope: [administrator, processor, user, recommender, authoriser] },
       handler: async (request, h) => {
         setAppSearch(request, sessionKeys.appSearch.filterStatus, [])
         return h.view(viewTemplate, await viewModel(request)) // NOSONAR
@@ -49,9 +45,7 @@ export const agreementsRoutes = [
     method: 'GET',
     path: `${currentPath}/remove/{status}`,
     options: {
-      auth: {
-        scope: [administrator, processor, user, recommender, authoriser]
-      },
+      // TODO 1061 auth: { scope: [administrator, processor, user, recommender, authoriser] },
       validate: {
         params: Joi.object({
           status: Joi.string()
@@ -72,9 +66,7 @@ export const agreementsRoutes = [
     method: 'POST',
     path: `${currentPath}`,
     options: {
-      auth: {
-        scope: [administrator, processor, user, recommender, authoriser]
-      },
+      // TODO 1061 auth: { scope: [administrator, processor, user, recommender, authoriser] },
       validate: {
         query: Joi.object({
           page: Joi.number().greater(0).default(1),
@@ -124,9 +116,7 @@ export const agreementsRoutes = [
     method: 'GET',
     path: `${currentPath}/sort/{field}/{direction}`,
     options: {
-      auth: {
-        scope: [administrator, processor, user, recommender, authoriser]
-      },
+      // TODO 1061 auth: { scope: [administrator, processor, user, recommender, authoriser] },
       validate: {
         params: Joi.object({
           field: Joi.string(),
@@ -142,3 +132,12 @@ export const agreementsRoutes = [
     }
   }
 ]
+
+export const agreementsRoutes = {
+  plugin: {
+    name: 'agreements',
+    register(server) {
+      server.route(agreements)
+    }
+  }
+}

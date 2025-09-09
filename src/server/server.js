@@ -14,7 +14,7 @@ import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
 import { secureContext } from '@defra/hapi-secure-context'
 // import { authPlugin } from '../plugins/auth.js'
 // import { cookiePlugin } from '../plugins/cookies.js'
-// import { crumbPlugin } from '../plugins/crumb.js'
+import { crumbPlugin } from '../plugins/crumb.js'
 // import { errorPagesPlugin } from '../plugins/error-pages.js'
 // import { headerPlugin } from '../plugins/header.js'
 // import { loggerPlugin } from '../plugins/logger.js'
@@ -67,8 +67,8 @@ export async function createServer() {
     pulse,
     sessionCache,
     nunjucksConfig,
-    router // Register all the controllers/routes defined in src/server/router.js
-    // crumbPlugin,
+    router, // Register all the controllers/routes defined in src/server/router.js
+    crumbPlugin
     // inertPlugin,
     // sessionPlugin,
     // cookiePlugin,

@@ -7,7 +7,7 @@ import { serveStaticFiles } from './common/helpers/serve-static-files.js'
 // import { accessibilityRoute } from '../routes/accessibility.js'
 // import { accountRoute } from '../routes/account.js'
 // import { agreementRoutes } from '../routes/agreement.js'
-// import { agreementsRoutes } from '../routes/agreements.js'
+import { agreementsRoutes } from '../routes/agreements.js'
 // import { approveApplicationClaimRoute } from '../routes/approve-application-claim.js'
 import { assetsRoute } from '../routes/assets.js'
 // import { authenticateRoute } from '../routes/authenticate.js'
@@ -15,7 +15,7 @@ import { assetsRoute } from '../routes/assets.js'
 // import { claimsRoutes } from '../routes/claims.js'
 // import { devAuthRoute } from '../routes/dev-auth.js'
 // import { flagsRoutes } from '../routes/flags.js'
-// import { homeRoute } from '../routes/home.js'
+import { homeRoute } from '../routes/home.js'
 // import { loginRoute } from '../routes/login.js'
 // import { logOutRoute } from '../routes/logout.js'
 // import { moveToInCheckRoute } from '../routes/move-to-in-check.js'
@@ -33,7 +33,7 @@ const routes = [
   // accessibilityRoute,
   // accountRoute,
   // ...agreementRoutes,
-  // ...agreementsRoutes,
+  agreementsRoutes,
   // approveApplicationClaimRoute,
   assetsRoute,
   // authenticateRoute,
@@ -41,7 +41,7 @@ const routes = [
   // ...claimsRoutes,
   // devAuthRoute,
   // ...flagsRoutes,
-  // homeRoute,
+  homeRoute,
   // loginRoute,
   // logOutRoute,
   // moveToInCheckRoute,

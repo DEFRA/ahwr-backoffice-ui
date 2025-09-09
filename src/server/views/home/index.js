@@ -6,12 +6,12 @@ import { homeController } from './controller.js'
  */
 export const home = {
   plugin: {
-    name: 'home',
+    name: 'demo1',
     register(server) {
       server.route([
         {
           method: 'GET',
-          path: '/',
+          path: '/demo1',
           ...homeController
         }
       ])
