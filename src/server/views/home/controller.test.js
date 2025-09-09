@@ -36,7 +36,7 @@ describe('#homeController', () => {
 
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/'
+      url: '/demo1'
     })
 
     expect(result).toEqual(

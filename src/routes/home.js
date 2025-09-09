@@ -1,14 +1,23 @@
-import { permissions } from '../auth/permissions.js'
+// import { permissions } from '../auth/permissions.js'
 
-const { administrator, processor, user, recommender, authoriser } = permissions
+// const { administrator, processor, user, recommender, authoriser } = permissions
 
-export const homeRoute = {
+const home = {
   method: 'GET',
   path: '/',
   options: {
-    auth: { scope: [administrator, processor, user, recommender, authoriser] },
+    // // TODO 1061 auth: { scope: [administrator, processor, user, recommender, authoriser] },
     handler: async (_, h) => {
-      return h.redirect('/claims')
+      return h.redirect('/agreements') // TODO switch back to /claims
+    }
+  }
+}
+
+export const homeRoute = {
+  plugin: {
+    name: 'home',
+    register(server) {
+      server.route([home])
     }
   }
 }

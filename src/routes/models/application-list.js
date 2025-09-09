@@ -5,9 +5,9 @@ import { getAppSearch } from '../../session/index.js'
 import { getStyleClassByStatus } from '../../constants/status.js'
 import { upperFirstLetter } from '../../lib/display-helper.js'
 import { FLAG_EMOJI } from '../utils/ui-constants.js'
-import { config } from '../../config/index.js'
+// import { config } from '../../config/index.js'
 
-const { serviceUri } = config
+// TODO 1061 NEED? const { serviceUri } = config
 
 export const viewModel = (request, page) => {
   return (async () => {
@@ -109,8 +109,8 @@ const buildApplicationList = (applications, page) => {
       {
         html:
           app.type === 'EE'
-            ? `<a href="${serviceUri}/agreement/${app.reference}/claims?page=${page}">View claims</a>`
-            : `<a href="${serviceUri}/view-agreement/${app.reference}?page=${page}">View details</a>`
+            ? `<a href="/agreement/${app.reference}/claims?page=${page}">View claims</a>`
+            : `<a href="/view-agreement/${app.reference}?page=${page}">View details</a>`
       }
     ]
 
