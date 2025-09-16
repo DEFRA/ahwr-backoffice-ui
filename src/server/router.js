@@ -17,7 +17,7 @@ import { devAuthRoute } from '../routes/dev-auth.js'
 // import { flagsRoutes } from '../routes/flags.js'
 import { homeRoute } from '../routes/home.js'
 import { loginRoute } from '../routes/login.js'
-// import { logOutRoute } from '../routes/logout.js'
+import { logOutRoute } from '../routes/logout.js'
 // import { moveToInCheckRoute } from '../routes/move-to-in-check.js'
 // import { privacyPolicyRoute } from '../routes/privacy-policy.js'
 // import { recommendToPayRoute } from '../routes/recommend-to-pay.js'
@@ -43,7 +43,7 @@ const routes = [
   // ...flagsRoutes,
   homeRoute,
   loginRoute,
-  // logOutRoute,
+  logOutRoute,
   // moveToInCheckRoute,
   // privacyPolicyRoute,
   // recommendToPayRoute,
