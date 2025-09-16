@@ -1,6 +1,6 @@
 import { auth } from '../auth/index.js'
 
-export const loginRoute = {
+const login = {
   method: 'GET',
   path: '/login',
   options: {
@@ -16,5 +16,14 @@ export const loginRoute = {
       request.logger.setBindings({ err })
     }
     return h.view('error-pages/500').code(500)
+  }
+}
+
+export const loginRoute = {
+  plugin: {
+    name: 'login',
+    register(server) {
+      server.route([login])
+    }
   }
 }

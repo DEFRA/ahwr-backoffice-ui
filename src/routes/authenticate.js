@@ -1,6 +1,6 @@
 import { auth } from '../auth/index.js'
 
-export const authenticateRoute = {
+const authenticate = {
   method: 'GET',
   path: '/authenticate',
   options: {
@@ -16,5 +16,14 @@ export const authenticateRoute = {
     }
 
     return h.view('error-pages/500').code(500)
+  }
+}
+
+export const authenticateRoute = {
+  plugin: {
+    name: 'authenticate',
+    register(server) {
+      server.route([authenticate])
+    }
   }
 }

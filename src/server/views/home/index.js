@@ -12,6 +12,9 @@ export const home = {
         {
           method: 'GET',
           path: '/demo1',
+          options: {
+            auth: false
+          },
           ...homeController
         }
       ])
