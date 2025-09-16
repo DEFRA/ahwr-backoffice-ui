@@ -12,7 +12,7 @@ import { requestLogger } from './common/helpers/logging/request-logger.js'
 import { sessionCache } from './common/helpers/session-cache/session-cache.js'
 import { getCacheEngine } from './common/helpers/session-cache/cache-engine.js'
 import { secureContext } from '@defra/hapi-secure-context'
-// import { authPlugin } from '../plugins/auth.js'
+import { authPlugin } from '../plugins/auth.js'
 // import { cookiePlugin } from '../plugins/cookies.js'
 import { crumbPlugin } from '../plugins/crumb.js'
 // import { errorPagesPlugin } from '../plugins/error-pages.js'
@@ -60,7 +60,7 @@ export async function createServer() {
     }
   })
   await server.register([
-    // TODO 1061 await server.register(authPlugin)
+    authPlugin,
     requestLogger,
     requestTracing,
     secureContext,

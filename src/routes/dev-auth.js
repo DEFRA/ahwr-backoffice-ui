@@ -1,6 +1,6 @@
 import { auth } from '../auth/index.js'
 
-export const devAuthRoute = {
+const devAuth = {
   method: 'GET',
   path: '/dev-auth',
   options: {
@@ -15,5 +15,14 @@ export const devAuthRoute = {
       request.logger.setBindings({ err })
     }
     return h.view('error-pages/500').code(500)
+  }
+}
+
+export const devAuthRoute = {
+  plugin: {
+    name: 'dev-auth',
+    register(server) {
+      server.route([devAuth])
+    }
   }
 }

@@ -1,7 +1,11 @@
-import { config } from '../config/index.js'
+import { config } from '../config/config.js'
 import { ConfidentialClientApplication, LogLevel } from '@azure/msal-node'
 
-const msalLogging = config.isProd
+const isProd = config.get('isProduction')
+const auth = config.get('auth')
+const authRedirectUrl = config.get('auth.redirectUrl')
+
+const msalLogging = isProd
   ? {}
   : {
       loggerCallback(_loglevel, message, _containsPii) {
@@ -15,7 +19,7 @@ let msalClientApplication
 
 export const init = () => {
   msalClientApplication = new ConfidentialClientApplication({
-    auth: config.auth,
+    auth,
     system: { loggerOptions: msalLogging }
   })
 }
@@ -23,7 +27,7 @@ export const init = () => {
 export const getAuthenticationUrl = () => {
   const authCodeUrlParameters = {
     prompt: 'select_account', // Force the MS account select dialog
-    redirectUri: config.auth.redirectUrl
+    redirectUri: authRedirectUrl
   }
 
   return msalClientApplication.getAuthCodeUrl(authCodeUrlParameters)
@@ -32,7 +36,7 @@ export const getAuthenticationUrl = () => {
 export const authenticate = async (redirectCode, cookieAuth) => {
   const token = await msalClientApplication.acquireTokenByCode({
     code: redirectCode,
-    redirectUri: config.auth.redirectUrl
+    redirectUri: authRedirectUrl
   })
 
   cookieAuth.set({

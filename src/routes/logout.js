@@ -1,6 +1,6 @@
 import { auth } from '../auth/index.js'
 
-export const logOutRoute = {
+const logOut = {
   method: 'GET',
   path: '/logout',
   handler: async (request, h) => {
@@ -12,6 +12,15 @@ export const logOutRoute = {
     } catch (err) {
       request.logger.setBindings({ err })
       throw err
+    }
+  }
+}
+
+export const logOutRoute = {
+  plugin: {
+    name: 'logOut',
+    register(server) {
+      server.route([logOut])
     }
   }
 }

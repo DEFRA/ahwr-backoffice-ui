@@ -1,5 +1,5 @@
 import Joi from 'joi'
-// import { permissions } from '../auth/permissions.js'
+import { permissions } from '../auth/permissions.js'
 // import { config } from '../config/index.js'
 import { setAppSearch, getAppSearch } from '../session/index.js'
 import { sessionKeys } from '../session/keys.js'
@@ -7,7 +7,7 @@ import { viewModel } from './models/application-list.js'
 import { searchValidation } from '../lib/search-validation.js'
 import { generateNewCrumb } from './utils/crumb-cache.js'
 
-// const { administrator, processor, user, recommender, authoriser } = permissions
+const { administrator, processor, user, recommender, authoriser } = permissions
 const { displayPageSize } = { displayPageSize: 10 } // TODO 1061 config
 const viewTemplate = 'agreements'
 const currentPath = `/${viewTemplate}`
@@ -17,7 +17,9 @@ export const agreements = [
     method: 'GET',
     path: currentPath,
     options: {
-      // TODO 1061 auth: { scope: [administrator, processor, user, recommender, authoriser] },
+      auth: {
+        scope: [administrator, processor, user, recommender, authoriser]
+      },
       validate: {
         query: Joi.object({
           page: Joi.number().greater(0).default(1),

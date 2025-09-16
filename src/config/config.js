@@ -225,6 +225,38 @@ export const config = convict({
       default: 'x-cdp-request-id',
       env: 'TRACING_HEADER'
     }
+  },
+  auth: {
+    enabled: {
+      doc: 'Is auth enabled',
+      format: Boolean,
+      default: false,
+      env: 'AADAR_ENABLED'
+    },
+    clientSecret: {
+      doc: 'clientSecret',
+      format: String,
+      default: '',
+      env: 'AADAR_CLIENT_SECRET'
+    },
+    clientId: {
+      doc: 'clientId',
+      format: String,
+      default: '',
+      env: 'AADAR_CLIENT_ID'
+    },
+    authority: {
+      doc: 'authority',
+      format: String,
+      default: '',
+      env: 'AADAR_AUTHORITY_URL'
+    },
+    redirectUrl: {
+      doc: 'redirectUrl',
+      format: String,
+      default: '',
+      env: 'AADAR_REDIRECT_URL'
+    }
   }
 })
 

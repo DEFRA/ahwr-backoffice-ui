@@ -10,14 +10,14 @@ import { serveStaticFiles } from './common/helpers/serve-static-files.js'
 import { agreementsRoutes } from '../routes/agreements.js'
 // import { approveApplicationClaimRoute } from '../routes/approve-application-claim.js'
 import { assetsRoute } from '../routes/assets.js'
-// import { authenticateRoute } from '../routes/authenticate.js'
+import { authenticateRoute } from '../routes/authenticate.js'
 // import { claimsDataRoutes } from '../routes/claims-data.js'
 // import { claimsRoutes } from '../routes/claims.js'
-// import { devAuthRoute } from '../routes/dev-auth.js'
+import { devAuthRoute } from '../routes/dev-auth.js'
 // import { flagsRoutes } from '../routes/flags.js'
 import { homeRoute } from '../routes/home.js'
-// import { loginRoute } from '../routes/login.js'
-// import { logOutRoute } from '../routes/logout.js'
+import { loginRoute } from '../routes/login.js'
+import { logOutRoute } from '../routes/logout.js'
 // import { moveToInCheckRoute } from '../routes/move-to-in-check.js'
 // import { privacyPolicyRoute } from '../routes/privacy-policy.js'
 // import { recommendToPayRoute } from '../routes/recommend-to-pay.js'
@@ -36,14 +36,14 @@ const routes = [
   agreementsRoutes,
   // approveApplicationClaimRoute,
   assetsRoute,
-  // authenticateRoute,
+  authenticateRoute,
   // ...claimsDataRoutes,
   // ...claimsRoutes,
-  // devAuthRoute,
+  devAuthRoute,
   // ...flagsRoutes,
   homeRoute,
-  // loginRoute,
-  // logOutRoute,
+  loginRoute,
+  logOutRoute,
   // moveToInCheckRoute,
   // privacyPolicyRoute,
   // recommendToPayRoute,

@@ -5,7 +5,7 @@ import {
   getApplicationHistory,
   getApplicationEvents
 } from '../api/applications.js'
-// import { permissions } from '../auth/permissions.js'
+import { permissions } from '../auth/permissions.js'
 import { getStyleClassByStatus } from '../constants/status.js'
 import { getClaimViewStates } from './utils/get-claim-view-states.js'
 import { getCurrentStatusEvent } from './utils/get-current-status-event.js'
@@ -22,13 +22,13 @@ import { getApplicationDetails } from './models/application-details.js'
 import { getHistoryDetails } from './models/application-history.js'
 import { getApplicationClaimDetails } from './models/application-claim.js'
 
-// const { administrator, processor, user, recommender, authoriser } = permissions
+const { administrator, processor, user, recommender, authoriser } = permissions
 
 const viewAgreement = {
   method: 'get',
   path: '/view-agreement/{reference}',
   options: {
-    // TODO 1061 auth: { scope: [administrator, processor, user, recommender, authoriser] },
+    auth: { scope: [administrator, processor, user, recommender, authoriser] },
     validate: {
       params: joi.object({
         reference: joi.string()

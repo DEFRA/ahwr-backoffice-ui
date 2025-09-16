@@ -1,6 +1,10 @@
-import { config } from '../config/index.js'
 import authCookie from '@hapi/cookie'
 import { auth } from '../auth/index.js'
+import { config } from '../config/config.js'
+
+const cookiePassword = config.get('session.cookie.password')
+const cookieTTL = config.get('session.cookie.ttl')
+const isProd = config.get('isProduction')
 
 export const authPlugin = {
   plugin: {
@@ -11,10 +15,10 @@ export const authPlugin = {
       server.auth.strategy('session-auth', 'cookie', {
         cookie: {
           name: 'session-auth',
-          password: config.cookie.password,
-          ttl: config.cookie.ttl,
+          password: cookiePassword,
+          ttl: cookieTTL,
           path: '/',
-          isSecure: config.isProd,
+          isSecure: isProd,
           isSameSite: 'Lax' // Needed for the post authentication redirect
         },
         keepAlive: true, // Resets the cookie ttl after each route
