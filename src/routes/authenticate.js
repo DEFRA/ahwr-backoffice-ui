@@ -9,7 +9,7 @@ const authenticate = {
   handler: async (request, h) => {
     try {
       await auth.authenticate(request.query.code, request.cookieAuth)
-      return h.redirect('/claims')
+      return h.redirect('/agreements') // TODO switch back to /claims
     } catch (err) {
       request.logger.setBindings({ err })
       request.logger.error(err.message)
