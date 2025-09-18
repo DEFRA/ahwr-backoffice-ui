@@ -1,6 +1,10 @@
 @use "govuk-frontend" as *;
-
-// Example namespaced custom element style CSS classes
+// $govuk-assets-path: "~govuk-frontend/dist/govuk/assets/";
+// @import "~govuk-frontend/dist/govuk/all";
+// @import "../../../frontend/src/css/app-task-list";
+// @import "../../../frontend/src/css/guidance-layout";
+// @import "../../../frontend/src/css/update-form";
+// @import "../../../frontend/src/css/flagged-item";
 
 .govuk-width-container,
 .moj-header__container,
@@ -14,3 +18,276 @@
   padding-top: govuk-spacing(4);
   padding-bottom: govuk-spacing(3);
 }
+
+// $moj-assets-path: "~@ministryofjustice/frontend/moj/assets/";
+
+// @import "@ministryofjustice/frontend/moj/all";
+
+// .nojs-hidden {
+//   display: none;
+// }
+
+// .moj-action-bar__filter.hide_pseudo_after::after {
+//   display: none;
+// }
+
+// .js-enabled .nojs-hidden {
+//   display: block;
+// }
+
+// .check-your-answers {
+//   td {
+//     vertical-align: top;
+
+//     // stylelint-disable selector-no-qualifying-type
+//     &.required {
+//       color: $govuk-error-colour;
+//     }
+//   }
+
+//   .change-answer {
+//     text-align: right;
+//     padding-right: 0;
+//   }
+// }
+
+// .govuk-prose-scope {
+//   // @extend inheritance
+
+//   // Contextual heading and paragraph combinations are inherited
+//   // through the use of @extend
+
+//   h1 {
+//     @extend %govuk-heading-xl;
+//   }
+
+//   h2 {
+//     @extend %govuk-heading-l;
+//   }
+
+//   h3 {
+//     @extend %govuk-heading-m;
+//   }
+
+//   h4 {
+//     @extend %govuk-heading-s;
+//   }
+
+//   p {
+//     @extend %govuk-body-m;
+//   }
+
+//   strong,
+//   b {
+//     @include govuk-typography-weight-bold;
+//   }
+
+//   ul,
+//   ol {
+//     @extend %govuk-list;
+//   }
+
+//   ol {
+//     @extend %govuk-list--number;
+//   }
+
+//   ul {
+//     @extend %govuk-list--bullet;
+//   }
+
+//   a {
+//     @extend %govuk-link;
+//   }
+
+//   hr {
+//     @extend %govuk-section-break;
+//     @extend %govuk-section-break--visible;
+//     @extend %govuk-section-break--xl;
+//   }
+// }
+
+// .map {
+//   height: 500px;
+//   width: 100%;
+//   margin-bottom: 10px;
+// }
+
+// .disabled {
+//   pointer-events: none;
+//   text-decoration: none;
+//   cursor: default;
+//   color: "black";
+// }
+
+// user search box
+.user-search-box .govuk-form-group {
+  margin-left: 20px;
+  margin-bottom: 10px;
+}
+
+.user-search-box {
+  position: relative;
+}
+
+.user-search-box .govuk-input {
+  padding-right: 45px;
+  width: 100%;
+}
+
+.user-search-box .search-button,
+.user-search-box .search-button:active {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  border-width: 0 0 0 2px;
+  border-style: solid;
+  border-left-color: #000000;
+  box-sizing: border-box;
+  margin-bottom: 0;
+  cursor: pointer;
+  border-radius: 0;
+  padding: 0;
+  width: 38px;
+  height: 36px;
+  background-image: url("../../images/search-icon.png");
+  background-repeat: no-repeat;
+  background-position: 2px 50%;
+  text-indent: 115%;
+  overflow: hidden;
+  white-space: nowrap;
+  background-color: #1d70b8;
+  box-shadow: none;
+}
+
+.user-search-box .search-button:hover,
+.user-search-box .search-button:focus,
+.user-search-box .search-button:active:hover,
+.user-search-box .search-button:active:focus {
+  background-color: #003078;
+}
+
+// .filter-block {
+//   padding-top: 30px;
+//   border-top: 1px solid #b1b4b6;
+//   margin: 30px 0 1px;
+// }
+
+// // pagination from: https://home-office-digital-patterns.herokuapp.com/components/pagination
+// .pagination {
+//   font-family: "GDS Transport", arial, sans-serif;
+//   padding: 0;
+//   margin: 0;
+//   display: inline-block;
+// }
+
+// .pagination__item {
+//   display: inline-block;
+//   list-style: none;
+// }
+
+// .pagination__link {
+//   padding: 5px;
+//   text-decoration: none;
+//   font-size: 16px;
+//   color: #005ea5;
+//   display: inline-block;
+//   margin-right: 15px;
+//   background-color: transparent;
+//   border: 0;
+//   cursor: pointer;
+// }
+
+// .pagination__link:hover,
+// .pagination__link:focus {
+//   background: #f8f8f8;
+//   outline: 3px solid #ffbf47;
+// }
+
+// .pagination__link.current {
+//   font-weight: 700;
+// }
+
+// .pagination__link.current,
+// .pagination__link.disabled {
+//   color: #0b0c0c;
+//   border: none;
+//   pointer-events: none;
+//   cursor: default;
+//   font-family: "GDS Transport", arial, sans-serif;
+// }
+
+// a.pagination__link:hover,
+// a.pagination__link:focus {
+//   background: #f8f8f8;
+//   outline: 3px solid #ffbf47;
+// }
+
+// .pagination__summary {
+//   font-family: "GDS Transport", arial, sans-serif;
+//   line-height: 30px;
+// }
+
+// @media (min-width: 642px) {
+//   .pagination__summary {
+//     float: right;
+//   }
+// }
+
+// .govuk-link {
+//   color: #d4351c;
+// }
+
+// .govuk-panel--confirmation {
+//   background-color: #fafafa;
+//   border-color: #000000;
+//   border-width: medium;
+
+//   h1 {
+//     color: #000000;
+//   }
+// }
+
+// .app-long-tag,
+// .app-long-tag .govuk-tag {
+//   max-width: 300px;
+// }
+
+// .fixed-layout-table {
+//   table-layout: fixed;
+//   width: 100%;
+// }
+
+// .col-12 {
+//   width: 12%;
+// }
+
+// .col-6 {
+//   width: 6%;
+// }
+
+// .col-25 {
+//   width: 25%;
+// }
+
+// .align-left {
+//   text-align: start;
+// }
+
+// @media (max-width: 1575px) {
+//   .responsive-text {
+//     // stylelint-disable-next-line declaration-no-important
+//     font-size: 16px !important;
+//   }
+// }
+
+// @media (max-width: 1310px) {
+//   .responsive-text {
+//     // stylelint-disable-next-line declaration-no-important
+//     font-size: 14px !important;
+//   }
+// }
+
+// .no-line-break {
+//   border-bottom: none;
+// }
+
