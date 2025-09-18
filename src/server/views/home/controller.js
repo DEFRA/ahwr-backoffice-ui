@@ -53,14 +53,14 @@ const getPageData = async (claimReference, applicationReference) => {
 
 const getApplicationFromBackend = async (applicationReference) => {
   const response = await fetch(
-    `${config.get('session.cache.apiEndpointApplication')}/application/get/${applicationReference}`
+    `${config.get('apiEndpointApplication')}/application/get/${applicationReference}`
   )
   return await response.json()
 }
 
 const getClaimFromBackend = async (claimReference) => {
   const response = await fetch(
-    `${config.get('session.cache.apiEndpointApplication')}/claim/get-by-reference/${claimReference}`
+    `${config.get('apiEndpointApplication')}/claim/get-by-reference/${claimReference}`
   )
   return await response.json()
 }

@@ -1,7 +1,7 @@
 import wreck from '@hapi/wreck'
 import { config } from '../config/config.js'
 
-const applicationApiUri = config.get('session.cache.apiEndpointApplication')
+const applicationApiUri = config.get('apiEndpointApplication')
 
 export async function getApplication(applicationReference, logger) {
   const endpoint = `${applicationApiUri}/application/get/${applicationReference}`

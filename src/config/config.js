@@ -132,17 +132,11 @@ export const config = convict({
         default: 'session',
         env: 'SESSION_CACHE_NAME'
       },
-      ttl: {
-        doc: 'server side session cache ttl',
+      expiresIn: {
+        doc: 'server side session cache expiresIn',
         format: Number,
         default: fourHoursMs,
-        env: 'SESSION_CACHE_TTL'
-      },
-      apiEndpointApplication: {
-        doc: 'AHWR application backend endpoint',
-        format: String,
-        default: '',
-        env: 'AHWR_APPLICATION_BACKEND_URL'
+        env: 'SESSION_CACHE_EXPIRES_IN'
       }
     },
     cookie: {
@@ -159,11 +153,25 @@ export const config = convict({
         env: 'SESSION_COOKIE_PASSWORD',
         sensitive: true
       },
-      secure: {
+      isSecure: {
         doc: 'set secure flag on cookie',
         format: Boolean,
         default: isProduction,
         env: 'SESSION_COOKIE_SECURE'
+      },
+      isSameSite: {
+        doc: 'isSameSite',
+        format: String,
+        default: 'Lax',
+        env: 'SESSION_COOKIE_IS_SAME_SITE',
+        sensitive: true
+      },
+      cookieNameSession: {
+        doc: 'cookieNameSession',
+        format: String,
+        default: 'ahwr_backoffice_ui_session',
+        env: 'SESSION_COOKIE_NAME_SESSION',
+        sensitive: true
       }
     }
   },
@@ -257,6 +265,12 @@ export const config = convict({
       default: '',
       env: 'AADAR_REDIRECT_URL'
     }
+  },
+  apiEndpointApplication: {
+    doc: 'AHWR application backend endpoint',
+    format: String,
+    default: '',
+    env: 'AHWR_APPLICATION_BACKEND_URL'
   }
 })
 

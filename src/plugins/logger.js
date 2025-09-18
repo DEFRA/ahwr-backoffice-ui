@@ -36,12 +36,12 @@ const err = (err) => ({
 export const loggerPlugin = {
   plugin: pino,
   options: {
-    name: 'ffc-ahwr-backoffice',
+    name: 'ahwr-backoffice-ui',
     ...(process.env.NODE_ENV === 'test' && testLevel),
     formatters: {
       level: (level) => ({ level })
     },
-    ignorePaths: ['/healthy', '/healthz'],
+    ignorePaths: ['/health'],
     ignoreTags: ['assets'],
     serializers: {
       req,
