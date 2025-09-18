@@ -165,13 +165,6 @@ export const config = convict({
         default: 'Lax',
         env: 'SESSION_COOKIE_IS_SAME_SITE',
         sensitive: true
-      },
-      cookieNameSession: {
-        doc: 'cookieNameSession',
-        format: String,
-        default: 'ahwr_backoffice_ui_session',
-        env: 'SESSION_COOKIE_NAME_SESSION',
-        sensitive: true
       }
     }
   },
