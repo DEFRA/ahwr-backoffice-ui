@@ -1,5 +1,7 @@
-import { config } from '../config/index.js'
 import yar from '@hapi/yar'
+import { config as convictConfig } from '../config/config.js'
+
+const config = convictConfig.get('session')
 
 export const sessionPlugin = {
   plugin: yar,

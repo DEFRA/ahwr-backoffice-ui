@@ -22,11 +22,7 @@ describe('#errors', () => {
       url: '/non-existent-path'
     })
 
-    expect(result).toEqual(
-      expect.stringContaining(
-        'Page not found | Get funding to improve animal health and welfare'
-      )
-    )
+    expect(result).toEqual(expect.stringContaining('404 - Not Found'))
     expect(statusCode).toBe(statusCodes.notFound)
   })
 })

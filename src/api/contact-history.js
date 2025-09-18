@@ -4,7 +4,7 @@ import { config } from '../config/config.js'
 
 const { fieldsNames, labels, notAvailable } = contactHistory
 
-const applicationApiUri = config.get('session.cache.apiEndpointApplication')
+const applicationApiUri = config.get('apiEndpointApplication')
 
 export async function getContactHistory(reference, logger) {
   const endpoint = `${applicationApiUri}/application/contact-history/${reference}`
