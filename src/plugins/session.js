@@ -6,8 +6,8 @@ const config = convictConfig.get('session')
 export const sessionPlugin = {
   plugin: yar,
   options: {
-    name: config.cookie.cookieNameSession,
-    maxCookieSize: config.useRedis ? 0 : 1024, // Non-zero cookie size required when not using redis e.g for testing
+    name: config.cache.name,
+    // maxCookieSize: config.useRedis ? 0 : 1024, // Non-zero cookie size required when not using redis e.g for testing
     cache: {
       cache: config.cache.name,
       expiresIn: config.cache.expiresIn
@@ -17,9 +17,9 @@ export const sessionPlugin = {
     cookieOptions: {
       // isHttpOnly: true,
       // isSameSite: config.cookie.isSameSite,
-      isSecure: config.cookie.isSecure,
       password: config.cookie.password,
       ttl: config.cache.expiresIn,
+      isSecure: config.cookie.isSecure,
       clearInvalid: true
     }
   }
