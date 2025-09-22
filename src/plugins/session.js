@@ -19,7 +19,7 @@ export const sessionPlugin = {
       // isSameSite: config.cookie.isSameSite,
       password: config.cookie.password,
       ttl: config.cache.expiresIn,
-      isSecure: config.cookie.isSecure,
+      isSecure: config.cookie.secure,
       clearInvalid: true
     }
   }
