@@ -36,7 +36,9 @@ export const agreements = [
     method: 'GET',
     path: `${currentPath}/clear`,
     options: {
-      // TODO 1061 auth: { scope: [administrator, processor, user, recommender, authoriser] },
+      auth: {
+        scope: [administrator, processor, user, recommender, authoriser]
+      },
       handler: async (request, h) => {
         setAppSearch(request, sessionKeys.appSearch.filterStatus, [])
         return h.view(viewTemplate, await viewModel(request)) // NOSONAR
@@ -47,7 +49,9 @@ export const agreements = [
     method: 'GET',
     path: `${currentPath}/remove/{status}`,
     options: {
-      // TODO 1061 auth: { scope: [administrator, processor, user, recommender, authoriser] },
+      auth: {
+        scope: [administrator, processor, user, recommender, authoriser]
+      },
       validate: {
         params: Joi.object({
           status: Joi.string()
@@ -68,7 +72,9 @@ export const agreements = [
     method: 'POST',
     path: `${currentPath}`,
     options: {
-      // TODO 1061 auth: { scope: [administrator, processor, user, recommender, authoriser] },
+      auth: {
+        scope: [administrator, processor, user, recommender, authoriser]
+      },
       validate: {
         query: Joi.object({
           page: Joi.number().greater(0).default(1),
@@ -118,7 +124,9 @@ export const agreements = [
     method: 'GET',
     path: `${currentPath}/sort/{field}/{direction}`,
     options: {
-      // TODO 1061 auth: { scope: [administrator, processor, user, recommender, authoriser] },
+      auth: {
+        scope: [administrator, processor, user, recommender, authoriser]
+      },
       validate: {
         params: Joi.object({
           field: Joi.string(),

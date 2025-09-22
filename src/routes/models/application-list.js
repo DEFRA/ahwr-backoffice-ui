@@ -5,9 +5,6 @@ import { getAppSearch } from '../../session/index.js'
 import { getStyleClassByStatus } from '../../constants/status.js'
 import { upperFirstLetter } from '../../lib/display-helper.js'
 import { FLAG_EMOJI } from '../utils/ui-constants.js'
-// import { config } from '../../config/index.js'
-
-// TODO 1061 NEED? const { serviceUri } = config
 
 export const viewModel = (request, page) => {
   return (async () => {

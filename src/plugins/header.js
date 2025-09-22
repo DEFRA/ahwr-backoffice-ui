@@ -16,9 +16,11 @@ export const headerPlugin = {
     register: (server, options) => {
       server.ext('onPreResponse', (request, h) => {
         const response = request.response
-        options?.keys?.forEach((x) => {
-          response.header(x.key, x.value)
-        })
+        if (response.header) { // TODO 1185 catchAll in errors.js causes error with this check
+          options?.keys?.forEach((x) => {
+            response.header(x.key, x.value)
+          })
+        }
         return h.continue
       })
     }
