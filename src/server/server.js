@@ -15,7 +15,7 @@ import { crumbPlugin } from '../plugins/crumb.js'
 import { errorPagesPlugin } from '../plugins/error-pages.js'
 import { loggerPlugin } from '../plugins/logger.js'
 import { sessionPlugin } from '../plugins/session.js'
-// import { cookiePlugin } from '../plugins/cookies.js'
+import { cookiePlugin } from '../plugins/cookies.js'
 import { headerPlugin } from '../plugins/header.js'
 import { inertPlugin } from '../plugins/inert.js'
 
@@ -67,7 +67,7 @@ export async function createServer() {
     router, // Register all the controllers/routes defined in src/server/router.js
     inertPlugin,
     headerPlugin,
-    // cookiePlugin,
+    cookiePlugin,
     crumbPlugin,
     errorPagesPlugin,
     loggerPlugin
