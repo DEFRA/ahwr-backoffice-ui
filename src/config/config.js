@@ -259,6 +259,12 @@ export const config = convict({
       env: 'AADAR_REDIRECT_URL'
     }
   },
+  serviceUri: {
+    doc: 'AHWR service uri',
+    format: String,
+    default: '',
+    env: 'AHWR_SERVICE_URI'
+  },
   apiEndpointApplication: {
     doc: 'AHWR application backend endpoint',
     format: String,
