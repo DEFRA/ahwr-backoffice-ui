@@ -1,4 +1,6 @@
-import { config } from '../config/index.js'
+import { config } from '../config/config.js'
+
+const serviceUri = config.get('serviceUri')
 
 const getSecurityPolicy = () =>
   "default-src 'self';" +
@@ -16,12 +18,14 @@ export const headerPlugin = {
     register: (server, options) => {
       server.ext('onPreResponse', (request, h) => {
         const response = request.response
+
+        // TODO 1185 catchAll in errors.js causes error without if (response.header)
         if (response.header) {
-          // TODO 1185 catchAll in errors.js causes error with this check
-          // options?.keys?.forEach((x) => {
-          //   response.header(x.key, x.value)
-          // })
+          options?.keys?.forEach((x) => {
+            response.header(x.key, x.value)
+          })
         }
+
         return h.continue
       })
     }
@@ -30,7 +34,7 @@ export const headerPlugin = {
     keys: [
       { key: 'X-Frame-Options', value: 'deny' },
       { key: 'X-Content-Type-Options', value: 'nosniff' },
-      { key: 'Access-Control-Allow-Origin', value: config.serviceUri },
+      { key: 'Access-Control-Allow-Origin', value: serviceUri },
       { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
       { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
       { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
