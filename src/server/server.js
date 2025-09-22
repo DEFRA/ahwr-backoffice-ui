@@ -63,11 +63,11 @@ export async function createServer() {
     requestTracing,
     secureContext,
     pulse,
+    sessionCache,
     nunjucksConfig,
     router, // Register all the controllers/routes defined in src/server/router.js
     crumbPlugin,
     inertPlugin,
-    sessionCache,
     cookiePlugin,
     errorPagesPlugin,
     loggerPlugin,

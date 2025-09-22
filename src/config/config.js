@@ -153,7 +153,7 @@ export const config = convict({
         env: 'SESSION_COOKIE_PASSWORD',
         sensitive: true
       },
-      isSecure: {
+      secure: {
         doc: 'set secure flag on cookie',
         format: Boolean,
         default: isProduction,
