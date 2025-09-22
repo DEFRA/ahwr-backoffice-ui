@@ -16,8 +16,8 @@ import { errorPagesPlugin } from '../plugins/error-pages.js'
 import { loggerPlugin } from '../plugins/logger.js'
 import { sessionPlugin } from '../plugins/session.js'
 // import { cookiePlugin } from '../plugins/cookies.js'
-// import { headerPlugin } from '../plugins/header.js'
-// import { inertPlugin } from '../plugins/inert.js'
+import { headerPlugin } from '../plugins/header.js'
+import { inertPlugin } from '../plugins/inert.js'
 
 export async function createServer() {
   setupProxy()
@@ -65,10 +65,10 @@ export async function createServer() {
     sessionPlugin,
     nunjucksConfig,
     router, // Register all the controllers/routes defined in src/server/router.js
-    crumbPlugin,
-    // inertPlugin,
+    inertPlugin,
+    headerPlugin,
     // cookiePlugin,
-    // headerPlugin
+    crumbPlugin,
     errorPagesPlugin,
     loggerPlugin
   ])

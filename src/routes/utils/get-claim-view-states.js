@@ -1,5 +1,5 @@
 import { CLAIM_STATUS } from 'ffc-ahwr-common-library'
-// import { mapAuth } from '../../auth/map-auth.js'
+import { mapAuth } from '../../auth/map-auth.js'
 
 const getAdminAndRecommenderActions = ({
   isAdminOrRecommender,
@@ -185,14 +185,9 @@ export const getClaimViewStates = (request, statusId, currentStatusEvent) => {
     updateVetRCVSNumber,
     updateEligiblePiiRedaction
   } = request.query
-  // TODO 1061 const { name } = request.auth.credentials.account
-  const name = 'Admin'
-
-  // TODO 1061 const { isAdministrator, isRecommender, isAuthoriser, isSuperAdmin } = mapAuth(request)
-  const isAdministrator = true
-  const isRecommender = true
-  const isAuthoriser = true
-  const isSuperAdmin = true
+  const { name } = request.auth.credentials.account
+  const { isAdministrator, isRecommender, isAuthoriser, isSuperAdmin } =
+    mapAuth(request)
 
   const admActions = getAdminActionsAvailable({
     isAdministrator,
