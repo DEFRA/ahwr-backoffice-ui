@@ -17,12 +17,21 @@ export const headerPlugin = {
     name: 'header',
     register: (server, options) => {
       server.ext('onPreResponse', (request, h) => {
-        const response = request.response
+        let response = request.response
 
-        // TODO 1185 catchAll in errors.js causes error without if (response.header)
-        if (response.header) {
-          options?.keys?.forEach((x) => {
+        // TODO 1185 had to change implementation
+
+        if (!response.isBoom && typeof response.header !== 'function') {
+          response = h.response(response)
+        }
+
+        if (!response.isBoom) {
+          ;(options?.keys || []).forEach((x) => {
             response.header(x.key, x.value)
+          })
+        } else {
+          ;(options?.keys || []).forEach((x) => {
+            response.output.headers[x.key] = x.value
           })
         }
 
