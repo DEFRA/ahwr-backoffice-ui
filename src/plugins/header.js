@@ -41,20 +41,7 @@ export const headerPlugin = {
   },
   options: {
     keys: [
-      { key: 'X-Frame-Options', value: 'deny' },
-      { key: 'X-Content-Type-Options', value: 'nosniff' },
-      { key: 'Access-Control-Allow-Origin', value: serviceUri },
-      { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
-      { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
-      { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
-      { key: 'X-XSS-Protection', value: '1; mode=block' },
-      { key: 'Strict-Transport-Security', value: 'max-age=31536000;' },
-      { key: 'Cache-Control', value: 'no-cache' },
-      { key: 'Referrer-Policy', value: 'no-referrer' },
-      {
-        key: 'Content-Security-Policy',
-        value: getSecurityPolicy()
-      }
+      { key: 'Test', value: 'basic' }
     ]
   }
 }
