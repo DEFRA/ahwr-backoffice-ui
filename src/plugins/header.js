@@ -42,8 +42,8 @@ export const headerPlugin = {
   // TODO 1185 one of the commented out items is causing 502 error
   options: {
     keys: [
-      { key: 'X-Frame-Options', value: 'deny' },
-      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      // { key: 'X-Frame-Options', value: 'deny' },
+      // { key: 'X-Content-Type-Options', value: 'nosniff' },
       // { key: 'Access-Control-Allow-Origin', value: serviceUri },
       // { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
       // { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
