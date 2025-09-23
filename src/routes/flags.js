@@ -255,8 +255,13 @@ const createFlagHandler = {
   }
 }
 
-export const flagsRoutes = [
-  getFlagsHandler,
-  deleteFlagHandler,
-  createFlagHandler
-]
+const flags = [getFlagsHandler, deleteFlagHandler, createFlagHandler]
+
+export const flagsRoutes = {
+  plugin: {
+    name: 'flags',
+    register(server) {
+      server.route(flags)
+    }
+  }
+}

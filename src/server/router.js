@@ -14,7 +14,7 @@ import { authenticateRoute } from '../routes/authenticate.js'
 // import { claimsDataRoutes } from '../routes/claims-data.js'
 // import { claimsRoutes } from '../routes/claims.js'
 import { devAuthRoute } from '../routes/dev-auth.js'
-// import { flagsRoutes } from '../routes/flags.js'
+import { flagsRoutes } from '../routes/flags.js'
 import { homeRoute } from '../routes/home.js'
 import { loginRoute } from '../routes/login.js'
 import { logOutRoute } from '../routes/logout.js'
@@ -40,7 +40,7 @@ const routes = [
   // ...claimsDataRoutes,
   // ...claimsRoutes,
   devAuthRoute,
-  // ...flagsRoutes,
+  flagsRoutes,
   homeRoute,
   loginRoute,
   logOutRoute,
