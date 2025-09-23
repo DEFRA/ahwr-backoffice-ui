@@ -1,7 +1,7 @@
 import wreck from '@hapi/wreck'
-import { config } from '../config/index.js'
+import { config } from '../config/config.js'
 
-const { applicationApiUri } = config
+const applicationApiUri = config.get('apiEndpointApplication')
 
 export async function getAllFlags(logger) {
   const endpoint = `${applicationApiUri}/flags`
