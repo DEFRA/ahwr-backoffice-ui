@@ -50,8 +50,9 @@ export const headerPlugin = {
       // { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
       // { key: 'X-XSS-Protection', value: '1; mode=block' },
       // { key: 'Strict-Transport-Security', value: 'max-age=31536000;' },
-      { key: 'Cache-Control', value: 'no-cache' }
-      // { key: 'Referrer-Policy', value: 'no-referrer' }
+      { key: 'Cache-Control', value: 'no-cache' },
+      { key: 'Test', value: 'basic' }
+      // { key: 'Referrer-Policy', value: 'no-referrer' } // maybe this one causing the issue!
       // {
       //   key: 'Content-Security-Policy',
       //   value: getSecurityPolicy()
