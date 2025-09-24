@@ -1,6 +1,6 @@
-import { config } from '../config/config.js'
+// import { config } from '../config/config.js'
 
-const serviceUri = config.get('serviceUri')
+// const serviceUri = config.get('serviceUri')
 
 // const getSecurityPolicy = () =>
 //   "default-src 'self';" +
@@ -42,16 +42,16 @@ export const headerPlugin = {
   // TODO 1185 one of the commented out items is causing 502 error
   options: {
     keys: [
-      { key: 'Access-Control-Allow-Origin', value: serviceUri },
-      { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
-      { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
-      { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+      // { key: 'Access-Control-Allow-Origin', value: serviceUri },
+      // { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+      // { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
+      // { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
       { key: 'Cache-Control', value: 'no-cache' }
       // {
       //   key: 'Content-Security-Policy',
       //   value: getSecurityPolicy()
       // },
-      // { key: 'Referrer-Policy', value: 'no-referrer' } // maybe this one causing the issue!
+      // { key: 'Referrer-Policy', value: 'no-referrer' }
       // TODO below already added to headers
       // { key: 'X-Frame-Options', value: 'deny' },
       // { key: 'X-Content-Type-Options', value: 'nosniff' },
