@@ -2,7 +2,6 @@ import { createServer } from '../../server.js'
 import { config } from '../../../config/config.js'
 
 async function startServer() {
-  setup()
   const server = await createServer()
   await server.start()
 
