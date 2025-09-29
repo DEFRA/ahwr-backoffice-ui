@@ -44,7 +44,10 @@ export const agreements = [
       },
       handler: async (request, h) => {
         setAppSearch(request, sessionKeys.appSearch.filterStatus, [])
-        await recordExceptionMetrics('agreement-exception', new Error('Test error value'))
+        await recordExceptionMetrics(
+          'agreement-exception',
+          new Error('Test error value')
+        )
         return h.view(viewTemplate, await viewModel(request)) // NOSONAR
       }
     }
