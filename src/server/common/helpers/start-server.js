@@ -1,5 +1,4 @@
 import { createServer } from '../../server.js'
-import { setup } from '../../../insights.js'
 import { config } from '../../../config/config.js'
 
 async function startServer() {
