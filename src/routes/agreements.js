@@ -46,7 +46,12 @@ export const agreements = [
         setAppSearch(request, sessionKeys.appSearch.filterStatus, [])
         await recordExceptionMetrics(
           'agreement-exception',
-          new Error('Test error value')
+          new Error('Test error value'),
+          {
+            severity: 'Low',
+            type: 'Test',
+            user: request.auth.credentials?.userId ?? 'someone'
+          }
         )
         return h.view(viewTemplate, await viewModel(request)) // NOSONAR
       }

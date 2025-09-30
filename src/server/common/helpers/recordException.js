@@ -10,7 +10,7 @@ import { createLogger } from './logging/logger.js'
 /**
  * Aws embedded metrics wrapper
  */
-export async function recordExceptionMetrics(metricName, err) {
+export async function recordExceptionMetrics(metricName, err, metaData = {}) {
   const isMetricsEnabled = config.get('isMetricsEnabled')
 
   if (!isMetricsEnabled) {
@@ -20,6 +20,7 @@ export async function recordExceptionMetrics(metricName, err) {
   try {
     const metricsLogger = createMetricsLogger()
     metricsLogger.setProperty('exception', err)
+    metricsLogger.setDimensions(metaData, true)
     metricsLogger.putMetric(
       metricName,
       1,
