@@ -1,6 +1,7 @@
 import authCookie from '@hapi/cookie'
 import { auth } from '../auth/index.js'
 import { config } from '../config/config.js'
+import { createLogger } from '../server/common/helpers/logging/logger.js'
 
 const cookiePassword = config.get('session.cookie.password')
 const cookieTTL = config.get('session.cookie.ttl')
@@ -29,7 +30,8 @@ export const authPlugin = {
 
       server.ext('onPreAuth', async (request, h) => {
         if (request.auth.credentials) {
-          request.logger.info('Refreshing session token...')
+          const logger = createLogger()
+          logger.info('Refreshing session token...')
           await auth.refresh(
             request.auth.credentials.account,
             request.cookieAuth
