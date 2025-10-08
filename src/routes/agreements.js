@@ -1,13 +1,10 @@
 import Joi from 'joi'
 import { permissions } from '../auth/permissions.js'
-// import { config } from '../config/index.js'
 import { setAppSearch, getAppSearch } from '../session/index.js'
 import { sessionKeys } from '../session/keys.js'
 import { viewModel } from './models/application-list.js'
 import { searchValidation } from '../lib/search-validation.js'
 import { generateNewCrumb } from './utils/crumb-cache.js'
-import { metricsCounter } from '../server/common/helpers/metrics.js'
-import { recordExceptionMetrics } from '../server/common/helpers/recordException.js'
 
 const { administrator, processor, user, recommender, authoriser } = permissions
 const { displayPageSize } = { displayPageSize: 10 } // TODO 1061 config
@@ -30,7 +27,6 @@ export const agreements = [
       },
       handler: async (request, h) => {
         await generateNewCrumb(request, h)
-        await metricsCounter('agreements-viewed', 1)
         return h.view(viewTemplate, await viewModel(request)) // NOSONAR
       }
     }
@@ -44,15 +40,6 @@ export const agreements = [
       },
       handler: async (request, h) => {
         setAppSearch(request, sessionKeys.appSearch.filterStatus, [])
-        await recordExceptionMetrics(
-          'agreement-exception',
-          new Error('Test error value'),
-          {
-            severity: 'Low',
-            type: 'Test',
-            user: request.auth.credentials?.userId ?? 'someone'
-          }
-        )
         return h.view(viewTemplate, await viewModel(request)) // NOSONAR
       }
     }
