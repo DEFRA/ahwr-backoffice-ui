@@ -29,6 +29,7 @@ export const authPlugin = {
 
       server.ext('onPreAuth', async (request, h) => {
         if (request.auth.credentials) {
+          request.logger.info('Refreshing session token...')
           await auth.refresh(
             request.auth.credentials.account,
             request.cookieAuth
