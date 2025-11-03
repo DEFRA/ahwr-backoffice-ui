@@ -1,0 +1,28 @@
+# This override file should be used when running this service in isolation
+# to provide dependencies and expose ports for local testing
+
+services:
+  ffc-ahwr-backoffice:
+    build:
+      target: development
+    image: ffc-ahwr-backoffice-development
+    container_name: ffc-ahwr-backoffice-development
+    environment:
+      USE_PRETTY_PRINT: ${USE_PRETTY_PRINT:-true}
+      SUPER_ADMINS: ${SUPER_ADMINS:-developer@defra.gov.uk}
+    ports:
+      - "3002:3000"
+      - "9231:9229"
+    volumes:
+      - ./app:/home/node/app
+      - ./package.json:/home/node/package.json
+    networks:
+      - ahwr-local
+
+volumes:
+  redis_data:
+
+# Make sure you have this network locally 'ahwr-local' (created in /scripts/start)
+networks:
+  ahwr-local:
+    external: true

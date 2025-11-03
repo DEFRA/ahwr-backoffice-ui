@@ -1,4 +1,5 @@
-.public
-package-lock.json
-node_modules
-coverage
+test-output
+app/frontend/dist
+snyk-cli
+snyk_report.html
+snyk-result.json

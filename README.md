@@ -97,15 +97,7 @@ npm install
 To run the application in `development` mode run:
 
 ```bash
-npm run dev
-```
-
-### Production
-
-To mimic the application running in `production` mode locally run:
-
-```bash
-npm start
+./scripts/start
 ```
 
 ### Npm scripts
