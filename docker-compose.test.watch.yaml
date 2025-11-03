@@ -1,0 +1,14 @@
+services:
+  ffc-ahwr-backoffice:
+    command: >
+      sh -c "npm run test:watch:all"
+    volumes:
+      - ./app:/home/node/app
+      - ./test:/home/node/test
+      - ./jest.config.cjs:/home/node/jest.config.cjs
+      - ./webpack.config.js:/home/node/webpack.config.js
+      - ./babel.config.cjs:/home/node/babel.config.cjs
+
+volumes:
+  dist:
+  layouts:
