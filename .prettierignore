@@ -1,4 +1,3 @@
-helm
 test-output
 app/frontend/dist
 snyk-cli
