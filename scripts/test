@@ -71,6 +71,10 @@ compose() {
     npm run prettier:fix
   fi
 
+  # Create test output folder
+  mkdir -p test-output
+  chmod -R 777 test-output
+
   # Guarantee clean environment
   compose down -v
 
