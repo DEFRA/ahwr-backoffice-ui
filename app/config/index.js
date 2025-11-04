@@ -118,7 +118,7 @@ const buildConfig = () => {
     name: process.env.SERVICE_NAME ?? "ahwr-backoffice-ui",
     logLevel: process.env.LOG_LEVEL ?? (process.env.NODE_ENV === "test" ? "silent" : "info"),
     logFormat: process.env.USE_PRETTY_PRINT === "true" ? "pino-pretty" : "ecs",
-    logRedact: process.env.LOG_REDACT ? process.env.LOG_REDACT.split(",") : [],
+    logRedact: process.env.LOG_REDACT ? process.env.LOG_REDACT.split(",") : ['req.headers', 'res.headers'],
   };
 
   if (process.env.NODE_ENV === "test") {

@@ -26,9 +26,11 @@ export const getApplicationTableHeader = (sortField) => {
         "aria-sort": sort === "Reference" ? direction : "none",
         "data-url": "/agreements/sort/Reference",
       },
+      classes: "col-9",
     },
     {
       html: `<span>Flagged ${FLAG_EMOJI}</span>`,
+      classes: "col-9",
     },
     {
       text: "Organisation",
@@ -36,6 +38,7 @@ export const getApplicationTableHeader = (sortField) => {
         "aria-sort": sort === "Organisation" ? direction : "none",
         "data-url": "/agreements/sort/Organisation",
       },
+      classes: "col-25",
     },
     {
       text: "SBI number",
@@ -43,7 +46,7 @@ export const getApplicationTableHeader = (sortField) => {
         "aria-sort": sort === "SBI" ? direction : "none",
         "data-url": "/agreements/sort/SBI",
       },
-      format: "numeric",
+      classes: "col-6",
     },
     {
       text: agreementDateTitle,
@@ -52,6 +55,7 @@ export const getApplicationTableHeader = (sortField) => {
         "data-url": "/agreements/sort/Apply date",
       },
       format: "date",
+      classes: "col-6",
     },
     {
       text: "Status",
@@ -59,10 +63,8 @@ export const getApplicationTableHeader = (sortField) => {
         "aria-sort": sort === "Status" ? direction : "none",
         "data-url": "/agreements/sort/Status",
       },
-    },
-    {
-      text: "Details",
-    },
+      classes: "col-6",
+    }
   ];
 
   return headerColumns;
@@ -82,14 +84,13 @@ const buildApplicationList = (applications, page) => {
         html: app.flags.length > 0 ? `<span>Yes ${FLAG_EMOJI}</span>` : "",
       },
       {
-        text: app.data?.organisation?.name,
+        text: app.organisation?.name,
         attributes: {
           "data-sort-value": `${app.data?.organisation?.name}`,
         },
       },
       {
-        text: app.data?.organisation?.sbi,
-        format: "numeric",
+        text: app.organisation?.sbi,
         attributes: {
           "data-sort-value": app.data?.organisation?.sbi,
         },
@@ -102,17 +103,11 @@ const buildApplicationList = (applications, page) => {
         },
       },
       {
-        html: `<span class="app-long-tag"><span class="govuk-tag ${statusClass}">${upperFirstLetter(app.status.toLowerCase())}</span></span>`,
+        html: `<span class="app-long-tag"><span class="govuk-tag ${statusClass}">${upperFirstLetter(app.status.toLowerCase()).replace(/_/g, " ")}</span></span>`,
         attributes: {
           "data-sort-value": `${app.status}`,
         },
-      },
-      {
-        html:
-          app.type === "EE"
-            ? `<a href="${serviceUri}/agreement/${app.reference}/claims?page=${page}">View claims</a>`
-            : `<a href="${serviceUri}/view-agreement/${app.reference}?page=${page}">View details</a>`,
-      },
+      }
     ];
 
     if (app.flags.length) {

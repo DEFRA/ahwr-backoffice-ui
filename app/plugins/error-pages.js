@@ -11,7 +11,14 @@ export const errorPagesPlugin = {
           const { payload } = response.output;
           const { statusCode, message } = payload;
 
-          request.logger.setBindings({ message });
+          request.logger.error(
+            {
+              statusCode,
+              message,
+              stack: response.data ? response.data.stack : response.stack,
+            },
+            "pre response error",
+          );
 
           if (statusCode === StatusCodes.NOT_FOUND) {
             // handled specifically by a route handler that renders a 404 page for unknown pages. This allows us to still track which user it is
@@ -24,10 +31,6 @@ export const errorPagesPlugin = {
           ) {
             return h.view("error-pages/4xx", { payload }).code(statusCode);
           }
-
-          request.logger.error({
-            stack: response.data ? response.data.stack : response.stack,
-          });
 
           return h.view("error-pages/500").code(statusCode);
         }

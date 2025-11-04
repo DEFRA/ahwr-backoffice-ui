@@ -70,6 +70,6 @@ describe("Application-list createModel", () => {
       },
     };
     const result = await createModel(request, 1);
-    expect(result.applications[0][6].html).toContain("View claims");
+    expect(result.applications[0][5].html).toContain("Agreed");
   });
 });

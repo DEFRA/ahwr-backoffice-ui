@@ -36,8 +36,8 @@ export const claims = [
         },
         confirmCheckDetails: "yes",
       },
+      flags: [],
     },
-    flags: [],
   },
   {
     id: "605df3c4-518c-48e0-adcf-4b0ec02aa53b",
@@ -76,7 +76,7 @@ export const claims = [
         },
         confirmCheckDetails: "yes",
       },
+      flags: [],
     },
-    flags: [],
   },
 ];

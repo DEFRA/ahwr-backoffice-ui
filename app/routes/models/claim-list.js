@@ -77,6 +77,7 @@ export const getClaimTableHeader = (sortField, dataURLPrefix = "", showSBI = tru
 
 export const getClaimTableRows = (claims, page, returnPage, showSBI = true) =>
   claims.map((claim) => {
+    const { application } = claim;
     const row = [
       {
         html: `<div>
@@ -85,7 +86,7 @@ export const getClaimTableRows = (claims, page, returnPage, showSBI = true) =>
               </div>`,
       },
       {
-        html: claim.flags.length ? `<span>Yes ${FLAG_EMOJI}</span>` : "",
+        html: application.flags.length ? `<span>Yes ${FLAG_EMOJI}</span>` : "",
         classes: respText,
       },
       {
@@ -126,14 +127,14 @@ export const getClaimTableRows = (claims, page, returnPage, showSBI = true) =>
         classes: `${respText} align-left`,
       },
       {
-        html: `<span class="app-long-tag"><span class="govuk-tag ${respText} ${getStyleClassByStatus(claim.status)}">${upperFirstLetter(claim.status.toLowerCase())}</span></span>`,
+        html: `<span class="app-long-tag"><span class="govuk-tag ${respText} ${getStyleClassByStatus(claim.status)}">${upperFirstLetter(claim.status.toLowerCase()).replace(/_/g, " ")}</span></span>`,
         attributes: {
           "data-sort-value": `${claim.status}`,
         },
       },
     ];
 
-    if (claim.flags.length) {
+    if (application.flags.length) {
       return row.map((rowItem) => ({
         ...rowItem,
         classes: rowItem?.classes ? `${rowItem.classes} flagged-item` : "flagged-item",

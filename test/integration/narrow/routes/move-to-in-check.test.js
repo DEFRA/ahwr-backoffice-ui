@@ -9,9 +9,6 @@ import { preSubmissionHandler } from "../../../../app/routes/utils/pre-submissio
 import boom from "@hapi/boom";
 
 jest.mock("../../../../app/auth");
-jest.mock("@hapi/wreck", () => ({
-  put: jest.fn().mockReturnValue({}),
-}));
 jest.mock("../../../../app/api/applications");
 jest.mock("../../../../app/api/claims");
 jest.mock("../../../../app/routes/utils/pre-submission-handler");

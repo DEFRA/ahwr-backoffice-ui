@@ -15,7 +15,7 @@ export async function getAllFlags(logger) {
 }
 
 export async function deleteFlag({ flagId, deletedNote }, user, logger) {
-  const endpoint = `${applicationApiUri}/application/flag/${flagId}/delete`;
+  const endpoint = `${applicationApiUri}/applications/flag/${flagId}/delete`;
   try {
     await wreck.patch(endpoint, { json: true, payload: { user, deletedNote } });
   } catch (err) {
@@ -25,7 +25,7 @@ export async function deleteFlag({ flagId, deletedNote }, user, logger) {
 }
 
 export async function createFlag(payload, appRef, logger) {
-  const endpoint = `${applicationApiUri}/application/${appRef}/flag`;
+  const endpoint = `${applicationApiUri}/applications/${appRef}/flag`;
   try {
     return wreck.post(endpoint, { json: true, payload });
   } catch (err) {

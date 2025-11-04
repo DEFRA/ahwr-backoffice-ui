@@ -6,7 +6,7 @@ const { fieldsNames, labels, notAvailable } = contactHistory;
 const { applicationApiUri } = config;
 
 export async function getContactHistory(reference, logger) {
-  const endpoint = `${applicationApiUri}/application/contact-history/${reference}`;
+  const endpoint = `${applicationApiUri}/applications/contact-history/${reference}`;
   try {
     const { payload } = await wreck.get(endpoint, { json: true });
 

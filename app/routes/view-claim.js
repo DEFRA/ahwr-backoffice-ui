@@ -138,7 +138,7 @@ export const viewClaimRoute = {
 
       const application = await getApplication(applicationReference, request.logger);
 
-      const { organisation } = application.data;
+      const { organisation } = application;
 
       request.logger.setBindings({ sbi: organisation.sbi });
 
@@ -501,7 +501,7 @@ export const viewClaimRoute = {
         reference,
         applicationReference,
         claimOrAgreement: "claim",
-        title: upperFirstLetter(application.data.organisation.name),
+        title: upperFirstLetter(organisation.name),
         claimSummaryDetails: rowsWithData,
         status: {
           normalType: upperFirstLetter(claim.status.replace(/_/g, " ")).toLowerCase(),

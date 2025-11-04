@@ -64,7 +64,7 @@ describe("Flags API", () => {
       await deleteFlag({ flagId, deletedNote }, username, mockLogger);
 
       expect(wreck.patch).toHaveBeenCalledWith(
-        `${applicationApiUri}/application/flag/${flagId}/delete`,
+        `${applicationApiUri}/applications/flag/${flagId}/delete`,
         {
           json: true,
           payload: {
@@ -108,7 +108,7 @@ describe("Flags API", () => {
       await createFlag(payload, applicationReference, mockLogger);
 
       expect(wreck.post).toHaveBeenCalledWith(
-        `${applicationApiUri}/application/${applicationReference}/flag`,
+        `${applicationApiUri}/applications/${applicationReference}/flag`,
         {
           json: true,
           payload,
