@@ -98,9 +98,9 @@ const buildConfig = () => {
     isDev: process.env.NODE_ENV === "development",
     isProd: process.env.NODE_ENV === "production",
     port: process.env.PORT,
-    serviceUri: process.env.SERVICE_URI,
+    serviceUri: process.env.AHWR_SERVICE_URI,
     useRedis: process.env.NODE_ENV !== "test",
-    applicationApiUri: process.env.APPLICATION_API_URI,
+    applicationApiUri: process.env.AHWR_APPLICATION_BACKEND_URL,
     displayPageSize: Number(process.env.DISPLAY_PAGE_SIZE),
     onHoldAppScheduler: {
       enabled: process.env.ON_HOLD_APP_PROCESS_ENABLED === "true",
@@ -118,7 +118,7 @@ const buildConfig = () => {
     name: process.env.SERVICE_NAME ?? "ahwr-backoffice-ui",
     logLevel: process.env.LOG_LEVEL ?? (process.env.NODE_ENV === "test" ? "silent" : "info"),
     logFormat: process.env.USE_PRETTY_PRINT === "true" ? "pino-pretty" : "ecs",
-    logRedact: process.env.LOG_REDACT ? process.env.LOG_REDACT.split(",") : [],
+    logRedact: process.env.LOG_REDACT ? process.env.LOG_REDACT.split(",") : ['req.headers', 'res.headers'],
   };
 
   if (process.env.NODE_ENV === "test") {

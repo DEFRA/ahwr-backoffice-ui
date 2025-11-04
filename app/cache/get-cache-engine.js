@@ -24,7 +24,7 @@ export const getCacheEngine = () => {
 
   return {
     provider: {
-      constructor: catboxMemory,
+      constructor: catboxMemory.Engine,
       options: {},
     },
   };

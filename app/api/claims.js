@@ -4,7 +4,7 @@ import { config } from "../config/index.js";
 const { applicationApiUri } = config;
 
 export async function getClaim(reference, logger) {
-  const endpoint = `${applicationApiUri}/claim/get-by-reference/${reference}`;
+  const endpoint = `${applicationApiUri}/claims/get-by-reference/${reference}`;
   try {
     const { payload } = await wreck.get(endpoint, { json: true });
     return payload;
@@ -15,7 +15,7 @@ export async function getClaim(reference, logger) {
 }
 
 export async function getClaims(searchType, searchText, filter, limit, offset, sort, logger) {
-  const endpoint = `${applicationApiUri}/claim/search`;
+  const endpoint = `${applicationApiUri}/claims/search`;
   const options = {
     payload: {
       search: { text: searchText, type: searchType },
@@ -37,7 +37,7 @@ export async function getClaims(searchType, searchText, filter, limit, offset, s
 }
 
 export async function updateClaimStatus(reference, user, status, logger, note) {
-  const endpoint = `${applicationApiUri}/claim/update-by-reference`;
+  const endpoint = `${applicationApiUri}/claims/update-by-reference`;
   const options = {
     payload: {
       reference,

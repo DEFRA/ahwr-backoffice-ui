@@ -54,7 +54,7 @@ export const agreementRoutes = [
           throw boom.badRequest();
         }
 
-        const { organisation } = application.data;
+        const { organisation } = application;
         const isFlagged = application.flags.length > 0;
         const flaggedText = isFlagged ? ` ${FLAG_EMOJI}` : "";
         const isRedacted = application.redacted;
@@ -140,7 +140,7 @@ export const agreementRoutes = [
 
         return h.view("agreement", {
           backLink: getBackLink(page, reference, returnPage),
-          businessName: application.data?.organisation?.name,
+          businessName: organisation.name,
           applicationSummaryDetails,
           claimsTotal: total,
           header,

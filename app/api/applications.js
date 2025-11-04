@@ -83,7 +83,7 @@ export async function updateApplicationStatus(reference, user, status, logger, n
 }
 
 export async function getApplicationHistory(reference, logger) {
-  const endpoint = `${applicationApiUri}/application/history/${reference}`;
+  const endpoint = `${applicationApiUri}/applications/${reference}/history`;
   try {
     const { payload } = await wreck.get(endpoint, { json: true });
     return payload;
@@ -94,7 +94,7 @@ export async function getApplicationHistory(reference, logger) {
 }
 
 export async function getApplicationEvents(reference, logger) {
-  const endpoint = `${applicationApiUri}/application/events/${reference}`;
+  const endpoint = `${applicationApiUri}/applications/events/${reference}`;
   try {
     const { payload } = await wreck.get(endpoint, { json: true });
     return payload;

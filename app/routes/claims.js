@@ -38,7 +38,6 @@ const getViewData = async (request) => {
   const { previous, next, pages } = getPagingData(total, limit, request.query);
   const error = total === 0 ? "No claims found." : null;
 
-
   return {
     searchText,
     header,

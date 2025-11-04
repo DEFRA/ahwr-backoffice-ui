@@ -5,7 +5,6 @@ import { cookiePlugin } from "./plugins/cookies.js";
 import { crumbPlugin } from "./plugins/crumb.js";
 import { errorPagesPlugin } from "./plugins/error-pages.js";
 import { headerPlugin } from "./plugins/header.js";
-import { loggerPlugin } from "./plugins/logger.js";
 import { routerPlugin } from "./plugins/router.js";
 import { sessionPlugin } from "./plugins/session.js";
 import { viewsPlugin } from "./plugins/views.js";
@@ -13,6 +12,7 @@ import { inertPlugin } from "./plugins/inert.js";
 import { loggingContextPlugin } from "./plugins/logging-context.js";
 import { setupProxy } from "./lib/setup-proxy.js";
 import { getCacheEngine } from "./cache/get-cache-engine.js";
+import { requestLogger } from "./logging/request-logger.js";
 
 export async function createServer() {
   setupProxy()
@@ -39,13 +39,13 @@ export async function createServer() {
 
   await server.register(authPlugin);
   await server.register(crumbPlugin);
-  await server.register(inertPlugin);
+  await server.register(inertPlugin.plugin);
   await server.register(routerPlugin);
   await server.register(viewsPlugin);
   await server.register(sessionPlugin);
+  await server.register(requestLogger);
   await server.register(cookiePlugin);
   await server.register(errorPagesPlugin);
-  await server.register(loggerPlugin);
   await server.register(headerPlugin);
   await server.register(loggingContextPlugin);
 

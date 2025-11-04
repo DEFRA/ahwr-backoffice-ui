@@ -289,7 +289,7 @@ describe("Application API", () => {
     expect(response).toEqual(wreckResponse.payload);
     expect(wreck.get).toHaveBeenCalledTimes(1);
     expect(wreck.get).toHaveBeenCalledWith(
-      `${applicationApiUri}/application/history/${appRef}`,
+      `${applicationApiUri}/applications/${appRef}/history`,
       options,
     );
   });
@@ -304,7 +304,7 @@ describe("Application API", () => {
     }).rejects.toBe("getApplicationHistory boom");
     expect(wreck.get).toHaveBeenCalledTimes(1);
     expect(wreck.get).toHaveBeenCalledWith(
-      `${applicationApiUri}/application/history/${appRef}`,
+      `${applicationApiUri}/applications/${appRef}/history`,
       options,
     );
   });
@@ -327,7 +327,7 @@ describe("Application API", () => {
 
     expect(wreck.get).toHaveBeenCalledTimes(1);
     expect(wreck.get).toHaveBeenCalledWith(
-      `${applicationApiUri}/application/events/${appRef}`,
+      `${applicationApiUri}/applications/events/${appRef}`,
       options,
     );
   });
@@ -342,7 +342,7 @@ describe("Application API", () => {
     }).rejects.toBe("getApplicationEvents boom");
     expect(wreck.get).toHaveBeenCalledTimes(1);
     expect(wreck.get).toHaveBeenCalledWith(
-      `${applicationApiUri}/application/events/${appRef}`,
+      `${applicationApiUri}/applications/events/${appRef}`,
       options,
     );
   });

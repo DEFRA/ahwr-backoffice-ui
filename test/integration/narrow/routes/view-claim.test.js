@@ -31,17 +31,17 @@ describe("View claim test", () => {
       reference: null,
       declaration: true,
       offerStatus: "accepted",
-      organisation: {
-        sbi: "113494460",
-        name: "Test Farm Lodge",
-        email: "russelldaviese@seivadllessurm.com.test",
-        orgEmail: "orgEmail@gmail.com",
-        address:
-          "Tesco Stores Ltd,Harwell,Betton,WHITE HOUSE FARM,VINCENT CLOSE,LEIGHTON BUZZARD,HR2 8AN,United Kingdom",
-        userType: "newUser",
-        farmerName: "Russell Paul Davies",
-      },
       confirmCheckDetails: "yes",
+    },
+    organisation: {
+      sbi: "113494460",
+      name: "Test Farm Lodge",
+      email: "russelldaviese@seivadllessurm.com.test",
+      orgEmail: "orgEmail@gmail.com",
+      address:
+        "Tesco Stores Ltd,Harwell,Betton,WHITE HOUSE FARM,VINCENT CLOSE,LEIGHTON BUZZARD,HR2 8AN,United Kingdom",
+      userType: "newUser",
+      farmerName: "Russell Paul Davies",
     },
     claimed: false,
     createdAt: "2024-03-22T12:19:04.696Z",
@@ -77,7 +77,7 @@ describe("View claim test", () => {
       createdBy: "sql query",
       updatedBy: null,
       status: "PAID",
-      flags: [],
+      application
     },
     {
       id: "5e8558ee-31d7-454b-a061-b8c97bb91d56",
@@ -127,7 +127,7 @@ describe("View claim test", () => {
       createdBy: "sql query",
       updatedBy: null,
       status: "RECOMMENDED_TO_PAY",
-      flags: [],
+      application
     },
     {
       id: "58b297c9-c983-475c-8bdb-db5746899cec",
@@ -159,7 +159,7 @@ describe("View claim test", () => {
       createdBy: "sql query",
       updatedBy: null,
       status: "PAID",
-      flags: [],
+      application
     },
     {
       id: "58b297c9-c983-475c-8bdb-db5746899cec",
@@ -186,7 +186,7 @@ describe("View claim test", () => {
       createdBy: "sql query",
       updatedBy: null,
       status: "PAID",
-      flags: [],
+      application
     },
   ];
 
@@ -224,7 +224,7 @@ describe("View claim test", () => {
     createdBy: "sql query",
     updatedBy: null,
     status: "PAID",
-    flags: [],
+    application
   };
   getApplicationHistory.mockReturnValue({ historyRecords: [] });
   afterEach(async () => {
