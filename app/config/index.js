@@ -46,14 +46,6 @@ const getConfigSchema = () =>
     useRedis: joi.boolean().required(),
     applicationApiUri: joi.string().uri().required(),
     displayPageSize: joi.number().required(),
-    onHoldAppScheduler: {
-      enabled: joi.bool().required(),
-      schedule: joi.string().required(),
-    },
-    dataRedactionScheduler: {
-      enabled: joi.bool().required(),
-      schedule: joi.string().required(),
-    },
     superAdmins: joi.array().items(joi.string()).required(),
     proxy: joi.string().optional(),
     serviceVersion: joi.string().required(),
@@ -102,14 +94,6 @@ const buildConfig = () => {
     useRedis: process.env.NODE_ENV !== "test",
     applicationApiUri: process.env.AHWR_APPLICATION_BACKEND_URL,
     displayPageSize: Number(process.env.DISPLAY_PAGE_SIZE),
-    onHoldAppScheduler: {
-      enabled: process.env.ON_HOLD_APP_PROCESS_ENABLED === "true",
-      schedule: process.env.ON_HOLD_APP_PROCESS_SCHEDULE,
-    },
-    dataRedactionScheduler: {
-      enabled: process.env.DATA_REDACTION_PROCESS_ENABLED === "true",
-      schedule: process.env.DATA_REDACTION_PROCESS_SCHEDULE,
-    },
     superAdmins: process.env.SUPER_ADMINS
       ? process.env.SUPER_ADMINS.split(",").map((user) => user.trim().toLowerCase())
       : [],
@@ -127,6 +111,7 @@ const buildConfig = () => {
 
   const schema = getConfigSchema();
   const { error } = schema.validate(conf, { abortEarly: false });
+
   if (error) {
     throw new Error(`The server config is invalid. ${error.message}`);
   }
