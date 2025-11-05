@@ -11,6 +11,7 @@ export const authenticateRoute = {
   },
   handler: async (request, h) => {
     try {
+      console.log("Received request to authenticate...");
       const [username, roles] = await auth.authenticate(request.query.code, request.cookieAuth);
       setUserDetails(request, "user", username);
       setUserDetails(request, "roles", roles.map((x) => upperFirstLetter(x)).join(", "));
