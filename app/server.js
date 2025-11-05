@@ -4,7 +4,6 @@ import { authPlugin } from "./plugins/auth.js";
 import { cookiePlugin } from "./plugins/cookies.js";
 import { crumbPlugin } from "./plugins/crumb.js";
 import { errorPagesPlugin } from "./plugins/error-pages.js";
-import { headerPlugin } from "./plugins/header.js";
 import { routerPlugin } from "./plugins/router.js";
 import { sessionPlugin } from "./plugins/session.js";
 import { viewsPlugin } from "./plugins/views.js";
@@ -46,7 +45,6 @@ export async function createServer() {
   await server.register(requestLogger);
   await server.register(cookiePlugin);
   await server.register(errorPagesPlugin);
-  await server.register(headerPlugin);
   await server.register(loggingContextPlugin);
 
   return server;
