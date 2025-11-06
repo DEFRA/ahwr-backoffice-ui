@@ -78,6 +78,9 @@ export const getClaimTableHeader = (sortField, dataURLPrefix = "", showSBI = tru
 export const getClaimTableRows = (claims, page, returnPage, showSBI = true) =>
   claims.map((claim) => {
     const { application } = claim;
+    if (!application || !application.flags) {
+      console.log((claim.reference));
+    }
     const row = [
       {
         html: `<div>
