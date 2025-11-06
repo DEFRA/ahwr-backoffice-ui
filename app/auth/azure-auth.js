@@ -13,7 +13,7 @@ const msalLogging = config.isProd
 export const init = () => {
   return new ConfidentialClientApplication({
     auth: config.auth,
-    system: { loggerOptions: msalLogging },
+    system: { loggerOptions: msalLogging, customAgentOptions: { keepAlive: false } },
   });
 };
 
