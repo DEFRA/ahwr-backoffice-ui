@@ -28,13 +28,11 @@ export const getAuthenticationUrl = (userId) => {
   return "/dev-auth";
 };
 
-export const authenticate = async (userId, cookieAuth) => {
+export const authenticate = async (userId, auth, cookieAuth) => {
   const roles = [administrator, processor, user, recommender, authoriser];
   const account = getDevAccount(userId);
-  cookieAuth.set({
-    scope: roles,
-    account,
-  });
+  const sessionId = await auth.createSession(account, roles);
+  cookieAuth.set({ id: sessionId });
   return [account.username, roles];
 };
 
