@@ -13,8 +13,11 @@ export const authenticateRoute = {
     try {
       console.log("Received request to authenticate...");
       const [username, roles] = await auth.authenticate(request.query.code, request.cookieAuth);
+      console.log("Setting username");
       setUserDetails(request, "user", username);
+      console.log("Setting roles");
       setUserDetails(request, "roles", roles.map((x) => upperFirstLetter(x)).join(", "));
+      console.log("Redirecting to claims....")
       return h.redirect("/claims");
     } catch (err) {
       request.logger.setBindings({ error: err });

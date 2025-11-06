@@ -1,7 +1,7 @@
 import { config } from "../config/index.js";
 import { ConfidentialClientApplication, LogLevel } from "@azure/msal-node";
 
-const msalLogging = config.isProd
+const msalLogging = !config.isProd
   ? {}
   : {
       loggerCallback(_loglevel, message, _containsPii) {
@@ -37,12 +37,14 @@ export const authenticate = async (redirectCode, cookieAuth) => {
     redirectUri: config.auth.redirectUrl,
   });
 
-  console.log("Got the token!");
+  console.log({ token, redirectCode });
 
   cookieAuth.set({
     scope: token.idTokenClaims.roles,
     account: token.account,
   });
+
+  console.log("Setting auth in cookie");
 
   return [token.account.username, token.idTokenClaims.roles];
 };
