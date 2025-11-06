@@ -1,36 +1,35 @@
 import { config } from "../config/index.js";
 import { ConfidentialClientApplication, LogLevel } from "@azure/msal-node";
 
-const msalLogging = !config.isProd
-  ? {}
-  : {
+const msalLogging = config.isProd
+  ? {
       loggerCallback(_loglevel, message, _containsPii) {
         console.log(message);
       },
       piiLoggingEnabled: false,
       logLevel: LogLevel.Verbose,
-    };
-
-let msalClientApplication;
+    } : {};
 
 export const init = () => {
-  msalClientApplication = new ConfidentialClientApplication({
+  return new ConfidentialClientApplication({
     auth: config.auth,
     system: { loggerOptions: msalLogging },
   });
 };
 
 export const getAuthenticationUrl = () => {
+  const msal = init();
   const authCodeUrlParameters = {
     prompt: "select_account", // Force the MS account select dialog
     redirectUri: config.auth.redirectUrl,
   };
 
-  return msalClientApplication.getAuthCodeUrl(authCodeUrlParameters);
+  return msal.getAuthCodeUrl(authCodeUrlParameters);
 };
 
 export const authenticate = async (redirectCode, cookieAuth) => {
-  const token = await msalClientApplication.acquireTokenByCode({
+  const msal = init();
+  const token = await msal.acquireTokenByCode({
     code: redirectCode,
     redirectUri: config.auth.redirectUrl,
   });
@@ -44,7 +43,8 @@ export const authenticate = async (redirectCode, cookieAuth) => {
 };
 
 export const refresh = async (account, cookieAuth) => {
-  const token = await msalClientApplication.acquireTokenSilent({
+  const msal = init();
+  const token = await msal.acquireTokenSilent({
     account,
     forceRefresh: true,
   });
@@ -59,7 +59,8 @@ export const refresh = async (account, cookieAuth) => {
 
 export const logout = async (account) => {
   try {
-    await msalClientApplication.getTokenCache().removeAccount(account);
+    const msal = init();
+    await msal.getTokenCache().removeAccount(account);
   } catch (err) {
     console.error("Unable to end session", err);
   }
