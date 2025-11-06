@@ -43,7 +43,7 @@ describe("Claims API", () => {
 
   test("getClaims (post)", async () => {
     const wreckResponse = {
-      payload: claims,
+      payload: { claims, total: claims.length },
       res: {
         statusCode: 200,
       },
