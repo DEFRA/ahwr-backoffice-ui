@@ -29,9 +29,6 @@ export async function getClaims(searchType, searchText, filter, limit, offset, s
   try {
     const { payload } = await wreck.post(endpoint, options);
 
-    console.log({payload});
-    console.log( { total: payload.total, numberOfClaims: payload.claims.length });
-
     return payload;
   } catch (err) {
     logger.setBindings({ error: err, endpoint });
