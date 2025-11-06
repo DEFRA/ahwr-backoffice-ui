@@ -27,17 +27,15 @@ export const getAuthenticationUrl = () => {
   return msal.getAuthCodeUrl(authCodeUrlParameters);
 };
 
-export const authenticate = async (redirectCode, cookieAuth) => {
+export const authenticate = async (redirectCode, auth, cookieAuth) => {
   const msal = init();
   const token = await msal.acquireTokenByCode({
     code: redirectCode,
     redirectUri: config.auth.redirectUrl,
   });
 
-  cookieAuth.set({
-    scope: token.idTokenClaims.roles,
-    account: token.account,
-  });
+  const sessionId = await auth.createSession(token.account, token.idTokenClaims.roles);
+  cookieAuth.set({ id: sessionId });
 
   return [token.account.username, token.idTokenClaims.roles];
 };
