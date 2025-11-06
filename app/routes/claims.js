@@ -64,7 +64,6 @@ export const claimsRoutes = [
         }),
       },
       handler: async (request, h) => {
-        console.log("Received request to render claims page...");
         await generateNewCrumb(request, h);
         const viewData = await getViewData(request);
         return h.view("claims", viewData);

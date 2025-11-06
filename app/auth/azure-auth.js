@@ -30,21 +30,15 @@ export const getAuthenticationUrl = () => {
 };
 
 export const authenticate = async (redirectCode, cookieAuth) => {
-  console.log("acquiring token by code...");
-  console.log({ redirectUrl: config.auth })
   const token = await msalClientApplication.acquireTokenByCode({
     code: redirectCode,
     redirectUri: config.auth.redirectUrl,
   });
 
-  console.log({ token, redirectCode });
-
   cookieAuth.set({
     scope: token.idTokenClaims.roles,
     account: token.account,
   });
-
-  console.log("Setting auth in cookie");
 
   return [token.account.username, token.idTokenClaims.roles];
 };
