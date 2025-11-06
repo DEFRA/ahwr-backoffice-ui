@@ -28,14 +28,11 @@ export const authPlugin = {
         keepAlive: false,
         redirectTo: "/login",
         validateFunc: async (_request, session) => {
-          console.log("IN THE AUTH PLUGIN");
           const sessionFromCache = await getSession(session.id);
           if (!sessionFromCache) {
-            console.log("NO SESSION FOUND");
             return { valid: false };
           }
 
-          console.log("SESSION WAS FOUND");
           return {
             valid: true,
             credentials: {
@@ -50,8 +47,6 @@ export const authPlugin = {
 
       server.expose({
         createSession: async (account, scope) => {
-          console.log("CREATING THE SESSION");
-          console.log( { account, scope });
           const sessionId = crypto.randomUUID();
           await saveSession(sessionId, { account, scope });
           return sessionId;

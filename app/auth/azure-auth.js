@@ -10,26 +10,26 @@ const msalLogging = config.isProd
       logLevel: LogLevel.Verbose,
     } : {};
 
+let msalApplication;
+
 export const init = () => {
-  return new ConfidentialClientApplication({
+  msalApplication = new ConfidentialClientApplication({
     auth: config.auth,
     system: { loggerOptions: msalLogging, customAgentOptions: { keepAlive: false } },
   });
 };
 
 export const getAuthenticationUrl = () => {
-  const msal = init();
   const authCodeUrlParameters = {
     prompt: "select_account", // Force the MS account select dialog
     redirectUri: config.auth.redirectUrl,
   };
 
-  return msal.getAuthCodeUrl(authCodeUrlParameters);
+  return msalApplication.getAuthCodeUrl(authCodeUrlParameters);
 };
 
 export const authenticate = async (redirectCode, auth, cookieAuth) => {
-  const msal = init();
-  const token = await msal.acquireTokenByCode({
+  const token = await msalApplication.acquireTokenByCode({
     code: redirectCode,
     redirectUri: config.auth.redirectUrl,
   });
@@ -41,8 +41,7 @@ export const authenticate = async (redirectCode, auth, cookieAuth) => {
 };
 
 export const refresh = async (account, cookieAuth) => {
-  const msal = init();
-  const token = await msal.acquireTokenSilent({
+  const token = await msalApplication.acquireTokenSilent({
     account,
     forceRefresh: true,
   });
@@ -57,8 +56,7 @@ export const refresh = async (account, cookieAuth) => {
 
 export const logout = async (account) => {
   try {
-    const msal = init();
-    await msal.getTokenCache().removeAccount(account);
+    await msalApplication.getTokenCache().removeAccount(account);
   } catch (err) {
     console.error("Unable to end session", err);
   }
