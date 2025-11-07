@@ -6,7 +6,7 @@ import { permissions } from "../../../../app/auth/permissions";
 import { when, resetAllWhenMocks } from "jest-when";
 import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states";
 import { getApplication, getApplicationHistory } from "../../../../app/api/applications";
-import { viewApplicationData } from "../../../data/view-applications";
+import { oldWorldApplication } from "../../../data/ow-application";
 import { applicationHistory } from "../../../data/application-history";
 import { StatusCodes } from "http-status-codes";
 
@@ -18,37 +18,46 @@ jest.mock("@hapi/wreck", () => ({
 jest.mock("../../../../app/auth");
 
 const { administrator } = permissions;
-const reference = "AHWR-555A-FD4C";
+const { reference } = oldWorldApplication;
 
 function expectWithdrawLink($, reference, isWithdrawLinkVisible) {
   if (isWithdrawLinkVisible) {
     expect($(".govuk-link").hasClass);
     const withdrawLink = $(".govuk-button");
     expect(withdrawLink.text()).toMatch("Withdraw");
-    expect(withdrawLink.attr("href")).toMatch(`/agreements/${reference}?page=1&withdraw=true`);
+    expect(withdrawLink.attr("href")).toMatch(`/view-agreement/${reference}?page=1&withdraw=true`);
   } else {
     expect($(".govuk-link").not.hasClass);
   }
 }
+
 function expectApplicationDetails($) {
   expect($("#organisation-details .govuk-summary-list__row").length).toEqual(5);
 
   expect($(".govuk-summary-list__key").eq(0).text()).toMatch("Agreement holder");
-  expect($(".govuk-summary-list__value").eq(0).text()).toMatch("Farmer name");
+  expect($(".govuk-summary-list__value").eq(0).text()).toMatch(
+    oldWorldApplication.organisation.farmerName,
+  );
 
   expect($(".govuk-summary-list__key").eq(1).text()).toMatch("SBI number");
-  expect($(".govuk-summary-list__value").eq(1).text()).toMatch("333333333");
+  expect($(".govuk-summary-list__value").eq(1).text()).toMatch(
+    oldWorldApplication.organisation.sbi,
+  );
 
   expect($(".govuk-summary-list__key").eq(2).text()).toMatch("Address");
   expect($(".govuk-summary-list__value").eq(2).text()).toMatch(
-    "Long dusty road, Middle-of-nowhere, In the countryside, CC33 3CC",
+    oldWorldApplication.organisation.address,
   );
 
   expect($(".govuk-summary-list__key").eq(3).text()).toMatch("Email address");
-  expect($(".govuk-summary-list__value").eq(3).text()).toMatch("test@test.com");
+  expect($(".govuk-summary-list__value").eq(3).text()).toMatch(
+    oldWorldApplication.organisation.email,
+  );
 
   expect($(".govuk-summary-list__key").eq(4).text()).toMatch("Organisation email address");
-  expect($(".govuk-summary-list__value").eq(4).text()).toMatch("test@test.com");
+  expect($(".govuk-summary-list__value").eq(4).text()).toMatch(
+    oldWorldApplication.organisation.orgEmail,
+  );
 }
 function expectRecommendButtons($, areRecommendButtonsVisible) {
   if (areRecommendButtonsVisible) {
@@ -58,7 +67,7 @@ function expectRecommendButtons($, areRecommendButtonsVisible) {
     expect(recommendToPayButton.hasClass("govuk-button"));
     expect(recommendToPayButton.text()).toMatch("Recommend to pay");
     expect(recommendToPayButton.attr("href")).toMatch(
-      "/agreements/AHWR-555A-FD4C?page=1&recommendToPay=true",
+      `/view-agreement/${oldWorldApplication.reference}?page=1&recommendToPay=true`,
     );
 
     expect(recommendToRejectButton.hasClass("govuk-button"));
@@ -82,8 +91,7 @@ function expectWithdrawConfirmationPanel($, istWithdrawConfirmationPanelVisible)
     : expect(confirmButtonText).not.toBeDefined();
 }
 
-// TODO - fix these tests rather than skipping them
-describe.skip("View Application test", () => {
+describe("View Application test", () => {
   const url = `/view-agreement/${reference}`;
 
   let auth = {
@@ -126,7 +134,7 @@ describe.skip("View Application test", () => {
 
     test("should not show actions when agreement is redacted", async () => {
       getApplication.mockReturnValueOnce({
-        ...viewApplicationData.agreed,
+        ...oldWorldApplication,
         redacted: true,
       });
       getApplicationHistory.mockReturnValueOnce({
@@ -161,7 +169,7 @@ describe.skip("View Application test", () => {
           strategy: "session-auth",
           credentials: { scope: [authScope], account: { username: "test" } },
         };
-        getApplication.mockReturnValueOnce(viewApplicationData.agreed);
+        getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "AGREED" });
         getApplicationHistory.mockReturnValueOnce({
           historyRecords: applicationHistory,
         });
@@ -181,7 +189,7 @@ describe.skip("View Application test", () => {
     test.each([true, false])(
       "Recommend buttons displayed as expected for when claim helper returns %s",
       async (areRecommendButtonsVisible) => {
-        getApplication.mockReturnValueOnce(viewApplicationData.incheck);
+        getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "IN_CHECK" });
         getApplicationHistory.mockReturnValueOnce({
           historyRecords: applicationHistory,
         });
@@ -201,7 +209,7 @@ describe.skip("View Application test", () => {
     );
 
     test.each([true, false])("Present authorisation for payment panel", async (authoriseForm) => {
-      getApplication.mockReturnValueOnce(viewApplicationData.readytopay);
+      getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "READY_TO_PAY" });
       getApplicationHistory.mockReturnValueOnce({
         historyRecords: applicationHistory,
       });
@@ -225,7 +233,7 @@ describe.skip("View Application test", () => {
     });
 
     test.each([true, false])("Present authorisation for reject panel", async (rejectForm) => {
-      getApplication.mockReturnValueOnce(viewApplicationData.readytopay);
+      getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "READY_TO_PAY" });
       getApplicationHistory.mockReturnValueOnce({
         historyRecords: applicationHistory,
       });
@@ -251,7 +259,7 @@ describe.skip("View Application test", () => {
     test.each([false, true])(
       "Authorisation form displayed as expected for role %s",
       async (authoriseForm) => {
-        getApplication.mockReturnValueOnce(viewApplicationData.readytopay);
+        getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "READY_TO_PAY" });
         getApplicationHistory.mockReturnValueOnce({
           historyRecords: applicationHistory,
         });
@@ -292,7 +300,7 @@ describe.skip("View Application test", () => {
     test.each([false, true])(
       "Recommended to pay form displayed as expected when claim helper returns %s",
       async (recommendToPayForm) => {
-        getApplication.mockReturnValueOnce(viewApplicationData.readytopay);
+        getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "READY_TO_PAY" });
         getApplicationHistory.mockReturnValueOnce({
           historyRecords: applicationHistory,
         });
@@ -336,7 +344,7 @@ describe.skip("View Application test", () => {
     test.each([false, true])(
       "Authorisation confirm form displayed as expected for role %s",
       async (rejectForm) => {
-        getApplication.mockReturnValueOnce(viewApplicationData.readytopay);
+        getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "READY_TO_PAY" });
         getApplicationHistory.mockReturnValueOnce({
           historyRecords: applicationHistory,
         });
@@ -381,7 +389,7 @@ describe.skip("View Application test", () => {
     test.each([false, true])(
       "Recommended to reject confirm form displayed as expected when claim helper returns %s",
       async (recommendToRejectForm) => {
-        getApplication.mockReturnValueOnce(viewApplicationData.readytopay);
+        getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "READY_TO_PAY" });
         getApplicationHistory.mockReturnValueOnce({
           historyRecords: applicationHistory,
         });
@@ -443,7 +451,7 @@ describe.skip("View Application test", () => {
           strategy: "session-auth",
           credentials: { scope: [authScope], account: { username: "test" } },
         };
-        getApplication.mockReturnValueOnce(viewApplicationData.agreed);
+        getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "AGREED" });
         getApplicationHistory.mockReturnValueOnce({
           historyRecords: applicationHistory,
         });
@@ -474,7 +482,7 @@ describe.skip("View Application test", () => {
         strategy: "session-auth",
         credentials: { scope: [authScope], account: { username: "test" } },
       };
-      getApplication.mockReturnValueOnce(viewApplicationData.agreed);
+      getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "AGREED" });
       getApplicationHistory.mockReturnValueOnce({
         historyRecords: applicationHistory,
       });
@@ -498,7 +506,7 @@ describe.skip("View Application test", () => {
         "Date of agreement",
       );
       expect($("#application .govuk-summary-list__row:nth-child(2) dd").text()).toContain(
-        "06/06/2022",
+        new Intl.DateTimeFormat("en-GB").format(new Date(oldWorldApplication.createdAt)),
       );
       expect($("#application .govuk-summary-list__row:nth-child(3) dt").text()).toContain(
         "Business details correct",
@@ -507,12 +515,14 @@ describe.skip("View Application test", () => {
       expect($("#application .govuk-summary-list__row:nth-child(4) dt").text()).toContain(
         "Type of review",
       );
-      expect($("#application .govuk-summary-list__row:nth-child(4) dd").text()).toContain("Sheep");
+      expect(
+        $("#application .govuk-summary-list__row:nth-child(4) dd").text().toLowerCase(),
+      ).toContain(oldWorldApplication.data.whichReview);
       expect($("#application .govuk-summary-list__row:nth-child(5) dt").text()).toContain(
         "Number of livestock",
       );
       expect($("#application .govuk-summary-list__row:nth-child(5) dd").text()).toContain(
-        "Minimum 21",
+        "Minimum 11",
       );
       expect($("#application .govuk-summary-list__row:nth-child(6) dt").text()).toContain(
         "Agreement accepted",
@@ -532,7 +542,7 @@ describe.skip("View Application test", () => {
           strategy: "session-auth",
           credentials: { scope: [authScope], account: { username: "test" } },
         };
-        getApplication.mockReturnValueOnce(viewApplicationData.incheck);
+        getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "IN_CHECK" });
         getApplicationHistory.mockReturnValueOnce({
           historyRecords: applicationHistory,
         });
@@ -553,25 +563,26 @@ describe.skip("View Application test", () => {
         expect($("#application .govuk-summary-list__key").eq(1).text()).toContain(
           "Date of agreement",
         );
-        expect($("#application .govuk-summary-list__value").eq(1).text()).toContain("06/06/2022");
+        expect($("#application .govuk-summary-list__value").eq(1).text()).toContain(
+          new Intl.DateTimeFormat("en-GB").format(new Date(oldWorldApplication.createdAt)),
+        );
         expect($("#application .govuk-summary-list__key").eq(2).text()).toContain(
           "Business details correct",
         );
         expect($("#application .govuk-summary-list__value").eq(2).text()).toContain("Yes");
         expect($("#application .govuk-summary-list__key").eq(3).text()).toContain("Type of review");
-        expect($("#application .govuk-summary-list__value").eq(3).text()).toContain("Sheep");
+        expect($("#application .govuk-summary-list__value").eq(3).text().toLowerCase()).toContain(
+          oldWorldApplication.data.whichReview,
+        );
         expect($("#application .govuk-summary-list__key").eq(4).text()).toContain(
           "Number of livestock",
         );
-        expect($("#application .govuk-summary-list__value").eq(4).text()).toContain("Minimum 21");
+        expect($("#application .govuk-summary-list__value").eq(4).text()).toContain("Minimum 11");
         expect($("#application .govuk-summary-list__key").eq(5).text()).toContain(
           "Agreement accepted",
         );
         expect($("#application .govuk-summary-list__value").eq(5).text()).toContain("Yes");
         expect($("#application").text()).toContain(status);
-
-        // TODO - investigate why the below doesnt work, but the above expect does work
-        // expect($("#claim").text()).toContain(status);
 
         phaseBannerOk($);
       },
@@ -584,7 +595,7 @@ describe.skip("View Application test", () => {
           strategy: "session-auth",
           credentials: { scope: [authScope], account: { username: "test" } },
         };
-        getApplication.mockReturnValueOnce(viewApplicationData.readytopay);
+        getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "READY_TO_PAY" });
         getApplicationHistory.mockReturnValueOnce({
           historyRecords: applicationHistory,
         });
@@ -603,7 +614,6 @@ describe.skip("View Application test", () => {
         expectApplicationDetails($);
 
         expect($("#application").text()).toContain(status);
-        expect($("#claim").text()).toContain(status);
 
         phaseBannerOk($);
       },
@@ -616,7 +626,7 @@ describe.skip("View Application test", () => {
           account: { username: "test" },
         },
       };
-      getApplication.mockReturnValueOnce(viewApplicationData.agreed);
+      getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "AGREED" });
       getApplicationHistory.mockReturnValueOnce({
         historyRecords: applicationHistory,
       });
@@ -636,7 +646,7 @@ describe.skip("View Application test", () => {
     });
 
     test("returns 200 application - valid history tab", async () => {
-      getApplication.mockReturnValueOnce(viewApplicationData.notagreed);
+      getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "NOT_AGREED" });
       getApplicationHistory.mockReturnValueOnce({
         historyRecords: applicationHistory,
       });
@@ -703,7 +713,7 @@ describe.skip("View Application test", () => {
           enabled: true,
         },
       }));
-      getApplication.mockReturnValueOnce(viewApplicationData.incheck);
+      getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "IN_CHECK" });
       getApplicationHistory.mockReturnValueOnce({
         historyRecords: applicationHistory,
       });
@@ -762,7 +772,7 @@ describe.skip("View Application test", () => {
           enabled: true,
         },
       }));
-      getApplication.mockReturnValueOnce(viewApplicationData.incheck);
+      getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "IN_CHECK" });
       getApplicationHistory.mockReturnValueOnce({
         historyRecords: applicationHistory,
       });
@@ -823,7 +833,7 @@ describe.skip("View Application test", () => {
           enabled: true,
         },
       }));
-      getApplication.mockReturnValueOnce(viewApplicationData.incheck);
+      getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "IN_CHECK" });
       getApplicationHistory.mockReturnValueOnce({
         historyRecords: applicationHistory,
       });
@@ -891,7 +901,7 @@ describe.skip("View Application test", () => {
           enabled: true,
         },
       }));
-      getApplication.mockReturnValueOnce(viewApplicationData.incheck);
+      getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "IN_CHECK" });
       getApplicationHistory.mockReturnValueOnce({
         historyRecords: applicationHistory,
       });

@@ -78,9 +78,7 @@ export const getClaimTableHeader = (sortField, dataURLPrefix = "", showSBI = tru
 export const getClaimTableRows = (claims, page, returnPage, showSBI = true) =>
   claims.map((claim) => {
     const { application } = claim;
-    if (!application || !application.flags) {
-      console.log((claim.reference));
-    }
+
     const row = [
       {
         html: `<div>
@@ -112,10 +110,10 @@ export const getClaimTableRows = (claims, page, returnPage, showSBI = true) =>
       ...(showSBI
         ? [
             {
-              text: claim.application.data?.organisation?.sbi,
+              text: claim.application.organisation.sbi,
               format: "numeric",
               attributes: {
-                "data-sort-value": claim.application.data?.organisation?.sbi,
+                "data-sort-value": claim.application.organisation.sbi,
               },
               classes: `${respText} align-left`,
             },

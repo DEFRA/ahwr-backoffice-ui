@@ -1,15 +1,14 @@
 import { formattedDateToUk, upperFirstLetter } from "../../lib/display-helper.js";
 import { getStyleClassByStatus } from "../../constants/status.js";
-import { parseData } from "../utils/parse-data.js";
 
 const claimDataStatus = [
-  "IN CHECK",
+  "IN_CHECK",
   "REJECTED",
-  "READY TO PAY",
-  "ON HOLD",
+  "READY_TO_PAY",
+  "ON_HOLD",
   "PAID",
-  "Recommended to Pay",
-  "Recommended to Reject",
+  "RECOMMENDED_TO_PAY",
+  "RECOMMENDED_TO_REJECT",
 ];
 
 export const getApplicationClaimDetails = (
@@ -25,24 +24,27 @@ export const getApplicationClaimDetails = (
   }
 
   const { data, status } = application;
-  let formatedDate = "";
+  let formattedDate = "";
 
   if (data?.dateOfClaim) {
-    formatedDate = formattedDateToUk(data?.dateOfClaim);
+    formattedDate = formattedDateToUk(data?.dateOfClaim);
   } else {
     let filteredEvents;
     if (applicationEvents?.eventRecords) {
       filteredEvents = applicationEvents.eventRecords.filter(
         (event) => event.EventType === "claim-claimed",
       );
-      if (filteredEvents.length !== 0) {
-        const claimClaimed = parseData(filteredEvents, "claim-claimed", "claimed");
-        formatedDate = formattedDateToUk(claimClaimed?.raisedOn);
+
+      if (filteredEvents.length) {
+        const claimClaimedEvent = filteredEvents[0];
+        formattedDate = formattedDateToUk(claimClaimedEvent.EventRaised);
+      } else {
+        formattedDate = "N/A";
       }
     }
   }
 
-  const statusLabel = upperFirstLetter(status.toLowerCase());
+  const statusLabel = upperFirstLetter(status.toLowerCase().replace(/_/g, " "));
   const statusClass = getStyleClassByStatus(status);
 
   return [
@@ -55,14 +57,14 @@ export const getApplicationClaimDetails = (
     },
     {
       key: { text: "Date of review" },
-      value: { text: formattedDateToUk(data.visitDate) },
+      value: { text: data.visitDate ? formattedDateToUk(data.visitDate) : "N/A" },
       actions: visitDateActions,
     },
     {
       key: { text: "Date of testing" },
-      value: { text: formattedDateToUk(data.dateOfTesting) },
+      value: { text: data.dateOfTesting ? formattedDateToUk(data.dateOfTesting) : "N/A" },
     },
-    { key: { text: "Date of claim" }, value: { text: formatedDate } },
+    { key: { text: "Date of claim" }, value: { text: formattedDate } },
     {
       key: { text: "Review details confirmed" },
       value: { text: upperFirstLetter(data.confirmCheckDetails) },

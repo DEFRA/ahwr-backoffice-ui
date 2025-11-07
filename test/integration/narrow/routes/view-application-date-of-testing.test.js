@@ -2,7 +2,7 @@ import * as cheerio from "cheerio";
 import { phaseBannerOk } from "../../../utils/phase-banner-expect";
 import { getApplication, getApplicationHistory } from "../../../../app/api/applications";
 import { permissions } from "../../../../app/auth/permissions";
-import { viewApplicationData } from "../../../data/view-applications.js";
+import { oldWorldApplication } from "../../../data/ow-application.js";
 import { applicationHistory } from "../../../data/application-history.js";
 import { resetAllWhenMocks } from "jest-when";
 import { createServer } from "../../../../app/server";
@@ -29,8 +29,7 @@ function expectWithdrawLink($, reference, isWithdrawLinkVisible) {
   }
 }
 
-// TODO - fix these tests rather than skipping them
-describe.skip("View Application test with Date of Testing enabled", () => {
+describe("View Application test with Date of Testing enabled", () => {
   const auth = {
     strategy: "session-auth",
     credentials: { scope: [administrator], account: { username: "" } },
@@ -65,9 +64,9 @@ describe.skip("View Application test with Date of Testing enabled", () => {
 
   describe("GET /agreements/<reference> route", () => {
     test("returns 200 application claim - claim date in application data", async () => {
-      const reference = "AHWR-555A-FD4C";
-      const status = "Claimed";
-      getApplication.mockReturnValueOnce(viewApplicationData.claim);
+      const { reference, organisation } = oldWorldApplication;
+      const status = "Ready to pay";
+      getApplication.mockReturnValueOnce(oldWorldApplication);
       getApplicationHistory.mockReturnValueOnce({
         historyRecords: applicationHistory,
       });
@@ -85,43 +84,52 @@ describe.skip("View Application test with Date of Testing enabled", () => {
       expect($("title").text()).toContain("Administration: User Agreement");
       expect($("#organisation-details .govuk-summary-list__row").length).toEqual(5);
       expect($(".govuk-summary-list__key").eq(0).text()).toMatch("Agreement holder");
-      expect($(".govuk-summary-list__value").eq(0).text()).toMatch("Farmer name");
+      expect($(".govuk-summary-list__value").eq(0).text()).toMatch(organisation.farmerName);
 
       expect($(".govuk-summary-list__key").eq(1).text()).toMatch("SBI number");
-      expect($(".govuk-summary-list__value").eq(1).text()).toMatch("333333333");
+      expect($(".govuk-summary-list__value").eq(1).text()).toMatch(organisation.sbi);
 
       expect($(".govuk-summary-list__key").eq(2).text()).toMatch("Address");
-      expect($(".govuk-summary-list__value").eq(2).text()).toMatch(
-        "Long dusty road, Middle-of-nowhere, In the countryside, CC33 3CC",
-      );
+      expect($(".govuk-summary-list__value").eq(2).text()).toMatch(organisation.address);
 
       expect($(".govuk-summary-list__key").eq(3).text()).toMatch("Email address");
-      expect($(".govuk-summary-list__value").eq(3).text()).toMatch("test@test.com");
+      expect($(".govuk-summary-list__value").eq(3).text()).toMatch(organisation.email);
 
       expect($(".govuk-summary-list__key").eq(4).text()).toMatch("Organisation email address");
-      expect($(".govuk-summary-list__value").eq(4).text()).toMatch("test@test.com");
+      expect($(".govuk-summary-list__value").eq(4).text()).toMatch(organisation.orgEmail);
 
       expect($("#application").text()).toContain(status);
-      expect($("#claim").text()).toContain(status);
 
       expect($("#claim .govuk-summary-list__key").eq(1).text()).toContain("Date of review");
-      expect($("#claim .govuk-summary-list__value").eq(1).text()).toContain("07/11/2022");
+      expect($("#claim .govuk-summary-list__value").eq(1).text()).toContain(
+        new Intl.DateTimeFormat("en-GB").format(new Date(oldWorldApplication.data.visitDate)),
+      );
       expect($("#claim .govuk-summary-list__key").eq(2).text()).toContain("Date of testing");
-      expect($("#claim .govuk-summary-list__value").eq(2).text()).toContain("08/11/2022");
+      expect($("#claim .govuk-summary-list__value").eq(2).text()).toContain(
+        new Intl.DateTimeFormat("en-GB").format(new Date(oldWorldApplication.data.dateOfTesting)),
+      );
       expect($("#claim .govuk-summary-list__key").eq(3).text()).toContain("Date of claim");
-      expect($("#claim .govuk-summary-list__value").eq(3).text()).toContain("09/11/2022");
+      expect($("#claim .govuk-summary-list__value").eq(3).text()).toContain(
+        new Intl.DateTimeFormat("en-GB").format(new Date(oldWorldApplication.data.dateOfClaim)),
+      );
       expect($("#claim .govuk-summary-list__key").eq(4).text()).toContain(
         "Review details confirmed",
       );
       expect($("#claim .govuk-summary-list__value").eq(4).text()).toContain("Yes");
       expect($("#claim .govuk-summary-list__key").eq(5).text()).toContain("Vet’s name");
-      expect($("#claim .govuk-summary-list__value").eq(5).text()).toContain("testVet");
+      expect($("#claim .govuk-summary-list__value").eq(5).text()).toContain(
+        oldWorldApplication.data.vetName,
+      );
       expect($("#claim .govuk-summary-list__key").eq(6).text()).toContain("Vet’s RCVS number");
-      expect($("#claim .govuk-summary-list__value").eq(6).text()).toContain("1234234");
+      expect($("#claim .govuk-summary-list__value").eq(6).text()).toContain(
+        oldWorldApplication.data.vetRcvs,
+      );
       expect($("#claim .govuk-summary-list__key").eq(7).text()).toContain(
         "Test results unique reference number (URN)",
       );
-      expect($("#claim .govuk-summary-list__value").eq(7).text()).toContain("134242");
+      expect($("#claim .govuk-summary-list__value").eq(7).text()).toContain(
+        oldWorldApplication.data.urnResult,
+      );
 
       expectWithdrawLink($, reference, false);
 

@@ -53,12 +53,11 @@ describe("Application-list createModel", () => {
       createdBy: "sql query",
       updatedBy: null,
       application: {
-        data: {
-          organisation: {
-            sbi: 123456,
-          },
+        data: {},
+        organisation: {
+          sbi: 123456,
         },
-        flags: []
+        flags: [],
       },
     },
   ];
