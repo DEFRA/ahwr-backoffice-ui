@@ -5,7 +5,7 @@ import { STATUS } from "ffc-ahwr-common-library";
 
 export const getApplicationDetails = (application, statusActions, eligiblePiiRedactionActions) => {
   const { data, createdAt, status, eligiblePiiRedaction } = application;
-  const formatedDate = formattedDateToUk(createdAt);
+  const formattedDate = formattedDateToUk(createdAt);
 
   const statusLabel = upperFirstLetter(status.toLowerCase().replace(/_/g, " "));
   const statusClass = getStyleClassByStatus(status);
@@ -22,7 +22,7 @@ export const getApplicationDetails = (application, statusActions, eligiblePiiRed
       key: {
         text: status === STATUS.NOT_AGREED ? "Date agreement rejected" : "Date of agreement",
       },
-      value: { text: formatedDate },
+      value: { text: formattedDate },
     },
     {
       key: { text: "Business details correct" },

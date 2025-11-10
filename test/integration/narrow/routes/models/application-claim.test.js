@@ -1,5 +1,5 @@
 import { getApplicationClaimDetails } from "../../../../../app/routes/models/application-claim.js";
-import { viewApplicationData } from "../../../../data/view-applications.js";
+import { oldWorldApplication } from "../../../../data/ow-application.js";
 import { applicationEvents } from "../../../../data/application-events.js";
 
 describe("Application-claim model", () => {
@@ -9,7 +9,7 @@ describe("Application-claim model", () => {
     const vetsNameActions = { items: [{ test: "change vets name" }] };
     const vetRCVSActions = { items: [{ test: "change RCVS" }] };
     const res = getApplicationClaimDetails(
-      viewApplicationData.claim,
+      oldWorldApplication,
       [],
       statusActions,
       visitDateActions,
@@ -21,31 +21,49 @@ describe("Application-claim model", () => {
       {
         key: { text: "Status" },
         value: {
-          html: '<span class="govuk-tag app-long-tag govuk-tag--blue">Claimed</span>',
+          html: '<span class="govuk-tag app-long-tag govuk-tag">Ready to pay</span>',
         },
         actions: statusActions,
       },
       {
         key: { text: "Date of review" },
-        value: { text: "07/11/2022" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.visitDate),
+          ),
+        },
         actions: visitDateActions,
       },
-      { key: { text: "Date of testing" }, value: { text: "08/11/2022" } },
-      { key: { text: "Date of claim" }, value: { text: "09/11/2022" } },
+      {
+        key: { text: "Date of testing" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.dateOfTesting),
+          ),
+        },
+      },
+      {
+        key: { text: "Date of claim" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.dateOfClaim),
+          ),
+        },
+      },
       { key: { text: "Review details confirmed" }, value: { text: "Yes" } },
       {
         key: { text: "Vet’s name" },
-        value: { text: "testVet" },
+        value: { text: oldWorldApplication.data.vetName },
         actions: vetsNameActions,
       },
       {
         key: { text: "Vet’s RCVS number" },
-        value: { text: "1234234" },
+        value: { text: oldWorldApplication.data.vetRcvs },
         actions: vetRCVSActions,
       },
       {
         key: { text: "Test results unique reference number (URN)" },
-        value: { text: "134242" },
+        value: { text: oldWorldApplication.data.urnResult },
       },
     ]);
   });
@@ -56,7 +74,7 @@ describe("Application-claim model", () => {
     const vetsNameActions = { items: [{ test: "change vets name" }] };
     const vetRCVSActions = { items: [{ test: "change RCVS" }] };
     const res = getApplicationClaimDetails(
-      viewApplicationData.claimWithNoClaimDate,
+      oldWorldApplication,
       applicationEvents,
       statusActions,
       visitDateActions,
@@ -68,43 +86,68 @@ describe("Application-claim model", () => {
       {
         key: { text: "Status" },
         value: {
-          html: '<span class="govuk-tag app-long-tag govuk-tag--blue">Claimed</span>',
+          html: '<span class="govuk-tag app-long-tag govuk-tag">Ready to pay</span>',
         },
         actions: statusActions,
       },
       {
         key: { text: "Date of review" },
-        value: { text: "07/11/2022" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.visitDate),
+          ),
+        },
         actions: visitDateActions,
       },
-      { key: { text: "Date of testing" }, value: { text: "08/11/2022" } },
-      { key: { text: "Date of claim" }, value: { text: "09/11/2022" } },
+      {
+        key: { text: "Date of testing" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.dateOfTesting),
+          ),
+        },
+      },
+      {
+        key: { text: "Date of claim" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.dateOfClaim),
+          ),
+        },
+      },
       { key: { text: "Review details confirmed" }, value: { text: "Yes" } },
       {
         key: { text: "Vet’s name" },
-        value: { text: "testVet" },
+        value: { text: oldWorldApplication.data.vetName },
         actions: vetsNameActions,
       },
       {
         key: { text: "Vet’s RCVS number" },
-        value: { text: "1234234" },
+        value: { text: oldWorldApplication.data.vetRcvs },
         actions: vetRCVSActions,
       },
       {
         key: { text: "Test results unique reference number (URN)" },
-        value: { text: "134242" },
+        value: { text: oldWorldApplication.data.urnResult },
       },
     ]);
   });
 
-  test("getClaimData - Valid Data with no date of claim", async () => {
+  test("getClaimData - Valid Data with no date of claim, gets it from the claim-claimed event", async () => {
     const statusActions = { items: [{ test: "change status" }] };
     const visitDateActions = { items: [{ test: "change visit date" }] };
     const vetsNameActions = { items: [{ test: "change vets name" }] };
     const vetRCVSActions = { items: [{ test: "change RCVS" }] };
     const res = getApplicationClaimDetails(
-      viewApplicationData.claimWithNoClaimDate,
-      [],
+      { ...oldWorldApplication, data: { ...oldWorldApplication.data, dateOfClaim: undefined } },
+      {
+        eventRecords: [
+          {
+            EventRaised: "2022-11-09T11:00:00.000Z",
+            EventType: "claim-claimed",
+          },
+        ],
+      },
       statusActions,
       visitDateActions,
       vetsNameActions,
@@ -114,31 +157,42 @@ describe("Application-claim model", () => {
       {
         key: { text: "Status" },
         value: {
-          html: '<span class="govuk-tag app-long-tag govuk-tag--blue">Claimed</span>',
+          html: '<span class="govuk-tag app-long-tag govuk-tag">Ready to pay</span>',
         },
         actions: statusActions,
       },
       {
         key: { text: "Date of review" },
-        value: { text: "07/11/2022" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.visitDate),
+          ),
+        },
         actions: visitDateActions,
       },
-      { key: { text: "Date of testing" }, value: { text: "08/11/2022" } },
-      { key: { text: "Date of claim" }, value: { text: "" } },
+      {
+        key: { text: "Date of testing" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.dateOfTesting),
+          ),
+        },
+      },
+      { key: { text: "Date of claim" }, value: { text: "09/11/2022" } },
       { key: { text: "Review details confirmed" }, value: { text: "Yes" } },
       {
         key: { text: "Vet’s name" },
-        value: { text: "testVet" },
+        value: { text: oldWorldApplication.data.vetName },
         actions: vetsNameActions,
       },
       {
         key: { text: "Vet’s RCVS number" },
-        value: { text: "1234234" },
+        value: { text: oldWorldApplication.data.vetRcvs },
         actions: vetRCVSActions,
       },
       {
         key: { text: "Test results unique reference number (URN)" },
-        value: { text: "134242" },
+        value: { text: oldWorldApplication.data.urnResult },
       },
     ]);
   });
@@ -149,7 +203,7 @@ describe("Application-claim model", () => {
     const vetsNameActions = { items: [{ test: "change vets name" }] };
     const vetRCVSActions = { items: [{ test: "change RCVS" }] };
     const res = getApplicationClaimDetails(
-      viewApplicationData.claimWithNoDateOfTesting,
+      { ...oldWorldApplication, data: { ...oldWorldApplication.data, dateOfTesting: undefined } },
       [],
       statusActions,
       visitDateActions,
@@ -161,31 +215,47 @@ describe("Application-claim model", () => {
       {
         key: { text: "Status" },
         value: {
-          html: '<span class="govuk-tag app-long-tag govuk-tag--blue">Claimed</span>',
+          html: '<span class="govuk-tag app-long-tag govuk-tag">Ready to pay</span>',
         },
         actions: statusActions,
       },
       {
         key: { text: "Date of review" },
-        value: { text: "07/11/2022" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.visitDate),
+          ),
+        },
         actions: visitDateActions,
       },
-      { key: { text: "Date of testing" }, value: { text: "Invalid Date" } },
-      { key: { text: "Date of claim" }, value: { text: "" } },
+      {
+        key: { text: "Date of testing" },
+        value: {
+          text: "N/A",
+        },
+      },
+      {
+        key: { text: "Date of claim" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.dateOfClaim),
+          ),
+        },
+      },
       { key: { text: "Review details confirmed" }, value: { text: "Yes" } },
       {
         key: { text: "Vet’s name" },
-        value: { text: "testVet" },
+        value: { text: oldWorldApplication.data.vetName },
         actions: vetsNameActions,
       },
       {
         key: { text: "Vet’s RCVS number" },
-        value: { text: "1234234" },
+        value: { text: oldWorldApplication.data.vetRcvs },
         actions: vetRCVSActions,
       },
       {
         key: { text: "Test results unique reference number (URN)" },
-        value: { text: "134242" },
+        value: { text: oldWorldApplication.data.urnResult },
       },
     ]);
   });
@@ -196,7 +266,7 @@ describe("Application-claim model", () => {
     const vetsNameActions = { items: [{ test: "change vets name" }] };
     const vetRCVSActions = { items: [{ test: "change RCVS" }] };
     const res = getApplicationClaimDetails(
-      viewApplicationData.claimWithNoClaimDate,
+      oldWorldApplication,
       {
         eventRecords: [
           {
@@ -215,31 +285,49 @@ describe("Application-claim model", () => {
       {
         key: { text: "Status" },
         value: {
-          html: '<span class="govuk-tag app-long-tag govuk-tag--blue">Claimed</span>',
+          html: '<span class="govuk-tag app-long-tag govuk-tag">Ready to pay</span>',
         },
         actions: statusActions,
       },
       {
         key: { text: "Date of review" },
-        value: { text: "07/11/2022" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.visitDate),
+          ),
+        },
         actions: visitDateActions,
       },
-      { key: { text: "Date of testing" }, value: { text: "08/11/2022" } },
-      { key: { text: "Date of claim" }, value: { text: "" } },
+      {
+        key: { text: "Date of testing" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.dateOfTesting),
+          ),
+        },
+      },
+      {
+        key: { text: "Date of claim" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.dateOfClaim),
+          ),
+        },
+      },
       { key: { text: "Review details confirmed" }, value: { text: "Yes" } },
       {
         key: { text: "Vet’s name" },
-        value: { text: "testVet" },
+        value: { text: oldWorldApplication.data.vetName },
         actions: vetsNameActions,
       },
       {
         key: { text: "Vet’s RCVS number" },
-        value: { text: "1234234" },
+        value: { text: oldWorldApplication.data.vetRcvs },
         actions: vetRCVSActions,
       },
       {
         key: { text: "Test results unique reference number (URN)" },
-        value: { text: "134242" },
+        value: { text: oldWorldApplication.data.urnResult },
       },
     ]);
   });
@@ -250,7 +338,7 @@ describe("Application-claim model", () => {
     const vetsNameActions = { items: [{ test: "change vets name" }] };
     const vetRCVSActions = { items: [{ test: "change RCVS" }] };
     const res = getApplicationClaimDetails(
-      viewApplicationData.paid,
+      { ...oldWorldApplication, status: "PAID" },
       {
         eventRecords: [
           {
@@ -275,25 +363,43 @@ describe("Application-claim model", () => {
       },
       {
         key: { text: "Date of review" },
-        value: { text: "Invalid Date" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.visitDate),
+          ),
+        },
         actions: visitDateActions,
       },
-      { key: { text: "Date of testing" }, value: { text: "Invalid Date" } },
-      { key: { text: "Date of claim" }, value: { text: "08/11/2022" } },
+      {
+        key: { text: "Date of testing" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.dateOfTesting),
+          ),
+        },
+      },
+      {
+        key: { text: "Date of claim" },
+        value: {
+          text: new Intl.DateTimeFormat("en-GB").format(
+            new Date(oldWorldApplication.data.dateOfClaim),
+          ),
+        },
+      },
       { key: { text: "Review details confirmed" }, value: { text: "Yes" } },
       {
         key: { text: "Vet’s name" },
-        value: { text: undefined },
+        value: { text: oldWorldApplication.data.vetName },
         actions: vetsNameActions,
       },
       {
         key: { text: "Vet’s RCVS number" },
-        value: { text: undefined },
+        value: { text: oldWorldApplication.data.vetRcvs },
         actions: vetRCVSActions,
       },
       {
         key: { text: "Test results unique reference number (URN)" },
-        value: { text: undefined },
+        value: { text: oldWorldApplication.data.urnResult },
       },
     ]);
   });
