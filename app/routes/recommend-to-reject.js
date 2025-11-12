@@ -61,12 +61,7 @@ export const recommendToRejectRoute = {
 
       if (claimOrAgreement === "claim") {
         query.append("returnPage", returnPage);
-        await updateClaimStatus(
-          reference,
-          name,
-          STATUS.RECOMMENDED_TO_REJECT,
-          request.logger,
-        );
+        await updateClaimStatus(reference, name, STATUS.RECOMMENDED_TO_REJECT, request.logger);
       } else {
         await updateApplicationStatus(
           reference,

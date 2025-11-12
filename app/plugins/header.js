@@ -14,28 +14,28 @@
 
 export const headerPlugin = {
   plugin: {
-    name: 'header',
+    name: "header",
     register: (server, options) => {
-      server.ext('onPreResponse', (request, h) => {
+      server.ext("onPreResponse", (request, h) => {
         let { response } = request;
 
-        if (!response.isBoom && typeof response.header !== 'function') {
-          response = h.response(response)
+        if (!response.isBoom && typeof response.header !== "function") {
+          response = h.response(response);
         }
 
         if (!response.isBoom) {
           (options?.keys || []).forEach((x) => {
-            response.header(x.key, x.value)
+            response.header(x.key, x.value);
           });
         } else {
           (options?.keys || []).forEach((x) => {
-            response.output.headers[x.key] = x.value
+            response.output.headers[x.key] = x.value;
           });
         }
 
         return h.continue;
-      })
-    }
+      });
+    },
   },
   // TODO 1185 one of the commented out items is causing 502 error
   options: {
@@ -44,7 +44,7 @@ export const headerPlugin = {
       // { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
       // { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
       // { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
-      { key: 'Cache-Control', value: 'no-cache' }
+      { key: "Cache-Control", value: "no-cache" },
       // {
       //   key: 'Content-Security-Policy',
       //   value: getSecurityPolicy()
@@ -55,6 +55,6 @@ export const headerPlugin = {
       // { key: 'X-Content-Type-Options', value: 'nosniff' },
       // { key: 'X-XSS-Protection', value: '1; mode=block' },
       // { key: 'Strict-Transport-Security', value: 'max-age=31536000;' }, // different value
-    ]
-  }
-}
+    ],
+  },
+};

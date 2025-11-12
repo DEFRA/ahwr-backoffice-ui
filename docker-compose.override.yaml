@@ -6,7 +6,7 @@ services:
     build:
       target: development
     image: ffc-ahwr-backoffice-development
-    container_name: ffc-ahwr-backoffice-development
+    container_name: ahwr-backoffice-ui-development
     environment:
       USE_PRETTY_PRINT: ${USE_PRETTY_PRINT:-true}
       SUPER_ADMINS: ${SUPER_ADMINS:-developer@defra.gov.uk}

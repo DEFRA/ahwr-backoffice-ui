@@ -77,7 +77,9 @@ describe("Application-list createModel", () => {
   test("getClaimTableRows with a flagged claim", async () => {
     const page = 1;
     const returnPage = "claim";
-    const flaggedClaims = [{ ...claims[0], application: { ...claims[0].application, flags: [{ appliesToMh: true }] } }];
+    const flaggedClaims = [
+      { ...claims[0], application: { ...claims[0].application, flags: [{ appliesToMh: true }] } },
+    ];
     const rows = getClaimTableRows(flaggedClaims, page, returnPage);
 
     const formattedRows = rows[0][0].html.replace(/\s+/g, " ");

@@ -77,7 +77,7 @@ describe("View claim test", () => {
       createdBy: "sql query",
       updatedBy: null,
       status: "PAID",
-      application
+      application,
     },
     {
       id: "5e8558ee-31d7-454b-a061-b8c97bb91d56",
@@ -127,7 +127,7 @@ describe("View claim test", () => {
       createdBy: "sql query",
       updatedBy: null,
       status: "RECOMMENDED_TO_PAY",
-      application
+      application,
     },
     {
       id: "58b297c9-c983-475c-8bdb-db5746899cec",
@@ -159,7 +159,7 @@ describe("View claim test", () => {
       createdBy: "sql query",
       updatedBy: null,
       status: "PAID",
-      application
+      application,
     },
     {
       id: "58b297c9-c983-475c-8bdb-db5746899cec",
@@ -186,7 +186,7 @@ describe("View claim test", () => {
       createdBy: "sql query",
       updatedBy: null,
       status: "PAID",
-      application
+      application,
     },
   ];
 
@@ -224,7 +224,7 @@ describe("View claim test", () => {
     createdBy: "sql query",
     updatedBy: null,
     status: "PAID",
-    application
+    application,
   };
   getApplicationHistory.mockReturnValue({ historyRecords: [] });
   afterEach(async () => {

@@ -212,9 +212,7 @@ const superAdminActions = (
   updateDateOfVisit,
   updateEligiblePiiRedaction,
 ) => {
-  const claimIsntPaidOrReadyToPay = ![STATUS.READY_TO_PAY, STATUS.PAID].includes(
-    status,
-  );
+  const claimIsntPaidOrReadyToPay = ![STATUS.READY_TO_PAY, STATUS.PAID].includes(status);
 
   const updateStatusAction = isSuperAdmin && claimIsntPaidOrReadyToPay;
   const updateStatusForm = isSuperAdmin && updateStatus === true && claimIsntPaidOrReadyToPay;

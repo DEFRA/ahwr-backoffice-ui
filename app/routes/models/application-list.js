@@ -64,7 +64,7 @@ export const getApplicationTableHeader = (sortField) => {
         "data-url": "/agreements/sort/Status",
       },
       classes: "col-6",
-    }
+    },
   ];
 
   return headerColumns;
@@ -107,7 +107,7 @@ const buildApplicationList = (applications, page) => {
         attributes: {
           "data-sort-value": `${app.status}`,
         },
-      }
+      },
     ];
 
     if (app.flags.length) {

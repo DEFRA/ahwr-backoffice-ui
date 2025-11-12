@@ -42,8 +42,8 @@ export const updateEligiblePiiRedactionRoute = {
 
         if (reference.startsWith("AHWR")) {
           return h.redirect(`/view-agreement/${reference}?${query.toString()}`).takeover();
-        } 
-          
+        }
+
         return h.redirect(`/agreement/${reference}/claims?${query.toString()}`).takeover();
       },
     },
@@ -65,7 +65,7 @@ export const updateEligiblePiiRedactionRoute = {
       if (reference.startsWith("AHWR")) {
         return h.redirect(`/view-agreement/${reference}?${query.toString()}`);
       }
-      
+
       return h.redirect(`/agreement/${reference}/claims?${query.toString()}`);
     },
   },

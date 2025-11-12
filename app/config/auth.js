@@ -6,7 +6,7 @@ const buildAuthConfig = () => {
     clientSecret: joi.string().required(),
     clientId: joi.string().required(),
     authority: joi.string().uri().required(),
-    redirectUrl: joi.string().uri().required()
+    redirectUrl: joi.string().uri().required(),
   });
 
   const config = {

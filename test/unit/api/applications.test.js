@@ -66,10 +66,7 @@ describe("Application API", () => {
 
     expect(response).toEqual(wreckResponse.payload);
     expect(wreck.get).toHaveBeenCalledTimes(1);
-    expect(wreck.get).toHaveBeenCalledWith(
-      `${applicationApiUri}/applications/${appRef}`,
-      options,
-    );
+    expect(wreck.get).toHaveBeenCalledWith(`${applicationApiUri}/applications/${appRef}`, options);
   });
 
   it("getApplication should return an application", async () => {
@@ -88,10 +85,7 @@ describe("Application API", () => {
 
     expect(response).toEqual(wreckResponse.payload);
     expect(wreck.get).toHaveBeenCalledTimes(1);
-    expect(wreck.get).toHaveBeenCalledWith(
-      `${applicationApiUri}/applications/${appRef}`,
-      options,
-    );
+    expect(wreck.get).toHaveBeenCalledWith(`${applicationApiUri}/applications/${appRef}`, options);
   });
 
   it("getApplications should throw errors", async () => {
@@ -128,10 +122,7 @@ describe("Application API", () => {
     }).rejects.toBe("getApplication boom");
 
     expect(wreck.get).toHaveBeenCalledTimes(1);
-    expect(wreck.get).toHaveBeenCalledWith(
-      `${applicationApiUri}/applications/${appRef}`,
-      options,
-    );
+    expect(wreck.get).toHaveBeenCalledWith(`${applicationApiUri}/applications/${appRef}`, options);
   });
 
   it("updateApplicationStatus should throw errors", async () => {

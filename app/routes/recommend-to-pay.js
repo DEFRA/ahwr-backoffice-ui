@@ -64,12 +64,7 @@ export const recommendToPayRoute = {
         query.append("returnPage", returnPage);
         await updateClaimStatus(reference, name, STATUS.RECOMMENDED_TO_PAY, request.logger);
       } else {
-        await updateApplicationStatus(
-          reference,
-          name,
-          STATUS.RECOMMENDED_TO_PAY,
-          request.logger,
-        );
+        await updateApplicationStatus(reference, name, STATUS.RECOMMENDED_TO_PAY, request.logger);
       }
 
       return h.redirect(`/view-${claimOrAgreement}/${reference}?${query.toString()}`);

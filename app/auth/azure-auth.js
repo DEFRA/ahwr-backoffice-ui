@@ -8,7 +8,8 @@ const msalLogging = config.isProd
       },
       piiLoggingEnabled: false,
       logLevel: LogLevel.Verbose,
-    } : {};
+    }
+  : {};
 
 let msalApplication;
 

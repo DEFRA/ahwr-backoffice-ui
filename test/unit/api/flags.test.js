@@ -63,16 +63,13 @@ describe("Flags API", () => {
 
       await deleteFlag({ flagId, deletedNote }, username, mockLogger);
 
-      expect(wreck.patch).toHaveBeenCalledWith(
-        `${applicationApiUri}/applications/flag/${flagId}/delete`,
-        {
-          json: true,
-          payload: {
-            user: username,
-            deletedNote,
-          },
+      expect(wreck.patch).toHaveBeenCalledWith(`${applicationApiUri}/flags/${flagId}/delete`, {
+        json: true,
+        payload: {
+          user: username,
+          deletedNote,
         },
-      );
+      });
       expect(mockLogger.setBindings).not.toHaveBeenCalled();
     });
 
