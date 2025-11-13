@@ -1,5 +1,4 @@
 import { StatusCodes } from "http-status-codes";
-import { getErrorDetails } from "./logging-holder.js";
 
 export const errorPagesPlugin = {
   plugin: {
