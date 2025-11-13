@@ -2,7 +2,7 @@
 # that test output is saved to the host
 
 services:
-  ffc-ahwr-backoffice:
+  ahwr-backoffice-ui:
     build:
       target: development
     environment:
@@ -12,8 +12,8 @@ services:
       AADAR_CLIENT_ID: NCC-1701-D
       AADAR_REDIRECT_URL: http://thesearenotthedroidsyouarelookingfor
       AADAR_TENANT_ID: C3PO-R2D2
-    image: ffc-ahwr-backoffice-development
-    container_name: ffc-ahwr-backoffice-test
+    image: ahwr-backoffice-ui-development
+    container_name: ahwr-backoffice-ui-test
     command: npm run test
     volumes:
       - ./test-output:/home/node/test-output

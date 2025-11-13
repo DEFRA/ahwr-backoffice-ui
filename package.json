@@ -2,7 +2,7 @@
   "name": "ahwr-backoffice-ui",
   "version": "0.0.1",
   "description": "Back office UI for AHWR service",
-  "homepage": "https://github.com/DEFRA/ffc-ahwr-backoffice",
+  "homepage": "https://github.com/DEFRA/ahwr-backoffice-ui",
   "main": "app/index.js",
   "type": "module",
   "scripts": {

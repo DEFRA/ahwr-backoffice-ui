@@ -47,7 +47,7 @@ export const viewsPlugin = {
     context: {
       appVersion: process.env.npm_package_version,
       assetPath: "/assets",
-      pageTitle: "ffc-ahwr-backoffice",
+      pageTitle: "ahwr-backoffice-ui",
     },
   },
 };

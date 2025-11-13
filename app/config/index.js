@@ -74,7 +74,7 @@ const buildConfig = () => {
       cookieNameSession: "ffc_ahwr_backoffice_session",
       isSameSite: "Lax",
       isSecure: process.env.NODE_ENV === "production",
-      password: process.env.COOKIE_PASSWORD,
+      password: process.env.COOKIE_PASSWORD ?? "set_a_secure_cookie_password_of_at_least_32_characters",
       ttl: MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_DAY * NUMBER_OF_DAYS,
     },
     cookiePolicy: {
@@ -93,7 +93,7 @@ const buildConfig = () => {
     serviceUri: process.env.AHWR_SERVICE_URI,
     useRedis: process.env.NODE_ENV !== "test",
     applicationApiUri: process.env.AHWR_APPLICATION_BACKEND_URL,
-    displayPageSize: Number(process.env.DISPLAY_PAGE_SIZE),
+    displayPageSize: Number(process.env.DISPLAY_PAGE_SIZE ?? '20'),
     superAdmins: process.env.SUPER_ADMINS
       ? process.env.SUPER_ADMINS.split(",").map((user) => user.trim().toLowerCase())
       : [],

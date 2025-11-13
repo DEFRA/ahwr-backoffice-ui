@@ -2,10 +2,10 @@
 # to provide dependencies and expose ports for local testing
 
 services:
-  ffc-ahwr-backoffice:
+  ahwr-backoffice-ui:
     build:
       target: development
-    image: ffc-ahwr-backoffice-development
+    image: ahwr-backoffice-ui-development
     container_name: ahwr-backoffice-ui-development
     environment:
       USE_PRETTY_PRINT: ${USE_PRETTY_PRINT:-true}

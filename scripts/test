@@ -3,7 +3,7 @@
 set -e
 projectRoot="$(a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}/; cd "$a/.." || return; pwd)"
 
-service="ffc-ahwr-backoffice"
+service="ahwr-backoffice-ui"
 
 # Determine which docker compose command is available
 if command -v docker compose &> /dev/null; then
