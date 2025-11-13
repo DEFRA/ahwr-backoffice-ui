@@ -14,7 +14,7 @@ import { getCacheEngine } from "./cache/get-cache-engine.js";
 import { requestLogger } from "./logging/request-logger.js";
 
 export async function createServer() {
-  setupProxy()
+  setupProxy();
   const server = Hapi.server({
     cache: [getCacheEngine()],
     port: config.port,

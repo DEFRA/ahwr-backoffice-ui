@@ -61,4 +61,4 @@ export const buildRedisClient = () => {
   });
 
   return redisClient;
-}
+};

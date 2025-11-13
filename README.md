@@ -71,15 +71,15 @@ proxy dispatcher:
 To add the dispatcher to your own client:
 
 ```javascript
-import { ProxyAgent } from 'undici'
+import { ProxyAgent } from "undici";
 
 return await fetch(url, {
   dispatcher: new ProxyAgent({
     uri: proxyUrl,
     keepAliveTimeout: 10,
-    keepAliveMaxTimeout: 10
-  })
-})
+    keepAliveMaxTimeout: 10,
+  }),
+});
 ```
 
 ## Local Development

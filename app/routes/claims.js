@@ -65,9 +65,9 @@ export const claimsRoutes = [
       },
       handler: async (request, h) => {
         try {
-        await generateNewCrumb(request, h);
-        const viewData = await getViewData(request);
-        return h.view("claims", viewData);
+          await generateNewCrumb(request, h);
+          const viewData = await getViewData(request);
+          return h.view("claims", viewData);
         } catch (error) {
           console.log(error);
           throw error;

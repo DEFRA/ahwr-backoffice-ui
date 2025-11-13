@@ -10,7 +10,7 @@ services:
       AADAR_CLIENT_SECRET: ${AADAR_CLIENT_SECRET:-notset}
       AADAR_CLIENT_ID: ${AADAR_CLIENT_ID:-notset}
       AADAR_REDIRECT_URL: ${AADAR_REDIRECT_URL:-http://localhost:3002/authenticate}
-      AADAR_AUTHORITY_URL: ${AADAR_AUTHORITY_URL:-notset}
+      AADAR_AUTHORITY_URL: ${AADAR_AUTHORITY_URL:-http://notset}
       COOKIE_PASSWORD: who-likes-cookies-i-like-cookies-everybody-likes-cookies
       REDIS_HOST: redis
       REDIS_USERNAME: ""
