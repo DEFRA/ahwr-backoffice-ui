@@ -32,6 +32,18 @@ export const loggerOptions = {
   level: logLevel,
   ...formatters[logFormat],
   nesting: true,
+  serializers: {
+    error: (err) => {
+      if (err instanceof Error) {
+        return {
+          message: err.message,
+          stack_trace: err.stack,
+          type: err.name
+        }
+      }
+      return err
+    }
+  },
   mixin() {
     const mixinValues = {};
     const traceId = getTraceId();
