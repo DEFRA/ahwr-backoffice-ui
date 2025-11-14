@@ -1,9 +1,8 @@
 import * as cheerio from "cheerio";
 import { phaseBannerOk } from "../../../utils/phase-banner-expect";
-import { getApplication, getApplicationHistory } from "../../../../app/api/applications";
+import { getApplication } from "../../../../app/api/applications";
 import { permissions } from "../../../../app/auth/permissions";
 import { oldWorldApplication } from "../../../data/ow-application.js";
-import { applicationHistory } from "../../../data/application-history.js";
 import { resetAllWhenMocks } from "jest-when";
 import { createServer } from "../../../../app/server";
 import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states";
@@ -62,14 +61,11 @@ describe("View Application test with Date of Testing enabled", () => {
     resetAllWhenMocks();
   });
 
-  describe("GET /agreements/<reference> route", () => {
+  describe("GET /view-greement/<reference> route", () => {
     test("returns 200 application claim - claim date in application data", async () => {
       const { reference, organisation } = oldWorldApplication;
       const status = "Ready to pay";
       getApplication.mockReturnValueOnce(oldWorldApplication);
-      getApplicationHistory.mockReturnValueOnce({
-        historyRecords: applicationHistory,
-      });
 
       const options = {
         method: "GET",

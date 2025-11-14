@@ -38,11 +38,11 @@ export const loggerOptions = {
         return {
           message: err.message,
           stack_trace: err.stack,
-          type: err.name
-        }
+          type: err.name,
+        };
       }
-      return err
-    }
+      return err;
+    },
   },
   mixin() {
     const mixinValues = {};

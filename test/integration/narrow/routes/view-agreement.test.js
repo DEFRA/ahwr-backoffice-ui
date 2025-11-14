@@ -5,9 +5,8 @@ import { phaseBannerOk } from "../../../utils/phase-banner-expect";
 import { permissions } from "../../../../app/auth/permissions";
 import { when, resetAllWhenMocks } from "jest-when";
 import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states";
-import { getApplication, getApplicationHistory } from "../../../../app/api/applications";
+import { getApplication } from "../../../../app/api/applications";
 import { oldWorldApplication } from "../../../data/ow-application";
-import { applicationHistory } from "../../../data/application-history";
 import { StatusCodes } from "http-status-codes";
 
 jest.mock("../../../../app/routes/utils/get-claim-view-states");
@@ -137,9 +136,6 @@ describe("View Application test", () => {
         ...oldWorldApplication,
         redacted: true,
       });
-      getApplicationHistory.mockReturnValueOnce({
-        historyRecords: applicationHistory,
-      });
 
       const options = {
         method: "GET",
@@ -170,9 +166,7 @@ describe("View Application test", () => {
           credentials: { scope: [authScope], account: { username: "test" } },
         };
         getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "AGREED" });
-        getApplicationHistory.mockReturnValueOnce({
-          historyRecords: applicationHistory,
-        });
+
         const options = {
           method: "GET",
           url,
@@ -190,9 +184,7 @@ describe("View Application test", () => {
       "Recommend buttons displayed as expected for when claim helper returns %s",
       async (areRecommendButtonsVisible) => {
         getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "IN_CHECK" });
-        getApplicationHistory.mockReturnValueOnce({
-          historyRecords: applicationHistory,
-        });
+
         getClaimViewStates.mockReturnValueOnce({
           recommendAction: areRecommendButtonsVisible,
         });
@@ -210,9 +202,7 @@ describe("View Application test", () => {
 
     test.each([true, false])("Present authorisation for payment panel", async (authoriseForm) => {
       getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "READY_TO_PAY" });
-      getApplicationHistory.mockReturnValueOnce({
-        historyRecords: applicationHistory,
-      });
+
       when(getClaimViewStates).mockReturnValue({
         authoriseForm,
       });
@@ -234,9 +224,7 @@ describe("View Application test", () => {
 
     test.each([true, false])("Present authorisation for reject panel", async (rejectForm) => {
       getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "READY_TO_PAY" });
-      getApplicationHistory.mockReturnValueOnce({
-        historyRecords: applicationHistory,
-      });
+
       when(getClaimViewStates).mockReturnValue({
         rejectForm,
       });
@@ -260,9 +248,7 @@ describe("View Application test", () => {
       "Authorisation form displayed as expected for role %s",
       async (authoriseForm) => {
         getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "READY_TO_PAY" });
-        getApplicationHistory.mockReturnValueOnce({
-          historyRecords: applicationHistory,
-        });
+
         when(getClaimViewStates).mockReturnValue({
           authoriseForm,
         });
@@ -301,9 +287,7 @@ describe("View Application test", () => {
       "Recommended to pay form displayed as expected when claim helper returns %s",
       async (recommendToPayForm) => {
         getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "READY_TO_PAY" });
-        getApplicationHistory.mockReturnValueOnce({
-          historyRecords: applicationHistory,
-        });
+
         getClaimViewStates.mockReturnValueOnce({
           recommendToPayForm,
         });
@@ -345,9 +329,7 @@ describe("View Application test", () => {
       "Authorisation confirm form displayed as expected for role %s",
       async (rejectForm) => {
         getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "READY_TO_PAY" });
-        getApplicationHistory.mockReturnValueOnce({
-          historyRecords: applicationHistory,
-        });
+
         getClaimViewStates.mockReturnValueOnce({
           rejectForm,
         });
@@ -390,9 +372,7 @@ describe("View Application test", () => {
       "Recommended to reject confirm form displayed as expected when claim helper returns %s",
       async (recommendToRejectForm) => {
         getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "READY_TO_PAY" });
-        getApplicationHistory.mockReturnValueOnce({
-          historyRecords: applicationHistory,
-        });
+
         getClaimViewStates.mockReturnValueOnce({
           recommendToRejectForm,
         });
@@ -452,9 +432,7 @@ describe("View Application test", () => {
           credentials: { scope: [authScope], account: { username: "test" } },
         };
         getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "AGREED" });
-        getApplicationHistory.mockReturnValueOnce({
-          historyRecords: applicationHistory,
-        });
+
         getClaimViewStates.mockReturnValueOnce({
           withdrawAction,
         });
@@ -483,9 +461,7 @@ describe("View Application test", () => {
         credentials: { scope: [authScope], account: { username: "test" } },
       };
       getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "AGREED" });
-      getApplicationHistory.mockReturnValueOnce({
-        historyRecords: applicationHistory,
-      });
+
       const options = {
         method: "GET",
         url,
@@ -543,9 +519,7 @@ describe("View Application test", () => {
           credentials: { scope: [authScope], account: { username: "test" } },
         };
         getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "IN_CHECK" });
-        getApplicationHistory.mockReturnValueOnce({
-          historyRecords: applicationHistory,
-        });
+
         const options = {
           method: "GET",
           url,
@@ -596,9 +570,7 @@ describe("View Application test", () => {
           credentials: { scope: [authScope], account: { username: "test" } },
         };
         getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "READY_TO_PAY" });
-        getApplicationHistory.mockReturnValueOnce({
-          historyRecords: applicationHistory,
-        });
+
         const options = {
           method: "GET",
           url,
@@ -627,9 +599,7 @@ describe("View Application test", () => {
         },
       };
       getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "AGREED" });
-      getApplicationHistory.mockReturnValueOnce({
-        historyRecords: applicationHistory,
-      });
+
       const url = `/view-agreement/${reference}?page=1&withdraw=${true}`;
       const options = {
         method: "GET",
@@ -647,9 +617,7 @@ describe("View Application test", () => {
 
     test("returns 200 application - valid history tab", async () => {
       getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "NOT_AGREED" });
-      getApplicationHistory.mockReturnValueOnce({
-        historyRecords: applicationHistory,
-      });
+
       const options = {
         method: "GET",
         url,
@@ -658,27 +626,27 @@ describe("View Application test", () => {
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
       const $ = cheerio.load(res.payload);
-      expect($("#history").text()).toContain("History");
-      expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(1)").text()).toContain("Date");
-      expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(2)").text()).toContain("Time");
-      expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(3)").text()).toContain("Action");
-      expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(4)").text()).toContain("User");
-      expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(1)").text()).toContain(
-        "23/03/2023",
-      );
-      expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(2)").text()).toContain("10:00:12");
-      expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(3)").text()).toContain("Approved");
-      expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(4)").text()).toContain(
-        "Daniel Jones",
-      );
-      expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("24/03/2023");
-      expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("09:30:00");
-      expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("Withdrawn");
-      expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("Daniel Jones");
-      expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("25/03/2023");
-      expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("11:10:15");
-      expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("Rejected");
-      expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("Amanda Hassan");
+      expect($("#history").text()).toContain("History"); // TODO: expand when history implemented
+      // expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(1)").text()).toContain("Date");
+      // expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(2)").text()).toContain("Time");
+      // expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(3)").text()).toContain("Action");
+      // expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(4)").text()).toContain("User");
+      // expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(1)").text()).toContain(
+      //   "23/03/2023",
+      // );
+      // expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(2)").text()).toContain("10:00:12");
+      // expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(3)").text()).toContain("Approved");
+      // expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(4)").text()).toContain(
+      //   "Daniel Jones",
+      // );
+      // expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("24/03/2023");
+      // expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("09:30:00");
+      // expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("Withdrawn");
+      // expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("Daniel Jones");
+      // expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("25/03/2023");
+      // expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("11:10:15");
+      // expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("Rejected");
+      // expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("Amanda Hassan");
 
       phaseBannerOk($);
     });
@@ -714,9 +682,7 @@ describe("View Application test", () => {
         },
       }));
       getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "IN_CHECK" });
-      getApplicationHistory.mockReturnValueOnce({
-        historyRecords: applicationHistory,
-      });
+
       const options = {
         method: "GET",
         url: `/agreements/${reference}/${queryParam}`,
@@ -773,9 +739,7 @@ describe("View Application test", () => {
         },
       }));
       getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "IN_CHECK" });
-      getApplicationHistory.mockReturnValueOnce({
-        historyRecords: applicationHistory,
-      });
+
       const options = {
         method: "GET",
         url: `/agreements/${reference}/${queryParam}`,
@@ -834,9 +798,7 @@ describe("View Application test", () => {
         },
       }));
       getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "IN_CHECK" });
-      getApplicationHistory.mockReturnValueOnce({
-        historyRecords: applicationHistory,
-      });
+
       const options = {
         method: "GET",
         url: `/agreements/${reference}/${queryParam}`,
@@ -902,9 +864,7 @@ describe("View Application test", () => {
         },
       }));
       getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "IN_CHECK" });
-      getApplicationHistory.mockReturnValueOnce({
-        historyRecords: applicationHistory,
-      });
+
       const options = {
         method: "GET",
         url: `/agreements/${reference}${queryParam}`,

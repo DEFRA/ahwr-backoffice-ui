@@ -5,7 +5,6 @@ import {
   getApplication,
   updateApplicationStatus,
   processApplicationClaim,
-  getApplicationHistory,
   getApplicationEvents,
   updateApplicationData,
   redactPiiData,
@@ -262,42 +261,6 @@ describe("Application API", () => {
     expect(response).toEqual(wreckResponse.payload);
     expect(wreck.post).toHaveBeenCalledTimes(1);
     expect(wreck.post).toHaveBeenCalledWith(`${applicationApiUri}/applications/claim`, options);
-  });
-
-  it("getApplicationHistory should return history records", async () => {
-    const wreckResponse = {
-      payload: {
-        historyRecords: [{}, {}, {}],
-      },
-      res: {
-        statusCode: 200,
-      },
-    };
-
-    const options = { json: true };
-    wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
-    const response = await getApplicationHistory(appRef);
-    expect(response).toEqual(wreckResponse.payload);
-    expect(wreck.get).toHaveBeenCalledTimes(1);
-    expect(wreck.get).toHaveBeenCalledWith(
-      `${applicationApiUri}/applications/${appRef}/history`,
-      options,
-    );
-  });
-
-  it("getApplicationHistory should throw errors", async () => {
-    const options = { json: true };
-    wreck.get = jest.fn().mockRejectedValueOnce("getApplicationHistory boom");
-    const logger = { setBindings: jest.fn() };
-
-    expect(async () => {
-      await getApplicationHistory(appRef, logger);
-    }).rejects.toBe("getApplicationHistory boom");
-    expect(wreck.get).toHaveBeenCalledTimes(1);
-    expect(wreck.get).toHaveBeenCalledWith(
-      `${applicationApiUri}/applications/${appRef}/history`,
-      options,
-    );
   });
 
   it("getApplicationEvents should return records", async () => {
