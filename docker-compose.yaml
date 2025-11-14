@@ -1,10 +1,10 @@
 services:
-  ffc-ahwr-backoffice:
+  ahwr-backoffice-ui:
     build:
       context: .
       target: production
-    image: ffc-ahwr-backoffice
-    container_name: ffc-ahwr-backoffice
+    image: ahwr-backoffice-ui
+    container_name: ahwr-backoffice-ui
     environment:
       AADAR_ENABLED: ${AADAR_ENABLED:-false}
       AADAR_CLIENT_SECRET: ${AADAR_CLIENT_SECRET:-notset}

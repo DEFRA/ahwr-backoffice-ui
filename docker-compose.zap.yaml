@@ -1,9 +1,9 @@
 services:
-  ffc-ahwr-backoffice:
+  ahwr-backoffice-ui:
     command: npm run start:watch
     build:
       target: development
-    image: ffc-ahwr-backoffice-development
+    image: ahwr-backoffice-ui-development
     environment:
       NODE_ENV: test
     volumes:
@@ -11,9 +11,9 @@ services:
 
   zap-baseline-scan:
     image: zaproxy/zap-bare:2.16.1
-    command: zap.sh -cmd -quickurl http://ffc-ahwr-backoffice:${PORT:-3000} -configfile wrk/config/zap.conf -quickout wrk/test-output/zap-report.html
+    command: zap.sh -cmd -quickurl http://ahwr-backoffice-ui:${PORT:-3000} -configfile wrk/config/zap.conf -quickout wrk/test-output/zap-report.html
     depends_on:
-      - ffc-ahwr-backoffice
+      - ahwr-backoffice-ui
     volumes:
       - ./test-output/:/zap/wrk/test-output/
       - ./zap/:/zap/wrk/config/

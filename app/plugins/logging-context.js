@@ -5,8 +5,8 @@ export function addBindings(request) {
   const roles = getUserDetails(request, "roles");
 
   request.logger.setBindings({
-    user: username,
-    roles,
+    "user.name": username,
+    "user.roles": roles,
   });
 }
 

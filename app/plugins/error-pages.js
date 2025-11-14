@@ -14,10 +14,10 @@ export const errorPagesPlugin = {
           request.logger.error(
             {
               statusCode,
-              message,
-              stack: response.data ? response.data.stack : response.stack,
+              "error.message": message,
+              "error.stack": response.data ? response.data.stack : response.stack,
             },
-            "pre response error",
+            "Error plugin picked up error",
           );
 
           if (statusCode === StatusCodes.NOT_FOUND) {

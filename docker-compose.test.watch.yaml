@@ -1,5 +1,5 @@
 services:
-  ffc-ahwr-backoffice:
+  ahwr-backoffice-ui:
     command: >
       sh -c "npm run test:watch:all"
     volumes:
