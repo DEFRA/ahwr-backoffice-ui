@@ -11,13 +11,14 @@ export const errorPagesPlugin = {
           const { payload } = response.output;
           const { statusCode, message } = payload;
 
+          const error = new Error(message);
+          error.stack = response.data ? response.data.stack : response.stack
+          error.type = "pre-response"
           request.logger.error(
             {
               statusCode,
-              "error.message": message,
-              "error.stack_trace" : response.data ? response.data.stack : response.stack,
-            },
-            "Error plugin picked up error",
+              error
+            }
           );
 
           if (statusCode === StatusCodes.NOT_FOUND) {
