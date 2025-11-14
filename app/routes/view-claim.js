@@ -1,7 +1,6 @@
 import { Buffer } from "node:buffer";
 import joi from "joi";
 import { getClaim, getClaims } from "../api/claims.js";
-import { getApplication, getApplicationHistory } from "../api/applications.js";
 import { getHistoryDetails } from "./models/application-history.js";
 import { getStyleClassByStatus } from "../constants/status.js";
 import { upperFirstLetter, formattedDateToUk } from "../lib/display-helper.js";
@@ -17,6 +16,7 @@ import { getReviewType } from "../lib/get-review-type.js";
 import { getHerdBreakdown } from "../lib/get-herd-breakdown.js";
 import { getHerdRowData } from "../lib/get-herd-row-data.js";
 import { claimType } from "../constants/claim-type.js";
+import { getApplication } from "../api/applications.js";
 
 const { BEEF, PIGS, DAIRY, SHEEP } = TYPE_OF_LIVESTOCK;
 const { administrator, authoriser, processor, recommender, user } = permissions;
@@ -162,7 +162,8 @@ export const viewClaimRoute = {
         ? JSON.parse(Buffer.from(request.query.errors, "base64").toString("utf8"))
         : [];
 
-      const { historyRecords } = await getApplicationHistory(reference, request.logger);
+      const historyRecords = []; // TODO: status history and change history are inside the claim as returned, put them together here to form the view
+
       const historyDetails = getHistoryDetails(historyRecords);
       const currentStatusEvent = getCurrentStatusEvent(claim, historyRecords);
 
@@ -504,7 +505,7 @@ export const viewClaimRoute = {
         title: upperFirstLetter(organisation.name),
         claimSummaryDetails: rowsWithData,
         status: {
-          normalType: upperFirstLetter(claim.status.replace(/_/g, " ")).toLowerCase(),
+          normalType: upperFirstLetter(claim.status.replace(/_/g, " ").toLowerCase()),
           tagClass: getStyleClassByStatus(claim.status.replace(/_/g, " ")),
         },
         applicationSummaryDetails,

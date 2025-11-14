@@ -1,10 +1,6 @@
 import { Buffer } from "buffer";
 import joi from "joi";
-import {
-  getApplication,
-  getApplicationHistory,
-  getApplicationEvents,
-} from "../api/applications.js";
+import { getApplication, getApplicationEvents } from "../api/applications.js";
 import { permissions } from "../auth/permissions.js";
 import { getStyleClassByStatus } from "../constants/status.js";
 import { getClaimViewStates } from "./utils/get-claim-view-states.js";
@@ -50,10 +46,7 @@ export const viewAgreementRoute = {
       const { page } = request.query;
       const application = await getApplication(request.params.reference, request.logger);
       const { status } = application;
-      const { historyRecords } = await getApplicationHistory(
-        request.params.reference,
-        request.logger,
-      );
+      const historyRecords = []; // TODO: status history and change history are inside the agreement as returned, put them together here to form the view
 
       const currentStatusEvent = getCurrentStatusEvent(application, historyRecords);
 

@@ -82,17 +82,6 @@ export async function updateApplicationStatus(reference, user, status, logger, n
   }
 }
 
-export async function getApplicationHistory(reference, logger) {
-  const endpoint = `${applicationApiUri}/applications/${reference}/history`;
-  try {
-    const { payload } = await wreck.get(endpoint, { json: true });
-    return payload;
-  } catch (err) {
-    logger.setBindings({ error: err, endpoint });
-    throw err;
-  }
-}
-
 export async function getApplicationEvents(reference, logger) {
   const endpoint = `${applicationApiUri}/applications/events/${reference}`;
   try {

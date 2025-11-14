@@ -28,7 +28,23 @@ export const oldWorldApplication = {
   },
   redacted: false,
   updateHistory: [],
-  statusHistory: [],
+  statusHistory: [
+    {
+      createdAt: "2023-03-23T10:00:12.000Z",
+      status: "READY_TO_PAY",
+      createdBy: "Daniel Jones",
+    },
+    {
+      createdAt: "2023-03-24T09:30:00.000Z",
+      status: "WITHDRAWN",
+      createdBy: "Daniel Jones",
+    },
+    {
+      createdAt: "2023-03-25T11:10:15.000Z",
+      status: "REJECTED",
+      createdBy: "Amanda Hassan",
+    },
+  ],
   contactHistory: [
     {
       id: "7e4dca92-2ee8-4420-8efc-eec7daafd26b",

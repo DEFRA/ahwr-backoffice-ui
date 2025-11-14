@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import { getClaim, getClaims } from "../../../../app/api/claims";
 import { permissions } from "../../../../app/auth/permissions";
-import { getApplication, getApplicationHistory } from "../../../../app/api/applications";
+import { getApplication } from "../../../../app/api/applications";
 import { createServer } from "../../../../app/server";
 import { StatusCodes } from "http-status-codes";
 import { getPigTestResultRows } from "../../../../app/routes/view-claim";
@@ -25,7 +25,7 @@ describe("View claim test", () => {
   };
   const application = {
     id: "787b407f-29da-4d75-889f-1c614d47e87e",
-    reference: "AHWR-1234-APP1",
+    reference: "IAHW-1234-APP1",
     data: {
       type: "EE",
       reference: null,
@@ -56,8 +56,8 @@ describe("View claim test", () => {
   const claims = [
     {
       id: "58b297c9-c983-475c-8bdb-db5746899cec",
-      reference: "AHWR-1111-6666",
-      applicationReference: "AHWR-1234-APP1",
+      reference: "REPI-1111-6666",
+      applicationReference: "IAHW-1234-APP1",
       data: {
         claimType: "R",
         typeOfLivestock: "pigs",
@@ -77,12 +77,33 @@ describe("View claim test", () => {
       createdBy: "sql query",
       updatedBy: null,
       status: "PAID",
-      application,
+      statusHistory: [
+        {
+          createdAt: "2024-03-25T12:20:18.307Z",
+          status: "IN_CHECK",
+          createdBy: "admin",
+        },
+        {
+          createdAt: "2024-03-26T12:20:18.307Z",
+          status: "RECOMMENDED_TO_PAY",
+          createdBy: "Jim Junior",
+        },
+        {
+          createdAt: "2024-03-27T12:20:18.307Z",
+          status: "READY_TO_PAY",
+          createdBy: "Jim Senior",
+        },
+        {
+          createdAt: "2024-03-28T12:20:18.307Z",
+          status: "PAID",
+          createdBy: "admin",
+        },
+      ],
     },
     {
       id: "5e8558ee-31d7-454b-a061-b8c97bb91d56",
-      reference: "AHWR-0000-4444",
-      applicationReference: "AHWR-1234-APP1",
+      reference: "FUSH-0000-4444",
+      applicationReference: "IAHW-1234-APP1",
       data: {
         vetsName: "12312312312sdfsdf",
         dateOfVisit: "2024-03-22T00:00:00.000Z",
@@ -127,12 +148,23 @@ describe("View claim test", () => {
       createdBy: "sql query",
       updatedBy: null,
       status: "RECOMMENDED_TO_PAY",
-      application,
+      statusHistory: [
+        {
+          createdAt: "2024-03-25T12:20:18.307Z",
+          status: "IN_CHECK",
+          createdBy: "admin",
+        },
+        {
+          createdAt: "2024-03-26T12:20:18.307Z",
+          status: "RECOMMENDED_TO_PAY",
+          createdBy: "Jim Junior",
+        },
+      ],
     },
     {
       id: "58b297c9-c983-475c-8bdb-db5746899cec",
-      reference: "AHWR-1111-6666",
-      applicationReference: "AHWR-1234-APP1",
+      reference: "FUPI-1111-6666",
+      applicationReference: "IAHW-1234-APP1",
       data: {
         claimType: "E",
         vetsName: "12312312312sdfsdf",
@@ -159,12 +191,33 @@ describe("View claim test", () => {
       createdBy: "sql query",
       updatedBy: null,
       status: "PAID",
-      application,
+      statusHistory: [
+        {
+          createdAt: "2024-03-25T12:20:18.307Z",
+          status: "IN_CHECK",
+          createdBy: "admin",
+        },
+        {
+          createdAt: "2024-03-26T12:20:18.307Z",
+          status: "RECOMMENDED_TO_PAY",
+          createdBy: "Jim Junior",
+        },
+        {
+          createdAt: "2024-03-27T12:20:18.307Z",
+          status: "READY_TO_PAY",
+          createdBy: "Jim Senior",
+        },
+        {
+          createdAt: "2024-03-28T12:20:18.307Z",
+          status: "PAID",
+          createdBy: "admin",
+        },
+      ],
     },
     {
       id: "58b297c9-c983-475c-8bdb-db5746899cec",
-      reference: "AHWR-1111-6666",
-      applicationReference: "AHWR-1234-APP1",
+      reference: "FUBC-1111-6666",
+      applicationReference: "IAHW-1234-APP1",
       data: {
         vetsName: "12312312312sdfsdf",
         biosecurity: "no",
@@ -186,7 +239,28 @@ describe("View claim test", () => {
       createdBy: "sql query",
       updatedBy: null,
       status: "PAID",
-      application,
+      statusHistory: [
+        {
+          createdAt: "2024-03-25T12:20:18.307Z",
+          status: "IN_CHECK",
+          createdBy: "admin",
+        },
+        {
+          createdAt: "2024-03-26T12:20:18.307Z",
+          status: "RECOMMENDED_TO_PAY",
+          createdBy: "Jim Junior",
+        },
+        {
+          createdAt: "2024-03-27T12:20:18.307Z",
+          status: "READY_TO_PAY",
+          createdBy: "Jim Senior",
+        },
+        {
+          createdAt: "2024-03-28T12:20:18.307Z",
+          status: "PAID",
+          createdBy: "admin",
+        },
+      ],
     },
   ];
 
@@ -224,9 +298,30 @@ describe("View claim test", () => {
     createdBy: "sql query",
     updatedBy: null,
     status: "PAID",
-    application,
+    statusHistory: [
+      {
+        createdAt: "2024-03-25T12:20:18.307Z",
+        status: "IN_CHECK",
+        createdBy: "admin",
+      },
+      {
+        createdAt: "2024-03-26T12:20:18.307Z",
+        status: "RECOMMENDED_TO_PAY",
+        createdBy: "Jim Junior",
+      },
+      {
+        createdAt: "2024-03-27T12:20:18.307Z",
+        status: "READY_TO_PAY",
+        createdBy: "Jim Senior",
+      },
+      {
+        createdAt: "2024-03-28T12:20:18.307Z",
+        status: "PAID",
+        createdBy: "admin",
+      },
+    ],
   };
-  getApplicationHistory.mockReturnValue({ historyRecords: [] });
+
   afterEach(async () => {
     jest.clearAllMocks();
   });
@@ -285,7 +380,7 @@ describe("View claim test", () => {
       expect(res.statusCode).toBe(StatusCodes.OK);
 
       const expectedContent = [
-        { key: "Agreement number", value: "AHWR-1234-APP1" },
+        { key: "Agreement number", value: "IAHW-1234-APP1" },
         { key: "Agreement date", value: "22/03/2024" },
         { key: "Agreement holder", value: "Russell Paul Davies" },
         {
@@ -446,7 +541,7 @@ describe("View claim test", () => {
       const $ = cheerio.load(res.payload);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
-      expect($(".govuk-back-link").attr("href")).toEqual("/agreement/AHWR-1234-APP1/claims");
+      expect($(".govuk-back-link").attr("href")).toEqual("/agreement/IAHW-1234-APP1/claims");
     });
     test("the back link should go to all claims main tab if the user is coming from all claims main tab", async () => {
       const options = {

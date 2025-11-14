@@ -67,7 +67,7 @@ describe("Claims API", () => {
 
     wreck.post = jest.fn().mockRejectedValueOnce(wreckResponse);
 
-    const logger = { setBindings: jest.fn() };
+    const logger = { error: jest.fn() };
     const filter = { field: "updatedAt", op: "lte", value: "2025-01-17" };
     expect(async () => {
       await getClaims("sbi", "1010", filter, 10, 10, "ASC", logger);
