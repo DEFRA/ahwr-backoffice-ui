@@ -14,10 +14,8 @@ export const errorPagesPlugin = {
           request.logger.error(
             {
               statusCode,
-              error: {
-                message,
-                stack_trace: response.data ? response.data.stack : response.stack,
-              }
+              "error.message": message,
+              "error.stack_trace" : response.data ? response.data.stack : response.stack,
             },
             "Error plugin picked up error",
           );
