@@ -31,7 +31,7 @@ export async function getClaims(searchType, searchText, filter, limit, offset, s
 
     return payload;
   } catch (err) {
-    logger.setBindings({ "error.message": err.message, "error.stack": err.stack, endpoint });
+    logger.error({ err }, "Error fetching claims");
     throw err;
   }
 }

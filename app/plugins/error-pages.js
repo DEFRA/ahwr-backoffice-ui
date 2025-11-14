@@ -12,15 +12,11 @@ export const errorPagesPlugin = {
           const { statusCode, message } = payload;
 
           const error = new Error(message);
-          error.stack = response.data ? response.data.stack : response.stack
-          console.log(error.stack)
-          error.type = "pre-response"
-          request.logger.error(
-            {
-              statusCode,
-              error
-            }
-          );
+          error.stack = response.data ? response.data.stack : response.stack;
+          request.logger.error({
+            statusCode,
+            error,
+          });
 
           if (statusCode === StatusCodes.NOT_FOUND) {
             // handled specifically by a route handler that renders a 404 page for unknown pages. This allows us to still track which user it is

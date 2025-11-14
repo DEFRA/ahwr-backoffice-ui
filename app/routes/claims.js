@@ -68,9 +68,9 @@ export const claimsRoutes = [
           await generateNewCrumb(request, h);
           const viewData = await getViewData(request);
           return h.view("claims", viewData);
-        } catch (error) {
-          console.log(error);
-          throw error;
+        } catch (err) {
+          request.logger.error({ err });
+          throw err;
         }
       },
     },
