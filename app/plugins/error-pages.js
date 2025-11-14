@@ -13,6 +13,7 @@ export const errorPagesPlugin = {
 
           const error = new Error(message);
           error.stack = response.data ? response.data.stack : response.stack
+          console.log(error.stack)
           error.type = "pre-response"
           request.logger.error(
             {
