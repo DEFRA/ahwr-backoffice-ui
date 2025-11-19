@@ -25,7 +25,7 @@ const validStatus = [
   "on hold",
 ];
 const sbiRegEx = /^[0-9]{9}$/i;
-const validTypes = ["review", "endemics"];
+
 const validSpecies = (searchText) => {
   const species = {
     "Beef cattle": "beef",
@@ -38,9 +38,10 @@ const validSpecies = (searchText) => {
     return { isValidSpecies: false, theSpecies: "" };
   }
   let theSpecies;
-  Object.keys(species).forEach((key) => {
+
+  Object.entries(species).forEach(([key, value]) => {
     if (key.toLowerCase() === searchText.toLowerCase()) {
-      theSpecies = species[key];
+      theSpecies = value;
     }
   });
 
@@ -65,11 +66,6 @@ export const searchValidation = (searchText) => {
     case regexChecker(dateRegEx, searchText):
       searchType = "date";
       break;
-    case validTypes.indexOf(searchText.toLowerCase()) !== -1:
-      searchType = "type";
-      searchText =
-        validTypes[validTypes.indexOf(searchText.toLowerCase())] === "review" ? "R" : "E";
-      break;
     case isValidSpecies:
       searchType = "species";
       searchText = theSpecies;
@@ -78,6 +74,7 @@ export const searchValidation = (searchText) => {
       searchType = "organisation";
       break;
   }
+
   if (searchText.length === 0) {
     searchType = "reset";
   }

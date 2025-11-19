@@ -22,11 +22,11 @@ const getViewData = async (request) => {
   const { limit, offset } = getPagination(page);
   const searchText = getClaimSearch(request, claimSearch.searchText);
   const sort = getClaimSearch(request, claimSearch.sort);
-  const { searchType } = searchValidation(searchText);
+  const { searchType, searchText: validatedSearchText } = searchValidation(searchText);
   const filter = undefined;
   const { claims, total } = await getClaims(
     searchType,
-    searchText,
+    validatedSearchText,
     filter,
     limit,
     offset,
