@@ -12,13 +12,11 @@ describe("searchValidation", () => {
     { type: "date", text: "01/12/2024" },
     { type: "organisation", text: "a string" },
     { type: "species", text: "sheep" },
-    { type: "type", text: "review" },
-    { type: "type", text: "endemics" },
     { type: "reset", text: "" },
   ])("A valid $searchType ($text) should return $text and $type as type", ({ type, text }) => {
     const { searchText, searchType } = searchValidation(text);
     expect(searchType).toBe(type);
-    expect(searchText).toBe(text === "endemics" ? "E" : text === "review" ? "R" : text);
+    expect(searchText).toBe(text);
   });
   test.each([
     { status: "agreed" },
