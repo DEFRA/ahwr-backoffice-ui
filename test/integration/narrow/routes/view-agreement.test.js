@@ -8,6 +8,7 @@ import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-
 import { getApplication, getOldWorldApplicationHistory } from "../../../../app/api/applications";
 import { oldWorldApplication } from "../../../data/ow-application";
 import { StatusCodes } from "http-status-codes";
+import { applicationHistory } from "../../../data/application-history";
 
 jest.mock("../../../../app/routes/utils/get-claim-view-states");
 jest.mock("../../../../app/api/applications");
@@ -114,7 +115,7 @@ describe("View Application test", () => {
       updateEligiblePiiRedactionForm: false,
     });
 
-    getOldWorldApplicationHistory.mockResolvedValue({ historyRecords: [] });
+    getOldWorldApplicationHistory.mockResolvedValue({ historyRecords: applicationHistory });
 
     server = await createServer();
   });
@@ -628,27 +629,27 @@ describe("View Application test", () => {
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
       const $ = cheerio.load(res.payload);
-      expect($("#history").text()).toContain("History"); // TODO: expand when history implemented
-      // expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(1)").text()).toContain("Date");
-      // expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(2)").text()).toContain("Time");
-      // expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(3)").text()).toContain("Action");
-      // expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(4)").text()).toContain("User");
-      // expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(1)").text()).toContain(
-      //   "23/03/2023",
-      // );
-      // expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(2)").text()).toContain("10:00:12");
-      // expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(3)").text()).toContain("Approved");
-      // expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(4)").text()).toContain(
-      //   "Daniel Jones",
-      // );
-      // expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("24/03/2023");
-      // expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("09:30:00");
-      // expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("Withdrawn");
-      // expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("Daniel Jones");
-      // expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("25/03/2023");
-      // expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("11:10:15");
-      // expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("Rejected");
-      // expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("Amanda Hassan");
+      expect($("#history").text()).toContain("History");
+      expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(1)").text()).toContain("Date");
+      expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(2)").text()).toContain("Time");
+      expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(3)").text()).toContain("Action");
+      expect($("thead:nth-child(1) tr:nth-child(1) th:nth-child(4)").text()).toContain("User");
+      expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(1)").text()).toContain(
+        "23/03/2023",
+      );
+      expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(2)").text()).toContain("10:00:12");
+      expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(3)").text()).toContain("Approved");
+      expect($("tbody:nth-child(2) tr:nth-child(1) td:nth-child(4)").text()).toContain(
+        "Daniel Jones",
+      );
+      expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("24/03/2023");
+      expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("09:30:00");
+      expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("Withdrawn");
+      expect($("tbody:nth-child(2) tr:nth-child(2)").text()).toContain("Daniel Jones");
+      expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("25/03/2023");
+      expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("11:10:15");
+      expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("Rejected");
+      expect($("tbody:nth-child(2) tr:nth-child(3)").text()).toContain("Amanda Hassan");
 
       phaseBannerOk($);
     });
