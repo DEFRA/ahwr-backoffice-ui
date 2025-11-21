@@ -5,7 +5,7 @@ import { phaseBannerOk } from "../../../utils/phase-banner-expect";
 import { permissions } from "../../../../app/auth/permissions";
 import { when, resetAllWhenMocks } from "jest-when";
 import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states";
-import { getApplication } from "../../../../app/api/applications";
+import { getApplication, getOldWorldApplicationHistory } from "../../../../app/api/applications";
 import { oldWorldApplication } from "../../../data/ow-application";
 import { StatusCodes } from "http-status-codes";
 
@@ -113,6 +113,8 @@ describe("View Application test", () => {
       updateEligiblePiiRedactionAction: false,
       updateEligiblePiiRedactionForm: false,
     });
+
+    getOldWorldApplicationHistory.mockResolvedValue({ historyRecords: [] });
 
     server = await createServer();
   });

@@ -1,6 +1,6 @@
 import { Buffer } from "node:buffer";
 import joi from "joi";
-import { getClaim, getClaims } from "../api/claims.js";
+import { getClaim, getClaimHistory, getClaims } from "../api/claims.js";
 import { getHistoryDetails } from "./models/application-history.js";
 import { getStyleClassByStatus } from "../constants/status.js";
 import { upperFirstLetter, formattedDateToUk } from "../lib/display-helper.js";
@@ -126,7 +126,7 @@ export const viewClaimRoute = {
 
       const {
         data,
-        reference,
+        reference: claimReference,
         type,
         applicationReference,
         status: claimStatus,
@@ -134,7 +134,7 @@ export const viewClaimRoute = {
         herd,
       } = claim;
 
-      request.logger.setBindings({ applicationReference, reference });
+      request.logger.setBindings({ applicationReference, claimReference });
 
       const application = await getApplication(applicationReference, request.logger);
 
@@ -162,8 +162,7 @@ export const viewClaimRoute = {
         ? JSON.parse(Buffer.from(request.query.errors, "base64").toString("utf8"))
         : [];
 
-      const historyRecords = []; // TODO: status history and change history are inside the claim as returned, put them together here to form the view
-
+      const { historyRecords } = await getClaimHistory(claimReference, request.logger);
       const historyDetails = getHistoryDetails(historyRecords);
       const currentStatusEvent = getCurrentStatusEvent(claim, historyRecords);
 
@@ -233,7 +232,7 @@ export const viewClaimRoute = {
         return {
           items: [
             {
-              href: `/view-claim/${reference}?${query}=true&page=${page}&returnPage=${returnPage}#${id}`,
+              href: `/view-claim/${claimReference}?${query}=true&page=${page}&returnPage=${returnPage}#${id}`,
               text: "Change",
               visuallyHiddenText,
             },
@@ -499,7 +498,7 @@ export const viewClaimRoute = {
         backLink: backLink(applicationReference, returnPage, page),
         returnPage,
         isFlagged,
-        reference,
+        reference: claimReference,
         applicationReference,
         claimOrAgreement: "claim",
         title: upperFirstLetter(organisation.name),

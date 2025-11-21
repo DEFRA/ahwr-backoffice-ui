@@ -71,3 +71,14 @@ export async function updateClaimData(reference, data, note, name, logger) {
   const { payload } = await wreck.put(endpoint, options);
   return payload;
 }
+
+export async function getClaimHistory(claimRef, logger) {
+  const endpoint = `${applicationApiUri}/claims/${claimRef}/history`;
+  try {
+    const { payload } = await wreck.get(endpoint, { json: true });
+    return payload;
+  } catch (err) {
+    logger.setBindings({ error: err });
+    throw err;
+  }
+}
