@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { getClaim, getClaims } from "../../../../app/api/claims";
+import { getClaim, getClaimHistory, getClaims } from "../../../../app/api/claims";
 import { permissions } from "../../../../app/auth/permissions";
 import { getApplication } from "../../../../app/api/applications";
 import { createServer } from "../../../../app/server";
@@ -351,6 +351,8 @@ describe("View claim test", () => {
       updateDateOfVisitAction: false,
       updateDateOfVisitForm: false,
     });
+
+    getClaimHistory.mockResolvedValue({ historyRecords: [] });
   });
 
   describe(`GET ${url} route`, () => {

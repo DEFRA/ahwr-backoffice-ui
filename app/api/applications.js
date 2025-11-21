@@ -137,3 +137,14 @@ export async function updateEligiblePiiRedaction(reference, data, note, name, lo
     throw err;
   }
 }
+
+export async function getOldWorldApplicationHistory(oldWorldAppRef, logger) {
+  const endpoint = `${applicationApiUri}/applications/${oldWorldAppRef}/history`;
+  try {
+    const { payload } = await wreck.get(endpoint, { json: true });
+    return payload;
+  } catch (err) {
+    logger.setBindings({ error: err });
+    throw err;
+  }
+}
