@@ -113,10 +113,11 @@ export const claimsRoutes = [
           setClaimSearch(request, claimSearch.searchText, request.payload?.searchText);
           const viewData = await getViewData(request);
           return h.view(viewTemplate, viewData);
-        } catch (err) {
-          request.logger.setBindings({ error: err });
+        } catch (error) {
+          request.logger.error({ error });
+
           return h
-            .view(viewTemplate, { ...request.payload, error: err })
+            .view(viewTemplate, { ...request.payload, error })
             .code(StatusCodes.BAD_REQUEST)
             .takeover();
         }

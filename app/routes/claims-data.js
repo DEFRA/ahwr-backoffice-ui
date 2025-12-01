@@ -99,14 +99,14 @@ export const claimsDataRoutes = [
             reference: joi.string().required(),
           })
           .required(),
-        failAction: async (request, h, err) => {
+        failAction: async (request, h, error) => {
           const { claimOrAgreement, form, page, reference, returnPage } = request.payload;
 
-          request.logger.setBindings({ error: err, form });
+          request.logger.error({ error, form });
 
           const panelID = panelIdGivenFormName(form);
 
-          const errors = encodeErrorsForUI(err.details, panelID);
+          const errors = encodeErrorsForUI(error.details, panelID);
           const query = new URLSearchParams({
             page,
             [form]: "true",
@@ -138,6 +138,7 @@ export const claimsDataRoutes = [
           reference,
         } = request.payload;
 
+        // TODO - look at removing setBindings here
         request.logger.setBindings({ form });
 
         await generateNewCrumb(request, h);

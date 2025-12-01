@@ -20,9 +20,10 @@ export const devAuthRoute = {
 
       setUserDetails(request, "user", username);
       setUserDetails(request, "roles", roles.map((x) => upperFirstLetter(x)).join(", "));
+
       return h.redirect("/");
-    } catch (err) {
-      request.logger.setBindings({ error: err });
+    } catch (error) {
+      request.logger.error({ error });
     }
     return h.view("error-pages/500").code(StatusCodes.INTERNAL_SERVER_ERROR);
   },

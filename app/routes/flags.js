@@ -75,10 +75,10 @@ const deleteFlagHandler = {
       payload: Joi.object({
         deletedNote: Joi.string().min(2).required(),
       }),
-      failAction: async (request, h, err) => {
-        request.logger.setBindings({ error: err });
+      failAction: async (request, h, error) => {
+        request.logger.error({ error });
 
-        const joiError = err.details[0];
+        const joiError = error.details[0];
 
         let errorMessageToBeRendered = "";
 
@@ -133,10 +133,10 @@ const createFlagHandler = {
         note: Joi.string().min(MIN_NOTE_LENGTH).required(),
         appliesToMh: Joi.string().valid("yes", "no").required(),
       }),
-      failAction: async (request, h, err) => {
-        request.logger.setBindings({ error: err });
+      failAction: async (request, h, error) => {
+        request.logger.error({ error });
 
-        const formattedErrors = err.details
+        const formattedErrors = error.details
           .map((error) => {
             if (error.message.includes("note")) {
               return {
@@ -198,11 +198,11 @@ const createFlagHandler = {
         }
 
         return h.redirect("/flags").takeover();
-      } catch (err) {
-        request.logger.setBindings({ error: err });
+      } catch (error) {
+        request.logger.error({ error });
         let formattedErrors = [];
 
-        if (err.data.res.statusCode === StatusCodes.NOT_FOUND) {
+        if (error.data.res.statusCode === StatusCodes.NOT_FOUND) {
           formattedErrors = [
             {
               message: "Agreement reference does not exist.",
@@ -215,7 +215,7 @@ const createFlagHandler = {
           ];
         }
 
-        if (err.data.res.statusCode === StatusCodes.NO_CONTENT) {
+        if (error.data.res.statusCode === StatusCodes.NO_CONTENT) {
           formattedErrors = [
             {
               message: `Flag not created - agreement flag with the same "Flag applies to multiple herds T&C's" value already exists.`,
@@ -229,8 +229,8 @@ const createFlagHandler = {
         }
 
         if (
-          err.isBoom &&
-          err.data.payload.message === "Unable to create flag for redacted agreement"
+          error.isBoom &&
+          error.data.payload.message === "Unable to create flag for redacted agreement"
         ) {
           formattedErrors = ERRORS.AGREEMENT_REDACTED;
         }

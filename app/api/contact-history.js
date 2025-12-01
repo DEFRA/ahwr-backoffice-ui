@@ -11,9 +11,9 @@ export async function getContactHistory(reference, logger) {
     const { payload } = await wreck.get(endpoint, { json: true });
 
     return payload;
-  } catch (err) {
-    logger.setBindings({ error: err, endpoint });
-    throw err;
+  } catch (error) {
+    logger.error({ error, endpoint });
+    throw error;
   }
 }
 

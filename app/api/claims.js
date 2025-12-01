@@ -8,9 +8,9 @@ export async function getClaim(reference, logger) {
   try {
     const { payload } = await wreck.get(endpoint, { json: true });
     return payload;
-  } catch (err) {
-    logger.setBindings({ error: err, endpoint });
-    throw err;
+  } catch (error) {
+    logger.error({ error, endpoint });
+    throw error;
   }
 }
 
@@ -50,15 +50,14 @@ export async function updateClaimStatus(reference, user, status, logger, note) {
   try {
     const { payload } = await wreck.put(endpoint, options);
     return payload;
-  } catch (err) {
-    logger.setBindings({ error: err, endpoint });
-    throw err;
+  } catch (error) {
+    logger.error({ error, endpoint });
+    throw error;
   }
 }
 
 export async function updateClaimData(reference, data, note, name, logger) {
   const endpoint = `${applicationApiUri}/claims/${reference}/data`;
-  logger.setBindings({ endpoint });
 
   const options = {
     payload: {
@@ -68,8 +67,13 @@ export async function updateClaimData(reference, data, note, name, logger) {
     },
   };
 
-  const { payload } = await wreck.put(endpoint, options);
-  return payload;
+  try {
+    const { payload } = await wreck.put(endpoint, options);
+    return payload;
+  } catch (error) {
+    logger.error({ error, endpoint });
+    throw error;
+  }
 }
 
 export async function getClaimHistory(claimRef, logger) {
@@ -77,8 +81,8 @@ export async function getClaimHistory(claimRef, logger) {
   try {
     const { payload } = await wreck.get(endpoint, { json: true });
     return payload;
-  } catch (err) {
-    logger.setBindings({ error: err });
-    throw err;
+  } catch (error) {
+    logger.error({ error, endpoint });
+    throw error;
   }
 }

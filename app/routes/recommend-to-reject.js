@@ -31,12 +31,12 @@ export const recommendToRejectRoute = {
         page: joi.number().greater(0).default(1),
         returnPage: joi.string().optional().allow("").valid("agreement", "claims"),
       }),
-      failAction: async (request, h, err) => {
+      failAction: async (request, h, error) => {
         const { claimOrAgreement, page, reference, returnPage } = request.payload;
 
-        request.logger.setBindings({ error: err, reference });
+        request.logger.error({ error, reference });
 
-        const errors = encodeErrorsForUI(err.details, "#recommend-to-reject");
+        const errors = encodeErrorsForUI(error.details, "#recommend-to-reject");
         const query = new URLSearchParams({
           page,
           recommendToReject: "true",
@@ -54,6 +54,7 @@ export const recommendToRejectRoute = {
       const { claimOrAgreement, page, reference, returnPage } = request.payload;
       const { name } = request.auth.credentials.account;
 
+      // TODO - look at removing setBindings here
       request.logger.setBindings({ reference });
 
       await generateNewCrumb(request, h);

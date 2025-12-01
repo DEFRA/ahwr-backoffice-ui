@@ -10,7 +10,7 @@ jest.mock("../../../../../app/api/flags");
 getAllFlags.mockResolvedValue(flags);
 
 const mockLogger = {
-  setBindings: jest.fn(),
+  logger: jest.fn(),
 };
 
 describe("createFlagsTableData", () => {

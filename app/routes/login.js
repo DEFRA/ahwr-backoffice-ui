@@ -12,8 +12,8 @@ export const loginRoute = {
       const { userId } = request.query;
       const authUrl = await auth.getAuthenticationUrl(userId);
       return h.redirect(authUrl);
-    } catch (err) {
-      request.logger.setBindings({ error: err });
+    } catch (error) {
+      request.logger.error({ error });
     }
     return h.view("error-pages/500").code(500);
   },

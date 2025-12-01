@@ -134,12 +134,14 @@ export const viewClaimRoute = {
         herd,
       } = claim;
 
+      // TODO - look at removing setBindings here
       request.logger.setBindings({ applicationReference, claimReference });
 
       const application = await getApplication(applicationReference, request.logger);
 
       const { organisation } = application;
 
+      // TODO - look at removing setBindings here
       request.logger.setBindings({ sbi: organisation.sbi });
 
       const isFlagged = application.flags.length > 0;
