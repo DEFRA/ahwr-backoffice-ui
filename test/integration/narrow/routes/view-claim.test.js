@@ -71,7 +71,7 @@ describe("View claim test", () => {
         numberAnimalsTested: "40",
         testResults: "positive",
       },
-      type: "R",
+      type: "REVIEW",
       createdAt: "2024-03-25T12:20:18.307Z",
       updatedAt: "2024-03-25T12:20:18.307Z",
       createdBy: "sql query",
@@ -142,7 +142,7 @@ describe("View claim test", () => {
           },
         ],
       },
-      type: "E",
+      type: "FOLLOW_UP",
       createdAt: "2024-03-20T12:20:18.307Z",
       updatedAt: "2024-03-20T12:20:18.307Z",
       createdBy: "sql query",
@@ -185,7 +185,7 @@ describe("View claim test", () => {
         reviewTestResults: "positive",
         vetVisitsReviewTestResults: "positive",
       },
-      type: "E",
+      type: "FOLLOW_UP",
       createdAt: "2024-03-25T12:20:18.307Z",
       updatedAt: "2024-03-25T12:20:18.307Z",
       createdBy: "sql query",
@@ -233,7 +233,7 @@ describe("View claim test", () => {
         testResults: "positive",
         reviewTestResults: "positive",
       },
-      type: "E",
+      type: "FOLLOW_UP",
       createdAt: "2024-03-25T12:20:18.307Z",
       updatedAt: "2024-03-25T12:20:18.307Z",
       createdBy: "sql query",
@@ -292,7 +292,7 @@ describe("View claim test", () => {
       herdVaccinationStatus: "notVaccinated",
       numberOfSamplesTested: "30",
     },
-    type: "E",
+    type: "FOLLOW_UP",
     createdAt: "2024-03-25T12:20:18.307Z",
     updatedAt: "2024-03-25T12:20:18.307Z",
     createdBy: "sql query",
@@ -667,13 +667,13 @@ describe("View claim test", () => {
 
   describe("getPigTestResultRows", () => {
     it("returns the review test result when the claim is a review", () => {
-      const result = getPigTestResultRows(claims[0].data);
+      const result = getPigTestResultRows(claims[0].data, claims[0].type);
 
       expect(result).toEqual([{ key: { text: "Test result" }, value: { html: "Positive" } }]);
     });
 
     it("returns the ELISA positive when the claim is a follow up", () => {
-      const result = getPigTestResultRows(pigFollowUpClaimElisa.data);
+      const result = getPigTestResultRows(pigFollowUpClaimElisa.data, pigFollowUpClaimElisa.type);
 
       expect(result).toEqual([{ key: { text: "Test result" }, value: { html: "ELISA positive" } }]);
     });
@@ -688,7 +688,7 @@ describe("View claim test", () => {
           pigsGeneticSequencing: "mlv",
         },
       };
-      const result = getPigTestResultRows(pigsFollowUpPcr.data);
+      const result = getPigTestResultRows(pigsFollowUpPcr.data, pigsFollowUpPcr.data);
 
       expect(result).toEqual([
         { key: { text: "Test result" }, value: { html: "PCR positive" } },

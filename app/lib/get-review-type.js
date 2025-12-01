@@ -1,4 +1,4 @@
-import { claimType } from "../constants/claim-type.js";
+import { claimType } from "ffc-ahwr-common-library";
 
 export const getReviewType = (typeOfReview) => {
   return {

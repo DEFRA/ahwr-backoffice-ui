@@ -4,7 +4,11 @@ import { getClaim, getClaimHistory, getClaims } from "../api/claims.js";
 import { getHistoryDetails } from "./models/application-history.js";
 import { getStyleClassByStatus } from "../constants/status.js";
 import { upperFirstLetter, formattedDateToUk } from "../lib/display-helper.js";
-import { TYPE_OF_LIVESTOCK, PIG_GENETIC_SEQUENCING_VALUES } from "ffc-ahwr-common-library";
+import {
+  TYPE_OF_LIVESTOCK,
+  PIG_GENETIC_SEQUENCING_VALUES,
+  claimType,
+} from "ffc-ahwr-common-library";
 import { sheepPackages } from "../constants/sheep-test-types.js";
 import { permissions } from "../auth/permissions.js";
 import { getCurrentStatusEvent } from "./utils/get-current-status-event.js";
@@ -15,7 +19,6 @@ import { getLivestockTypes } from "../lib/get-livestock-types.js";
 import { getReviewType } from "../lib/get-review-type.js";
 import { getHerdBreakdown } from "../lib/get-herd-breakdown.js";
 import { getHerdRowData } from "../lib/get-herd-row-data.js";
-import { claimType } from "../constants/claim-type.js";
 import { getApplication } from "../api/applications.js";
 
 const { BEEF, PIGS, DAIRY, SHEEP } = TYPE_OF_LIVESTOCK;
@@ -52,8 +55,8 @@ const buildKeyValueJson = (keyText, valueText, valueAsHtml = false) => {
 
 const testResultText = "Test result";
 
-export const getPigTestResultRows = (data) => {
-  if (data.claimType === claimType.review) {
+export const getPigTestResultRows = (data, type) => {
+  if (type === claimType.review) {
     return [
       {
         key: { text: testResultText },
@@ -379,7 +382,7 @@ export const viewClaimRoute = {
         true,
       );
       const herdRowData = getHerdRowData(herd, isSheep);
-      const pigFollowUpTestResultRows = getPigTestResultRows(data);
+      const pigFollowUpTestResultRows = getPigTestResultRows(data, type);
 
       // There are more common rows than this, but the ordering matters and things get more complicated after these
       const commonRows = [

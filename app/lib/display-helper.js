@@ -1,3 +1,5 @@
+import { claimType } from "ffc-ahwr-common-library";
+
 export const upperFirstLetter = (str) => {
   return typeof str === "string" ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 };
@@ -20,5 +22,5 @@ export const formatSpecies = (species) => {
 };
 
 export const formatTypeOfVisit = (typeOfVisit) => {
-  return typeOfVisit === "E" ? "Endemics" : "Review";
+  return typeOfVisit === claimType.endemics ? "Endemics" : "Review";
 };
