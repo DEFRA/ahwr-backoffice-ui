@@ -35,7 +35,7 @@ describe("Claims API", () => {
 
     wreck.get = jest.fn().mockRejectedValueOnce(wreckResponse);
 
-    const logger = { setBindings: jest.fn() };
+    const logger = { error: jest.fn() };
     expect(async () => {
       await getClaim("AHWR-2222-2222", logger);
     }).rejects.toEqual(wreckResponse);
@@ -100,7 +100,7 @@ describe("Claims API", () => {
     };
 
     wreck.put = jest.fn().mockRejectedValueOnce(wreckResponse);
-    const logger = { setBindings: jest.fn() };
+    const logger = { error: jest.fn() };
 
     expect(async () => {
       await updateClaimStatus(applicationReference, "Admin", STATUS.IN_CHECK, logger);
@@ -114,7 +114,7 @@ describe("Claims API", () => {
       },
       json: true,
     };
-    const logger = { setBindings: jest.fn() };
+    const logger = { error: jest.fn() };
 
     wreck.put = jest.fn().mockResolvedValueOnce(wreckResponse);
 
@@ -143,7 +143,7 @@ describe("Claims API", () => {
     };
 
     wreck.put = jest.fn().mockRejectedValueOnce(wreckResponse);
-    const logger = { setBindings: jest.fn() };
+    const logger = { error: jest.fn() };
 
     expect(async () => {
       await updateClaimData(

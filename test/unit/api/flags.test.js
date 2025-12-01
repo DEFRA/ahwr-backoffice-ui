@@ -9,7 +9,7 @@ jest.mock("@hapi/wreck");
 jest.mock("../../../app/config");
 
 const mockLogger = {
-  setBindings: jest.fn(),
+  error: jest.fn(),
 };
 
 describe("Flags API", () => {
@@ -32,7 +32,7 @@ describe("Flags API", () => {
       const response = await getAllFlags(mockLogger);
 
       expect(response).toEqual(wreckResponse.payload);
-      expect(mockLogger.setBindings).not.toHaveBeenCalled();
+      expect(mockLogger.error).not.toHaveBeenCalled();
     });
 
     test("getAllFlags throws an error if the get call errors", async () => {
@@ -41,7 +41,7 @@ describe("Flags API", () => {
       });
 
       expect(async () => await getAllFlags(mockLogger)).rejects.toThrow("test error");
-      expect(mockLogger.setBindings).toHaveBeenCalled();
+      expect(mockLogger.error).toHaveBeenCalled();
     });
   });
 
@@ -70,7 +70,7 @@ describe("Flags API", () => {
           deletedNote,
         },
       });
-      expect(mockLogger.setBindings).not.toHaveBeenCalled();
+      expect(mockLogger.error).not.toHaveBeenCalled();
     });
 
     test("throws an error if the patch call errors", async () => {
@@ -79,7 +79,7 @@ describe("Flags API", () => {
       });
 
       expect(async () => await deleteFlag("", "", mockLogger)).rejects.toThrow("test error");
-      expect(mockLogger.setBindings).toHaveBeenCalled();
+      expect(mockLogger.error).toHaveBeenCalled();
     });
   });
 
@@ -112,7 +112,7 @@ describe("Flags API", () => {
         },
       );
 
-      expect(mockLogger.setBindings).not.toHaveBeenCalled();
+      expect(mockLogger.error).not.toHaveBeenCalled();
     });
 
     test("throws an error if the post call errors", async () => {
@@ -121,7 +121,7 @@ describe("Flags API", () => {
       });
 
       expect(async () => await createFlag({}, "", mockLogger)).rejects.toThrow("test error");
-      expect(mockLogger.setBindings).toHaveBeenCalled();
+      expect(mockLogger.error).toHaveBeenCalled();
     });
   });
 });

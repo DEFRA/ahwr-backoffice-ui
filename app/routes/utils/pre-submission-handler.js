@@ -6,6 +6,7 @@ export const preSubmissionHandler = async (request, h) => {
     const lookupCrumb = await lookupSubmissionCrumb(request);
 
     if (lookupCrumb?.crumb) {
+      // TODO - look at removing setBindings here
       request.logger.setBindings({ crumb: request.plugins.crumb });
       return boom.forbidden("Duplicate submission");
     }

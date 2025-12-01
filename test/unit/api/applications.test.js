@@ -102,7 +102,7 @@ describe("Application API", () => {
       json: true,
     };
     wreck.post = jest.fn().mockRejectedValueOnce("getApplications boom");
-    const logger = { setBindings: jest.fn() };
+    const logger = { error: jest.fn() };
 
     expect(async () => {
       await getApplications(searchType, searchText, limit, offset, filter, sort, logger);
@@ -114,7 +114,7 @@ describe("Application API", () => {
   it("getApplication should throw errors", async () => {
     const options = { json: true };
     wreck.get = jest.fn().mockRejectedValueOnce("getApplication boom");
-    const logger = { setBindings: jest.fn() };
+    const logger = { error: jest.fn() };
 
     expect(async () => {
       await getApplication(appRef, logger);
@@ -133,7 +133,7 @@ describe("Application API", () => {
       json: true,
     };
     wreck.put = jest.fn().mockRejectedValueOnce("updateApplicationStatus boom");
-    const logger = { setBindings: jest.fn() };
+    const logger = { error: jest.fn() };
 
     expect(async () => {
       await updateApplicationStatus(appRef, "test", 2, logger);
@@ -174,7 +174,7 @@ describe("Application API", () => {
       },
       json: true,
     };
-    const logger = { setBindings: jest.fn() };
+    const logger = { error: jest.fn() };
 
     wreck.put = jest.fn().mockResolvedValueOnce(wreckResponse);
 
@@ -203,7 +203,7 @@ describe("Application API", () => {
     };
 
     wreck.put = jest.fn().mockRejectedValueOnce(wreckResponse);
-    const logger = { setBindings: jest.fn() };
+    const logger = { error: jest.fn() };
 
     expect(async () => {
       await updateApplicationData(
@@ -230,7 +230,7 @@ describe("Application API", () => {
       json: true,
     };
     wreck.post = jest.fn().mockRejectedValueOnce("processApplicationClaim boom");
-    const logger = { setBindings: jest.fn() };
+    const logger = { error: jest.fn() };
 
     expect(async () => {
       await processApplicationClaim(appRef, "test", false, logger);
@@ -289,7 +289,7 @@ describe("Application API", () => {
   it("getApplicationEvents should throw errors", async () => {
     const options = { json: true };
     wreck.get = jest.fn().mockRejectedValueOnce("getApplicationEvents boom");
-    const logger = { setBindings: jest.fn() };
+    const logger = { error: jest.fn() };
 
     expect(async () => {
       await getApplicationEvents(appRef, logger);
@@ -303,7 +303,7 @@ describe("Application API", () => {
 
   describe("redactPiiData", () => {
     const logger = {
-      setBindings: jest.fn(),
+      error: jest.fn(),
     };
 
     const endpoint = `${applicationApiUri}/redact/pii`;
@@ -319,7 +319,7 @@ describe("Application API", () => {
 
       expect(wreck.post).toHaveBeenCalledWith(endpoint, {});
       expect(result).toEqual({});
-      expect(logger.setBindings).not.toHaveBeenCalled();
+      expect(logger.error).not.toHaveBeenCalled();
     });
 
     it("should log and rethrow error when request fails", async () => {
@@ -328,7 +328,7 @@ describe("Application API", () => {
 
       await expect(redactPiiData(logger)).rejects.toThrow("Request failed");
 
-      expect(logger.setBindings).toHaveBeenCalledWith({
+      expect(logger.error).toHaveBeenCalledWith({
         error: mockError,
         endpoint,
       });
@@ -337,7 +337,7 @@ describe("Application API", () => {
 
   describe("updateEligiblePiiRedaction", () => {
     const logger = {
-      setBindings: jest.fn(),
+      error: jest.fn(),
     };
     const reference = "IAHW-KJLI-2678";
     const endpoint = `${applicationApiUri}/applications/${reference}/eligible-pii-redaction`;
@@ -365,7 +365,7 @@ describe("Application API", () => {
         },
       });
       expect(result).toEqual({});
-      expect(logger.setBindings).not.toHaveBeenCalled();
+      expect(logger.error).not.toHaveBeenCalled();
     });
 
     it("should log and rethrow error when request fails", async () => {
@@ -382,7 +382,7 @@ describe("Application API", () => {
         ),
       ).rejects.toThrow("Request failed");
 
-      expect(logger.setBindings).toHaveBeenCalledWith({
+      expect(logger.error).toHaveBeenCalledWith({
         error: mockError,
         endpoint,
       });

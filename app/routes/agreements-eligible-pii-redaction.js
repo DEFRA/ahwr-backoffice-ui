@@ -26,14 +26,14 @@ export const updateEligiblePiiRedactionRoute = {
           reference: joi.string().required(),
         })
         .required(),
-      failAction: async (request, h, err) => {
+      failAction: async (request, h, error) => {
         const { page, reference } = request.payload;
 
-        request.logger.setBindings({ error: err });
+        request.logger.error({ error });
 
         const panelID = "#update-eligible-pii-redaction";
 
-        const errors = encodeErrorsForUI(err.details, panelID);
+        const errors = encodeErrorsForUI(error.details, panelID);
         const query = new URLSearchParams({
           page,
           updateEligiblePiiRedaction: "true",
@@ -51,6 +51,7 @@ export const updateEligiblePiiRedactionRoute = {
       const { name } = request.auth.credentials.account;
       const { page, note, reference, eligiblePiiRedaction } = request.payload;
 
+      // TODO - look at removing setBindings here
       request.logger.setBindings({ reference });
 
       await generateNewCrumb(request, h);

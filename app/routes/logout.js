@@ -8,9 +8,9 @@ export const logOutRoute = {
       request.auth?.credentials?.account && (await auth.logout(request.auth.credentials.account));
       request.cookieAuth.clear();
       return h.redirect("/login");
-    } catch (err) {
-      request.logger.setBindings({ error: err });
-      throw err;
+    } catch (error) {
+      request.logger.error({ error });
+      throw error;
     }
   },
 };

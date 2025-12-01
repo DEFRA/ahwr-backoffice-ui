@@ -23,12 +23,12 @@ export const updateStatusRoute = {
         page: joi.number().greater(0).default(1),
         returnPage: joi.string().optional().allow("").valid("agreement", "claims"),
       }),
-      failAction: async (request, h, err) => {
+      failAction: async (request, h, error) => {
         const { claimOrAgreement, page, reference, returnPage } = request.payload;
 
-        request.logger.setBindings({ error: err, reference });
+        request.logger.error({ error, reference });
 
-        const errors = encodeErrorsForUI(err.details, "#update-status");
+        const errors = encodeErrorsForUI(error.details, "#update-status");
         const query = new URLSearchParams({
           page,
           updateStatus: "true",
@@ -46,6 +46,7 @@ export const updateStatusRoute = {
       const { claimOrAgreement, page, reference, returnPage, status, note } = request.payload;
       const { name } = request.auth.credentials.account;
 
+      // TODO - look at removing setBindings here
       request.logger.setBindings({ status, reference });
 
       await generateNewCrumb(request, h);

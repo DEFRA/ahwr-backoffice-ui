@@ -27,7 +27,7 @@ describe("contact-history", () => {
     });
 
     test("throws errors", () => {
-      const logger = { setBindings: jest.fn() };
+      const logger = { error: jest.fn() };
 
       const response = {
         message: "history boom",

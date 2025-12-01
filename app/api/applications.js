@@ -8,9 +8,9 @@ export async function getApplication(applicationReference, logger) {
   try {
     const { payload } = await wreck.get(endpoint, { json: true });
     return payload;
-  } catch (err) {
-    logger.setBindings({ error: err, endpoint });
-    throw err;
+  } catch (error) {
+    logger.error({ error, endpoint });
+    throw error;
   }
 }
 
@@ -37,9 +37,9 @@ export async function getApplications(
   try {
     const { payload } = await wreck.post(endpoint, options);
     return payload;
-  } catch (err) {
-    logger.setBindings({ error: err, endpoint });
-    throw err;
+  } catch (error) {
+    logger.error({ error, endpoint });
+    throw error;
   }
 }
 
@@ -57,9 +57,9 @@ export async function processApplicationClaim(reference, user, approved, logger,
   try {
     const { payload } = await wreck.post(endpoint, options);
     return payload;
-  } catch (err) {
-    logger.setBindings({ error: err, endpoint });
-    throw err;
+  } catch (error) {
+    logger.error({ error, endpoint });
+    throw error;
   }
 }
 
@@ -76,9 +76,9 @@ export async function updateApplicationStatus(reference, user, status, logger, n
   try {
     const { payload } = await wreck.put(endpoint, options);
     return payload;
-  } catch (err) {
-    logger.setBindings({ error: err, endpoint });
-    throw err;
+  } catch (error) {
+    logger.error({ error, endpoint });
+    throw error;
   }
 }
 
@@ -87,15 +87,14 @@ export async function getApplicationEvents(reference, logger) {
   try {
     const { payload } = await wreck.get(endpoint, { json: true });
     return payload;
-  } catch (err) {
-    logger.setBindings({ error: err });
-    throw err;
+  } catch (error) {
+    logger.error({ error });
+    throw error;
   }
 }
 
 export async function updateApplicationData(reference, data, note, name, logger) {
   const endpoint = `${applicationApiUri}/applications/${reference}/data`;
-  logger.setBindings({ endpoint });
   const options = {
     payload: {
       ...data,
@@ -104,8 +103,13 @@ export async function updateApplicationData(reference, data, note, name, logger)
     },
   };
 
-  const { payload } = await wreck.put(endpoint, options);
-  return payload;
+  try {
+    const { payload } = await wreck.put(endpoint, options);
+    return payload;
+  } catch (error) {
+    logger.error({ error, endpoint });
+    throw error;
+  }
 }
 
 export async function redactPiiData(logger) {
@@ -113,9 +117,9 @@ export async function redactPiiData(logger) {
   try {
     const { payload } = await wreck.post(endpoint, {});
     return payload;
-  } catch (err) {
-    logger.setBindings({ error: err, endpoint });
-    throw err;
+  } catch (error) {
+    logger.error({ error, endpoint });
+    throw error;
   }
 }
 
@@ -132,9 +136,9 @@ export async function updateEligiblePiiRedaction(reference, data, note, name, lo
   try {
     const { payload } = await wreck.put(endpoint, options);
     return payload;
-  } catch (err) {
-    logger.setBindings({ error: err, endpoint });
-    throw err;
+  } catch (error) {
+    logger.error({ error, endpoint });
+    throw error;
   }
 }
 
@@ -143,8 +147,8 @@ export async function getOldWorldApplicationHistory(oldWorldAppRef, logger) {
   try {
     const { payload } = await wreck.get(endpoint, { json: true });
     return payload;
-  } catch (err) {
-    logger.setBindings({ error: err });
-    throw err;
+  } catch (error) {
+    logger.error({ error, endpoint });
+    throw error;
   }
 }
