@@ -34,8 +34,8 @@ describe("display-helper tests", () => {
   });
 
   test.each([
-    { input: "E", expected: "Endemics" },
-    { input: "R", expected: "Review" },
+    { input: "FOLLOW_UP", expected: "Endemics" },
+    { input: "REVIEW", expected: "Review" },
   ])("formatTypeOfVisit with $input", async ({ input, expected }) => {
     expect(formatTypeOfVisit(input)).toEqual(expected);
   });
