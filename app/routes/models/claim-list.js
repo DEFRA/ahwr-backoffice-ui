@@ -99,7 +99,7 @@ export const getClaimTableRows = (claims, page, returnPage, showSBI = true) =>
       },
       {
         text:
-          claim.herd?.herdName ??
+          claim.herd?.name ??
           (claim.data.typeOfLivestock === "sheep" ? "Unnamed flock" : "Unnamed herd"),
         classes: respText,
       },

@@ -5,7 +5,8 @@ export const getHerdBreakdown = (claims) => {
 
   for (const claim of claims) {
     if (claim.herd) {
-      const { id: herdId, species } = claim.herd;
+      const { id: herdId } = claim.herd;
+      const species = claim.data.typeOfLivestock;
 
       if (!countedHerdIds.has(herdId)) {
         countedHerdIds.add(herdId);

@@ -5,15 +5,15 @@ export const getHerdRowData = (herd, isSheep) => {
   const flockOrHerdWord = isSheep ? "flock" : "herd";
 
   const herdInfo = herd ?? {
-    herdName: `Unnamed ${flockOrHerdWord}`,
+    name: `Unnamed ${flockOrHerdWord}`,
     cph: "-",
   };
-  const isOnlyHerd = herdInfo.herdReasons?.includes("onlyHerd") ? "Yes" : "No";
-  const reasonText = getHerdReasonsText(herdInfo.herdReasons);
+  const isOnlyHerd = herdInfo.reasons?.includes("onlyHerd") ? "Yes" : "No";
+  const reasonText = getHerdReasonsText(herdInfo.reasons);
   const herdName = {
     key: { text: `${upperFirstLetter(flockOrHerdWord)} name` },
     value: {
-      html: herdInfo.herdName ?? `Unnamed ${flockOrHerdWord}`,
+      html: herdInfo.name ?? `Unnamed ${flockOrHerdWord}`,
     },
   };
   const herdCph = {
@@ -22,7 +22,7 @@ export const getHerdRowData = (herd, isSheep) => {
   };
   const otherHerdsOnSbi = {
     key: { text: `Is this the only ${flockOrHerdWord} on this SBI?` },
-    value: { html: herdInfo.herdReasons ? isOnlyHerd : "-" },
+    value: { html: herdInfo.reasons ? isOnlyHerd : "-" },
   };
   const reasonsForHerd = {
     key: { text: `Reasons the ${flockOrHerdWord} is separate` },
