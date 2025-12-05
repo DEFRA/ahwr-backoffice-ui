@@ -168,7 +168,7 @@ export const getClaimViewStates = (request, status, currentStatusEvent) => {
 
   const { isAdministrator, isRecommender, isAuthoriser, isSuperAdmin } = mapAuth(request);
 
-  request.logger.info({
+  request.logger?.info({
     isAdministrator,
     isRecommender,
     isAuthoriser,
