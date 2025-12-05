@@ -8,7 +8,7 @@ export const mapAuth = (request) => {
   const { isAuthenticated, credentials } = request.auth;
   const { username } = credentials.account;
 
-  request.logger?.error({
+  console.log({
     error: {
       message: JSON.stringify({
         isAuthenticated,
