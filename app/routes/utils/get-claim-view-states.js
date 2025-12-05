@@ -170,10 +170,12 @@ export const getClaimViewStates = (request, status, currentStatusEvent) => {
 
   request.logger?.error({
     error: {
-      isAdministrator,
-      isRecommender,
-      isAuthoriser,
-      isSuperAdmin,
+      message: JSON.stringify({
+        isAdministrator,
+        isRecommender,
+        isAuthoriser,
+        isSuperAdmin,
+      }),
     },
   });
   const admActions = getAdminActionsAvailable({

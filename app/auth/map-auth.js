@@ -10,12 +10,14 @@ export const mapAuth = (request) => {
 
   request.logger?.error({
     error: {
-      isAuthenticated,
-      administrator: credentials.scope.includes(administrator),
-      username: username.trim().toLowerCase(),
-      superAdminsLength: superAdmins.length,
-      superAdmins1: superAdmins[0],
-      includes: superAdmins.includes(username.trim().toLowerCase()),
+      message: JSON.stringify({
+        isAuthenticated,
+        administrator: credentials.scope.includes(administrator),
+        username: username.trim().toLowerCase(),
+        superAdminsLength: superAdmins.length,
+        superAdmins1: superAdmins[0],
+        includes: superAdmins.includes(username.trim().toLowerCase()),
+      }),
     },
   });
 
