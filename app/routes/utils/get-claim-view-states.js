@@ -168,13 +168,11 @@ export const getClaimViewStates = (request, status, currentStatusEvent) => {
 
   const { isAdministrator, isRecommender, isAuthoriser, isSuperAdmin } = mapAuth(request);
 
-  request.logger?.error({
-    error: {
-      isAdministrator,
-      isRecommender,
-      isAuthoriser,
-      isSuperAdmin,
-    },
+  console.log({
+    isAdministrator,
+    isRecommender,
+    isAuthoriser,
+    isSuperAdmin,
   });
   const admActions = getAdminActionsAvailable({
     isAdministrator,
