@@ -8,7 +8,6 @@ const init = async () => {
 };
 
 process.on("unhandledRejection", async (err) => {
-  console.log(err);
   await server.stop();
   server.logger.error(err, "unhandledRejection");
   process.exit(1);
