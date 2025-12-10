@@ -8,19 +8,6 @@ export const mapAuth = (request) => {
   const { isAuthenticated, credentials } = request.auth;
   const { username } = credentials.account;
 
-  console.log({
-    error: {
-      message: JSON.stringify({
-        isAuthenticated,
-        administrator: credentials.scope.includes(administrator),
-        username: username.trim().toLowerCase(),
-        superAdminsLength: superAdmins.length,
-        superAdmins1: superAdmins[0],
-        includes: superAdmins.includes(username.trim().toLowerCase()),
-      }),
-    },
-  });
-
   return {
     isAuthenticated,
     isAdministrator: isAuthenticated && credentials.scope.includes(administrator),

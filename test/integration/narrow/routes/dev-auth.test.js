@@ -2,20 +2,24 @@ import { createServer } from "../../../../app/server";
 import { auth } from "../../../../app/auth";
 import { StatusCodes } from "http-status-codes";
 import { setUserDetails } from "../../../../app/session/index.js";
+import { config } from "../../../../app/config";
 
 jest.mock("../../../../app/session/index.js");
 jest.mock("../../../../app/auth");
+
 describe("Authentication route tests", () => {
   let server;
   const url = "/dev-auth";
 
   beforeAll(async () => {
+    config.auth.enabled = false;
     server = await createServer();
     jest.clearAllMocks();
   });
 
   describe("Authenticate GET request", () => {
     const method = "GET";
+
     test(`GET ${url} route redirects to '/'`, async () => {
       auth.authenticate.mockResolvedValueOnce(["user1", ["role1", "role2"]]);
       const options = {

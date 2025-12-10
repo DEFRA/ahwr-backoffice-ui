@@ -24,6 +24,7 @@ import { viewClaimRoute } from "../routes/view-claim.js";
 import { withdrawAgreementRoute } from "../routes/withdraw-agreement.js";
 import { updateEligiblePiiRedactionRoute } from "../routes/agreements-eligible-pii-redaction.js";
 import { missingPagesRoute } from "../routes/missing-routes.js";
+import { config } from "../config/index.js";
 
 const routes = [
   accessibilityRoute,
@@ -35,7 +36,6 @@ const routes = [
   authenticateRoute,
   ...claimsDataRoutes,
   ...claimsRoutes,
-  devAuthRoute,
   ...flagsRoutes,
   healthRoute,
   homeRoute,
@@ -54,11 +54,19 @@ const routes = [
   missingPagesRoute,
 ];
 
+const getRoutes = () => {
+  if (!config.auth.enabled) {
+    return routes.concat(devAuthRoute);
+  }
+
+  return routes;
+};
+
 export const routerPlugin = {
   plugin: {
     name: "router",
     register: (server, _) => {
-      server.route(routes);
+      server.route(getRoutes());
     },
   },
 };
