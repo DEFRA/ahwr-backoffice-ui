@@ -43,26 +43,6 @@ export async function getApplications(
   }
 }
 
-export async function processApplicationClaim(reference, user, approved, logger, note) {
-  const endpoint = `${applicationApiUri}/applications/claim`;
-  const options = {
-    payload: {
-      reference,
-      user,
-      approved,
-      note,
-    },
-    json: true,
-  };
-  try {
-    const { payload } = await wreck.post(endpoint, options);
-    return payload;
-  } catch (error) {
-    logger.error({ error, endpoint });
-    throw error;
-  }
-}
-
 export async function updateApplicationStatus(reference, user, status, logger, note) {
   const endpoint = `${applicationApiUri}/applications/${reference}`;
   const options = {

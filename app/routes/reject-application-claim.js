@@ -1,7 +1,6 @@
 import joi from "joi";
 import { preSubmissionHandler } from "./utils/pre-submission-handler.js";
 import { generateNewCrumb } from "./utils/crumb-cache.js";
-import { processApplicationClaim } from "../api/applications.js";
 import { updateClaimStatus } from "../api/claims.js";
 import { encodeErrorsForUI } from "./utils/encode-errors-for-ui.js";
 import { permissions } from "../auth/permissions.js";
@@ -61,9 +60,6 @@ export const rejectApplicationClaimRoute = {
       if (claimOrAgreement === "claim") {
         query.append("returnPage", returnPage);
         await updateClaimStatus(reference, name, STATUS.REJECTED, request.logger);
-      } else {
-        const isClaimToBePaid = false;
-        await processApplicationClaim(reference, name, isClaimToBePaid, request.logger);
       }
 
       return h.redirect(`/view-${claimOrAgreement}/${reference}?${query.toString()}`);

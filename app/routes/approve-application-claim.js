@@ -2,7 +2,6 @@ import joi from "joi";
 import { permissions } from "../auth/permissions.js";
 import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { preSubmissionHandler } from "./utils/pre-submission-handler.js";
-import { processApplicationClaim } from "../api/applications.js";
 import { updateClaimStatus } from "../api/claims.js";
 import { encodeErrorsForUI } from "./utils/encode-errors-for-ui.js";
 import { STATUS } from "ffc-ahwr-common-library";
@@ -60,9 +59,6 @@ export const approveApplicationClaimRoute = {
       if (claimOrAgreement === "claim") {
         query.append("returnPage", returnPage);
         await updateClaimStatus(reference, name, STATUS.READY_TO_PAY, request.logger);
-      } else {
-        const isClaimToBePaid = true;
-        await processApplicationClaim(reference, name, isClaimToBePaid, request.logger);
       }
 
       return h.redirect(`/view-${claimOrAgreement}/${reference}?${query.toString()}`);

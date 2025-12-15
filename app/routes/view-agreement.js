@@ -36,8 +36,6 @@ export const viewAgreementRoute = {
         errors: joi.string().allow(null),
         withdraw: joi.bool().default(false),
         moveToInCheck: joi.bool().default(false),
-        recommendToPay: joi.bool().default(false),
-        recommendToReject: joi.bool().default(false),
         approve: joi.bool().default(false),
         reject: joi.bool().default(false),
         updateStatus: joi.bool().default(false),

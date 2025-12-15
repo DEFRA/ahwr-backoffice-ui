@@ -1,19 +1,15 @@
 import { permissions } from "../../../../app/auth/permissions";
 import { getCrumbs } from "../../../utils/get-crumbs";
 import { createServer } from "../../../../app/server";
-import { processApplicationClaim } from "../../../../app/api/applications";
 import { generateNewCrumb } from "../../../../app/routes/utils/crumb-cache";
 import { StatusCodes } from "http-status-codes";
 
-jest.mock("../../../../app/api/applications");
 jest.mock("../../../../app/api/claims");
 jest.mock("../../../../app/routes/utils/crumb-cache");
 jest.mock("../../../../app/auth");
 
 const reference = "AHWR-555A-FD4C";
 const url = "/recommend-to-pay";
-
-processApplicationClaim.mockResolvedValue(true);
 
 const { administrator, recommender } = permissions;
 
@@ -47,29 +43,6 @@ describe("Recommended To Pay test", () => {
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
     });
 
-    test("returns 302 when validation fails for application", async () => {
-      const errors =
-        "W3sidGV4dCI6IlNlbGVjdCBhbGwgY2hlY2tib3hlcyIsImhyZWYiOiIjcmVjb21tZW5kLXRvLXBheSIsImtleSI6ImNvbmZpcm0ifV0%3D";
-      const options = {
-        method: "POST",
-        url,
-        auth,
-        headers: { cookie: `crumb=${crumb}` },
-        payload: {
-          reference,
-          claimOrAgreement: "agreement",
-          page: 1,
-          confirm: "checkedAgainstChecklist",
-          crumb,
-        },
-      };
-      const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      expect(res.headers.location).toEqual(
-        `/view-agreement/${reference}?page=1&recommendToPay=true&errors=${errors}`,
-      );
-    });
-
     test("returns 302 when validation fails for claim", async () => {
       const errors =
         "W3sidGV4dCI6IlNlbGVjdCBhbGwgY2hlY2tib3hlcyIsImhyZWYiOiIjcmVjb21tZW5kLXRvLXBheSIsImtleSI6ImNvbmZpcm0ifV0%3D";
@@ -93,36 +66,6 @@ describe("Recommended To Pay test", () => {
         `/view-claim/${reference}?page=1&recommendToPay=true&errors=${errors}&returnPage=claims`,
       );
     });
-
-    test.each([recommender, administrator])(
-      "Redirects correctly on successful validation for application",
-      async (scope) => {
-        auth = {
-          strategy: "session-auth",
-          credentials: {
-            scope: [scope],
-            account: { homeAccountId: "testId", name: "admin" },
-          },
-        };
-        const options = {
-          method: "POST",
-          url,
-          auth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: {
-            reference,
-            claimOrAgreement: "agreement",
-            page: 1,
-            confirm: ["checkedAgainstChecklist", "sentChecklist"],
-            crumb,
-          },
-        };
-        const res = await server.inject(options);
-        expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-        expect(generateNewCrumb).toHaveBeenCalledTimes(1);
-        expect(res.headers.location).toEqual(`/view-agreement/${reference}?page=1`);
-      },
-    );
 
     test.each([recommender, administrator])(
       "Redirects correctly on successful validation for claim",
@@ -155,7 +98,7 @@ describe("Recommended To Pay test", () => {
       },
     );
 
-    test("Returns 403 when user is not administrator or recomender ", async () => {
+    test("Returns 403 when user is not administrator or recommender ", async () => {
       auth = {
         strategy: "session-auth",
         credentials: {
@@ -197,7 +140,7 @@ describe("Recommended To Pay test", () => {
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           reference,
-          claimOrAgreement: "agreement",
+          claimOrAgreement: "claim",
           page: 1,
           confirm: ["sentChecklist"],
           crumb,
@@ -206,7 +149,7 @@ describe("Recommended To Pay test", () => {
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
       expect(res.headers.location).toEqual(
-        `/view-agreement/${reference}?page=1&recommendToPay=true&errors=${errors}`,
+        `/view-claim/${reference}?page=1&recommendToPay=true&errors=${errors}&returnPage=undefined`,
       );
     });
 
@@ -228,7 +171,7 @@ describe("Recommended To Pay test", () => {
         payload: {
           page: 1,
           reference: 123,
-          claimOrAgreement: "agreement",
+          claimOrAgreement: "claim",
           confirm: ["recommendToPay", "sentChecklist"],
           crumb,
         },
@@ -238,7 +181,7 @@ describe("Recommended To Pay test", () => {
 
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
       expect(res.headers.location).toEqual(
-        `/view-agreement/123?page=1&recommendToPay=true&errors=${errors}`,
+        `/view-claim/123?page=1&recommendToPay=true&errors=${errors}&returnPage=undefined`,
       );
     });
   });
