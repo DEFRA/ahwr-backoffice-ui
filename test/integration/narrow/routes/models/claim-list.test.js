@@ -89,6 +89,21 @@ describe("Application-list createModel", () => {
     expect(formattedRows).toContain('<p class="govuk-!-margin-0 responsive-text">Review</p>');
   });
 
+  test("getClaimTableRows with a claim missing flags info", async () => {
+    const page = 1;
+    const returnPage = "claim";
+    const flaggedClaims = [
+      { ...claims[0], application: { ...claims[0].application } },
+    ];
+    const rows = getClaimTableRows(flaggedClaims, page, returnPage);
+
+    const formattedRows = rows[0][0].html.replace(/\s+/g, " ");
+    expect(formattedRows).toContain(
+      '<a class="govuk-!-margin-0 responsive-text" href="test-uri/view-claim/AHWR-1111-1111?page=1&returnPage=claim">AHWR-1111-1111</a>',
+    );
+    expect(formattedRows).toContain('<p class="govuk-!-margin-0 responsive-text">Review</p>');
+  });
+
   test("getClaimTableRows showSBI false", async () => {
     const page = 1;
     const returnPage = "claim";

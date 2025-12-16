@@ -87,7 +87,7 @@ export const getClaimTableRows = (claims, page, returnPage, showSBI = true) =>
               </div>`,
       },
       {
-        html: application.flags.length ? `<span>Yes ${FLAG_EMOJI}</span>` : "",
+        html: application.flags?.length ? `<span>Yes ${FLAG_EMOJI}</span>` : "",
         classes: respText,
       },
       {

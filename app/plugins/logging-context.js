@@ -4,11 +4,11 @@ export function addBindings(request) {
   const username = getUserDetails(request, "user");
   const roles = getUserDetails(request, "roles");
 
-  // TODO - look at removing setBindings here
-  request.logger.setBindings({
-    "user.name": username,
-    "user.roles": roles,
-  });
+  if(username && roles) {
+    request.logger.setBindings({
+      "transaction.id": `username: ${username}, roles: ${roles}`
+    });
+  }
 }
 
 export const loggingContextPlugin = {
