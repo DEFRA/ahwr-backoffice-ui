@@ -2,11 +2,7 @@
 
 <div class="govuk-panel govuk-panel--confirmation govuk-!-text-align-left" id="recommend-to-pay">
   <form method="post" autocomplete="off" novalidate="novalidate" action="/recommend-to-pay" class="ahwr-update-form">
-    {% if claimOrAgreement == 'agreement' %}
-      <a href="/view-agreement/{{ reference }}?page={{ page }}" class="govuk-link govuk-body">Back</a>
-    {% elif claimOrAgreement == 'claim' %}
       <a href="/view-claim/{{ reference }}" class="govuk-link govuk-body">Back</a>
-    {% endif %}
     {{ govukCheckboxes({
       name: "confirm",
       fieldset: {

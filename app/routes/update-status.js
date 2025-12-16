@@ -1,7 +1,7 @@
 import joi from "joi";
 import { permissions } from "../auth/permissions.js";
 import { updateClaimStatus } from "../api/claims.js";
-import { updateApplicationStatus, processApplicationClaim } from "../api/applications.js";
+import { updateApplicationStatus } from "../api/applications.js";
 import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { encodeErrorsForUI } from "./utils/encode-errors-for-ui.js";
 import { STATUS } from "ffc-ahwr-common-library";
@@ -63,14 +63,6 @@ export const updateStatusRoute = {
         status !== STATUS.REJECTED
       ) {
         await updateApplicationStatus(reference, name, status, request.logger, note);
-      }
-
-      if (
-        claimOrAgreement === "agreement" &&
-        (status === STATUS.READY_TO_PAY || status === STATUS.REJECTED)
-      ) {
-        const isClaimToBePaid = status === STATUS.READY_TO_PAY;
-        await processApplicationClaim(reference, name, isClaimToBePaid, request.logger, note);
       }
 
       return h.redirect(`/view-${claimOrAgreement}/${reference}?${query.toString()}`);

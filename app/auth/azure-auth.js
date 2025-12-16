@@ -1,15 +1,29 @@
 import { config } from "../config/index.js";
 import { ConfidentialClientApplication, LogLevel } from "@azure/msal-node";
+import { getLogger } from "../logging/logger.js";
 
-const msalLogging = config.isProd
-  ? {
-      loggerCallback(_loglevel, message, _containsPii) {
-        console.log(message);
+export const getMsalLoggingSetup = () => {
+  if (config.isProd || config.isTest) {
+    return {
+      loggerCallback(loglevel, message, _containsPii) {
+        const logger = getLogger();
+        if (loglevel === LogLevel.Error) {
+          logger.error(message);
+        } else if (loglevel === LogLevel.Warning) {
+          logger.warn(message);
+        } else {
+          logger.info(message);
+        }
       },
       piiLoggingEnabled: false,
-      logLevel: LogLevel.Verbose,
-    }
-  : {};
+      logLevel: LogLevel.Info,
+    };
+  } else {
+    return {};
+  }
+};
+
+const msalLogging = getMsalLoggingSetup();
 
 let msalApplication;
 

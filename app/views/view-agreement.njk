@@ -52,18 +52,6 @@
       {% if moveToInCheckForm %}
         {%  include "./includes/move-to-in-check-form.njk" %}
       {% endif %}
-      {% if recommendToPayForm %}
-        {% include "./includes/recommend-to-pay-form.njk" %}
-      {% endif %}
-      {% if recommendToRejectForm %}
-        {% include "./includes/recommend-to-reject-form.njk" %}
-      {% endif %}
-      {% if authoriseForm %}
-        {% include "./includes/authorise-form.njk" %}
-      {% endif %}
-      {% if rejectForm %}
-        {% include "./includes/reject-form.njk" %}
-      {% endif %}
       {% if updateStatusForm %}
         {% include "./includes/update-status-form.njk" %}
       {% endif %}
@@ -87,15 +75,6 @@
       {% endif %}
       {% if moveToInCheckAction %}
         {% include "./includes/move-to-in-check-action.njk" %}
-      {% endif %}
-      {% if recommendAction %}
-        {% include "./includes/recommend-action.njk" %}
-      {% endif %}
-      {% if authoriseAction %}
-        {% include "./includes/authorise-action.njk" %}
-      {% endif %}
-      {% if rejectAction %}
-        {% include "./includes/reject-action.njk" %}
       {% endif %}
     </div>
   </div>

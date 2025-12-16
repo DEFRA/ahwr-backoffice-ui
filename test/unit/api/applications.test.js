@@ -4,7 +4,6 @@ import {
   getApplications,
   getApplication,
   updateApplicationStatus,
-  processApplicationClaim,
   getApplicationEvents,
   updateApplicationData,
   redactPiiData,
@@ -218,49 +217,6 @@ describe("Application API", () => {
         logger,
       );
     }).rejects.toEqual(wreckResponse);
-  });
-
-  it("processApplicationClaim should throw errors", async () => {
-    const options = {
-      payload: {
-        user: "test",
-        approved: false,
-        reference: appRef,
-      },
-      json: true,
-    };
-    wreck.post = jest.fn().mockRejectedValueOnce("processApplicationClaim boom");
-    const logger = { error: jest.fn() };
-
-    expect(async () => {
-      await processApplicationClaim(appRef, "test", false, logger);
-    }).rejects.toBe("processApplicationClaim boom");
-    expect(wreck.post).toHaveBeenCalledTimes(1);
-    expect(wreck.post).toHaveBeenCalledWith(`${applicationApiUri}/applications/claim`, options);
-  });
-
-  it("processApplicationClaim should return on success", async () => {
-    const options = {
-      payload: {
-        user: "test",
-        approved: true,
-        reference: appRef,
-      },
-      json: true,
-    };
-    const wreckResponse = {
-      payload: {},
-      res: {
-        statusCode: 200,
-      },
-    };
-
-    wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
-    const response = await processApplicationClaim(appRef, "test", true);
-
-    expect(response).toEqual(wreckResponse.payload);
-    expect(wreck.post).toHaveBeenCalledTimes(1);
-    expect(wreck.post).toHaveBeenCalledWith(`${applicationApiUri}/applications/claim`, options);
   });
 
   it("getApplicationEvents should return records", async () => {
