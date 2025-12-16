@@ -98,7 +98,5 @@ describe("Recommended To Reject test", () => {
       expect(generateNewCrumb).toHaveBeenCalledTimes(1);
       expect(res.headers.location).toEqual(`/view-claim/${reference}?page=1&returnPage=claims`);
     });
-
-
   });
 });
