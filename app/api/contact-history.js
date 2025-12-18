@@ -18,7 +18,7 @@ export async function getContactHistory(reference, logger) {
 }
 
 export const getContactFieldData = (contactHistoryData, field) => {
-  const filteredData = contactHistoryData.filter((contact) => contact.data?.field === field);
+  const filteredData = contactHistoryData.filter((contact) => contact.field === field);
 
   if (filteredData.length === 0) {
     return "NA";
@@ -28,7 +28,7 @@ export const getContactFieldData = (contactHistoryData, field) => {
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
   );
 
-  return `${labels[field]} ${firstUpdate.data.oldValue}`;
+  return `${labels[field]} ${firstUpdate.oldValue}`;
 };
 
 export const displayContactHistory = (history) => {

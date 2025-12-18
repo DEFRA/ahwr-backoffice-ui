@@ -4,9 +4,9 @@ export function addBindings(request) {
   const username = getUserDetails(request, "user");
   const roles = getUserDetails(request, "roles");
 
-  if(username && roles) {
+  if (username && roles) {
     request.logger.setBindings({
-      "transaction.id": `username: ${username}, roles: ${roles}`
+      "transaction.id": `username: ${username}, roles: ${roles}`,
     });
   }
 }
