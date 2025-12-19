@@ -3,7 +3,7 @@ import boom from "@hapi/boom";
 import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { permissions } from "../auth/permissions.js";
 import { getApplication } from "../api/applications.js";
-import { formattedDateToUk } from "../lib/display-helper.js";
+import { formattedDateToUk, upperFirstLetter } from "../lib/display-helper.js";
 import { getClaimSearch, setClaimSearch } from "../session/index.js";
 import { sessionKeys } from "../session/keys.js";
 import { getContactHistory, displayContactHistory } from "../api/contact-history.js";
@@ -13,6 +13,7 @@ import { FLAG_EMOJI } from "./utils/ui-constants.js";
 import { getHerdBreakdown } from "../lib/get-herd-breakdown.js";
 import { getClaimViewStates } from "./utils/get-claim-view-states.js";
 import { getErrorMessagesByKey } from "./utils/get-error-messages-by-key.js";
+import { getStyleClassByStatus } from "../constants/status.js";
 
 const { administrator, authoriser, processor, recommender, user } = permissions;
 const pageUrl = "/agreement/{reference}/claims";
@@ -50,11 +51,12 @@ export const agreementRoutes = [
         const application = await getApplication(applicationReference);
         const contactHistory = await getContactHistory(applicationReference);
         const contactHistoryDetails = displayContactHistory(contactHistory);
+
         if (!application) {
           throw boom.badRequest();
         }
 
-        const { organisation } = application;
+        const { organisation, status } = application;
         const isFlagged = application.flags.length > 0;
         const flaggedText = isFlagged ? ` ${FLAG_EMOJI}` : "";
         const isRedacted = application.redacted;
@@ -138,6 +140,9 @@ export const agreementRoutes = [
           : [];
         const errorMessages = getErrorMessagesByKey(errors);
 
+        const statusLabel = upperFirstLetter(status.toLowerCase().replace(/_/g, " "));
+        const statusClass = getStyleClassByStatus(status);
+
         return h.view("agreement", {
           backLink: getBackLink(page, reference, returnPage),
           businessName: organisation.name,
@@ -154,6 +159,10 @@ export const agreementRoutes = [
           page,
           errorMessages,
           errors,
+          applicationStatus: {
+            statusLabel,
+            statusClass,
+          },
         });
       },
     },
