@@ -92,9 +92,7 @@ describe("Application-list createModel", () => {
   test("getClaimTableRows with a claim missing flags info", async () => {
     const page = 1;
     const returnPage = "claim";
-    const flaggedClaims = [
-      { ...claims[0], application: { ...claims[0].application } },
-    ];
+    const flaggedClaims = [{ ...claims[0], application: { ...claims[0].application } }];
     const rows = getClaimTableRows(flaggedClaims, page, returnPage);
 
     const formattedRows = rows[0][0].html.replace(/\s+/g, " ");

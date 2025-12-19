@@ -60,31 +60,23 @@ describe("contact-history", () => {
       const contactHistory = [
         {
           createdAt: "2020-01-01",
-          data: {
-            field: "orgEmail",
-            oldValue: "more-recent-org@example.com",
-          },
+          field: "orgEmail",
+          oldValue: "more-recent-org@example.com",
         },
         {
           createdAt: "2019-12-01",
-          data: {
-            field: "orgEmail",
-            oldValue: "original-org@example.com",
-          },
+          field: "orgEmail",
+          oldValue: "original-org@example.com",
         },
         {
           createdAt: "2020-02-01",
-          data: {
-            field: "email",
-            oldValue: "more-recent-test@example.com",
-          },
+          field: "email",
+          oldValue: "more-recent-test@example.com",
         },
         {
           createdAt: "2020-01-01",
-          data: {
-            field: "email",
-            oldValue: "original-test@example.com",
-          },
+          field: "email",
+          oldValue: "original-test@example.com",
         },
       ];
 
