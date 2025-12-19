@@ -22,7 +22,10 @@
         }) }}
       {% endif %}
       <h1 class="govuk-caption-l govuk-!-margin-bottom-3">Agreement details and claims</h1>
-      <h2 class="govuk-heading-l">{{ businessName }}</h2>
+      <h2 class="govuk-heading-l">
+        {{ businessName }} 
+        <span class="govuk-tag app-long-tag govuk-!-margin-left-2 {{applicationStatus.statusClass}}">{{applicationStatus.statusLabel}}</span> 
+      </h2>
       {% if updateEligiblePiiRedactionForm %}
         {% include "./includes/eligible-pii-redaction-form.njk" %}
       {% endif %}
