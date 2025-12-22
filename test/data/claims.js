@@ -1,8 +1,8 @@
 export const claims = [
   {
     id: "32ccceb1-038f-4c6b-8ed0-af0cf70af831",
-    reference: "AHWR-1111-1111",
-    applicationReference: "AHWR-1234-APP1",
+    reference: "RESH-1111-1111",
+    applicationReference: "IAHW-1234-APP1",
     data: {
       vetsName: "asdasd",
       dateOfVisit: "2024-03-22T00:00:00.000Z",
@@ -14,7 +14,7 @@ export const claims = [
       numberAnimalsTested: "123",
     },
     status: "PAID",
-    type: "R",
+    type: "REVIEW",
     createdAt: "2024-03-22T12:20:18.307Z",
     updatedAt: "2024-03-22T12:20:18.307Z",
     createdBy: "sql query",
@@ -41,8 +41,8 @@ export const claims = [
   },
   {
     id: "605df3c4-518c-48e0-adcf-4b0ec02aa53b",
-    reference: "AHWR-0000-1111",
-    applicationReference: "AHWR-1234-APP1",
+    reference: "RESH-0000-1111",
+    applicationReference: "IAHW-1234-APP1",
     data: {
       vetsName: "asdasd",
       dateOfVisit: "2024-03-22T00:00:00.000Z",
@@ -54,7 +54,7 @@ export const claims = [
       numberAnimalsTested: "123",
     },
     status: "ON_HOLD",
-    type: "R",
+    type: "REVIEW",
     createdAt: "2024-03-22T12:20:18.307Z",
     updatedAt: "2024-03-22T12:20:18.307Z",
     createdBy: "sql query",

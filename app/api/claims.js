@@ -4,7 +4,7 @@ import { config } from "../config/index.js";
 const { applicationApiUri } = config;
 
 export async function getClaim(reference, logger) {
-  const endpoint = `${applicationApiUri}/claims/get-by-reference/${reference}`;
+  const endpoint = `${applicationApiUri}/claims/${reference}`;
   try {
     const { payload } = await wreck.get(endpoint, { json: true });
     return payload;
