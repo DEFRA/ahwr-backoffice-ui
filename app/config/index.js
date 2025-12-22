@@ -4,8 +4,7 @@ import { authConfig } from "./auth.js";
 const SECONDS_PER_HOUR = 3600;
 const MILLISECONDS_PER_SECOND = 1000;
 const HOURS_PER_DAY = 24;
-const NUMBER_OF_DAYS = 3;
-const ONE_YEAR_IN_DAYS = 365;
+const HOURS_PER_HALF_DAY = 12;
 
 const getConfigSchema = () =>
   joi.object({
@@ -29,15 +28,6 @@ const getConfigSchema = () =>
       password: joi.string().min(32).required(),
       ttl: joi.number().required(),
     },
-    cookiePolicy: {
-      clearInvalid: joi.bool().required(),
-      encoding: joi.string().required(),
-      isSameSite: joi.string().required(),
-      isSecure: joi.bool().required(),
-      password: joi.string().min(32).required(),
-      path: joi.string().required(),
-      ttl: joi.number().required(),
-    },
     env: joi.string().valid("development", "test", "production").required(),
     isDev: joi.boolean().required(),
     isProd: joi.boolean().required(),
@@ -59,7 +49,7 @@ const getConfigSchema = () =>
 const buildConfig = () => {
   const conf = {
     cache: {
-      expiresIn: MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_DAY * NUMBER_OF_DAYS,
+      expiresIn: MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_DAY * HOURS_PER_HALF_DAY,
       options: {
         host: process.env.REDIS_HOST || "redis-hostname.default",
         keyPrefix: process.env.REDIS_KEY_PREFIX || "ahwr-backoffice-ui",
@@ -77,16 +67,7 @@ const buildConfig = () => {
       isSecure: process.env.NODE_ENV === "production",
       password:
         process.env.COOKIE_PASSWORD ?? "set_a_secure_cookie_password_of_at_least_32_characters",
-      ttl: MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_DAY * NUMBER_OF_DAYS,
-    },
-    cookiePolicy: {
-      clearInvalid: false,
-      encoding: "base64json",
-      isSameSite: "Lax",
-      isSecure: process.env.NODE_ENV === "production",
-      password: process.env.COOKIE_PASSWORD,
-      path: "/",
-      ttl: MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_DAY * ONE_YEAR_IN_DAYS,
+      ttl: MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_DAY * HOURS_PER_HALF_DAY,
     },
     env: process.env.NODE_ENV,
     isDev: process.env.NODE_ENV === "development",
