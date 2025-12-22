@@ -20,8 +20,9 @@ describe("Claims API", () => {
 
     wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
 
-    const response = await getClaim("AHWR-1111-1111");
+    const response = await getClaim("RESH-1111-1111");
 
+    expect(wreck.get).toHaveBeenCalledWith(expect.stringMatching('/claims/RESH-1111-1111'), { json: true } );
     expect(response).toEqual(wreckResponse.payload);
   });
 
@@ -37,7 +38,7 @@ describe("Claims API", () => {
 
     const logger = { error: jest.fn() };
     expect(async () => {
-      await getClaim("AHWR-2222-2222", logger);
+      await getClaim("RESH-2222-2222", logger);
     }).rejects.toEqual(wreckResponse);
   });
 
