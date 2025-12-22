@@ -3,7 +3,6 @@ import { authConfig } from "./auth.js";
 
 const SECONDS_PER_HOUR = 3600;
 const MILLISECONDS_PER_SECOND = 1000;
-const HOURS_PER_DAY = 24;
 const HOURS_PER_HALF_DAY = 12;
 
 const getConfigSchema = () =>
@@ -49,7 +48,7 @@ const getConfigSchema = () =>
 const buildConfig = () => {
   const conf = {
     cache: {
-      expiresIn: MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_DAY * HOURS_PER_HALF_DAY,
+      expiresIn: MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_HALF_DAY,
       options: {
         host: process.env.REDIS_HOST || "redis-hostname.default",
         keyPrefix: process.env.REDIS_KEY_PREFIX || "ahwr-backoffice-ui",
@@ -67,7 +66,7 @@ const buildConfig = () => {
       isSecure: process.env.NODE_ENV === "production",
       password:
         process.env.COOKIE_PASSWORD ?? "set_a_secure_cookie_password_of_at_least_32_characters",
-      ttl: MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_DAY * HOURS_PER_HALF_DAY,
+      ttl: MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_HALF_DAY,
     },
     env: process.env.NODE_ENV,
     isDev: process.env.NODE_ENV === "development",
