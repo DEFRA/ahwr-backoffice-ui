@@ -1,6 +1,5 @@
 import { getApplicationClaimDetails } from "../../../../../app/routes/models/application-claim.js";
 import { oldWorldApplication } from "../../../../data/ow-application.js";
-import { applicationEvents } from "../../../../data/application-events.js";
 
 describe("Application-claim model", () => {
   test("getClaimData - Valid Data with date of claim in application data", async () => {
@@ -10,7 +9,6 @@ describe("Application-claim model", () => {
     const vetRCVSActions = { items: [{ test: "change RCVS" }] };
     const res = getApplicationClaimDetails(
       oldWorldApplication,
-      [],
       statusActions,
       visitDateActions,
       vetsNameActions,
@@ -50,135 +48,6 @@ describe("Application-claim model", () => {
           ),
         },
       },
-      { key: { text: "Review details confirmed" }, value: { text: "Yes" } },
-      {
-        key: { text: "Vet’s name" },
-        value: { text: oldWorldApplication.data.vetName },
-        actions: vetsNameActions,
-      },
-      {
-        key: { text: "Vet’s RCVS number" },
-        value: { text: oldWorldApplication.data.vetRcvs },
-        actions: vetRCVSActions,
-      },
-      {
-        key: { text: "Test results unique reference number (URN)" },
-        value: { text: oldWorldApplication.data.urnResult },
-      },
-    ]);
-  });
-
-  test("getClaimData - Valid Data with date of claim in events data", async () => {
-    const statusActions = { items: [{ test: "change status" }] };
-    const visitDateActions = { items: [{ test: "change visit date" }] };
-    const vetsNameActions = { items: [{ test: "change vets name" }] };
-    const vetRCVSActions = { items: [{ test: "change RCVS" }] };
-    const res = getApplicationClaimDetails(
-      oldWorldApplication,
-      applicationEvents,
-      statusActions,
-      visitDateActions,
-      vetsNameActions,
-      vetRCVSActions,
-    );
-
-    expect(res).toEqual([
-      {
-        key: { text: "Status" },
-        value: {
-          html: '<span class="govuk-tag app-long-tag govuk-tag">Ready to pay</span>',
-        },
-        actions: statusActions,
-      },
-      {
-        key: { text: "Date of review" },
-        value: {
-          text: new Intl.DateTimeFormat("en-GB").format(
-            new Date(oldWorldApplication.data.visitDate),
-          ),
-        },
-        actions: visitDateActions,
-      },
-      {
-        key: { text: "Date of testing" },
-        value: {
-          text: new Intl.DateTimeFormat("en-GB").format(
-            new Date(oldWorldApplication.data.dateOfTesting),
-          ),
-        },
-      },
-      {
-        key: { text: "Date of claim" },
-        value: {
-          text: new Intl.DateTimeFormat("en-GB").format(
-            new Date(oldWorldApplication.data.dateOfClaim),
-          ),
-        },
-      },
-      { key: { text: "Review details confirmed" }, value: { text: "Yes" } },
-      {
-        key: { text: "Vet’s name" },
-        value: { text: oldWorldApplication.data.vetName },
-        actions: vetsNameActions,
-      },
-      {
-        key: { text: "Vet’s RCVS number" },
-        value: { text: oldWorldApplication.data.vetRcvs },
-        actions: vetRCVSActions,
-      },
-      {
-        key: { text: "Test results unique reference number (URN)" },
-        value: { text: oldWorldApplication.data.urnResult },
-      },
-    ]);
-  });
-
-  test("getClaimData - Valid Data with no date of claim, gets it from the claim-claimed event", async () => {
-    const statusActions = { items: [{ test: "change status" }] };
-    const visitDateActions = { items: [{ test: "change visit date" }] };
-    const vetsNameActions = { items: [{ test: "change vets name" }] };
-    const vetRCVSActions = { items: [{ test: "change RCVS" }] };
-    const res = getApplicationClaimDetails(
-      { ...oldWorldApplication, data: { ...oldWorldApplication.data, dateOfClaim: undefined } },
-      {
-        eventRecords: [
-          {
-            EventRaised: "2022-11-09T11:00:00.000Z",
-            EventType: "claim-claimed",
-          },
-        ],
-      },
-      statusActions,
-      visitDateActions,
-      vetsNameActions,
-      vetRCVSActions,
-    );
-    expect(res).toEqual([
-      {
-        key: { text: "Status" },
-        value: {
-          html: '<span class="govuk-tag app-long-tag govuk-tag">Ready to pay</span>',
-        },
-        actions: statusActions,
-      },
-      {
-        key: { text: "Date of review" },
-        value: {
-          text: new Intl.DateTimeFormat("en-GB").format(
-            new Date(oldWorldApplication.data.visitDate),
-          ),
-        },
-        actions: visitDateActions,
-      },
-      {
-        key: { text: "Date of testing" },
-        value: {
-          text: new Intl.DateTimeFormat("en-GB").format(
-            new Date(oldWorldApplication.data.dateOfTesting),
-          ),
-        },
-      },
-      { key: { text: "Date of claim" }, value: { text: "09/11/2022" } },
       { key: { text: "Review details confirmed" }, value: { text: "Yes" } },
       {
         key: { text: "Vet’s name" },
@@ -204,7 +73,6 @@ describe("Application-claim model", () => {
     const vetRCVSActions = { items: [{ test: "change RCVS" }] };
     const res = getApplicationClaimDetails(
       { ...oldWorldApplication, data: { ...oldWorldApplication.data, dateOfTesting: undefined } },
-      [],
       statusActions,
       visitDateActions,
       vetsNameActions,
@@ -260,78 +128,6 @@ describe("Application-claim model", () => {
     ]);
   });
 
-  test("getClaimData - Valid Data with no claim-claimed event", async () => {
-    const statusActions = { items: [{ test: "change status" }] };
-    const visitDateActions = { items: [{ test: "change visit date" }] };
-    const vetsNameActions = { items: [{ test: "change vets name" }] };
-    const vetRCVSActions = { items: [{ test: "change RCVS" }] };
-    const res = getApplicationClaimDetails(
-      oldWorldApplication,
-      {
-        eventRecords: [
-          {
-            EventRaised: "2022-11-09T11:00:00.000Z",
-            EventType: "claim-createdBy",
-          },
-        ],
-      },
-      statusActions,
-      visitDateActions,
-      vetsNameActions,
-      vetRCVSActions,
-    );
-
-    expect(res).toEqual([
-      {
-        key: { text: "Status" },
-        value: {
-          html: '<span class="govuk-tag app-long-tag govuk-tag">Ready to pay</span>',
-        },
-        actions: statusActions,
-      },
-      {
-        key: { text: "Date of review" },
-        value: {
-          text: new Intl.DateTimeFormat("en-GB").format(
-            new Date(oldWorldApplication.data.visitDate),
-          ),
-        },
-        actions: visitDateActions,
-      },
-      {
-        key: { text: "Date of testing" },
-        value: {
-          text: new Intl.DateTimeFormat("en-GB").format(
-            new Date(oldWorldApplication.data.dateOfTesting),
-          ),
-        },
-      },
-      {
-        key: { text: "Date of claim" },
-        value: {
-          text: new Intl.DateTimeFormat("en-GB").format(
-            new Date(oldWorldApplication.data.dateOfClaim),
-          ),
-        },
-      },
-      { key: { text: "Review details confirmed" }, value: { text: "Yes" } },
-      {
-        key: { text: "Vet’s name" },
-        value: { text: oldWorldApplication.data.vetName },
-        actions: vetsNameActions,
-      },
-      {
-        key: { text: "Vet’s RCVS number" },
-        value: { text: oldWorldApplication.data.vetRcvs },
-        actions: vetRCVSActions,
-      },
-      {
-        key: { text: "Test results unique reference number (URN)" },
-        value: { text: oldWorldApplication.data.urnResult },
-      },
-    ]);
-  });
-
   test("getClaimData - Data returned for paid status", async () => {
     const statusActions = { items: [{ test: "change status" }] };
     const visitDateActions = { items: [{ test: "change visit date" }] };
@@ -339,14 +135,6 @@ describe("Application-claim model", () => {
     const vetRCVSActions = { items: [{ test: "change RCVS" }] };
     const res = getApplicationClaimDetails(
       { ...oldWorldApplication, status: "PAID" },
-      {
-        eventRecords: [
-          {
-            EventRaised: "2022-11-09T11:00:00.000Z",
-            EventType: "claim-createdBy",
-          },
-        ],
-      },
       statusActions,
       visitDateActions,
       vetsNameActions,

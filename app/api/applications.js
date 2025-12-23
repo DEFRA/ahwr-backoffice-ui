@@ -62,17 +62,6 @@ export async function updateApplicationStatus(reference, user, status, logger, n
   }
 }
 
-export async function getApplicationEvents(reference, logger) {
-  const endpoint = `${applicationApiUri}/applications/events/${reference}`;
-  try {
-    const { payload } = await wreck.get(endpoint, { json: true });
-    return payload;
-  } catch (error) {
-    logger.error({ error });
-    throw error;
-  }
-}
-
 export async function updateApplicationData(reference, data, note, name, logger) {
   const endpoint = `${applicationApiUri}/applications/${reference}/data`;
   const options = {

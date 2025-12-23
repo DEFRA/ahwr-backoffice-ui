@@ -13,7 +13,6 @@ const claimDataStatus = [
 
 export const getApplicationClaimDetails = (
   application,
-  applicationEvents,
   statusActions,
   visitDateActions,
   vetsNameActions,
@@ -28,20 +27,6 @@ export const getApplicationClaimDetails = (
 
   if (data?.dateOfClaim) {
     formattedDate = formattedDateToUk(data?.dateOfClaim);
-  } else {
-    let filteredEvents;
-    if (applicationEvents?.eventRecords) {
-      filteredEvents = applicationEvents.eventRecords.filter(
-        (event) => event.EventType === "claim-claimed",
-      );
-
-      if (filteredEvents.length) {
-        const claimClaimedEvent = filteredEvents[0];
-        formattedDate = formattedDateToUk(claimClaimedEvent.EventRaised);
-      } else {
-        formattedDate = "N/A";
-      }
-    }
   }
 
   const statusLabel = upperFirstLetter(status.toLowerCase().replace(/_/g, " "));

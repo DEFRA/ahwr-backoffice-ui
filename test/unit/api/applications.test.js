@@ -4,7 +4,6 @@ import {
   getApplications,
   getApplication,
   updateApplicationStatus,
-  getApplicationEvents,
   updateApplicationData,
   redactPiiData,
   updateEligiblePiiRedaction,
@@ -217,44 +216,6 @@ describe("Application API", () => {
         logger,
       );
     }).rejects.toEqual(wreckResponse);
-  });
-
-  it("getApplicationEvents should return records", async () => {
-    const wreckResponse = {
-      payload: {
-        eventRecords: [{}, {}],
-      },
-      res: {
-        statusCode: 200,
-      },
-    };
-
-    const options = { json: true };
-    wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
-    const response = await getApplicationEvents(appRef);
-
-    expect(response).toEqual(wreckResponse.payload);
-
-    expect(wreck.get).toHaveBeenCalledTimes(1);
-    expect(wreck.get).toHaveBeenCalledWith(
-      `${applicationApiUri}/applications/events/${appRef}`,
-      options,
-    );
-  });
-
-  it("getApplicationEvents should throw errors", async () => {
-    const options = { json: true };
-    wreck.get = jest.fn().mockRejectedValueOnce("getApplicationEvents boom");
-    const logger = { error: jest.fn() };
-
-    expect(async () => {
-      await getApplicationEvents(appRef, logger);
-    }).rejects.toBe("getApplicationEvents boom");
-    expect(wreck.get).toHaveBeenCalledTimes(1);
-    expect(wreck.get).toHaveBeenCalledWith(
-      `${applicationApiUri}/applications/events/${appRef}`,
-      options,
-    );
   });
 
   describe("redactPiiData", () => {
