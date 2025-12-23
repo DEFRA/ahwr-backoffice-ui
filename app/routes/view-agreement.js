@@ -1,15 +1,12 @@
-import { Buffer } from "buffer";
 import joi from "joi";
 import {
   getApplication,
-  getApplicationEvents,
   getOldWorldApplicationHistory,
 } from "../api/applications.js";
 import { permissions } from "../auth/permissions.js";
 import { getStyleClassByStatus } from "../constants/status.js";
 import { getClaimViewStates } from "./utils/get-claim-view-states.js";
 import { getCurrentStatusEvent } from "./utils/get-current-status-event.js";
-import { STATUS } from "ffc-ahwr-common-library";
 import { getErrorMessagesByKey } from "./utils/get-error-messages-by-key.js";
 import { getStatusUpdateOptions } from "./utils/get-status-update-options.js";
 import { getContactHistory, displayContactHistory } from "../api/contact-history.js";
@@ -54,20 +51,6 @@ export const viewAgreementRoute = {
         request.logger,
       );
       const currentStatusEvent = getCurrentStatusEvent(application, historyRecords);
-
-      let applicationEvents;
-      if (
-        (application.claimed ||
-          status === STATUS.IN_CHECK ||
-          status === STATUS.READY_TO_PAY ||
-          status === STATUS.REJECTED) &&
-        !application.data.dateOfClaim
-      ) {
-        applicationEvents = await getApplicationEvents(
-          application?.data?.organisation.sbi,
-          request.logger,
-        );
-      }
 
       const statusLabel = upperFirstLetter(status.toLowerCase().replace(/_/g, " "));
 
@@ -139,7 +122,6 @@ export const viewAgreementRoute = {
       const historyDetails = getHistoryDetails(historyRecords);
       const applicationClaimDetails = getApplicationClaimDetails(
         application,
-        applicationEvents,
         statusActions,
         dateOfVisitActions,
         vetsNameActions,
