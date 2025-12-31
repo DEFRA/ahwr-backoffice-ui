@@ -19,6 +19,15 @@ services:
     networks:
       - ahwr-local
 
+  redis:
+    image: redis:4.0.14
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6380:6379"
+    networks:
+      - ahwr-local
+
 volumes:
   redis_data:
 

@@ -1,13 +1,19 @@
 import wreck from "@hapi/wreck";
 import { claims } from "../../data/claims.js";
 import { STATUS } from "ffc-ahwr-common-library";
-import { getClaim, getClaims, updateClaimStatus, updateClaimData } from "../../../app/api/claims";
+import { getClaim, getClaims, updateClaimStatus, updateClaimData } from "../../../app/api/claims.js";
+import { metricsCounter } from '../../../app/lib/metrics.js'
 
 jest.mock("@hapi/wreck");
 jest.mock("../../../app/config");
+jest.mock("../../../app/lib/metrics.js");
 
 describe("Claims API", () => {
   const applicationReference = "AHWR-1234-APP1";
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  })
 
   test("getClaim", async () => {
     const wreckResponse = {
@@ -22,7 +28,9 @@ describe("Claims API", () => {
 
     const response = await getClaim("RESH-1111-1111");
 
-    expect(wreck.get).toHaveBeenCalledWith(expect.stringMatching('/claims/RESH-1111-1111'), { json: true } );
+    expect(wreck.get).toHaveBeenCalledWith(expect.stringMatching("/claims/RESH-1111-1111"), {
+      json: true,
+    });
     expect(response).toEqual(wreckResponse.payload);
   });
 
@@ -89,6 +97,7 @@ describe("Claims API", () => {
     const response = await updateClaimStatus(applicationReference, "Admin", STATUS.IN_CHECK);
 
     expect(response).toEqual(wreckResponse.payload);
+    expect(metricsCounter).toHaveBeenCalledWith('claim_status_update');
   });
 
   test("updateClaimStatus error", async () => {
@@ -106,7 +115,9 @@ describe("Claims API", () => {
     expect(async () => {
       await updateClaimStatus(applicationReference, "Admin", STATUS.IN_CHECK, logger);
     }).rejects.toEqual(wreckResponse);
+    expect(metricsCounter).not.toHaveBeenCalled();
   });
+
   test("updateClaimData", async () => {
     const wreckResponse = {
       payload: {},
@@ -132,6 +143,7 @@ describe("Claims API", () => {
     );
 
     expect(response).toEqual(wreckResponse.payload);
+    expect(metricsCounter).toHaveBeenCalledWith('claim_data_update');
   });
 
   test("updateClaimData error", async () => {
@@ -159,5 +171,6 @@ describe("Claims API", () => {
         logger,
       );
     }).rejects.toEqual(wreckResponse);
+    expect(metricsCounter).not.toHaveBeenCalled();
   });
 });

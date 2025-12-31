@@ -21,6 +21,12 @@ export const errorPagesPlugin = {
                 stack_trace: originalError?.stack,
                 id: request.logger.mixins?.trace?.id,
               },
+              event: {
+                type: "exception",
+                category: "error-on-page-render",
+                reason: message,
+                severity: "error",
+              },
             },
             firstLineOfError,
           );

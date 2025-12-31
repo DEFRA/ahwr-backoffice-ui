@@ -1,12 +1,14 @@
 import wreck from "@hapi/wreck";
-import { getAllFlags, deleteFlag, createFlag } from "../../../app/api/flags";
+import { getAllFlags, deleteFlag, createFlag } from "../../../app/api/flags.js";
 import { flags } from "../../data/flags.js";
 import { config } from "../../../app/config";
+import { metricsCounter } from '../../../app/lib/metrics.js'
 
 const { applicationApiUri } = config;
 
 jest.mock("@hapi/wreck");
 jest.mock("../../../app/config");
+jest.mock("../../../app/lib/metrics.js");
 
 const mockLogger = {
   error: jest.fn(),
@@ -71,6 +73,7 @@ describe("Flags API", () => {
         },
       });
       expect(mockLogger.error).not.toHaveBeenCalled();
+      expect(metricsCounter).toHaveBeenCalledWith('flag_deleted');
     });
 
     test("throws an error if the patch call errors", async () => {
@@ -80,6 +83,7 @@ describe("Flags API", () => {
 
       expect(async () => await deleteFlag("", "", mockLogger)).rejects.toThrow("test error");
       expect(mockLogger.error).toHaveBeenCalled();
+      expect(metricsCounter).not.toHaveBeenCalled();
     });
   });
 
@@ -113,6 +117,7 @@ describe("Flags API", () => {
       );
 
       expect(mockLogger.error).not.toHaveBeenCalled();
+      expect(metricsCounter).toHaveBeenCalledWith('flag_created');
     });
 
     test("throws an error if the post call errors", async () => {
@@ -122,6 +127,7 @@ describe("Flags API", () => {
 
       expect(async () => await createFlag({}, "", mockLogger)).rejects.toThrow("test error");
       expect(mockLogger.error).toHaveBeenCalled();
+      expect(metricsCounter).not.toHaveBeenCalled();
     });
   });
 });
