@@ -1,5 +1,6 @@
 import wreck from "@hapi/wreck";
 import { config } from "../config/index.js";
+import { metricsCounter } from "../lib/metrics.js";
 
 const { applicationApiUri } = config;
 
@@ -49,6 +50,7 @@ export async function updateClaimStatus(reference, user, status, logger, note) {
   };
   try {
     const { payload } = await wreck.put(endpoint, options);
+    await metricsCounter("claim_status_update");
     return payload;
   } catch (error) {
     logger.error({ error, endpoint });
@@ -69,6 +71,7 @@ export async function updateClaimData(reference, data, note, name, logger) {
 
   try {
     const { payload } = await wreck.put(endpoint, options);
+    await metricsCounter("claim_data_update");
     return payload;
   } catch (error) {
     logger.error({ error, endpoint });

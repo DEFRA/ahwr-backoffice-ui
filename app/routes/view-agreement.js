@@ -1,8 +1,5 @@
 import joi from "joi";
-import {
-  getApplication,
-  getOldWorldApplicationHistory,
-} from "../api/applications.js";
+import { getApplication, getOldWorldApplicationHistory } from "../api/applications.js";
 import { permissions } from "../auth/permissions.js";
 import { getStyleClassByStatus } from "../constants/status.js";
 import { getClaimViewStates } from "./utils/get-claim-view-states.js";

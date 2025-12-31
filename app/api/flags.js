@@ -1,5 +1,6 @@
 import wreck from "@hapi/wreck";
 import { config } from "../config/index.js";
+import { metricsCounter } from "../lib/metrics.js";
 
 const { applicationApiUri } = config;
 
@@ -18,6 +19,7 @@ export async function deleteFlag({ flagId, deletedNote }, user, logger) {
   const endpoint = `${applicationApiUri}/flags/${flagId}/delete`;
   try {
     await wreck.patch(endpoint, { json: true, payload: { user, deletedNote } });
+    await metricsCounter("flag_deleted");
   } catch (error) {
     logger.error({ error, endpoint });
     throw error;
@@ -27,7 +29,9 @@ export async function deleteFlag({ flagId, deletedNote }, user, logger) {
 export async function createFlag(payload, appRef, logger) {
   const endpoint = `${applicationApiUri}/applications/${appRef}/flag`;
   try {
-    return wreck.post(endpoint, { json: true, payload });
+    const res = await wreck.post(endpoint, { json: true, payload });
+    await metricsCounter("flag_created");
+    return res;
   } catch (error) {
     logger.error({ error, endpoint });
     throw error;
