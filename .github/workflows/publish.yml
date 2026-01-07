@@ -37,14 +37,8 @@ jobs:
             https://api.github.com/repos/DEFRA/ahwr-ui-tests/dispatches \
             -d '{"event_type": "run-tests", "client_payload": {"repo": "ahwr-public-user-ui"}}'
 
-#      - name: Create Test Coverage Reports
-#        run: |
-#          npm ci
-#          npm run build:frontend
-#          npm test
-
-#      - name: SonarCloud Scan
-#        uses: SonarSource/sonarqube-scan-action@v5.3.1 #  (or check latest version on https://github.com/marketplace/actions/official-sonarqube-scan)
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+     - name: SonarCloud Scan
+       uses: SonarSource/sonarqube-scan-action@v5.3.1 #  (or check latest version on https://github.com/marketplace/actions/official-sonarqube-scan)
+       env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
