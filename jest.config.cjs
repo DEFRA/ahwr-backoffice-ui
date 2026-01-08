@@ -1,6 +1,6 @@
 module.exports = {
   collectCoverage: true,
-  collectCoverageFrom: ["**/*.js", "!**/*.test.js"],
+  collectCoverageFrom: ["app/**/*.js", "!app/**/*.test.js", "!app/config/**/*.js"],
   coverageDirectory: "test-output",
   coverageReporters: ["text-summary", "lcov"],
   coveragePathIgnorePatterns: [
