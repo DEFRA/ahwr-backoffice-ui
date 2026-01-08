@@ -19,12 +19,9 @@ jest.mock("../../../../app/auth");
 
 function expectWithdrawLink($, reference, isWithdrawLinkVisible) {
   if (isWithdrawLinkVisible) {
-    expect($(".govuk-link").hasClass);
     const withdrawLink = $(".govuk-link");
     expect(withdrawLink.text()).toMatch("Withdraw");
     expect(withdrawLink.attr("href")).toMatch(`/agreements/${reference}?page=1&withdraw=true`);
-  } else {
-    expect($(".govuk-link").not.hasClass);
   }
 }
 

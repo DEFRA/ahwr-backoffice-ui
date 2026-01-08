@@ -7,7 +7,7 @@ export const getApplicationDetails = (application, statusActions, eligiblePiiRed
   const { data, createdAt, status, eligiblePiiRedaction } = application;
   const formattedDate = formattedDateToUk(createdAt);
 
-  const statusLabel = upperFirstLetter(status.toLowerCase().replace(/_/g, " "));
+  const statusLabel = upperFirstLetter(status.toLowerCase().replaceAll(/_/g, " "));
   const statusClass = getStyleClassByStatus(status);
 
   return [
