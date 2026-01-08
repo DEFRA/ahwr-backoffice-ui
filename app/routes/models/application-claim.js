@@ -29,7 +29,7 @@ export const getApplicationClaimDetails = (
     formattedDate = formattedDateToUk(data?.dateOfClaim);
   }
 
-  const statusLabel = upperFirstLetter(status.toLowerCase().replaceAll(/_/g, " "));
+  const statusLabel = upperFirstLetter(status.toLowerCase().replaceAll("_", " "));
   const statusClass = getStyleClassByStatus(status);
 
   return [

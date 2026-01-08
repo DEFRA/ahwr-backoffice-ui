@@ -49,7 +49,7 @@ export const viewAgreementRoute = {
       );
       const currentStatusEvent = getCurrentStatusEvent(application, historyRecords);
 
-      const statusLabel = upperFirstLetter(status.toLowerCase().replaceAll(/_/g, " "));
+      const statusLabel = upperFirstLetter(status.toLowerCase().replaceAll("_", " "));
 
       const statusClass = getStyleClassByStatus(status);
 

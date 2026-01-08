@@ -23,6 +23,14 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
+      - name: Test code and Create Test Coverage Reports
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: |
+          ./scripts/test
+
       - name: Build and Publish
         uses: DEFRA/cdp-build-action/build@main
         with:

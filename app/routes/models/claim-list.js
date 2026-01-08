@@ -128,7 +128,7 @@ export const getClaimTableRows = (claims, page, returnPage, showSBI = true) =>
         classes: `${respText} align-left`,
       },
       {
-        html: `<span class="app-long-tag"><span class="govuk-tag ${respText} ${getStyleClassByStatus(claim.status)}">${upperFirstLetter(claim.status.toLowerCase()).replaceAll(/_/g, " ")}</span></span>`,
+        html: `<span class="app-long-tag"><span class="govuk-tag ${respText} ${getStyleClassByStatus(claim.status)}">${upperFirstLetter(claim.status.toLowerCase()).replaceAll("_", " ")}</span></span>`,
         attributes: {
           "data-sort-value": `${claim.status}`,
         },
