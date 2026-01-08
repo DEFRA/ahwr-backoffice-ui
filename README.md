@@ -119,13 +119,13 @@ You could run `./scripts/test` to run tests, which will run the tests dockerized
 The other option is to run the `./scripts/start` to run the application in a dockerized environemnt and then copy out the `dist` folder, so the view can be generated on your machine (once it is done once, you will not need the `dist` folder). The command to copy the files is:
 
 ```bash
-docker cp {your_cotainer_id}:/home/node/app/frontend/dist app/frontend/
+docker cp {your_container_id}:/home/node/app/frontend/dist app/frontend/
 ```
 
 You can retrieve the container id using docker by running
 
 ```bash
-dockert container ls
+docker container ls
 ```
 
 And then look for the container called `ahwr-backoffice-ui-development`
