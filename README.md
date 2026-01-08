@@ -15,6 +15,7 @@ Core delivery platform Node.js Frontend Template.
   - [Development](#development)
   - [Production](#production)
   - [Npm scripts](#npm-scripts)
+  - [Testing](#testing)
   - [Update dependencies](#update-dependencies)
   - [Formatting](#formatting)
     - [Windows prettier issue](#windows-prettier-issue)
@@ -108,6 +109,26 @@ To view them in your command line run:
 ```bash
 npm run
 ```
+
+### Testing
+
+Out of the box, integration tests will fail using `npm run test`. This is due to missing a view called `layout.njk` under `app/view/layouts`
+
+You could run `./scripts/test` to run tests, which will run the tests dockerized (there is a watch option available)
+
+The other option is to run the `./scripts/start` to run the application in a dockerized environemnt and then copy out the `dist` folder, so the view can be generated on your machine (once it is done once, you will not need the `dist` folder). The command to copy the files is:
+
+```bash
+docker cp {your_cotainer_id}:/home/node/app/frontend/dist app/frontend/
+```
+
+You can retrieve the container id using docker by running
+
+```bash
+dockert container ls
+```
+
+And then look for the container called `ahwr-backoffice-ui-development`
 
 ### Update dependencies
 
