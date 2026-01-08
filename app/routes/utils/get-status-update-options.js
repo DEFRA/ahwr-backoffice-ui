@@ -11,6 +11,6 @@ export const getStatusUpdateOptions = (claimStatus) =>
   Object.entries(statusUpdateOptions)
     .filter(([_, value]) => value !== claimStatus)
     .map(([key, value]) => ({
-      text: upperFirstLetter(key.toLowerCase()).replace(/_/g, " "),
+      text: upperFirstLetter(key.toLowerCase()).replaceAll("_", " "),
       value,
     }));

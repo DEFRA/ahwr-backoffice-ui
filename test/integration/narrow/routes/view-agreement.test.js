@@ -21,12 +21,9 @@ const { reference } = oldWorldApplication;
 
 function expectWithdrawLink($, reference, isWithdrawLinkVisible) {
   if (isWithdrawLinkVisible) {
-    expect($(".govuk-link").hasClass);
     const withdrawLink = $(".govuk-button");
     expect(withdrawLink.text()).toMatch("Withdraw");
     expect(withdrawLink.attr("href")).toMatch(`/view-agreement/${reference}?page=1&withdraw=true`);
-  } else {
-    expect($(".govuk-link").not.hasClass);
   }
 }
 
@@ -63,13 +60,13 @@ function expectRecommendButtons($, areRecommendButtonsVisible) {
     const recommendToPayButton = $("#btn-recommend-to-pay");
     const recommendToRejectButton = $("#btn-recommend-to-reject");
 
-    expect(recommendToPayButton.hasClass("govuk-button"));
+    expect(recommendToPayButton.hasClass("govuk-button")).toBeTruthy();
     expect(recommendToPayButton.text()).toMatch("Recommend to pay");
     expect(recommendToPayButton.attr("href")).toMatch(
       `/view-agreement/${oldWorldApplication.reference}?page=1&recommendToPay=true`,
     );
 
-    expect(recommendToRejectButton.hasClass("govuk-button"));
+    expect(recommendToRejectButton.hasClass("govuk-button")).toBeTruthy();
     expect(recommendToRejectButton.text()).toMatch("Recommend to reject");
     expect(recommendToRejectButton.attr("href")).toMatch("");
   } else {

@@ -273,7 +273,7 @@ export const viewClaimRoute = {
       const status = {
         key: { text: "Status" },
         value: {
-          html: `<span class='app-long-tag'><span class='govuk-tag responsive-text ${getStyleClassByStatus(claimStatus.replace(/_/g, " "))}'> ${upperFirstLetter(claimStatus.replace(/_/g, " ").toLowerCase())} </span></span>`,
+          html: `<span class='app-long-tag'><span class='govuk-tag responsive-text ${getStyleClassByStatus(claimStatus.replaceAll("_", " "))}'> ${upperFirstLetter(claimStatus.replaceAll("_", " ").toLowerCase())} </span></span>`,
         },
         actions: statusActions,
       };
@@ -509,8 +509,8 @@ export const viewClaimRoute = {
         title: upperFirstLetter(organisation.name),
         claimSummaryDetails: rowsWithData,
         status: {
-          normalType: upperFirstLetter(claim.status.replace(/_/g, " ").toLowerCase()),
-          tagClass: getStyleClassByStatus(claim.status.replace(/_/g, " ")),
+          normalType: upperFirstLetter(claim.status.replaceAll("_", " ").toLowerCase()),
+          tagClass: getStyleClassByStatus(claim.status.replaceAll("_", " ")),
         },
         applicationSummaryDetails,
         historyDetails,

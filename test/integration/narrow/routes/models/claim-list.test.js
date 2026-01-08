@@ -67,7 +67,7 @@ describe("Application-list createModel", () => {
     const returnPage = "claim";
     const rows = getClaimTableRows(claims, page, returnPage);
 
-    const formattedRows = rows[0][0].html.replace(/\s+/g, " ");
+    const formattedRows = rows[0][0].html.replaceAll(/\s+/g, " ");
     expect(formattedRows).toContain(
       '<a class="govuk-!-margin-0 responsive-text" href="test-uri/view-claim/AHWR-1111-1111?page=1&returnPage=claim">AHWR-1111-1111</a>',
     );
@@ -82,7 +82,7 @@ describe("Application-list createModel", () => {
     ];
     const rows = getClaimTableRows(flaggedClaims, page, returnPage);
 
-    const formattedRows = rows[0][0].html.replace(/\s+/g, " ");
+    const formattedRows = rows[0][0].html.replaceAll(/\s+/g, " ");
     expect(formattedRows).toContain(
       '<a class="govuk-!-margin-0 responsive-text" href="test-uri/view-claim/AHWR-1111-1111?page=1&returnPage=claim">AHWR-1111-1111</a>',
     );
@@ -95,7 +95,7 @@ describe("Application-list createModel", () => {
     const flaggedClaims = [{ ...claims[0], application: { ...claims[0].application } }];
     const rows = getClaimTableRows(flaggedClaims, page, returnPage);
 
-    const formattedRows = rows[0][0].html.replace(/\s+/g, " ");
+    const formattedRows = rows[0][0].html.replaceAll(/\s+/g, " ");
     expect(formattedRows).toContain(
       '<a class="govuk-!-margin-0 responsive-text" href="test-uri/view-claim/AHWR-1111-1111?page=1&returnPage=claim">AHWR-1111-1111</a>',
     );
@@ -107,7 +107,7 @@ describe("Application-list createModel", () => {
     const returnPage = "claim";
     const showSBI = false;
     const rows = getClaimTableRows(claims, page, returnPage, showSBI);
-    const formattedRows = rows[0][0].html.replace(/\s+/g, " ");
+    const formattedRows = rows[0][0].html.replaceAll(/\s+/g, " ");
     expect(formattedRows).toContain(
       '<a class="govuk-!-margin-0 responsive-text" href="test-uri/view-claim/AHWR-1111-1111?page=1&returnPage=claim">AHWR-1111-1111</a>',
     );

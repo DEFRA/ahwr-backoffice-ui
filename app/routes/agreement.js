@@ -140,7 +140,7 @@ export const agreementRoutes = [
           : [];
         const errorMessages = getErrorMessagesByKey(errors);
 
-        const statusLabel = upperFirstLetter(status.toLowerCase().replace(/_/g, " "));
+        const statusLabel = upperFirstLetter(status.toLowerCase().replaceAll("_", " "));
         const statusClass = getStyleClassByStatus(status);
 
         return h.view("agreement", {

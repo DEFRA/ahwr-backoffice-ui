@@ -103,7 +103,7 @@ const buildApplicationList = (applications, page) => {
         },
       },
       {
-        html: `<span class="app-long-tag"><span class="govuk-tag ${statusClass}">${upperFirstLetter(app.status.toLowerCase()).replace(/_/g, " ")}</span></span>`,
+        html: `<span class="app-long-tag"><span class="govuk-tag ${statusClass}">${upperFirstLetter(app.status.toLowerCase()).replaceAll("_", " ")}</span></span>`,
         attributes: {
           "data-sort-value": `${app.status}`,
         },
