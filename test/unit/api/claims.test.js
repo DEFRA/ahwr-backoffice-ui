@@ -1,8 +1,13 @@
 import wreck from "@hapi/wreck";
 import { claims } from "../../data/claims.js";
 import { STATUS } from "ffc-ahwr-common-library";
-import { getClaim, getClaims, updateClaimStatus, updateClaimData } from "../../../app/api/claims.js";
-import { metricsCounter } from '../../../app/lib/metrics.js'
+import {
+  getClaim,
+  getClaims,
+  updateClaimStatus,
+  updateClaimData,
+} from "../../../app/api/claims.js";
+import { metricsCounter } from "../../../app/lib/metrics.js";
 
 jest.mock("@hapi/wreck");
 jest.mock("../../../app/config");
@@ -13,7 +18,7 @@ describe("Claims API", () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-  })
+  });
 
   test("getClaim", async () => {
     const wreckResponse = {
@@ -97,7 +102,7 @@ describe("Claims API", () => {
     const response = await updateClaimStatus(applicationReference, "Admin", STATUS.IN_CHECK);
 
     expect(response).toEqual(wreckResponse.payload);
-    expect(metricsCounter).toHaveBeenCalledWith('claim_status_update');
+    expect(metricsCounter).toHaveBeenCalledWith("claim_status_update");
   });
 
   test("updateClaimStatus error", async () => {
@@ -143,7 +148,7 @@ describe("Claims API", () => {
     );
 
     expect(response).toEqual(wreckResponse.payload);
-    expect(metricsCounter).toHaveBeenCalledWith('claim_data_update');
+    expect(metricsCounter).toHaveBeenCalledWith("claim_data_update");
   });
 
   test("updateClaimData error", async () => {
