@@ -25,7 +25,6 @@ export const errorPagesPlugin = {
                 type: "exception",
                 category: "error-on-page-render",
                 reason: message,
-                severity: "error",
               },
             },
             firstLineOfError,
