@@ -36,7 +36,7 @@ const createView = async (request, h, deleteFlag, createFlag, errors) => {
       createFlag,
       isAdmin: isAdministrator,
     })),
-    errors: errors,
+    errors,
     isAdmin: isAdministrator,
   });
 };
