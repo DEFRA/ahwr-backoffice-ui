@@ -140,7 +140,7 @@ const createFlagHandler = {
       failAction: async (request, h, error) => {
         request.logger.error({ error });
 
-        const formattedErrors = error.details
+        const errors = error.details
           .map((receivedError) => {
             if (receivedError.message.includes("note")) {
               return {
@@ -165,13 +165,12 @@ const createFlagHandler = {
 
             return null;
           })
-          .filter((formattedError) => formattedError !== null);
-
-        const errors = formattedErrors.map((formattedError) => ({
-          text: formattedError.message,
-          href: "#",
-          key: formattedError.context.key,
-        }));
+          .filter((formattedError) => formattedError !== null)
+          .map((formattedError) => ({
+            text: formattedError.message,
+            href: "#",
+            key: formattedError.context.key,
+          }));
 
         return (await createView(request, h, false, true, errors)).takeover();
       },
