@@ -15,7 +15,7 @@ describe("Login route test", () => {
     server = await createServer();
   });
 
-  test("logs the user out and redirects to login", async () => {
+  test("builds an authentication url and redirects the user to it", async () => {
     const options = {
       method: "GET",
       url: "/login",
