@@ -146,6 +146,7 @@ const createFlagHandler = {
               return {
                 ...receivedError,
                 message: "Enter a note to explain the reason for creating the flag.",
+                href: "#note",
               };
             }
 
@@ -153,6 +154,7 @@ const createFlagHandler = {
               return {
                 ...receivedError,
                 message: "Enter a valid agreement reference.",
+                href: "#agreement-reference",
               };
             }
 
@@ -160,6 +162,7 @@ const createFlagHandler = {
               return {
                 ...receivedError,
                 message: "Select if the flag is because the user declined multiple herds T&C's.",
+                href: "#appliesToMh",
               };
             }
 
@@ -168,7 +171,7 @@ const createFlagHandler = {
           .filter((formattedError) => formattedError !== null)
           .map((formattedError) => ({
             text: formattedError.message,
-            href: "#",
+            href: formattedError.href,
             key: formattedError.context.key,
           }));
 

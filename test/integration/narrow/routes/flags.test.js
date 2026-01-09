@@ -283,7 +283,7 @@ describe("Flags tests", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toContain("Flags");
       expect($("title").text()).toContain("AHWR Flags");
-      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#appliesToMh");
       expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
         "Select if the flag is because the user declined multiple herds T&C's.",
       );
@@ -310,7 +310,9 @@ describe("Flags tests", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toContain("Flags");
       expect($("title").text()).toContain("AHWR Flags");
-      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+        "#agreement-reference",
+      );
       expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
         "Enter a valid agreement reference.",
       );
@@ -337,7 +339,7 @@ describe("Flags tests", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toContain("Flags");
       expect($("title").text()).toContain("AHWR Flags");
-      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#note");
       expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
         "Enter a note to explain the reason for creating the flag.",
       );
