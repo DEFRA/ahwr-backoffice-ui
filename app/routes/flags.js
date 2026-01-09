@@ -60,7 +60,7 @@ const getFlagsHandler = {
 
       const parsedErrors = errors ? JSON.parse(Buffer.from(errors, "base64").toString("utf8")) : [];
 
-      return await createView(request, h, deleteFlag, createFlag, parsedErrors);
+      return createView(request, h, deleteFlag, createFlag, parsedErrors);
     },
   },
 };
