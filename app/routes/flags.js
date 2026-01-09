@@ -25,6 +25,22 @@ const ERRORS = {
   ],
 };
 
+const createView = async (request, h, deleteFlag, createFlag, errors) => {
+  await generateNewCrumb(request, h);
+  const { isAdministrator } = mapAuth(request);
+
+  return h.view("flags", {
+    ...(await createFlagsTableData({
+      logger: request.logger,
+      flagIdToDelete: deleteFlag,
+      createFlag,
+      isAdmin: isAdministrator,
+    })),
+    errors: errors,
+    isAdmin: isAdministrator,
+  });
+};
+
 const getFlagsHandler = {
   method: "GET",
   path: "/flags",
@@ -41,22 +57,10 @@ const getFlagsHandler = {
     },
     handler: async (request, h) => {
       const { createFlag, deleteFlag, errors } = request.query;
-      await generateNewCrumb(request, h);
 
       const parsedErrors = errors ? JSON.parse(Buffer.from(errors, "base64").toString("utf8")) : [];
 
-      const { isAdministrator } = mapAuth(request);
-
-      return h.view("flags", {
-        ...(await createFlagsTableData({
-          logger: request.logger,
-          flagIdToDelete: deleteFlag,
-          createFlag,
-          isAdmin: isAdministrator,
-        })),
-        errors: parsedErrors,
-        isAdmin: isAdministrator,
-      });
+      return await createView(request, h, deleteFlag, createFlag, parsedErrors);
     },
   },
 };
@@ -122,7 +126,7 @@ const deleteFlagHandler = {
 
 const createFlagHandler = {
   method: "POST",
-  path: "/flags/create",
+  path: "/flags",
   options: {
     auth: {
       scope: [administrator],
@@ -163,13 +167,13 @@ const createFlagHandler = {
           })
           .filter((error) => error !== null);
 
-        const errors = encodeErrorsForUI(formattedErrors, "#");
-        const query = new URLSearchParams({
-          createFlag: "true",
-          errors,
-        });
+        const errors = formattedErrors.map((error) => ({
+          text: error.message,
+          href: "#",
+          key: error.context.key,
+        }));
 
-        return h.redirect(`/flags?${query.toString()}`).takeover();
+        return (await createView(request, h, false, true, errors)).takeover();
       },
     },
     handler: async (request, h) => {

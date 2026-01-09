@@ -194,7 +194,7 @@ describe("Flags tests", () => {
     });
   });
 
-  describe(`POST /flags/create route`, () => {
+  describe(`POST /flags route`, () => {
     beforeEach(async () => {
       crumb = await getCrumbs(server);
       jest.clearAllMocks();
@@ -203,7 +203,7 @@ describe("Flags tests", () => {
     test("returns 302 when there is no auth", async () => {
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
@@ -224,7 +224,7 @@ describe("Flags tests", () => {
       });
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -242,7 +242,7 @@ describe("Flags tests", () => {
       createFlag.mockResolvedValueOnce({ res: { statusCode: 201 } });
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -266,7 +266,7 @@ describe("Flags tests", () => {
     test("renders errors when the user has not provided the proper appliesToMh value", async () => {
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -278,26 +278,22 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
 
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain("flags?createFlag=true&errors=");
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#",
-          key: "appliesToMh",
-          text: "Select if the flag is because the user declined multiple herds T&C's.",
-        },
-      ]);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#");
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Select if the flag is because the user declined multiple herds T&C's.",
+      );
+      phaseBannerOk($);
     });
 
     test("renders errors when the user has not provided the proper appRef value", async () => {
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -309,26 +305,22 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
 
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain("flags?createFlag=true&errors=");
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#",
-          key: "appRef",
-          text: "Enter a valid agreement reference.",
-        },
-      ]);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#");
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Enter a valid agreement reference.",
+      );
+      phaseBannerOk($);
     });
 
     test("renders errors when the user has not provided the proper note value", async () => {
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -340,20 +332,16 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
 
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain("flags?createFlag=true&errors=");
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#",
-          key: "note",
-          text: "Enter a note to explain the reason for creating the flag.",
-        },
-      ]);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#");
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Enter a note to explain the reason for creating the flag.",
+      );
+      phaseBannerOk($);
     });
 
     test("renders an error when the user is trying to create a flag which already exists", async () => {
@@ -371,7 +359,7 @@ describe("Flags tests", () => {
       });
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -414,7 +402,7 @@ describe("Flags tests", () => {
       });
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -460,7 +448,7 @@ describe("Flags tests", () => {
       });
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
