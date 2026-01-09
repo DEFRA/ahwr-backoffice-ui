@@ -141,36 +141,36 @@ const createFlagHandler = {
         request.logger.error({ error });
 
         const formattedErrors = error.details
-          .map((error) => {
-            if (error.message.includes("note")) {
+          .map((receivedError) => {
+            if (receivedError.message.includes("note")) {
               return {
-                ...error,
+                ...receivedError,
                 message: "Enter a note to explain the reason for creating the flag.",
               };
             }
 
-            if (error.message.includes("appRef")) {
+            if (receivedError.message.includes("appRef")) {
               return {
-                ...error,
+                ...receivedError,
                 message: "Enter a valid agreement reference.",
               };
             }
 
-            if (error.message.includes("appliesToMh")) {
+            if (receivedError.message.includes("appliesToMh")) {
               return {
-                ...error,
+                ...receivedError,
                 message: "Select if the flag is because the user declined multiple herds T&C's.",
               };
             }
 
             return null;
           })
-          .filter((error) => error !== null);
+          .filter((formattedError) => formattedError !== null);
 
-        const errors = formattedErrors.map((error) => ({
-          text: error.message,
+        const errors = formattedErrors.map((formattedError) => ({
+          text: formattedError.message,
           href: "#",
-          key: error.context.key,
+          key: formattedError.context.key,
         }));
 
         return (await createView(request, h, false, true, errors)).takeover();
