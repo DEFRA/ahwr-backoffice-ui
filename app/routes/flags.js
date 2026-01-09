@@ -25,6 +25,22 @@ const ERRORS = {
   ],
 };
 
+const createView = async (request, h, deleteFlag, createFlag, errors) => {
+  await generateNewCrumb(request, h);
+  const { isAdministrator } = mapAuth(request);
+
+  return h.view("flags", {
+    ...(await createFlagsTableData({
+      logger: request.logger,
+      flagIdToDelete: deleteFlag,
+      createFlag,
+      isAdmin: isAdministrator,
+    })),
+    errors,
+    isAdmin: isAdministrator,
+  });
+};
+
 const getFlagsHandler = {
   method: "GET",
   path: "/flags",
@@ -41,22 +57,10 @@ const getFlagsHandler = {
     },
     handler: async (request, h) => {
       const { createFlag, deleteFlag, errors } = request.query;
-      await generateNewCrumb(request, h);
 
       const parsedErrors = errors ? JSON.parse(Buffer.from(errors, "base64").toString("utf8")) : [];
 
-      const { isAdministrator } = mapAuth(request);
-
-      return h.view("flags", {
-        ...(await createFlagsTableData({
-          logger: request.logger,
-          flagIdToDelete: deleteFlag,
-          createFlag,
-          isAdmin: isAdministrator,
-        })),
-        errors: parsedErrors,
-        isAdmin: isAdministrator,
-      });
+      return createView(request, h, deleteFlag, createFlag, parsedErrors);
     },
   },
 };
@@ -109,7 +113,7 @@ const deleteFlagHandler = {
         const { name: userName } = request.auth.credentials.account;
         await deleteFlagApiCall({ flagId, deletedNote }, userName, request.logger);
 
-        return h.redirect("/flags").takeover();
+        return createView(request, h);
       } catch (err) {
         return h
           .view("flags", { ...request.payload, error: err })
@@ -122,7 +126,7 @@ const deleteFlagHandler = {
 
 const createFlagHandler = {
   method: "POST",
-  path: "/flags/create",
+  path: "/flags",
   options: {
     auth: {
       scope: [administrator],
@@ -136,40 +140,42 @@ const createFlagHandler = {
       failAction: async (request, h, error) => {
         request.logger.error({ error });
 
-        const formattedErrors = error.details
-          .map((error) => {
-            if (error.message.includes("note")) {
+        const errors = error.details
+          .map((receivedError) => {
+            if (receivedError.message.includes("note")) {
               return {
-                ...error,
+                ...receivedError,
                 message: "Enter a note to explain the reason for creating the flag.",
+                href: "#note",
               };
             }
 
-            if (error.message.includes("appRef")) {
+            if (receivedError.message.includes("appRef")) {
               return {
-                ...error,
+                ...receivedError,
                 message: "Enter a valid agreement reference.",
+                href: "#agreement-reference",
               };
             }
 
-            if (error.message.includes("appliesToMh")) {
+            if (receivedError.message.includes("appliesToMh")) {
               return {
-                ...error,
+                ...receivedError,
                 message: "Select if the flag is because the user declined multiple herds T&C's.",
+                href: "#appliesToMh",
               };
             }
 
             return null;
           })
-          .filter((error) => error !== null);
+          .filter((formattedError) => formattedError !== null)
+          .map((formattedError) => ({
+            text: formattedError.message,
+            href: formattedError.href,
+            key: formattedError.context.key,
+          }));
 
-        const errors = encodeErrorsForUI(formattedErrors, "#");
-        const query = new URLSearchParams({
-          createFlag: "true",
-          errors,
-        });
-
-        return h.redirect(`/flags?${query.toString()}`).takeover();
+        return (await createView(request, h, false, true, errors)).takeover();
       },
     },
     handler: async (request, h) => {
@@ -192,12 +198,11 @@ const createFlagHandler = {
                 statusCode: StatusCodes.NO_CONTENT,
               },
             },
-            message: error.message,
           };
           throw error;
         }
 
-        return h.redirect("/flags").takeover();
+        return createView(request, h);
       } catch (error) {
         request.logger.error({ error });
         let formattedErrors = [];
@@ -211,6 +216,7 @@ const createFlagHandler = {
               context: {
                 key: "appRef",
               },
+              href: "#agreement-reference",
             },
           ];
         }
@@ -224,6 +230,7 @@ const createFlagHandler = {
               context: {
                 key: "appRef",
               },
+              href: "#agreement-reference",
             },
           ];
         }
@@ -232,17 +239,19 @@ const createFlagHandler = {
           error.isBoom &&
           error.data.payload.message === "Unable to create flag for redacted agreement"
         ) {
-          formattedErrors = ERRORS.AGREEMENT_REDACTED;
+          formattedErrors = ERRORS.AGREEMENT_REDACTED.map((redactedError) => ({
+            ...redactedError,
+            href: "#agreement-reference",
+          }));
         }
 
         if (formattedErrors.length) {
-          const errors = encodeErrorsForUI(formattedErrors, "#agreement-reference");
-          const query = new URLSearchParams({
-            createFlag: "true",
-            errors,
-          });
-
-          return h.redirect(`/flags?${query.toString()}`).takeover();
+          const errors = formattedErrors.map((formattedError) => ({
+            text: formattedError.message,
+            href: formattedError.href,
+            key: formattedError.context.key,
+          }));
+          return createView(request, h, false, true, errors);
         }
 
         return h

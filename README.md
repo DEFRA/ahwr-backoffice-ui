@@ -116,7 +116,7 @@ Out of the box, integration tests will fail using `npm run test`. This is due to
 
 You could run `./scripts/test` to run tests, which will run the tests dockerized (there is a watch option available)
 
-The other option is to run the `./scripts/start` to run the application in a dockerized environemnt and then copy out the `dist` folder, so the view can be generated on your machine (once it is done once, you will not need the `dist` folder). The command to copy the files is:
+The other option is to run the `./scripts/start` to run the application in a dockerized environment and then copy out the `dist` folder, so the view can be generated on your machine (once it is done once, you will not need the `dist` folder). The command to copy the files is:
 
 ```bash
 docker cp {your_container_id}:/home/node/app/frontend/dist app/frontend/

@@ -2,7 +2,7 @@ import wreck from "@hapi/wreck";
 import { getAllFlags, deleteFlag, createFlag } from "../../../app/api/flags.js";
 import { flags } from "../../data/flags.js";
 import { config } from "../../../app/config";
-import { metricsCounter } from '../../../app/lib/metrics.js'
+import { metricsCounter } from "../../../app/lib/metrics.js";
 
 const { applicationApiUri } = config;
 
@@ -73,7 +73,7 @@ describe("Flags API", () => {
         },
       });
       expect(mockLogger.error).not.toHaveBeenCalled();
-      expect(metricsCounter).toHaveBeenCalledWith('flag_deleted');
+      expect(metricsCounter).toHaveBeenCalledWith("flag_deleted");
     });
 
     test("throws an error if the patch call errors", async () => {
@@ -117,7 +117,7 @@ describe("Flags API", () => {
       );
 
       expect(mockLogger.error).not.toHaveBeenCalled();
-      expect(metricsCounter).toHaveBeenCalledWith('flag_created');
+      expect(metricsCounter).toHaveBeenCalledWith("flag_created");
     });
 
     test("throws an error if the post call errors", async () => {
