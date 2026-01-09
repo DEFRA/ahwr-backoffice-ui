@@ -198,12 +198,11 @@ const createFlagHandler = {
                 statusCode: StatusCodes.NO_CONTENT,
               },
             },
-            message: error.message,
           };
           throw error;
         }
 
-        return h.redirect("/flags").takeover();
+        return createView(request, h);
       } catch (error) {
         request.logger.error({ error });
         let formattedErrors = [];
@@ -217,6 +216,7 @@ const createFlagHandler = {
               context: {
                 key: "appRef",
               },
+              href: "#agreement-reference",
             },
           ];
         }
@@ -230,6 +230,7 @@ const createFlagHandler = {
               context: {
                 key: "appRef",
               },
+              href: "#agreement-reference",
             },
           ];
         }
@@ -238,17 +239,19 @@ const createFlagHandler = {
           error.isBoom &&
           error.data.payload.message === "Unable to create flag for redacted agreement"
         ) {
-          formattedErrors = ERRORS.AGREEMENT_REDACTED;
+          formattedErrors = ERRORS.AGREEMENT_REDACTED.map((redactedError) => ({
+            ...redactedError,
+            href: "#agreement-reference",
+          }));
         }
 
         if (formattedErrors.length) {
-          const errors = encodeErrorsForUI(formattedErrors, "#agreement-reference");
-          const query = new URLSearchParams({
-            createFlag: "true",
-            errors,
-          });
-
-          return h.redirect(`/flags?${query.toString()}`).takeover();
+          const errors = formattedErrors.map((formattedError) => ({
+            text: formattedError.message,
+            href: formattedError.href,
+            key: formattedError.context.key,
+          }));
+          return createView(request, h, false, true, errors);
         }
 
         return h

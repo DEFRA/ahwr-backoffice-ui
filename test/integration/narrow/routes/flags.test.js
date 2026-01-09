@@ -254,13 +254,12 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
       expect(createFlag).toHaveBeenCalledWith(
         { appliesToMh: true, note: "Test flag", user: "test admin" },
         "IAHW-TEST-REF1",
         expect.any(Object),
       );
-      expect(res.headers.location).toBe("/flags");
     });
 
     test("renders errors when the user has not provided the proper appliesToMh value", async () => {
@@ -373,20 +372,18 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
 
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain("flags?createFlag=true&errors=");
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#agreement-reference",
-          key: "appRef",
-          text: 'Flag not created - agreement flag with the same "Flag applies to multiple herds T&C\'s" value already exists.',
-        },
-      ]);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+        "#agreement-reference",
+      );
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        'Flag not created - agreement flag with the same "Flag applies to multiple herds T&C\'s" value already exists.',
+      );
+      phaseBannerOk($);
     });
 
     test("renders an error when the user is trying to create a flag with a reference that doesnt exist", async () => {
@@ -416,20 +413,18 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
 
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain("flags?createFlag=true&errors=");
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#agreement-reference",
-          key: "appRef",
-          text: "Agreement reference does not exist.",
-        },
-      ]);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+        "#agreement-reference",
+      );
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Agreement reference does not exist.",
+      );
+      phaseBannerOk($);
     });
 
     test("renders an error when the user is trying to create a flag for an agreement that is redacted", async () => {
@@ -462,20 +457,18 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
 
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain("flags?createFlag=true&errors=");
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#agreement-reference",
-          key: "appRef",
-          text: "Flag not created - agreement is redacted.",
-        },
-      ]);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+        "#agreement-reference",
+      );
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Flag not created - agreement is redacted.",
+      );
+      phaseBannerOk($);
     });
   });
 });
