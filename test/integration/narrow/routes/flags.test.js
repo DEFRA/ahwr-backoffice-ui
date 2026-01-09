@@ -130,8 +130,7 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      expect(res.headers.location).toBe("/flags");
+      expect(res.statusCode).toBe(StatusCodes.OK);
     });
 
     test("renders errors when the user has not provided a deleted note value", async () => {

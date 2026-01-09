@@ -113,7 +113,7 @@ const deleteFlagHandler = {
         const { name: userName } = request.auth.credentials.account;
         await deleteFlagApiCall({ flagId, deletedNote }, userName, request.logger);
 
-        return h.redirect("/flags").takeover();
+        return createView(request, h);
       } catch (err) {
         return h
           .view("flags", { ...request.payload, error: err })
