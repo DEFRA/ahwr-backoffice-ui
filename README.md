@@ -1,7 +1,5 @@
 # ahwr-backoffice-ui
 
-PAT SWITCH - TEST 1
-
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_ahwr-backoffice-ui&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=DEFRA_ahwr-backoffice-ui)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_ahwr-backoffice-ui&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DEFRA_ahwr-backoffice-ui)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_ahwr-backoffice-ui&metric=coverage)](https://sonarcloud.io/summary/new_code?id=DEFRA_ahwr-backoffice-ui)
