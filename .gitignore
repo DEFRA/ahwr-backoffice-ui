@@ -13,6 +13,7 @@ npm-debug.log
 *.log
 
 # Editor stuff
+.idea
 .vscode
 dist/
 
@@ -21,3 +22,9 @@ layout.njk
 
 # OS stuff
 .DS_Store
+
+# Other
+.server
+.cache
+.eslintcache
+coverage
