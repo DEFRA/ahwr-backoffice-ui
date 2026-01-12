@@ -13,8 +13,6 @@
     "git:pre-push-hook": "npm run format:check && npm run lint && npm test",
     "postinstall": "npm run setup:husky",
     "pretest": "npm run lint",
-    "prettier": "prettier . --check",
-    "prettier:fix": "prettier . --write",
     "test": "jest --runInBand",
     "test:watch": "jest --coverage=false --onlyChanged --watch --runInBand",
     "test:watch:all": "npm run test:watch & npm run build:watch",

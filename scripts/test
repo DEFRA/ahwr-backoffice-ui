@@ -68,7 +68,7 @@ compose() {
 
   if [ "${fix_lint}" = "true" ]; then
     npm run lint:fix
-    npm run prettier:fix
+    npm run format
   fi
 
   # Create test output folder
