@@ -3,7 +3,6 @@ import { permissions } from "../auth/permissions.js";
 import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { createFlagsTableData } from "./models/flags-list.js";
 import { deleteFlag as deleteFlagApiCall, createFlag as createFlagApiCall } from "../api/flags.js";
-import { encodeErrorsForUI } from "./utils/encode-errors-for-ui.js";
 import { StatusCodes } from "http-status-codes";
 import { mapAuth } from "../auth/map-auth.js";
 
@@ -67,16 +66,14 @@ const getFlagsHandler = {
 
 const deleteFlagHandler = {
   method: "POST",
-  path: "/flags/{flagId}/delete",
+  path: "/flags/delete",
   options: {
     auth: {
       scope: [administrator],
     },
     validate: {
-      params: Joi.object({
-        flagId: Joi.string().required(),
-      }),
       payload: Joi.object({
+        flagId: Joi.string().required(),
         deletedNote: Joi.string().min(2).required(),
       }),
       failAction: async (request, h, error) => {
@@ -92,28 +89,29 @@ const deleteFlagHandler = {
           errorMessageToBeRendered = "Enter a note to explain the reason for removing this flag";
         }
 
-        const formattedError = {
-          ...joiError,
-          message: errorMessageToBeRendered,
-        };
+        const formattedErrors = [
+          {
+            ...joiError,
+            message: errorMessageToBeRendered,
+          },
+        ].map((formattedError) => ({
+          text: formattedError.message,
+          href: "#deletedNote",
+          key: formattedError.context.key,
+        }));
 
-        const errors = encodeErrorsForUI([formattedError], "#deletedNote");
-        const query = new URLSearchParams({
-          deleteFlag: request.params.flagId,
-          errors,
-        });
-
-        return h.redirect(`/flags?${query.toString()}`).takeover();
+        return (
+          await createView(request, h, request.payload.flagId, false, formattedErrors)
+        ).takeover();
       },
     },
     handler: async (request, h) => {
       try {
-        const { flagId } = request.params;
-        const { deletedNote } = request.payload;
+        const { flagId, deletedNote } = request.payload;
         const { name: userName } = request.auth.credentials.account;
         await deleteFlagApiCall({ flagId, deletedNote }, userName, request.logger);
 
-        return createView(request, h);
+        return h.redirect(`/flags`).takeover();
       } catch (err) {
         return h
           .view("flags", { ...request.payload, error: err })

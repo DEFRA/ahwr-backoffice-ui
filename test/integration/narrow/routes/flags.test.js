@@ -82,7 +82,28 @@ describe("Flags tests", () => {
     });
   });
 
-  describe(`POST /flags/{flagId}/delete route`, () => {
+  describe(`POST /flags/delete route`, () => {
+    const abcReference = {
+      id: "abc123",
+      applicationReference: "IAHW-U6ZE-5R5E",
+      sbi: "123456789",
+      note: "Flag this please",
+      createdBy: "Ben",
+      createdAt: "2025-04-09T12: 01: 23.322Z",
+      appliesToMh: true,
+      deletedAt: null,
+      deletedBy: null,
+      redacted: false,
+    };
+    beforeAll(() => {
+      flags.push(abcReference);
+    });
+
+    afterAll(() => {
+      const i = flags.indexOf(abcReference);
+      if (i !== -1) flags.splice(i, 1);
+    });
+
     beforeEach(async () => {
       crumb = await getCrumbs(server);
     });
@@ -91,7 +112,8 @@ describe("Flags tests", () => {
       const flagId = "abc123";
       const options = {
         method: "POST",
-        url: `/flags/${flagId}/delete`,
+        url: `/flags/delete`,
+        payload: { flagId },
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
@@ -104,10 +126,10 @@ describe("Flags tests", () => {
       const flagId = "abc123";
       const options = {
         method: "POST",
-        url: `/flags/${flagId}/delete`,
+        url: `/flags/delete`,
         auth,
         headers: { cookie: `crumb=${crumb}` },
-        payload: { crumb, deletedNote: "Flag deleted" },
+        payload: { crumb, deletedNote: "Flag deleted", flagId },
       };
       const res = await server.inject(options);
 
@@ -123,73 +145,69 @@ describe("Flags tests", () => {
       const flagId = "abc123";
       const options = {
         method: "POST",
-        url: `/flags/${flagId}/delete`,
+        url: `/flags/delete`,
         auth,
         headers: { cookie: `crumb=${crumb}` },
-        payload: { crumb, deletedNote: "Flag deleted" },
-      };
-      const res = await server.inject(options);
-
-      expect(res.statusCode).toBe(StatusCodes.OK);
-    });
-
-    test("renders errors when the user has not provided a deleted note value", async () => {
-      const flagId = "abc123";
-      const options = {
-        method: "POST",
-        url: `/flags/${flagId}/delete`,
-        auth,
-        headers: { cookie: `crumb=${crumb}` },
-        payload: {
-          crumb,
-        },
+        payload: { crumb, deletedNote: "Flag deleted", flagId },
       };
       const res = await server.inject(options);
 
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-
       const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain(`flags?deleteFlag=${flagId}&errors=`);
+      expect(redirectedLocation).toContain(`flags`);
+    });
 
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#deletedNote",
-          key: "deletedNote",
-          text: "Enter a note to explain the reason for removing this flag",
+    test("renders errors when the user has not provided a deleted note value", async () => {
+      const flagId = "abc123";
+
+      const options = {
+        method: "POST",
+        url: `/flags/delete`,
+        auth,
+        headers: { cookie: `crumb=${crumb}` },
+        payload: {
+          crumb,
+          flagId,
         },
-      ]);
+      };
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#deletedNote");
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Enter a note to explain the reason for removing this flag",
+      );
+      phaseBannerOk($);
     });
 
     test("renders errors when the user has not provided a long enough deleted note value", async () => {
       const flagId = "abc123";
       const options = {
         method: "POST",
-        url: `/flags/${flagId}/delete`,
+        url: `/flags/delete`,
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           crumb,
           deletedNote: "a",
+          flagId,
         },
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain(`flags?deleteFlag=${flagId}&errors=`);
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#deletedNote",
-          key: "deletedNote",
-          text: "Enter a note of at least 2 characters in length",
-        },
-      ]);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#deletedNote");
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Enter a note of at least 2 characters in length",
+      );
+      phaseBannerOk($);
     });
   });
 
