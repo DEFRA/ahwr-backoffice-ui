@@ -11,6 +11,8 @@ const MIN_APPLICATION_REFERENCE_LENGTH = 14;
 const MIN_NOTE_LENGTH = 1;
 const STRING_EMPTY = "string.empty";
 
+const AGREEMENT_REFERENCE = "#agreement-reference";
+
 const ERRORS = {
   AGREEMENT_REDACTED: [
     {
@@ -152,7 +154,7 @@ const createFlagHandler = {
               return {
                 ...receivedError,
                 message: "Enter a valid agreement reference.",
-                href: "#agreement-reference",
+                href: AGREEMENT_REFERENCE,
               };
             }
 
@@ -189,8 +191,7 @@ const createFlagHandler = {
         const { res } = await createFlagApiCall(payload, appRef.trim(), request.logger);
 
         if (res.statusCode === StatusCodes.NO_CONTENT) {
-          let error = new Error("Flag already exists.");
-          error = {
+          const error = {
             data: {
               res: {
                 statusCode: StatusCodes.NO_CONTENT,
@@ -214,7 +215,7 @@ const createFlagHandler = {
               context: {
                 key: "appRef",
               },
-              href: "#agreement-reference",
+              href: AGREEMENT_REFERENCE,
             },
           ];
         }
@@ -228,7 +229,7 @@ const createFlagHandler = {
               context: {
                 key: "appRef",
               },
-              href: "#agreement-reference",
+              href: AGREEMENT_REFERENCE,
             },
           ];
         }
@@ -239,7 +240,7 @@ const createFlagHandler = {
         ) {
           formattedErrors = ERRORS.AGREEMENT_REDACTED.map((redactedError) => ({
             ...redactedError,
-            href: "#agreement-reference",
+            href: AGREEMENT_REFERENCE,
           }));
         }
 
