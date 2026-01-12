@@ -3,7 +3,6 @@ import { permissions } from "../auth/permissions.js";
 import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { createFlagsTableData } from "./models/flags-list.js";
 import { deleteFlag as deleteFlagApiCall, createFlag as createFlagApiCall } from "../api/flags.js";
-import { encodeErrorsForUI } from "./utils/encode-errors-for-ui.js";
 import { StatusCodes } from "http-status-codes";
 import { mapAuth } from "../auth/map-auth.js";
 
@@ -11,6 +10,8 @@ const { administrator, processor, user, recommender, authoriser } = permissions;
 const MIN_APPLICATION_REFERENCE_LENGTH = 14;
 const MIN_NOTE_LENGTH = 1;
 const STRING_EMPTY = "string.empty";
+
+const AGREEMENT_REFERENCE = "#agreement-reference";
 
 const ERRORS = {
   AGREEMENT_REDACTED: [
@@ -23,6 +24,22 @@ const ERRORS = {
       },
     },
   ],
+};
+
+const createView = async (request, h, deleteFlag, createFlag, errors) => {
+  await generateNewCrumb(request, h);
+  const { isAdministrator } = mapAuth(request);
+
+  return h.view("flags", {
+    ...(await createFlagsTableData({
+      logger: request.logger,
+      flagIdToDelete: deleteFlag,
+      createFlag,
+      isAdmin: isAdministrator,
+    })),
+    errors,
+    isAdmin: isAdministrator,
+  });
 };
 
 const getFlagsHandler = {
@@ -41,38 +58,24 @@ const getFlagsHandler = {
     },
     handler: async (request, h) => {
       const { createFlag, deleteFlag, errors } = request.query;
-      await generateNewCrumb(request, h);
 
       const parsedErrors = errors ? JSON.parse(Buffer.from(errors, "base64").toString("utf8")) : [];
 
-      const { isAdministrator } = mapAuth(request);
-
-      return h.view("flags", {
-        ...(await createFlagsTableData({
-          logger: request.logger,
-          flagIdToDelete: deleteFlag,
-          createFlag,
-          isAdmin: isAdministrator,
-        })),
-        errors: parsedErrors,
-        isAdmin: isAdministrator,
-      });
+      return createView(request, h, deleteFlag, createFlag, parsedErrors);
     },
   },
 };
 
 const deleteFlagHandler = {
   method: "POST",
-  path: "/flags/{flagId}/delete",
+  path: "/flags/delete",
   options: {
     auth: {
       scope: [administrator],
     },
     validate: {
-      params: Joi.object({
-        flagId: Joi.string().required(),
-      }),
       payload: Joi.object({
+        flagId: Joi.string().required(),
         deletedNote: Joi.string().min(2).required(),
       }),
       failAction: async (request, h, error) => {
@@ -88,28 +91,29 @@ const deleteFlagHandler = {
           errorMessageToBeRendered = "Enter a note to explain the reason for removing this flag";
         }
 
-        const formattedError = {
-          ...joiError,
-          message: errorMessageToBeRendered,
-        };
+        const formattedErrors = [
+          {
+            ...joiError,
+            message: errorMessageToBeRendered,
+          },
+        ].map((formattedError) => ({
+          text: formattedError.message,
+          href: "#deletedNote",
+          key: formattedError.context.key,
+        }));
 
-        const errors = encodeErrorsForUI([formattedError], "#deletedNote");
-        const query = new URLSearchParams({
-          deleteFlag: request.params.flagId,
-          errors,
-        });
-
-        return h.redirect(`/flags?${query.toString()}`).takeover();
+        return (
+          await createView(request, h, request.payload.flagId, false, formattedErrors)
+        ).takeover();
       },
     },
     handler: async (request, h) => {
       try {
-        const { flagId } = request.params;
-        const { deletedNote } = request.payload;
+        const { flagId, deletedNote } = request.payload;
         const { name: userName } = request.auth.credentials.account;
         await deleteFlagApiCall({ flagId, deletedNote }, userName, request.logger);
 
-        return h.redirect("/flags").takeover();
+        return h.redirect(`/flags`).takeover();
       } catch (err) {
         return h
           .view("flags", { ...request.payload, error: err })
@@ -122,7 +126,7 @@ const deleteFlagHandler = {
 
 const createFlagHandler = {
   method: "POST",
-  path: "/flags/create",
+  path: "/flags",
   options: {
     auth: {
       scope: [administrator],
@@ -136,40 +140,42 @@ const createFlagHandler = {
       failAction: async (request, h, error) => {
         request.logger.error({ error });
 
-        const formattedErrors = error.details
-          .map((error) => {
-            if (error.message.includes("note")) {
+        const errors = error.details
+          .map((receivedError) => {
+            if (receivedError.message.includes("note")) {
               return {
-                ...error,
+                ...receivedError,
                 message: "Enter a note to explain the reason for creating the flag.",
+                href: "#note",
               };
             }
 
-            if (error.message.includes("appRef")) {
+            if (receivedError.message.includes("appRef")) {
               return {
-                ...error,
+                ...receivedError,
                 message: "Enter a valid agreement reference.",
+                href: AGREEMENT_REFERENCE,
               };
             }
 
-            if (error.message.includes("appliesToMh")) {
+            if (receivedError.message.includes("appliesToMh")) {
               return {
-                ...error,
+                ...receivedError,
                 message: "Select if the flag is because the user declined multiple herds T&C's.",
+                href: "#appliesToMh",
               };
             }
 
             return null;
           })
-          .filter((error) => error !== null);
+          .filter((formattedError) => formattedError !== null)
+          .map((formattedError) => ({
+            text: formattedError.message,
+            href: formattedError.href,
+            key: formattedError.context.key,
+          }));
 
-        const errors = encodeErrorsForUI(formattedErrors, "#");
-        const query = new URLSearchParams({
-          createFlag: "true",
-          errors,
-        });
-
-        return h.redirect(`/flags?${query.toString()}`).takeover();
+        return (await createView(request, h, false, true, errors)).takeover();
       },
     },
     handler: async (request, h) => {
@@ -185,19 +191,17 @@ const createFlagHandler = {
         const { res } = await createFlagApiCall(payload, appRef.trim(), request.logger);
 
         if (res.statusCode === StatusCodes.NO_CONTENT) {
-          let error = new Error("Flag already exists.");
-          error = {
+          const error = {
             data: {
               res: {
                 statusCode: StatusCodes.NO_CONTENT,
               },
             },
-            message: error.message,
           };
           throw error;
         }
 
-        return h.redirect("/flags").takeover();
+        return createView(request, h);
       } catch (error) {
         request.logger.error({ error });
         let formattedErrors = [];
@@ -211,6 +215,7 @@ const createFlagHandler = {
               context: {
                 key: "appRef",
               },
+              href: AGREEMENT_REFERENCE,
             },
           ];
         }
@@ -224,6 +229,7 @@ const createFlagHandler = {
               context: {
                 key: "appRef",
               },
+              href: AGREEMENT_REFERENCE,
             },
           ];
         }
@@ -232,17 +238,19 @@ const createFlagHandler = {
           error.isBoom &&
           error.data.payload.message === "Unable to create flag for redacted agreement"
         ) {
-          formattedErrors = ERRORS.AGREEMENT_REDACTED;
+          formattedErrors = ERRORS.AGREEMENT_REDACTED.map((redactedError) => ({
+            ...redactedError,
+            href: AGREEMENT_REFERENCE,
+          }));
         }
 
         if (formattedErrors.length) {
-          const errors = encodeErrorsForUI(formattedErrors, "#agreement-reference");
-          const query = new URLSearchParams({
-            createFlag: "true",
-            errors,
-          });
-
-          return h.redirect(`/flags?${query.toString()}`).takeover();
+          const errors = formattedErrors.map((formattedError) => ({
+            text: formattedError.message,
+            href: formattedError.href,
+            key: formattedError.context.key,
+          }));
+          return createView(request, h, false, true, errors);
         }
 
         return h

@@ -82,7 +82,28 @@ describe("Flags tests", () => {
     });
   });
 
-  describe(`POST /flags/{flagId}/delete route`, () => {
+  describe(`POST /flags/delete route`, () => {
+    const abcReference = {
+      id: "abc123",
+      applicationReference: "IAHW-U6ZE-5R5E",
+      sbi: "123456789",
+      note: "Flag this please",
+      createdBy: "Ben",
+      createdAt: "2025-04-09T12: 01: 23.322Z",
+      appliesToMh: true,
+      deletedAt: null,
+      deletedBy: null,
+      redacted: false,
+    };
+    beforeAll(() => {
+      flags.push(abcReference);
+    });
+
+    afterAll(() => {
+      const i = flags.indexOf(abcReference);
+      if (i !== -1) flags.splice(i, 1);
+    });
+
     beforeEach(async () => {
       crumb = await getCrumbs(server);
     });
@@ -91,7 +112,8 @@ describe("Flags tests", () => {
       const flagId = "abc123";
       const options = {
         method: "POST",
-        url: `/flags/${flagId}/delete`,
+        url: `/flags/delete`,
+        payload: { flagId },
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
@@ -104,10 +126,10 @@ describe("Flags tests", () => {
       const flagId = "abc123";
       const options = {
         method: "POST",
-        url: `/flags/${flagId}/delete`,
+        url: `/flags/delete`,
         auth,
         headers: { cookie: `crumb=${crumb}` },
-        payload: { crumb, deletedNote: "Flag deleted" },
+        payload: { crumb, deletedNote: "Flag deleted", flagId },
       };
       const res = await server.inject(options);
 
@@ -123,78 +145,73 @@ describe("Flags tests", () => {
       const flagId = "abc123";
       const options = {
         method: "POST",
-        url: `/flags/${flagId}/delete`,
+        url: `/flags/delete`,
         auth,
         headers: { cookie: `crumb=${crumb}` },
-        payload: { crumb, deletedNote: "Flag deleted" },
+        payload: { crumb, deletedNote: "Flag deleted", flagId },
       };
       const res = await server.inject(options);
 
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      expect(res.headers.location).toBe("/flags");
+      const redirectedLocation = res.headers.location;
+      expect(redirectedLocation).toContain(`flags`);
     });
 
     test("renders errors when the user has not provided a deleted note value", async () => {
       const flagId = "abc123";
+
       const options = {
         method: "POST",
-        url: `/flags/${flagId}/delete`,
+        url: `/flags/delete`,
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           crumb,
+          flagId,
         },
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
 
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain(`flags?deleteFlag=${flagId}&errors=`);
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#deletedNote",
-          key: "deletedNote",
-          text: "Enter a note to explain the reason for removing this flag",
-        },
-      ]);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#deletedNote");
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Enter a note to explain the reason for removing this flag",
+      );
+      phaseBannerOk($);
     });
 
     test("renders errors when the user has not provided a long enough deleted note value", async () => {
       const flagId = "abc123";
       const options = {
         method: "POST",
-        url: `/flags/${flagId}/delete`,
+        url: `/flags/delete`,
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           crumb,
           deletedNote: "a",
+          flagId,
         },
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain(`flags?deleteFlag=${flagId}&errors=`);
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#deletedNote",
-          key: "deletedNote",
-          text: "Enter a note of at least 2 characters in length",
-        },
-      ]);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#deletedNote");
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Enter a note of at least 2 characters in length",
+      );
+      phaseBannerOk($);
     });
   });
 
-  describe(`POST /flags/create route`, () => {
+  describe(`POST /flags route`, () => {
     beforeEach(async () => {
       crumb = await getCrumbs(server);
       jest.clearAllMocks();
@@ -203,7 +220,7 @@ describe("Flags tests", () => {
     test("returns 302 when there is no auth", async () => {
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
@@ -224,7 +241,7 @@ describe("Flags tests", () => {
       });
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -242,7 +259,7 @@ describe("Flags tests", () => {
       createFlag.mockResolvedValueOnce({ res: { statusCode: 201 } });
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -254,19 +271,18 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
       expect(createFlag).toHaveBeenCalledWith(
         { appliesToMh: true, note: "Test flag", user: "test admin" },
         "IAHW-TEST-REF1",
         expect.any(Object),
       );
-      expect(res.headers.location).toBe("/flags");
     });
 
     test("renders errors when the user has not provided the proper appliesToMh value", async () => {
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -278,26 +294,22 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
 
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain("flags?createFlag=true&errors=");
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#",
-          key: "appliesToMh",
-          text: "Select if the flag is because the user declined multiple herds T&C's.",
-        },
-      ]);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#appliesToMh");
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Select if the flag is because the user declined multiple herds T&C's.",
+      );
+      phaseBannerOk($);
     });
 
     test("renders errors when the user has not provided the proper appRef value", async () => {
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -309,26 +321,24 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
 
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain("flags?createFlag=true&errors=");
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#",
-          key: "appRef",
-          text: "Enter a valid agreement reference.",
-        },
-      ]);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+        "#agreement-reference",
+      );
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Enter a valid agreement reference.",
+      );
+      phaseBannerOk($);
     });
 
     test("renders errors when the user has not provided the proper note value", async () => {
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -340,20 +350,16 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
 
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain("flags?createFlag=true&errors=");
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#",
-          key: "note",
-          text: "Enter a note to explain the reason for creating the flag.",
-        },
-      ]);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#note");
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Enter a note to explain the reason for creating the flag.",
+      );
+      phaseBannerOk($);
     });
 
     test("renders an error when the user is trying to create a flag which already exists", async () => {
@@ -371,7 +377,7 @@ describe("Flags tests", () => {
       });
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -383,20 +389,18 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
 
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain("flags?createFlag=true&errors=");
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#agreement-reference",
-          key: "appRef",
-          text: 'Flag not created - agreement flag with the same "Flag applies to multiple herds T&C\'s" value already exists.',
-        },
-      ]);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+        "#agreement-reference",
+      );
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        'Flag not created - agreement flag with the same "Flag applies to multiple herds T&C\'s" value already exists.',
+      );
+      phaseBannerOk($);
     });
 
     test("renders an error when the user is trying to create a flag with a reference that doesnt exist", async () => {
@@ -414,7 +418,7 @@ describe("Flags tests", () => {
       });
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -426,20 +430,18 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
 
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain("flags?createFlag=true&errors=");
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#agreement-reference",
-          key: "appRef",
-          text: "Agreement reference does not exist.",
-        },
-      ]);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+        "#agreement-reference",
+      );
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Agreement reference does not exist.",
+      );
+      phaseBannerOk($);
     });
 
     test("renders an error when the user is trying to create a flag for an agreement that is redacted", async () => {
@@ -460,7 +462,7 @@ describe("Flags tests", () => {
       });
       const options = {
         method: "POST",
-        url: "/flags/create",
+        url: "/flags",
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
@@ -472,20 +474,18 @@ describe("Flags tests", () => {
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      expect(res.statusCode).toBe(StatusCodes.OK);
 
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain("flags?createFlag=true&errors=");
-
-      const base64EncodedErrors = redirectedLocation.split("errors=")[1].replaceAll("%3D%3D", "");
-      const parsedErrors = JSON.parse(Buffer.from(base64EncodedErrors, "base64").toString("utf8"));
-      expect(parsedErrors).toEqual([
-        {
-          href: "#agreement-reference",
-          key: "appRef",
-          text: "Flag not created - agreement is redacted.",
-        },
-      ]);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+        "#agreement-reference",
+      );
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Flag not created - agreement is redacted.",
+      );
+      phaseBannerOk($);
     });
   });
 });
