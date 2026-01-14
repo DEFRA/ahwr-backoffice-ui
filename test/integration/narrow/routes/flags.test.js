@@ -80,6 +80,29 @@ describe("Flags tests", () => {
       expect($("title").text()).toContain("AHWR Flags");
       phaseBannerOk($);
     });
+
+    test("it does not handle errors from the url", async () => {
+      const auth = {
+        strategy: "session-auth",
+        credentials: { scope: [user], account: { name: "test user" } },
+      };
+
+      const options = {
+        method: "GET",
+        url: "/flags?createFlag=true&errors=something",
+        auth,
+        headers: { cookie: `crumb=${crumb}` },
+      };
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+
+      expect($(".govuk-error-summary__title").html()).toBeFalsy();
+      phaseBannerOk($);
+    });
   });
 
   describe(`POST /flags/delete route`, () => {
@@ -207,6 +230,29 @@ describe("Flags tests", () => {
       expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
         "Enter a note of at least 2 characters in length",
       );
+      phaseBannerOk($);
+    });
+
+    test("it does not handle errors from the url", async () => {
+      const auth = {
+        strategy: "session-auth",
+        credentials: { scope: [user], account: { name: "test user" } },
+      };
+
+      const options = {
+        method: "GET",
+        url: "/flags?deleteFlag=abc123&errors=something",
+        auth,
+        headers: { cookie: `crumb=${crumb}` },
+      };
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+
+      expect($(".govuk-error-summary__title").html()).toBeFalsy();
       phaseBannerOk($);
     });
   });
