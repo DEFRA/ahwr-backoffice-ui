@@ -57,11 +57,8 @@ const getFlagsHandler = {
       }),
     },
     handler: async (request, h) => {
-      const { createFlag, deleteFlag, errors } = request.query;
-
-      const parsedErrors = errors ? JSON.parse(Buffer.from(errors, "base64").toString("utf8")) : [];
-
-      return createView(request, h, deleteFlag, createFlag, parsedErrors);
+      const { createFlag, deleteFlag } = request.query;
+      return createView(request, h, deleteFlag, createFlag);
     },
   },
 };
