@@ -1,7 +1,7 @@
 import { formattedDateToUk, upperFirstLetter } from "../../lib/display-helper.js";
 import { getStyleClassByStatus } from "../../constants/status.js";
 
-const claimDataStatus = [
+const claimDataStatus = new Set([
   "IN_CHECK",
   "REJECTED",
   "READY_TO_PAY",
@@ -9,7 +9,7 @@ const claimDataStatus = [
   "PAID",
   "RECOMMENDED_TO_PAY",
   "RECOMMENDED_TO_REJECT",
-];
+]);
 
 export const getApplicationClaimDetails = (
   application,
@@ -18,7 +18,7 @@ export const getApplicationClaimDetails = (
   vetsNameActions,
   vetRCVSNumberActions,
 ) => {
-  if (!application.claimed && !claimDataStatus.includes(application.status)) {
+  if (!application.claimed && !claimDataStatus.has(application.status)) {
     return null;
   }
 

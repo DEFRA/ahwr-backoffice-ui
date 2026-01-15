@@ -1,8 +1,8 @@
 export const getErrorMessagesByKey = (errors) => {
-  const dateFields = ["day", "month", "year", "all"];
+  const dateFields = new Set(["day", "month", "year", "all"]);
   const dateErrors = [];
   const keyedErrors = errors.reduce((obj, { key, text }) => {
-    if (dateFields.includes(key)) {
+    if (dateFields.has(key)) {
       dateErrors.push(text);
     }
     return {
