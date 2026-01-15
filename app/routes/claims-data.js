@@ -74,7 +74,7 @@ export const claimsDataRoutes = [
               .alternatives()
               .conditional("form", {
                 is: "updateDateOfVisit",
-                then: joi.number().min(1).max(31).required(),
+                then: joi.number().min(1).max(31).required(), // NOSONAR
               })
               .messages({
                 "number.base": "Enter day",
@@ -85,7 +85,7 @@ export const claimsDataRoutes = [
               .alternatives()
               .conditional("form", {
                 is: "updateDateOfVisit",
-                then: joi.number().min(1).max(12).required(),
+                then: joi.number().min(1).max(12).required(), // NOSONAR
               })
               .messages({
                 "number.base": "Enter month",
@@ -96,7 +96,7 @@ export const claimsDataRoutes = [
               .alternatives()
               .conditional("form", {
                 is: "updateDateOfVisit",
-                then: joi.number().min(2020).max(2030).required(),
+                then: joi.number().min(2020).max(2030).required(), // NOSONAR
               })
               .messages({
                 "number.base": "Enter year",

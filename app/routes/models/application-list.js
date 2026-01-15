@@ -16,7 +16,7 @@ export const viewModel = (request, page) => {
 };
 
 export const getApplicationTableHeader = (sortField) => {
-  const direction = sortField && sortField.direction === "DESC" ? "descending" : "ascending";
+  const direction = sortField?.direction === "DESC" ? "descending" : "ascending";
   const agreementDateTitle = "Agreement date";
   const sort = sortField ? sortField.field : "";
   const headerColumns = [

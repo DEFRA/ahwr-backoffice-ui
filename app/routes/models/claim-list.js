@@ -14,7 +14,7 @@ const respText = "responsive-text";
 const col6RespText = `col-6 ${respText}`;
 
 export const getClaimTableHeader = (sortField, dataURLPrefix = "", showSBI = true) => {
-  const direction = sortField && sortField.direction === "DESC" ? "descending" : "ascending";
+  const direction = sortField?.direction === "DESC" ? "descending" : "ascending";
   const sort = sortField ? sortField.field : "";
 
   return [
