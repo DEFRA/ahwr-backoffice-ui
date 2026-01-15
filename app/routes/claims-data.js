@@ -74,6 +74,7 @@ export const claimsDataRoutes = [
               .alternatives()
               .conditional("form", {
                 is: "updateDateOfVisit",
+                // eslint-disable-next-line sonarjs/no-magic-numbers
                 then: joi.number().min(1).max(31).required(),
               })
               .messages({
@@ -85,6 +86,7 @@ export const claimsDataRoutes = [
               .alternatives()
               .conditional("form", {
                 is: "updateDateOfVisit",
+                // eslint-disable-next-line sonarjs/no-magic-numbers
                 then: joi.number().min(1).max(12).required(),
               })
               .messages({
@@ -96,6 +98,7 @@ export const claimsDataRoutes = [
               .alternatives()
               .conditional("form", {
                 is: "updateDateOfVisit",
+                // eslint-disable-next-line sonarjs/no-magic-numbers
                 then: joi.number().min(2020).max(2030).required(),
               })
               .messages({

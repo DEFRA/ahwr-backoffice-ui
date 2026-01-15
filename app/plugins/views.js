@@ -1,5 +1,5 @@
 import nunjucks from "nunjucks";
-import path from "path";
+import path from "node:path";
 import getMOJFilters from "@ministryofjustice/frontend/moj/filters/all.js";
 import vision from "@hapi/vision";
 
