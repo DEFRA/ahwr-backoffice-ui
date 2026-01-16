@@ -63,65 +63,7 @@ const getFlagsHandler = {
   },
 };
 
-const deleteFlagHandler = {
-  method: "POST",
-  path: "/flags/delete",
-  options: {
-    auth: {
-      scope: [administrator],
-    },
-    validate: {
-      payload: Joi.object({
-        flagId: Joi.string().required(),
-        deletedNote: Joi.string().min(2).required(),
-      }),
-      failAction: async (request, h, error) => {
-        request.logger.error({ error });
-
-        const joiError = error.details[0];
-
-        let errorMessageToBeRendered = "";
-
-        if (joiError.message.includes("length must be at least 2 characters long")) {
-          errorMessageToBeRendered = "Enter a note of at least 2 characters in length";
-        } else {
-          errorMessageToBeRendered = "Enter a note to explain the reason for removing this flag";
-        }
-
-        const formattedErrors = [
-          {
-            ...joiError,
-            message: errorMessageToBeRendered,
-          },
-        ].map((formattedError) => ({
-          text: formattedError.message,
-          href: "#deletedNote",
-          key: formattedError.context.key,
-        }));
-
-        return (
-          await createView(request, h, request.payload.flagId, false, formattedErrors)
-        ).takeover();
-      },
-    },
-    handler: async (request, h) => {
-      try {
-        const { flagId, deletedNote } = request.payload;
-        const { name: userName } = request.auth.credentials.account;
-        await deleteFlagApiCall({ flagId, deletedNote }, userName, request.logger);
-
-        return h.redirect(`/flags`).takeover();
-      } catch (err) {
-        return h
-          .view("flags", { ...request.payload, error: err })
-          .code(StatusCodes.BAD_REQUEST)
-          .takeover();
-      }
-    },
-  },
-};
-
-const createFlagHandler = {
+const postFlagHandler = {
   method: "POST",
   path: "/flags",
   options: {
@@ -129,17 +71,33 @@ const createFlagHandler = {
       scope: [administrator],
     },
     validate: {
-      payload: Joi.object({
-        appRef: Joi.string().min(MIN_APPLICATION_REFERENCE_LENGTH).required(),
-        note: Joi.string().min(MIN_NOTE_LENGTH).required(),
-        appliesToMh: Joi.string().valid("yes", "no").required(),
+      payload: Joi.alternatives().conditional(".action", {
+        switch: [
+          {
+            is: "create",
+            then: Joi.object({
+              appRef: Joi.string().min(MIN_APPLICATION_REFERENCE_LENGTH).required(),
+              note: Joi.string().min(MIN_NOTE_LENGTH).required(),
+              appliesToMh: Joi.string().valid("yes", "no").required(),
+              action: Joi.string().required(),
+            }),
+          },
+          {
+            is: "delete",
+            then: Joi.object({
+              flagId: Joi.string().required(),
+              deletedNote: Joi.string().min(2).required(),
+              action: Joi.string().required(),
+            }),
+          },
+        ],
       }),
       failAction: async (request, h, error) => {
         request.logger.error({ error });
 
         const errors = error.details
           .map((receivedError) => {
-            if (receivedError.message.includes("note")) {
+            if (receivedError.message.includes('"note"')) {
               return {
                 ...receivedError,
                 message: "Enter a note to explain the reason for creating the flag.",
@@ -163,6 +121,21 @@ const createFlagHandler = {
               };
             }
 
+            if (receivedError.message.includes("length must be at least 2 characters long")) {
+              return {
+                ...receivedError,
+                message: "Enter a note of at least 2 characters in length",
+                href: "#deletedNote",
+              };
+            }
+            if (receivedError.message.includes("deletedNote")) {
+              return {
+                ...receivedError,
+                message: "Enter a note to explain the reason for removing this flag",
+                href: "#deletedNote",
+              };
+            }
+
             return null;
           })
           .filter((formattedError) => formattedError !== null)
@@ -176,87 +149,111 @@ const createFlagHandler = {
       },
     },
     handler: async (request, h) => {
-      try {
-        const { name: userName } = request.auth.credentials.account;
-        const { note, appliesToMh, appRef } = request.payload;
-        const payload = {
-          user: userName,
-          note: note.trim(),
-          appliesToMh: appliesToMh === "yes",
-        };
-
-        const { res } = await createFlagApiCall(payload, appRef.trim(), request.logger);
-
-        if (res.statusCode === StatusCodes.NO_CONTENT) {
-          const error = {
-            data: {
-              res: {
-                statusCode: StatusCodes.NO_CONTENT,
-              },
-            },
-          };
-          throw error;
-        }
-
-        return createView(request, h);
-      } catch (error) {
-        request.logger.error({ error });
-        let formattedErrors = [];
-
-        if (error.data.res.statusCode === StatusCodes.NOT_FOUND) {
-          formattedErrors = [
-            {
-              message: "Agreement reference does not exist.",
-              path: [],
-              type: STRING_EMPTY,
-              context: {
-                key: "appRef",
-              },
-              href: AGREEMENT_REFERENCE,
-            },
-          ];
-        }
-
-        if (error.data.res.statusCode === StatusCodes.NO_CONTENT) {
-          formattedErrors = [
-            {
-              message: `Flag not created - agreement flag with the same "Flag applies to multiple herds T&C's" value already exists.`,
-              path: [],
-              type: STRING_EMPTY,
-              context: {
-                key: "appRef",
-              },
-              href: AGREEMENT_REFERENCE,
-            },
-          ];
-        }
-
-        if (
-          error.isBoom &&
-          error.data.payload.message === "Unable to create flag for redacted agreement"
-        ) {
-          formattedErrors = ERRORS.AGREEMENT_REDACTED.map((redactedError) => ({
-            ...redactedError,
-            href: AGREEMENT_REFERENCE,
-          }));
-        }
-
-        if (formattedErrors.length) {
-          const errors = formattedErrors.map((formattedError) => ({
-            text: formattedError.message,
-            href: formattedError.href,
-            key: formattedError.context.key,
-          }));
-          return createView(request, h, false, true, errors);
-        }
-
-        return h
-          .view("flags", await createFlagsTableData({ logger: request.logger }))
-          .code(StatusCodes.BAD_REQUEST)
-          .takeover();
+      const { action } = request.payload;
+      if (action === "create") {
+        return createFlag(request, h);
+      }
+      if (action === "delete") {
+        return deleteFlag(request, h);
       }
     },
   },
 };
 
-export const flagsRoutes = [getFlagsHandler, deleteFlagHandler, createFlagHandler];
+const deleteFlag = async (request, h) => {
+  try {
+    const { flagId, deletedNote } = request.payload;
+    const { name: userName } = request.auth.credentials.account;
+    await deleteFlagApiCall({ flagId, deletedNote }, userName, request.logger);
+    return (await createView(request, h)).takeover();
+  } catch (err) {
+    return h
+      .view("flags", { ...request.payload, error: err })
+      .code(StatusCodes.BAD_REQUEST)
+      .takeover();
+  }
+};
+
+const createFlag = async (request, h) => {
+  try {
+    const { name: userName } = request.auth.credentials.account;
+    const { note, appliesToMh, appRef } = request.payload;
+    const payload = {
+      user: userName,
+      note: note.trim(),
+      appliesToMh: appliesToMh === "yes",
+    };
+
+    const { res } = await createFlagApiCall(payload, appRef.trim(), request.logger);
+
+    if (res.statusCode === StatusCodes.NO_CONTENT) {
+      const error = {
+        data: {
+          res: {
+            statusCode: StatusCodes.NO_CONTENT,
+          },
+        },
+      };
+      throw error;
+    }
+
+    return createView(request, h);
+  } catch (error) {
+    request.logger.error({ error });
+    let formattedErrors = [];
+
+    if (error.data.res.statusCode === StatusCodes.NOT_FOUND) {
+      formattedErrors = [
+        {
+          message: "Agreement reference does not exist.",
+          path: [],
+          type: STRING_EMPTY,
+          context: {
+            key: "appRef",
+          },
+          href: AGREEMENT_REFERENCE,
+        },
+      ];
+    }
+
+    if (error.data.res.statusCode === StatusCodes.NO_CONTENT) {
+      formattedErrors = [
+        {
+          message: `Flag not created - agreement flag with the same "Flag applies to multiple herds T&C's" value already exists.`,
+          path: [],
+          type: STRING_EMPTY,
+          context: {
+            key: "appRef",
+          },
+          href: AGREEMENT_REFERENCE,
+        },
+      ];
+    }
+
+    if (
+      error.isBoom &&
+      error.data.payload.message === "Unable to create flag for redacted agreement"
+    ) {
+      formattedErrors = ERRORS.AGREEMENT_REDACTED.map((redactedError) => ({
+        ...redactedError,
+        href: AGREEMENT_REFERENCE,
+      }));
+    }
+
+    if (formattedErrors.length) {
+      const errors = formattedErrors.map((formattedError) => ({
+        text: formattedError.message,
+        href: formattedError.href,
+        key: formattedError.context.key,
+      }));
+      return createView(request, h, false, true, errors);
+    }
+
+    return h
+      .view("flags", await createFlagsTableData({ logger: request.logger }))
+      .code(StatusCodes.BAD_REQUEST)
+      .takeover();
+  }
+};
+
+export const flagsRoutes = [getFlagsHandler, postFlagHandler];
