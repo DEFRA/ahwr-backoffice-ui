@@ -151,16 +151,16 @@ const postFlagHandler = {
     handler: async (request, h) => {
       const { action } = request.payload;
       if (action === "create") {
-        return createFlag(request, h);
+        return createFlagHandler(request, h);
       }
       if (action === "delete") {
-        return deleteFlag(request, h);
+        return deleteFlagHandler(request, h);
       }
     },
   },
 };
 
-const deleteFlag = async (request, h) => {
+const deleteFlagHandler = async (request, h) => {
   try {
     const { flagId, deletedNote } = request.payload;
     const { name: userName } = request.auth.credentials.account;
@@ -174,7 +174,7 @@ const deleteFlag = async (request, h) => {
   }
 };
 
-const createFlag = async (request, h) => {
+const createFlagHandler = async (request, h) => {
   try {
     const { name: userName } = request.auth.credentials.account;
     const { note, appliesToMh, appRef } = request.payload;
