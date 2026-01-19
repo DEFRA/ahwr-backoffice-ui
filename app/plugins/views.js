@@ -3,6 +3,15 @@ import path from "node:path";
 import getMOJFilters from "@ministryofjustice/frontend/moj/filters/all.js";
 import vision from "@hapi/vision";
 
+export const removeUnexpectedUsername = (context) => {
+  if (
+    context.user?.username &&
+    context.check_username &&
+    context.user.username !== context.check_username
+  ) {
+    context.user = undefined;
+  }
+};
 export const viewsPlugin = {
   plugin: vision,
   options: {
@@ -10,8 +19,8 @@ export const viewsPlugin = {
       njk: {
         compile: (src, options) => {
           const template = nunjucks.compile(src, options.environment);
-
           return (context) => {
+            removeUnexpectedUsername(context);
             return template.render(context);
           };
         },

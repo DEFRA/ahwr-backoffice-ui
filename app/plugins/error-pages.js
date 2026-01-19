@@ -8,6 +8,7 @@ export const errorPagesPlugin = {
         const { response } = request;
 
         if (response.isBoom) {
+          const baseOptions = { check_username: request.auth?.credentials?.account?.username };
           const { statusCode, message } = response.output.payload;
 
           const originalError = response instanceof Error ? response : response.data?.error;
@@ -39,10 +40,12 @@ export const errorPagesPlugin = {
             statusCode >= StatusCodes.BAD_REQUEST &&
             statusCode < StatusCodes.INTERNAL_SERVER_ERROR
           ) {
-            return h.view("error-pages/4xx", { payload: response.output.payload }).code(statusCode);
+            return h
+              .view("error-pages/4xx", { ...baseOptions, payload: response.output.payload })
+              .code(statusCode);
           }
 
-          return h.view("error-pages/500").code(statusCode);
+          return h.view("error-pages/500", baseOptions).code(statusCode);
         }
 
         return h.continue;
