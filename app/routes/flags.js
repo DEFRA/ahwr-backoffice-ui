@@ -26,14 +26,14 @@ const ERRORS = {
   ],
 };
 
-const createView = async (request, h, deleteFlag, createFlag, errors) => {
+const createView = async (request, h, deleteFlagId, createFlag, errors) => {
   await generateNewCrumb(request, h);
   const { isAdministrator } = mapAuth(request);
 
   return h.view("flags", {
     ...(await createFlagsTableData({
       logger: request.logger,
-      flagIdToDelete: deleteFlag,
+      flagIdToDelete: deleteFlagId,
       createFlag,
       isAdmin: isAdministrator,
     })),
@@ -94,6 +94,7 @@ const postFlagHandler = {
       }),
       failAction: async (request, h, error) => {
         request.logger.error({ error });
+        const { flagId, action } = request.payload;
 
         const errors = error.details
           .map((receivedError) => {
@@ -145,7 +146,7 @@ const postFlagHandler = {
             key: formattedError.context.key,
           }));
 
-        return (await createView(request, h, false, true, errors)).takeover();
+        return (await createView(request, h, flagId, action === "create", errors)).takeover();
       },
     },
     handler: async (request, h) => {
