@@ -31,6 +31,23 @@ describe("Flags tests", () => {
   });
 
   describe("GET /flags route", () => {
+    const abcReference = {
+      id: "abc123",
+      applicationReference: "IAHW-U6ZE-5R5E",
+      sbi: "123456789",
+      note: "Flag this please",
+      createdBy: "Ben",
+      createdAt: "2025-04-09T12: 01: 23.322Z",
+      appliesToMh: true,
+      deletedAt: null,
+      deletedBy: null,
+      redacted: false,
+    };
+
+    beforeAll(() => {
+      flags.push(abcReference);
+    });
+
     beforeEach(async () => {
       crumb = await getCrumbs(server);
     });
@@ -103,6 +120,52 @@ describe("Flags tests", () => {
       expect($(".govuk-error-summary__title").html()).toBeFalsy();
       phaseBannerOk($);
     });
+
+    test("the create form links to the flags endpoint", async () => {
+      const auth = {
+        strategy: "session-auth",
+        credentials: { scope: [user], account: { name: "test user" } },
+      };
+
+      const options = {
+        method: "GET",
+        url: "/flags?createFlag=true",
+        auth,
+        headers: { cookie: `crumb=${crumb}` },
+      };
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+
+      expect($(".ahwr-update-form").attr("action")).toBe("/flags");
+      phaseBannerOk($);
+    });
+
+    test("the delete form links to the flags endpoint", async () => {
+      const auth = {
+        strategy: "session-auth",
+        credentials: { scope: [user], account: { name: "test user" } },
+      };
+
+      const options = {
+        method: "GET",
+        url: "/flags?deleteFlag=abc123",
+        auth,
+        headers: { cookie: `crumb=${crumb}` },
+      };
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+
+      expect($(".ahwr-update-form").attr("action")).toBe("/flags");
+      phaseBannerOk($);
+    });
   });
 
   describe(`POST /flags/delete route`, () => {
@@ -135,8 +198,8 @@ describe("Flags tests", () => {
       const flagId = "abc123";
       const options = {
         method: "POST",
-        url: `/flags/delete`,
-        payload: { flagId },
+        url: `/flags`,
+        payload: { flagId, action: "delete" },
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
@@ -149,10 +212,10 @@ describe("Flags tests", () => {
       const flagId = "abc123";
       const options = {
         method: "POST",
-        url: `/flags/delete`,
+        url: `/flags`,
         auth,
         headers: { cookie: `crumb=${crumb}` },
-        payload: { crumb, deletedNote: "Flag deleted", flagId },
+        payload: { crumb, deletedNote: "Flag deleted", flagId, action: "delete" },
       };
       const res = await server.inject(options);
 
@@ -168,16 +231,18 @@ describe("Flags tests", () => {
       const flagId = "abc123";
       const options = {
         method: "POST",
-        url: `/flags/delete`,
+        url: `/flags`,
         auth,
         headers: { cookie: `crumb=${crumb}` },
-        payload: { crumb, deletedNote: "Flag deleted", flagId },
+        payload: { crumb, deletedNote: "Flag deleted", flagId, action: "delete" },
       };
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      const redirectedLocation = res.headers.location;
-      expect(redirectedLocation).toContain(`flags`);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+      phaseBannerOk($);
     });
 
     test("renders errors when the user has not provided a deleted note value", async () => {
@@ -185,12 +250,13 @@ describe("Flags tests", () => {
 
       const options = {
         method: "POST",
-        url: `/flags/delete`,
+        url: `/flags`,
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           crumb,
           flagId,
+          action: "delete",
         },
       };
       const res = await server.inject(options);
@@ -211,13 +277,14 @@ describe("Flags tests", () => {
       const flagId = "abc123";
       const options = {
         method: "POST",
-        url: `/flags/delete`,
+        url: `/flags`,
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           crumb,
           deletedNote: "a",
           flagId,
+          action: "delete",
         },
       };
       const res = await server.inject(options);
@@ -295,6 +362,7 @@ describe("Flags tests", () => {
           appRef: "IAHW-TEST-REF1",
           note: "Test flag",
           appliesToMh: "yes",
+          action: "create",
         },
       };
       const res = await server.inject(options);
@@ -313,6 +381,7 @@ describe("Flags tests", () => {
           appRef: "IAHW-TEST-REF1",
           note: "Test flag",
           appliesToMh: "yes",
+          action: "create",
         },
       };
       const res = await server.inject(options);
@@ -336,6 +405,7 @@ describe("Flags tests", () => {
           appRef: "IAHW-TEST-REF1",
           note: "Test flag",
           appliesToMh: "something",
+          action: "create",
         },
       };
       const res = await server.inject(options);
@@ -363,6 +433,7 @@ describe("Flags tests", () => {
           appRef: "IAHW-TEST-RE",
           note: "Test flag",
           appliesToMh: "yes",
+          action: "create",
         },
       };
       const res = await server.inject(options);
@@ -392,6 +463,7 @@ describe("Flags tests", () => {
           appRef: "IAHW-TEST-REF1",
           note: "",
           appliesToMh: "yes",
+          action: "create",
         },
       };
       const res = await server.inject(options);
@@ -431,6 +503,7 @@ describe("Flags tests", () => {
           appRef: "IAHW-TEST-REF1",
           note: "To be flagged",
           appliesToMh: "yes",
+          action: "create",
         },
       };
       const res = await server.inject(options);
@@ -472,6 +545,7 @@ describe("Flags tests", () => {
           appRef: "IAHW-TEST-REF1",
           note: "To be flagged",
           appliesToMh: "yes",
+          action: "create",
         },
       };
       const res = await server.inject(options);
@@ -516,6 +590,7 @@ describe("Flags tests", () => {
           appRef: "IAHW-TEST-REF1",
           note: "To be flagged",
           appliesToMh: "yes",
+          action: "create",
         },
       };
       const res = await server.inject(options);

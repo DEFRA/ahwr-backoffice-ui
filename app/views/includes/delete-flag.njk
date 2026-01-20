@@ -2,7 +2,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 <div class="govuk-panel govuk-grid-column-two-thirds govuk-panel--confirmation govuk-!-text-align-left" id="recommend-to-reject">
-    <form method="POST" action="/flags/delete" class="ahwr-update-form">
+    <form method="POST" action="/flags" class="ahwr-update-form">
       <a href="/flags" class="govuk-link govuk-body">Back</a>
       <h1 class="govuk-heading-xl govuk-!-margin-top-2">Delete flag</h1>
       {% if errors.length %}
@@ -32,5 +32,6 @@
     }) }}
     <input type="hidden" name="crumb" value="{{ crumb }}"/>
     <input type="hidden" name="flagId" value="{{model.flagIdToDelete}}"/>
+    <input type="hidden" name="action" value="delete"/>
   </form>
 </div>
