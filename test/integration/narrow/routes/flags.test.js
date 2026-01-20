@@ -31,6 +31,23 @@ describe("Flags tests", () => {
   });
 
   describe("GET /flags route", () => {
+    const abcReference = {
+      id: "abc123",
+      applicationReference: "IAHW-U6ZE-5R5E",
+      sbi: "123456789",
+      note: "Flag this please",
+      createdBy: "Ben",
+      createdAt: "2025-04-09T12: 01: 23.322Z",
+      appliesToMh: true,
+      deletedAt: null,
+      deletedBy: null,
+      redacted: false,
+    };
+
+    beforeAll(() => {
+      flags.push(abcReference);
+    });
+
     beforeEach(async () => {
       crumb = await getCrumbs(server);
     });
@@ -101,6 +118,52 @@ describe("Flags tests", () => {
       expect($("title").text()).toContain("AHWR Flags");
 
       expect($(".govuk-error-summary__title").html()).toBeFalsy();
+      phaseBannerOk($);
+    });
+
+    test("the create form links to the flags endpoint", async () => {
+      const auth = {
+        strategy: "session-auth",
+        credentials: { scope: [user], account: { name: "test user" } },
+      };
+
+      const options = {
+        method: "GET",
+        url: "/flags?createFlag=true",
+        auth,
+        headers: { cookie: `crumb=${crumb}` },
+      };
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+
+      expect($(".ahwr-update-form").attr("action")).toBe("/flags");
+      phaseBannerOk($);
+    });
+
+    test("the delete form links to the flags endpoint", async () => {
+      const auth = {
+        strategy: "session-auth",
+        credentials: { scope: [user], account: { name: "test user" } },
+      };
+
+      const options = {
+        method: "GET",
+        url: "/flags?deleteFlag=abc123",
+        auth,
+        headers: { cookie: `crumb=${crumb}` },
+      };
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+
+      expect($(".ahwr-update-form").attr("action")).toBe("/flags");
       phaseBannerOk($);
     });
   });
