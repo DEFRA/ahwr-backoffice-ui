@@ -1,10 +1,12 @@
 import { createServer } from "./server.js";
+import { auth } from "./auth/index.js";
 
 let server;
 
 const init = async () => {
   server = await createServer();
   await server.start();
+  auth.initAuth();
 };
 
 process.on("unhandledRejection", async (err) => {

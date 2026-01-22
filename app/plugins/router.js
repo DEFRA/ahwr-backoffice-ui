@@ -55,7 +55,7 @@ const routes = [
 ];
 
 const getRoutes = () => {
-  if (!config.auth.enabled) {
+  if (!config.auth.enabled || config.perfTestEnabled) {
     return routes.concat(devAuthRoute);
   }
 
