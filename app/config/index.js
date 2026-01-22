@@ -44,6 +44,7 @@ const getConfigSchema = () =>
     logLevel: joi.string().required(),
     logFormat: joi.string().required(),
     logRedact: joi.array().items(joi.string()),
+    perfTestEnabled: joi.boolean().required()
   });
 
 const buildConfig = () => {
@@ -74,6 +75,7 @@ const buildConfig = () => {
     isProd: process.env.NODE_ENV === "production",
     isTest: process.env.NODE_ENV === "test",
     isMetricsEnabled: process.env.NODE_ENV === "production",
+    perfTestEnabled: process.env.PERF_TEST_ENABLED === "true",
     port: process.env.PORT,
     serviceUri: process.env.AHWR_SERVICE_URI,
     useRedis: process.env.NODE_ENV !== "test",
@@ -89,7 +91,7 @@ const buildConfig = () => {
     logFormat: process.env.USE_PRETTY_PRINT === "true" ? "pino-pretty" : "ecs",
     logRedact: process.env.LOG_REDACT
       ? process.env.LOG_REDACT.split(",")
-      : ["req.headers", "res.headers"],
+      : ["req.headers", "res.headers"]
   };
 
   if (process.env.NODE_ENV === "test") {

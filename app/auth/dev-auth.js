@@ -36,13 +36,4 @@ export const authenticate = async (userId, auth, cookieAuth) => {
   return [account.username, roles];
 };
 
-export const refresh = async (_account, cookieAuth) => {
-  cookieAuth.set({
-    scope: [administrator, processor, user, recommender, authoriser],
-    account: getDevAccount(cachedUserId),
-  });
-
-  return [administrator, processor, user, recommender, authoriser];
-};
-
 export const logout = async () => {};
