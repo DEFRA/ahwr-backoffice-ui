@@ -44,7 +44,7 @@ const getConfigSchema = () =>
     logLevel: joi.string().required(),
     logFormat: joi.string().required(),
     logRedact: joi.array().items(joi.string()),
-    perfTestEnabled: joi.boolean().required()
+    perfTestEnabled: joi.boolean().required(),
   });
 
 const buildConfig = () => {
@@ -91,7 +91,7 @@ const buildConfig = () => {
     logFormat: process.env.USE_PRETTY_PRINT === "true" ? "pino-pretty" : "ecs",
     logRedact: process.env.LOG_REDACT
       ? process.env.LOG_REDACT.split(",")
-      : ["req.headers", "res.headers"]
+      : ["req.headers", "res.headers"],
   };
 
   if (process.env.NODE_ENV === "test") {

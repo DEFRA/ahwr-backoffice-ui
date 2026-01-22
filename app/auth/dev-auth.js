@@ -2,12 +2,8 @@ import { permissions } from "./permissions.js";
 
 const { administrator, processor, user, recommender, authoriser } = permissions;
 
-let cachedUserId;
-
 const getDevAccount = (userId) => {
   if (userId) {
-    cachedUserId = userId;
-
     return {
       name: `Developer-${userId}`,
       username: `developer+${userId}@defra.gov.uk`,
