@@ -34,8 +34,8 @@ const toggleAuthMode = (possibleUserId) => {
   }
 };
 
-const authenticate = async (redirectCode, auth, cookieAuth) => {
-  return getAuth().authenticate(redirectCode, auth, cookieAuth);
+const authenticate = async (redirectCode, authPlugin, cookieAuth) => {
+  return getAuth().authenticate(redirectCode, authPlugin, cookieAuth);
 };
 
 const logout = async (account) => {
