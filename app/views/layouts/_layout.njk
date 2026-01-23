@@ -63,6 +63,12 @@
           .concat(nav.slice(1)) %}
       {% endif %}
 
+      {% if user %}
+        {% set nav = nav.slice(0, nav | length -1)
+          .concat([{ href: "/support", text: "Support" }])
+          .concat(nav.slice(nav | length -1)) %}
+      {% endif %}
+
       {{ govukServiceNavigation({
         serviceName: serviceName,
         serviceUrl: "https://www.gov.uk/government/collections/funding-to-improve-animal-health-and-welfare-guidance-for-farmers-and-vets",

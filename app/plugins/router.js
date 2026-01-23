@@ -25,6 +25,7 @@ import { withdrawAgreementRoute } from "../routes/withdraw-agreement.js";
 import { updateEligiblePiiRedactionRoute } from "../routes/agreements-eligible-pii-redaction.js";
 import { missingPagesRoute } from "../routes/missing-routes.js";
 import { config } from "../config/index.js";
+import { supportRoutes } from "../routes/support/support-routes.js";
 
 const routes = [
   accessibilityRoute,
@@ -37,6 +38,7 @@ const routes = [
   ...claimsDataRoutes,
   ...claimsRoutes,
   ...flagsRoutes,
+  ...supportRoutes,
   healthRoute,
   homeRoute,
   loginRoute,

@@ -1,0 +1,58 @@
+{% extends './layouts/layout.njk' %}
+{% block pageTitle %}
+  Support
+{% endblock %}
+{% block content %}
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-7">Support</h1>
+
+<form method="POST" action="/support" class="ahwr-application-search-form">
+  {{ govukInput({
+    label: {
+      text: "Application Reference",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "application-reference",
+    name: "applicationReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Application"
+  }) }}
+  <input type="hidden" name="action" value="searchApplication"/>
+</form>
+
+<form method="POST" action="/support" class="ahwr-claim-search-form">
+  {{ govukInput({
+    label: {
+      text: "Claim Reference",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "claim-reference",
+    name: "claimReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Claim"
+  }) }}
+  <input type="hidden" name="action" value="searchClaim"/>
+</form>
+
+<form method="POST" action="/support" class="ahwr-herd-search-form">
+  {{ govukInput({
+    label: {
+      text: "Herd Id",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "herd-id",
+    name: "herdId"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Herd"
+  }) }}
+  <input type="hidden" name="action" value="searchHerd"/>
+</form>
+{% endblock %}
