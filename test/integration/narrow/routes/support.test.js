@@ -108,8 +108,8 @@ describe("support-routes", () => {
   // those calls will be made with wreck
   // Therefore we will need to mock wreck.
   describe("post", () => {
-    describe.only("non existing action", () => {
-      it.only("returns not found", async () => {
+    describe("non existing action", () => {
+      it("returns not found", async () => {
         const applicationReference = "someReference";
         const options = {
           method: "POST",

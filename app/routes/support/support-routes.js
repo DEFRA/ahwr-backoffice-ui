@@ -3,18 +3,18 @@ import { permissions } from "../../auth/permissions.js";
 
 const { administrator } = permissions;
 
-const createView = async (request, h, errors) => {
+const createView = async ({ request, h, errors = undefined }) => {
   return h.view("support", { errors });
 };
 
 const getSupportHandler = (request, h) => {
-  return createView(request, h);
+  return createView({ request, h });
 };
 
 const searchApplicationHandler = async (request, h) => {
   // const { applicationReference } = request.payload;
   // const { payload } = await wreck.get(`https://somehwere/${applicationReference}`, { json: true });
-  return createView(request, h);
+  return createView({ request, h });
 };
 
 const getSupportRoute = {
@@ -68,8 +68,7 @@ const postSupportRoute = {
             key: formattedError.context.key,
           }));
 
-        console.log({ errors });
-        return (await createView(request, h, errors)).takeover();
+        return (await createView({ request, h, errors })).takeover();
       },
     },
     handler: async (request, h) => {
