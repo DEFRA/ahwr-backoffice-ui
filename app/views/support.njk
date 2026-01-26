@@ -19,6 +19,7 @@
   {{ govukButton({
     text: "Search for Application"
   }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
   <input type="hidden" name="action" value="searchApplication"/>
 </form>
 
@@ -36,6 +37,7 @@
   {{ govukButton({
     text: "Search for Claim"
   }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
   <input type="hidden" name="action" value="searchClaim"/>
 </form>
 
@@ -53,6 +55,7 @@
   {{ govukButton({
     text: "Search for Herd"
   }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
   <input type="hidden" name="action" value="searchHerd"/>
 </form>
 {% endblock %}
