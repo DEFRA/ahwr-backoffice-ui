@@ -1,10 +1,11 @@
 import Joi from "joi";
 import { permissions } from "../../auth/permissions.js";
+import { getApplicationDocument } from "./support-calls.js";
 
 const { administrator } = permissions;
 
-const createView = async ({ request, h, errors = undefined }) => {
-  return h.view("support", { errors });
+const createView = async ({ request, h, errors = undefined, applicationDocument = undefined }) => {
+  return h.view("support", { errors, applicationDocument });
 };
 
 const getSupportHandler = (request, h) => {
@@ -12,9 +13,10 @@ const getSupportHandler = (request, h) => {
 };
 
 const searchApplicationHandler = async (request, h) => {
-  // const { applicationReference } = request.payload;
-  // const { payload } = await wreck.get(`https://somehwere/${applicationReference}`, { json: true });
-  return createView({ request, h });
+  const { applicationReference } = request.payload;
+  const rawDocument = await getApplicationDocument(applicationReference);
+  const applicationDocument = JSON.stringify(rawDocument, null, 4);
+  return (await createView({ request, h, applicationDocument })).takeover();
 };
 
 const getSupportRoute = {
@@ -42,6 +44,7 @@ const postSupportRoute = {
             is: "searchApplication",
             then: Joi.object({
               applicationReference: Joi.string().required(),
+              action: Joi.string().required(),
             }),
           },
         ],
@@ -54,9 +57,11 @@ const postSupportRoute = {
               return { ...receivedError, message: `Action ${action} is not supported.` };
             }
 
-            if (receivedError.message.includes("something")) {
+            if (receivedError.message.includes('"applicationReference"')) {
               return {
                 ...receivedError,
+                message: "Application reference missing.",
+                href: "#application-reference",
               };
             }
 
@@ -66,6 +71,7 @@ const postSupportRoute = {
           .map((formattedError) => ({
             text: formattedError.message,
             key: formattedError.context.key,
+            href: formattedError.href,
           }));
 
         return (await createView({ request, h, errors })).takeover();

@@ -1,13 +1,14 @@
-// import Hapi from "@hapi/hapi";
 import * as cheerio from "cheerio";
-import wreck from "@hapi/wreck";
 
 import { StatusCodes } from "http-status-codes";
 import { permissions } from "../../../../app/auth/permissions.js";
 import { createServer } from "../../../../app/server.js";
 import { getCrumbs } from "../../../utils/get-crumbs.js";
+import { getApplicationDocument } from "../../../../app/routes/support/support-calls.js";
 
 const { administrator, user, processor, recommender, authoriser } = permissions;
+
+jest.mock("../../../../app/routes/support/support-calls.js");
 
 describe("support-routes", () => {
   const adminAuth = {
@@ -131,17 +132,44 @@ describe("support-routes", () => {
     });
 
     describe("search application", () => {
-      it.skip("shows application information when requested", async () => {
+      it("throws error if no application reference passed", async () => {
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, action: "searchApplication" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+          "#application-reference",
+        );
+        expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+          "Application reference missing.",
+        );
+        expect($("#applicationDocument").length).toBe(0);
+      });
+
+      it("shows application information when requested", async () => {
+        getApplicationDocument.mockResolvedValue({ document: { some: "value", another: "entry" } });
+
         const applicationReference = "someReference";
         const options = {
           method: "POST",
           url: "/support",
           auth: adminAuth,
           headers: { cookie: `crumb=${crumb}` },
-          payload: { applicationReference, action: "searchApplication" },
+          payload: { crumb, applicationReference, action: "searchApplication" },
         };
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($("#applicationDocument").length).toBe(1);
+        expect($("#applicationDocument").text()).toContain("entry");
       });
     });
   });

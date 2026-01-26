@@ -1,5 +1,6 @@
 {% extends './layouts/layout.njk' %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% block pageTitle %}
   Support
 {% endblock %}
@@ -31,6 +32,13 @@
   <input type="hidden" name="action" value="searchApplication"/>
 </form>
 
+{% if applicationDocument %}
+{{ govukInsetText({
+  text: applicationDocument,
+  id: "applicationDocument"
+}) }}
+{% endif %}
+    
 <form method="POST" action="/support" class="ahwr-claim-search-form">
   {{ govukInput({
     label: {
