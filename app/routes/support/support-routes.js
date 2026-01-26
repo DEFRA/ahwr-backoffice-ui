@@ -1,5 +1,5 @@
-import boom from "@hapi/boom";
-import Joi from "joi";
+// import boom from "@hapi/boom";
+// import Joi from "joi";
 import { permissions } from "../../auth/permissions.js";
 import { getSupportHandler, searchApplicationHandler } from "./support-handlers.js";
 
@@ -25,8 +25,7 @@ const postSupportRoute = {
     },
     handler: async (request, h) => {
       console.log("here");
-      const { action } = request.payload;
-      console.log("We are here");
+      // const { action } = request.payload;
       // if (action === "") {
       return searchApplicationHandler(request, h);
       // }
