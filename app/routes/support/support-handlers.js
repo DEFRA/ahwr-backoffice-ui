@@ -1,7 +1,7 @@
 // import wreck from "@hapi/wreck";
 
-const createView = async (request, h) => {
-  return h.view("support", {});
+export const createView = async (request, h, errors) => {
+  return h.view("support", {}, errors);
 };
 
 export const getSupportHandler = (request, h) => {
