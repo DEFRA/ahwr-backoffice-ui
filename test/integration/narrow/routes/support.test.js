@@ -118,8 +118,15 @@ describe("support-routes", () => {
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, applicationReference, action: "delete" },
         };
+
         const response = await server.inject(options);
-        expect(response.statusCode).toBe(StatusCodes.NOT_FOUND);
+
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($(".govuk-error-summary__list li:first-child").text()).toContain(
+          "Action delete is not supported.",
+        );
       });
     });
 
@@ -131,7 +138,7 @@ describe("support-routes", () => {
           url: "/support",
           auth: adminAuth,
           headers: { cookie: `crumb=${crumb}` },
-          payload: { applicationReference, action: "delete" },
+          payload: { applicationReference, action: "searchApplication" },
         };
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
