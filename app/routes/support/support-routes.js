@@ -1,3 +1,4 @@
+import boom from "@hapi/boom";
 import Joi from "joi";
 import { permissions } from "../../auth/permissions.js";
 import { getSupportHandler, searchApplicationHandler } from "./support-handlers.js";
@@ -23,10 +24,13 @@ const postSupportRoute = {
       scope: [administrator],
     },
     handler: async (request, h) => {
+      console.log("here");
       const { action } = request.payload;
-      if (action === "") {
-        return searchApplicationHandler(request, h);
-      }
+      console.log("We are here");
+      // if (action === "") {
+      return searchApplicationHandler(request, h);
+      // }
+      // return boom.notFound(`${action} is not supported`);
     },
   },
 };

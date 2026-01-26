@@ -1,3 +1,4 @@
+import Hapi from "@hapi/hapi";
 import * as cheerio from "cheerio";
 import wreck from "@hapi/wreck";
 
@@ -32,9 +33,55 @@ describe("support-routes", () => {
 
   beforeAll(async () => {
     server = await createServer({ testPort: 6001 });
+    // server.ext("onPreAuth", (request, h) => {
+    //   console.log({
+    //     event: "onPreAuth",
+    //     method: request.method,
+    //     path: request.url.pathname,
+    //     payload: request.payload,
+    //     headers: request.headers,
+    //     auth: request.auth,
+    //     "content-type:": request.headers["content-type"],
+    //   });
+    //   return h.continue;
+    // });
+    // server.ext("onPostAuth", (request, h) => {
+    //   console.log({
+    //     event: "onPostAuth",
+    //     method: request.method,
+    //     path: request.url.pathname,
+    //     payload: request.payload,
+    //     headers: request.headers,
+    //     "content-type:": request.headers["content-type"],
+    //   });
+    //   return h.continue;
+    // });
+    // server.ext("onPreHandler", (request, h) => {
+    //   console.log({
+    //     event: "onPreHandler",
+    //     method: request.method,
+    //     path: request.url.pathname,
+    //     payload: request.payload,
+    //     headers: request.headers,
+    //     "content-type:": request.headers["content-type"],
+    //   });
+    //   return h.continue;
+    // });
+    // server.ext("onPostHandler", (request, h) => {
+    //   console.log({
+    //     event: "onPostHandler",
+    //     method: request.method,
+    //     path: request.url.pathname,
+    //     payload: request.payload,
+    //     headers: request.headers,
+    //     "content-type:": request.headers["content-type"],
+    //   });
+    //   return h.continue;
+    // });
   });
 
   beforeEach(async () => {
+    jest.clearAllMocks();
     crumb = await getCrumbs(server);
   });
 
@@ -118,5 +165,112 @@ describe("support-routes", () => {
   // post we will have for each possible support call
   // those calls will be made with wreck
   // Therefore we will need to mock wreck.
-  describe("post", () => {});
+  describe("post", () => {
+    describe.only("non existing action", () => {
+      it.only("returns not found", async () => {
+        //** This is a sample of a minimal hapi server that shows the same issue
+        // const serv2 = Hapi.server();
+        // console.log("new server created");
+        // serv2.ext("onPreAuth", (request, h) => {
+        //   console.log({
+        //     event: "onPreAuth",
+        //     method: request.method,
+        //     path: request.url.pathname,
+        //     payload: request.payload,
+        //     raw: request.raw.req,
+        //     headers: request.headers,
+        //     auth: request.auth,
+        //     "content-type:": request.headers["content-type"],
+        //   });
+        //   return h.continue;
+        // });
+        // serv2.ext("onPostAuth", (request, h) => {
+        //   console.log({
+        //     event: "onPostAuth",
+        //     method: request.method,
+        //     path: request.url.pathname,
+        //     payload: request.payload,
+        //     headers: request.headers,
+        //     "content-type:": request.headers["content-type"],
+        //   });
+        //   return h.continue;
+        // });
+        // serv2.ext("onPreHandler", (request, h) => {
+        //   console.log({
+        //     event: "onPreHandler",
+        //     method: request.method,
+        //     path: request.url.pathname,
+        //     payload: request.payload,
+        //     headers: request.headers,
+        //     "content-type:": request.headers["content-type"],
+        //   });
+        //   return h.continue;
+        // });
+        // serv2.ext("onPostHandler", (request, h) => {
+        //   console.log({
+        //     event: "onPostHandler",
+        //     method: request.method,
+        //     path: request.url.pathname,
+        //     payload: request.payload,
+        //     headers: request.headers,
+        //     "content-type:": request.headers["content-type"],
+        //   });
+        //   return h.continue;
+        // });
+        // serv2.route({
+        //   method: "POST",
+        //   path: "/supporty",
+        //   handler: (request, h) => {
+        //     return h.response({ ok: true, payload: request.payload }).code(200);
+        //   },
+        // });
+
+        // const buf = Buffer.from(
+        //   JSON.stringify({ applicationReference: "x", action: "delete" }),
+        //   "utf8",
+        // );
+        // const res = await serv2.inject({
+        //   method: "POST",
+        //   url: "/supporty",
+        //   // headers: { "content-type": "text/plain" },
+        //   // payload: "something",
+        //   // payload: { x: "x" },
+        //   payload: buf,
+        // });
+
+        // expect(res.statusCode).toBe(200);
+        // expect(JSON.parse(res.payload).payload.action).toBe("delete");
+        //** END
+
+        // wreck.get = jest.fn();
+        const applicationReference = "someReference";
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { applicationReference: applicationReference, action: "delete" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.NOT_FOUND);
+        // // expect(wreck.get).toHaveBeenCalledWith(applicationReference);
+      });
+    });
+
+    describe("search application", () => {
+      it("shows application information when requested", async () => {
+        wreck.get = jest.fn();
+        const applicationReference = "someReference";
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { applicationReference, action: "delete" },
+        };
+        const response = await server.inject(options);
+        expect(wreck.get).toHaveBeenCalledWith(applicationReference);
+      });
+    });
+  });
 });
