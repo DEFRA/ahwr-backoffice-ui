@@ -4,6 +4,7 @@ import {
   getAgreementMessagesDocument,
   getApplicationDocument,
   getClaimDocument,
+  getClaimMessagesDocument,
   getHerdDocument,
   getPaymentDocument,
 } from "./support-calls.js";
@@ -19,6 +20,7 @@ const createView = async ({
   herdDocument = undefined,
   paymentDocument = undefined,
   agreementMessagesDocument = undefined,
+  claimMessagesDocument = undefined,
 }) => {
   return h.view("support", {
     errors,
@@ -27,6 +29,7 @@ const createView = async ({
     herdDocument,
     paymentDocument,
     agreementMessagesDocument,
+    claimMessagesDocument,
   });
 };
 
@@ -67,6 +70,13 @@ const searchAgreementMessagesHandler = async (request, h) => {
   const rawDocument = await getAgreementMessagesDocument(agreementMessagesReference);
   const agreementMessagesDocument = JSON.stringify(rawDocument, null, 4);
   return (await createView({ request, h, agreementMessagesDocument })).takeover();
+};
+
+const searchClaimMessagesHandler = async (request, h) => {
+  const { claimMessagesReference } = request.payload;
+  const rawDocument = await getClaimMessagesDocument(claimMessagesReference);
+  const claimMessagesDocument = JSON.stringify(rawDocument, null, 4);
+  return (await createView({ request, h, claimMessagesDocument })).takeover();
 };
 
 const getSupportRoute = {
@@ -125,6 +135,13 @@ const postSupportRoute = {
               action: Joi.string().required(),
             }),
           },
+          {
+            is: "searchClaimMessages",
+            then: Joi.object({
+              claimMessageReference: Joi.string().required(),
+              action: Joi.string().required(),
+            }),
+          },
         ],
       }),
       failAction: async (request, h, error) => {
@@ -175,6 +192,14 @@ const postSupportRoute = {
               };
             }
 
+            if (receivedError.message.includes('"claimMessageReference"')) {
+              return {
+                ...receivedError,
+                message: "Claim reference missing.",
+                href: "#claim-message-reference",
+              };
+            }
+
             return null;
           })
           .filter((formattedError) => formattedError !== null)
@@ -203,6 +228,9 @@ const postSupportRoute = {
       }
       if (action === "searchAgreementMessages") {
         return searchAgreementMessagesHandler(request, h);
+      }
+      if (action === "searchClaimMessages") {
+        return searchClaimMessagesHandler(request, h);
       }
     },
   },

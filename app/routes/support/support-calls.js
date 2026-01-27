@@ -85,3 +85,21 @@ export const getAgreementMessagesDocument = async (agreementReference) => {
     throw error;
   }
 };
+
+export const getClaimMessagesDocument = async (claimReference) => {
+  try {
+    const { payload } = await wreck.get(
+      `${messageGeneratorApiUri}/support/message-generation?claimReference=${claimReference}`,
+      {
+        json: true,
+      },
+    );
+    return payload;
+  } catch (error) {
+    if (error.data.res.statusCode === 404) {
+      return "No claim message found";
+    }
+
+    throw error;
+  }
+};

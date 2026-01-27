@@ -8,6 +8,7 @@ import {
   getAgreementMessagesDocument,
   getApplicationDocument,
   getClaimDocument,
+  getClaimMessagesDocument,
   getHerdDocument,
   getPaymentDocument,
 } from "../../../../app/routes/support/support-calls.js";
@@ -344,6 +345,50 @@ describe("support-routes", () => {
         const $ = cheerio.load(response.payload);
         expect($("#agreementMessagesDocument").length).toBe(1);
         expect($("#agreementMessagesDocument").text()).toContain("entry");
+      });
+    });
+
+    describe("search claim messages", () => {
+      it("throws error if no claim reference passed", async () => {
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, action: "searchClaimMessages" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+          "#claim-message-reference",
+        );
+        expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+          "Claim reference missing.",
+        );
+        expect($("#claimMessagesDocument").length).toBe(0);
+      });
+
+      it("shows claim information when requested", async () => {
+        getClaimMessagesDocument.mockResolvedValue({
+          document: { some: "value", another: "entry" },
+        });
+
+        const claimMessageReference = "someReference";
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, claimMessageReference, action: "searchClaimMessages" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($("#claimMessagesDocument").length).toBe(1);
+        expect($("#claimMessagesDocument").text()).toContain("entry");
       });
     });
   });
