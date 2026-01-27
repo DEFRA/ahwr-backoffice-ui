@@ -1,7 +1,7 @@
 import wreck from "@hapi/wreck";
 import { config } from "../../config/index.js";
 
-const { applicationApiUri } = config;
+const { applicationApiUri, paymentProxyApiUri } = config;
 export const getApplicationDocument = async (applicationReference) => {
   try {
     const { payload } = await wreck.get(
@@ -37,13 +37,31 @@ export const getClaimDocument = async (claimReference) => {
 
 export const getHerdDocument = async (herdId) => {
   try {
-    const { payload } = await wreck.get(`${applicationApiUri}/support/herds/${herId}`, {
+    const { payload } = await wreck.get(`${applicationApiUri}/support/herds/${herdId}`, {
       json: true,
     });
     return payload;
   } catch (error) {
     if (error.data.res.statusCode === 404) {
       return "No herd found";
+    }
+
+    throw error;
+  }
+};
+
+export const getPaymentDocument = async (paymentReference) => {
+  try {
+    const { payload } = await wreck.get(
+      `${paymentProxyApiUri}/support/payments/${paymentReference}/request-status`,
+      {
+        json: true,
+      },
+    );
+    return payload;
+  } catch (error) {
+    if (error.data.res.statusCode === 404) {
+      return "No payment found";
     }
 
     throw error;

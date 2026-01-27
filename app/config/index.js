@@ -36,6 +36,7 @@ const getConfigSchema = () =>
     serviceUri: joi.string().uri().required(),
     useRedis: joi.boolean().required(),
     applicationApiUri: joi.string().uri().required(),
+    paymentProxyApiUri: joi.string().uri().required(),
     displayPageSize: joi.number().required(),
     superAdmins: joi.array().items(joi.string()).required(),
     proxy: joi.string().optional(),
@@ -80,6 +81,7 @@ const buildConfig = () => {
     serviceUri: process.env.AHWR_SERVICE_URI,
     useRedis: process.env.NODE_ENV !== "test",
     applicationApiUri: process.env.AHWR_APPLICATION_BACKEND_URL,
+    paymentProxyApiUri: process.env.AHWR_PAYMENT_PROXY_URL,
     displayPageSize: Number(process.env.DISPLAY_PAGE_SIZE ?? "20"),
     superAdmins: process.env.SUPER_ADMINS
       ? process.env.SUPER_ADMINS.split(",").map((user) => user.trim().toLowerCase())

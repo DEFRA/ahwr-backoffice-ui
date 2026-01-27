@@ -1,6 +1,11 @@
 import Joi from "joi";
 import { permissions } from "../../auth/permissions.js";
-import { getApplicationDocument, getClaimDocument, getHerdDocument } from "./support-calls.js";
+import {
+  getApplicationDocument,
+  getClaimDocument,
+  getHerdDocument,
+  getPaymentDocument,
+} from "./support-calls.js";
 
 const { administrator } = permissions;
 
@@ -11,8 +16,15 @@ const createView = async ({
   applicationDocument = undefined,
   claimDocument = undefined,
   herdDocument = undefined,
+  paymentDocument = undefined,
 }) => {
-  return h.view("support", { errors, applicationDocument, claimDocument, herdDocument });
+  return h.view("support", {
+    errors,
+    applicationDocument,
+    claimDocument,
+    herdDocument,
+    paymentDocument,
+  });
 };
 
 const getSupportHandler = (request, h) => {
@@ -38,6 +50,13 @@ const searchHerdHandler = async (request, h) => {
   const rawDocument = await getHerdDocument(herdId);
   const herdDocument = JSON.stringify(rawDocument, null, 4);
   return (await createView({ request, h, herdDocument })).takeover();
+};
+
+const searchPaymentHandler = async (request, h) => {
+  const { paymentReference } = request.payload;
+  const rawDocument = await getPaymentDocument(paymentReference);
+  const paymentDocument = JSON.stringify(rawDocument, null, 4);
+  return (await createView({ request, h, paymentDocument })).takeover();
 };
 
 const getSupportRoute = {
@@ -82,6 +101,13 @@ const postSupportRoute = {
               action: Joi.string().required(),
             }),
           },
+          {
+            is: "searchPayment",
+            then: Joi.object({
+              paymentReference: Joi.string().required(),
+              action: Joi.string().required(),
+            }),
+          },
         ],
       }),
       failAction: async (request, h, error) => {
@@ -116,6 +142,14 @@ const postSupportRoute = {
               };
             }
 
+            if (receivedError.message.includes('"paymentReference"')) {
+              return {
+                ...receivedError,
+                message: "Payment reference missing.",
+                href: "#payment-reference",
+              };
+            }
+
             return null;
           })
           .filter((formattedError) => formattedError !== null)
@@ -138,6 +172,9 @@ const postSupportRoute = {
       }
       if (action === "searchHerd") {
         return searchHerdHandler(request, h);
+      }
+      if (action === "searchPayment") {
+        return searchPaymentHandler(request, h);
       }
     },
   },

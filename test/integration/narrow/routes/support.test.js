@@ -8,6 +8,7 @@ import {
   getApplicationDocument,
   getClaimDocument,
   getHerdDocument,
+  getPaymentDocument,
 } from "../../../../app/routes/support/support-calls.js";
 
 const { administrator, user, processor, recommender, authoriser } = permissions;
@@ -256,6 +257,48 @@ describe("support-routes", () => {
         const $ = cheerio.load(response.payload);
         expect($("#herdDocument").length).toBe(1);
         expect($("#herdDocument").text()).toContain("entry");
+      });
+    });
+
+    describe("search payment", () => {
+      it("throws error if no payment reference passed", async () => {
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, action: "searchPayment" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+          "#payment-reference",
+        );
+        expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+          "Payment reference missing.",
+        );
+        expect($("#paymentDocument").length).toBe(0);
+      });
+
+      it("shows payment information when requested", async () => {
+        getPaymentDocument.mockResolvedValue({ document: { some: "value", another: "entry" } });
+
+        const paymentReference = "someReference";
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, paymentReference, action: "searchPayment" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($("#paymentDocument").length).toBe(1);
+        expect($("#paymentDocument").text()).toContain("entry");
       });
     });
   });

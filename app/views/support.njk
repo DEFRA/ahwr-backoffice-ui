@@ -89,4 +89,29 @@
 }) }}
 {% endif %}
 
+<form method="POST" action="/support" class="ahwr-payment-search-form">
+  {{ govukInput({
+    label: {
+      text: "Payment Reference",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "payment-reference",
+    name: "paymentReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Payment"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchPayment"/>
+</form>
+
+{% if paymentDocument %}
+{{ govukInsetText({
+  text: paymentDocument,
+  id: "paymentDocument"
+}) }}
+{% endif %}
+
 {% endblock %}
