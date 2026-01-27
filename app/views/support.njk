@@ -37,6 +37,14 @@
   text: applicationDocument,
   id: "applicationDocument"
 }) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyApplicationDocument"
+  }
+}) }}
 {% endif %}
     
 <form method="POST" action="/support" class="ahwr-claim-search-form">
@@ -61,6 +69,14 @@
 {{ govukInsetText({
   text: claimDocument,
   id: "claimDocument"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyClaimDocument"
+  }
 }) }}
 {% endif %}
 
@@ -87,6 +103,15 @@
   text: herdDocument,
   id: "herdDocument"
 }) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyHerdDocument"
+  }
+}) }}
+
 {% endif %}
 
 <form method="POST" action="/support" class="ahwr-payment-search-form">
@@ -112,6 +137,15 @@
   text: paymentDocument,
   id: "paymentDocument"
 }) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyPaymentDocument"
+  }
+}) }}
+
 {% endif %}
 
 <form method="POST" action="/support" class="ahwr-agreement-messages-search-form">
@@ -137,6 +171,15 @@
   text: agreementMessagesDocument,
   id: "agreementMessagesDocument"
 }) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyAgreementMessagesDocument"
+  }
+}) }}
+
 {% endif %}
 
 <form method="POST" action="/support" class="ahwr-claim-messages-search-form">
@@ -162,6 +205,15 @@
   text: claimMessagesDocument,
   id: "claimMessagesDocument"
 }) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyClaimMessagesDocument"
+  }
+}) }}
+
 {% endif %}
 
 <form method="POST" action="/support" class="ahwr-agreement-logs-search-form">
@@ -187,6 +239,15 @@
   text: agreementLogsDocument,
   id: "agreementLogsDocument"
 }) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyAgreementLogsDocument"
+  }
+}) }}
+
 {% endif %}
 
 {% endblock %}
