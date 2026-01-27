@@ -1,5 +1,6 @@
 import wreck from "@hapi/wreck";
 import { config } from "../../config/index.js";
+import { StatusCodes } from "http-status-codes";
 
 const { applicationApiUri, paymentProxyApiUri, messageGeneratorApiUri, documentGeneratorApiUri } =
   config;
@@ -13,7 +14,7 @@ export const getApplicationDocument = async (applicationReference) => {
     );
     return payload;
   } catch (error) {
-    if (error.data.res.statusCode === 404) {
+    if (error.data.res.statusCode === StatusCodes.NOT_FOUND) {
       return "No application found";
     }
 
@@ -28,7 +29,7 @@ export const getClaimDocument = async (claimReference) => {
     });
     return payload;
   } catch (error) {
-    if (error.data.res.statusCode === 404) {
+    if (error.data.res.statusCode === StatusCodes.NOT_FOUND) {
       return "No claim found";
     }
 
@@ -43,7 +44,7 @@ export const getHerdDocument = async (herdId) => {
     });
     return payload;
   } catch (error) {
-    if (error.data.res.statusCode === 404) {
+    if (error.data.res.statusCode === StatusCodes.NOT_FOUND) {
       return "No herd found";
     }
 
@@ -61,7 +62,7 @@ export const getPaymentDocument = async (paymentReference) => {
     );
     return payload;
   } catch (error) {
-    if (error.data.res.statusCode === 404) {
+    if (error.data.res.statusCode === StatusCodes.NOT_FOUND) {
       return "No payment found";
     }
 
@@ -79,7 +80,7 @@ export const getAgreementMessagesDocument = async (agreementReference) => {
     );
     return payload;
   } catch (error) {
-    if (error.data.res.statusCode === 404) {
+    if (error.data.res.statusCode === StatusCodes.NOT_FOUND) {
       return "No agreement messages found";
     }
 
@@ -97,7 +98,7 @@ export const getClaimMessagesDocument = async (claimReference) => {
     );
     return payload;
   } catch (error) {
-    if (error.data.res.statusCode === 404) {
+    if (error.data.res.statusCode === StatusCodes.NOT_FOUND) {
       return "No claim message found";
     }
 
@@ -115,7 +116,7 @@ export const getAgreementLogsDocument = async (agreementReference) => {
     );
     return payload;
   } catch (error) {
-    if (error.data.res.statusCode === 404) {
+    if (error.data.res.statusCode === StatusCodes.NOT_FOUND) {
       return "No Logs found";
     }
 
