@@ -12,81 +12,59 @@ import {
 
 const { support } = permissions;
 
-const createView = async ({
-  request,
-  h,
-  errors = undefined,
-  applicationDocument = undefined,
-  claimDocument = undefined,
-  herdDocument = undefined,
-  paymentDocument = undefined,
-  agreementMessagesDocument = undefined,
-  claimMessagesDocument = undefined,
-  agreementLogsDocument = undefined,
-}) => {
-  return h.view("support", {
-    errors,
-    applicationDocument,
-    claimDocument,
-    herdDocument,
-    paymentDocument,
-    agreementMessagesDocument,
-    claimMessagesDocument,
-    agreementLogsDocument,
-  });
-};
+const supportTemplate = "support";
 
 const getSupportHandler = (request, h) => {
-  return createView({ request, h });
+  return h.view(supportTemplate);
 };
 
 const searchApplicationHandler = async (request, h) => {
   const { applicationReference } = request.payload;
   const rawDocument = await getApplicationDocument(applicationReference);
   const applicationDocument = JSON.stringify(rawDocument, null, 4);
-  return (await createView({ request, h, applicationDocument })).takeover();
+  return h.view(supportTemplate, { applicationDocument });
 };
 
 const searchClaimHandler = async (request, h) => {
   const { claimReference } = request.payload;
   const rawDocument = await getClaimDocument(claimReference);
   const claimDocument = JSON.stringify(rawDocument, null, 4);
-  return (await createView({ request, h, claimDocument })).takeover();
+  return h.view(supportTemplate, { claimDocument });
 };
 
 const searchHerdHandler = async (request, h) => {
   const { herdId } = request.payload;
   const rawDocument = await getHerdDocument(herdId);
   const herdDocument = JSON.stringify(rawDocument, null, 4);
-  return (await createView({ request, h, herdDocument })).takeover();
+  return h.view(supportTemplate, { herdDocument });
 };
 
 const searchPaymentHandler = async (request, h) => {
   const { paymentReference } = request.payload;
   const rawDocument = await getPaymentDocument(paymentReference);
   const paymentDocument = JSON.stringify(rawDocument, null, 4);
-  return (await createView({ request, h, paymentDocument })).takeover();
+  return h.view(supportTemplate, { paymentDocument });
 };
 
 const searchAgreementMessagesHandler = async (request, h) => {
   const { agreementMessagesReference } = request.payload;
   const rawDocument = await getAgreementMessagesDocument(agreementMessagesReference);
   const agreementMessagesDocument = JSON.stringify(rawDocument, null, 4);
-  return (await createView({ request, h, agreementMessagesDocument })).takeover();
+  return h.view(supportTemplate, { agreementMessagesDocument });
 };
 
 const searchClaimMessagesHandler = async (request, h) => {
   const { claimMessagesReference } = request.payload;
   const rawDocument = await getClaimMessagesDocument(claimMessagesReference);
   const claimMessagesDocument = JSON.stringify(rawDocument, null, 4);
-  return (await createView({ request, h, claimMessagesDocument })).takeover();
+  return h.view(supportTemplate, { claimMessagesDocument });
 };
 
 const searchAgreementLogsHandler = async (request, h) => {
   const { agreementLogReference } = request.payload;
   const rawDocument = await getAgreementLogsDocument(agreementLogReference);
   const agreementLogsDocument = JSON.stringify(rawDocument, null, 4);
-  return (await createView({ request, h, agreementLogsDocument })).takeover();
+  return h.view(supportTemplate, { agreementLogsDocument });
 };
 
 const getSupportRoute = {
@@ -234,7 +212,7 @@ const postSupportRoute = {
             href: formattedError.href,
           }));
 
-        return (await createView({ request, h, errors })).takeover();
+        return h.view(supportTemplate, { errors }).takeover();
       },
     },
     handler: async (request, h) => {
