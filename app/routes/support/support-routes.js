@@ -14,7 +14,7 @@ const { support } = permissions;
 
 const supportTemplate = "support";
 
-const getSupportHandler = (request, h) => {
+const getSupportHandler = (_request, h) => {
   return h.view(supportTemplate);
 };
 
