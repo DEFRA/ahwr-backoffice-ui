@@ -7,6 +7,7 @@ import { getCrumbs } from "../../../utils/get-crumbs.js";
 import {
   getApplicationDocument,
   getClaimDocument,
+  getHerdDocument,
 } from "../../../../app/routes/support/support-calls.js";
 
 const { administrator, user, processor, recommender, authoriser } = permissions;
@@ -215,6 +216,46 @@ describe("support-routes", () => {
         const $ = cheerio.load(response.payload);
         expect($("#claimDocument").length).toBe(1);
         expect($("#claimDocument").text()).toContain("entry");
+      });
+    });
+
+    describe("search herd", () => {
+      it("throws error if no herd reference passed", async () => {
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, action: "searchHerd" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#herd-id");
+        expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+          "Herd id missing.",
+        );
+        expect($("#herdDocument").length).toBe(0);
+      });
+
+      it("shows herd information when requested", async () => {
+        getHerdDocument.mockResolvedValue({ document: { some: "value", another: "entry" } });
+
+        const herdId = "someReference";
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, herdId, action: "searchHerd" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($("#herdDocument").length).toBe(1);
+        expect($("#herdDocument").text()).toContain("entry");
       });
     });
   });

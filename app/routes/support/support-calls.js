@@ -34,3 +34,18 @@ export const getClaimDocument = async (claimReference) => {
     throw error;
   }
 };
+
+export const getHerdDocument = async (herdId) => {
+  try {
+    const { payload } = await wreck.get(`${applicationApiUri}/support/herds/${herId}`, {
+      json: true,
+    });
+    return payload;
+  } catch (error) {
+    if (error.data.res.statusCode === 404) {
+      return "No herd found";
+    }
+
+    throw error;
+  }
+};

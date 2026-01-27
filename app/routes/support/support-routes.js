@@ -1,6 +1,6 @@
 import Joi from "joi";
 import { permissions } from "../../auth/permissions.js";
-import { getApplicationDocument, getClaimDocument } from "./support-calls.js";
+import { getApplicationDocument, getClaimDocument, getHerdDocument } from "./support-calls.js";
 
 const { administrator } = permissions;
 
@@ -10,8 +10,9 @@ const createView = async ({
   errors = undefined,
   applicationDocument = undefined,
   claimDocument = undefined,
+  herdDocument = undefined,
 }) => {
-  return h.view("support", { errors, applicationDocument, claimDocument });
+  return h.view("support", { errors, applicationDocument, claimDocument, herdDocument });
 };
 
 const getSupportHandler = (request, h) => {
@@ -30,6 +31,13 @@ const searchClaimHandler = async (request, h) => {
   const rawDocument = await getClaimDocument(claimReference);
   const claimDocument = JSON.stringify(rawDocument, null, 4);
   return (await createView({ request, h, claimDocument })).takeover();
+};
+
+const searchHerdHandler = async (request, h) => {
+  const { herdId } = request.payload;
+  const rawDocument = await getHerdDocument(herdId);
+  const herdDocument = JSON.stringify(rawDocument, null, 4);
+  return (await createView({ request, h, herdDocument })).takeover();
 };
 
 const getSupportRoute = {
@@ -67,6 +75,13 @@ const postSupportRoute = {
               action: Joi.string().required(),
             }),
           },
+          {
+            is: "searchHerd",
+            then: Joi.object({
+              herdId: Joi.string().required(),
+              action: Joi.string().required(),
+            }),
+          },
         ],
       }),
       failAction: async (request, h, error) => {
@@ -93,6 +108,14 @@ const postSupportRoute = {
               };
             }
 
+            if (receivedError.message.includes('"herdId"')) {
+              return {
+                ...receivedError,
+                message: "Herd id missing.",
+                href: "#herd-id",
+              };
+            }
+
             return null;
           })
           .filter((formattedError) => formattedError !== null)
@@ -112,6 +135,9 @@ const postSupportRoute = {
       }
       if (action === "searchClaim") {
         return searchClaimHandler(request, h);
+      }
+      if (action === "searchHerd") {
+        return searchHerdHandler(request, h);
       }
     },
   },

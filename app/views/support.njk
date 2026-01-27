@@ -81,4 +81,12 @@
   <input type="hidden" name="crumb" value="{{ crumb }}"/>
   <input type="hidden" name="action" value="searchHerd"/>
 </form>
+
+{% if herdDocument %}
+{{ govukInsetText({
+  text: herdDocument,
+  id: "herdDocument"
+}) }}
+{% endif %}
+
 {% endblock %}
