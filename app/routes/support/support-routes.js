@@ -1,6 +1,7 @@
 import Joi from "joi";
 import { permissions } from "../../auth/permissions.js";
 import {
+  getAgreementMessagesDocument,
   getApplicationDocument,
   getClaimDocument,
   getHerdDocument,
@@ -17,6 +18,7 @@ const createView = async ({
   claimDocument = undefined,
   herdDocument = undefined,
   paymentDocument = undefined,
+  agreementMessagesDocument = undefined,
 }) => {
   return h.view("support", {
     errors,
@@ -24,6 +26,7 @@ const createView = async ({
     claimDocument,
     herdDocument,
     paymentDocument,
+    agreementMessagesDocument,
   });
 };
 
@@ -57,6 +60,13 @@ const searchPaymentHandler = async (request, h) => {
   const rawDocument = await getPaymentDocument(paymentReference);
   const paymentDocument = JSON.stringify(rawDocument, null, 4);
   return (await createView({ request, h, paymentDocument })).takeover();
+};
+
+const searchAgreementMessagesHandler = async (request, h) => {
+  const { agreementMessagesReference } = request.payload;
+  const rawDocument = await getAgreementMessagesDocument(agreementMessagesReference);
+  const agreementMessagesDocument = JSON.stringify(rawDocument, null, 4);
+  return (await createView({ request, h, agreementMessagesDocument })).takeover();
 };
 
 const getSupportRoute = {
@@ -108,6 +118,13 @@ const postSupportRoute = {
               action: Joi.string().required(),
             }),
           },
+          {
+            is: "searchAgreementMessages",
+            then: Joi.object({
+              agreementMessageReference: Joi.string().required(),
+              action: Joi.string().required(),
+            }),
+          },
         ],
       }),
       failAction: async (request, h, error) => {
@@ -150,6 +167,14 @@ const postSupportRoute = {
               };
             }
 
+            if (receivedError.message.includes('"agreementMessageReference"')) {
+              return {
+                ...receivedError,
+                message: "Agreement reference missing.",
+                href: "#agreement-message-reference",
+              };
+            }
+
             return null;
           })
           .filter((formattedError) => formattedError !== null)
@@ -175,6 +200,9 @@ const postSupportRoute = {
       }
       if (action === "searchPayment") {
         return searchPaymentHandler(request, h);
+      }
+      if (action === "searchAgreementMessages") {
+        return searchAgreementMessagesHandler(request, h);
       }
     },
   },

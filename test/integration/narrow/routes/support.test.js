@@ -5,6 +5,7 @@ import { permissions } from "../../../../app/auth/permissions.js";
 import { createServer } from "../../../../app/server.js";
 import { getCrumbs } from "../../../utils/get-crumbs.js";
 import {
+  getAgreementMessagesDocument,
   getApplicationDocument,
   getClaimDocument,
   getHerdDocument,
@@ -299,6 +300,50 @@ describe("support-routes", () => {
         const $ = cheerio.load(response.payload);
         expect($("#paymentDocument").length).toBe(1);
         expect($("#paymentDocument").text()).toContain("entry");
+      });
+    });
+
+    describe("search agreement messages", () => {
+      it("throws error if no agreement reference passed", async () => {
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, action: "searchAgreementMessages" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+          "#agreement-message-reference",
+        );
+        expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+          "Agreement reference missing.",
+        );
+        expect($("#agreementMessagesDocument").length).toBe(0);
+      });
+
+      it("shows agreement information when requested", async () => {
+        getAgreementMessagesDocument.mockResolvedValue({
+          document: { some: "value", another: "entry" },
+        });
+
+        const agreementMessageReference = "someReference";
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, agreementMessageReference, action: "searchAgreementMessages" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($("#agreementMessagesDocument").length).toBe(1);
+        expect($("#agreementMessagesDocument").text()).toContain("entry");
       });
     });
   });
