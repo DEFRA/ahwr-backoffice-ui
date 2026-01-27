@@ -4,7 +4,10 @@ import { StatusCodes } from "http-status-codes";
 import { permissions } from "../../../../app/auth/permissions.js";
 import { createServer } from "../../../../app/server.js";
 import { getCrumbs } from "../../../utils/get-crumbs.js";
-import { getApplicationDocument } from "../../../../app/routes/support/support-calls.js";
+import {
+  getApplicationDocument,
+  getClaimDocument,
+} from "../../../../app/routes/support/support-calls.js";
 
 const { administrator, user, processor, recommender, authoriser } = permissions;
 
@@ -170,6 +173,48 @@ describe("support-routes", () => {
         const $ = cheerio.load(response.payload);
         expect($("#applicationDocument").length).toBe(1);
         expect($("#applicationDocument").text()).toContain("entry");
+      });
+    });
+
+    describe("search claim", () => {
+      it("throws error if no claim reference passed", async () => {
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, action: "searchClaim" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+          "#claim-reference",
+        );
+        expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+          "Claim reference missing.",
+        );
+        expect($("#claimDocument").length).toBe(0);
+      });
+
+      it("shows claim information when requested", async () => {
+        getClaimDocument.mockResolvedValue({ document: { some: "value", another: "entry" } });
+
+        const claimReference = "someReference";
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, claimReference, action: "searchClaim" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($("#claimDocument").length).toBe(1);
+        expect($("#claimDocument").text()).toContain("entry");
       });
     });
   });

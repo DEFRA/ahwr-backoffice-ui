@@ -19,3 +19,18 @@ export const getApplicationDocument = async (applicationReference) => {
     throw error;
   }
 };
+
+export const getClaimDocument = async (claimReference) => {
+  try {
+    const { payload } = await wreck.get(`${applicationApiUri}/support/claims/${claimReference}`, {
+      json: true,
+    });
+    return payload;
+  } catch (error) {
+    if (error.data.res.statusCode === 404) {
+      return "No claim found";
+    }
+
+    throw error;
+  }
+};

@@ -57,6 +57,13 @@
   <input type="hidden" name="action" value="searchClaim"/>
 </form>
 
+{% if claimDocument %}
+{{ govukInsetText({
+  text: claimDocument,
+  id: "claimDocument"
+}) }}
+{% endif %}
+
 <form method="POST" action="/support" class="ahwr-herd-search-form">
   {{ govukInput({
     label: {

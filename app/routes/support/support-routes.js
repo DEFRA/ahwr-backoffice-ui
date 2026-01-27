@@ -1,11 +1,17 @@
 import Joi from "joi";
 import { permissions } from "../../auth/permissions.js";
-import { getApplicationDocument } from "./support-calls.js";
+import { getApplicationDocument, getClaimDocument } from "./support-calls.js";
 
 const { administrator } = permissions;
 
-const createView = async ({ request, h, errors = undefined, applicationDocument = undefined }) => {
-  return h.view("support", { errors, applicationDocument });
+const createView = async ({
+  request,
+  h,
+  errors = undefined,
+  applicationDocument = undefined,
+  claimDocument = undefined,
+}) => {
+  return h.view("support", { errors, applicationDocument, claimDocument });
 };
 
 const getSupportHandler = (request, h) => {
@@ -17,6 +23,13 @@ const searchApplicationHandler = async (request, h) => {
   const rawDocument = await getApplicationDocument(applicationReference);
   const applicationDocument = JSON.stringify(rawDocument, null, 4);
   return (await createView({ request, h, applicationDocument })).takeover();
+};
+
+const searchClaimHandler = async (request, h) => {
+  const { claimReference } = request.payload;
+  const rawDocument = await getClaimDocument(claimReference);
+  const claimDocument = JSON.stringify(rawDocument, null, 4);
+  return (await createView({ request, h, claimDocument })).takeover();
 };
 
 const getSupportRoute = {
@@ -47,6 +60,13 @@ const postSupportRoute = {
               action: Joi.string().required(),
             }),
           },
+          {
+            is: "searchClaim",
+            then: Joi.object({
+              claimReference: Joi.string().required(),
+              action: Joi.string().required(),
+            }),
+          },
         ],
       }),
       failAction: async (request, h, error) => {
@@ -65,6 +85,14 @@ const postSupportRoute = {
               };
             }
 
+            if (receivedError.message.includes('"claimReference"')) {
+              return {
+                ...receivedError,
+                message: "Claim reference missing.",
+                href: "#claim-reference",
+              };
+            }
+
             return null;
           })
           .filter((formattedError) => formattedError !== null)
@@ -78,11 +106,13 @@ const postSupportRoute = {
       },
     },
     handler: async (request, h) => {
-      // const { action } = request.payload;
-      // if (action === "") {
-      return searchApplicationHandler(request, h);
-      // }
-      // return boom.notFound(`${action} is not supported`);
+      const { action } = request.payload;
+      if (action === "searchApplication") {
+        return searchApplicationHandler(request, h);
+      }
+      if (action === "searchClaim") {
+        return searchClaimHandler(request, h);
+      }
     },
   },
 };
