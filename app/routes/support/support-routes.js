@@ -1,6 +1,7 @@
 import Joi from "joi";
 import { permissions } from "../../auth/permissions.js";
 import {
+  getAgreementLogsDocument,
   getAgreementMessagesDocument,
   getApplicationDocument,
   getClaimDocument,
@@ -21,6 +22,7 @@ const createView = async ({
   paymentDocument = undefined,
   agreementMessagesDocument = undefined,
   claimMessagesDocument = undefined,
+  agreementLogsDocument = undefined,
 }) => {
   return h.view("support", {
     errors,
@@ -30,6 +32,7 @@ const createView = async ({
     paymentDocument,
     agreementMessagesDocument,
     claimMessagesDocument,
+    agreementLogsDocument,
   });
 };
 
@@ -77,6 +80,13 @@ const searchClaimMessagesHandler = async (request, h) => {
   const rawDocument = await getClaimMessagesDocument(claimMessagesReference);
   const claimMessagesDocument = JSON.stringify(rawDocument, null, 4);
   return (await createView({ request, h, claimMessagesDocument })).takeover();
+};
+
+const searchAgreementLogsHandler = async (request, h) => {
+  const { agreementLogReference } = request.payload;
+  const rawDocument = await getAgreementLogsDocument(agreementLogReference);
+  const agreementLogsDocument = JSON.stringify(rawDocument, null, 4);
+  return (await createView({ request, h, agreementLogsDocument })).takeover();
 };
 
 const getSupportRoute = {
@@ -142,6 +152,13 @@ const postSupportRoute = {
               action: Joi.string().required(),
             }),
           },
+          {
+            is: "searchAgreementLogs",
+            then: Joi.object({
+              agreementLogReference: Joi.string().required(),
+              action: Joi.string().required(),
+            }),
+          },
         ],
       }),
       failAction: async (request, h, error) => {
@@ -200,6 +217,14 @@ const postSupportRoute = {
               };
             }
 
+            if (receivedError.message.includes('"agreementLogReference"')) {
+              return {
+                ...receivedError,
+                message: "Agreement reference missing.",
+                href: "#agreement-log-reference",
+              };
+            }
+
             return null;
           })
           .filter((formattedError) => formattedError !== null)
@@ -231,6 +256,9 @@ const postSupportRoute = {
       }
       if (action === "searchClaimMessages") {
         return searchClaimMessagesHandler(request, h);
+      }
+      if (action === "searchAgreementLogs") {
+        return searchAgreementLogsHandler(request, h);
       }
     },
   },

@@ -9,6 +9,7 @@ import {
   getApplicationDocument,
   getClaimDocument,
   getClaimMessagesDocument,
+  getAgreementLogsDocument,
   getHerdDocument,
   getPaymentDocument,
 } from "../../../../app/routes/support/support-calls.js";
@@ -389,6 +390,50 @@ describe("support-routes", () => {
         const $ = cheerio.load(response.payload);
         expect($("#claimMessagesDocument").length).toBe(1);
         expect($("#claimMessagesDocument").text()).toContain("entry");
+      });
+    });
+
+    describe("search agreement document logs", () => {
+      it("throws error if no agreement reference passed", async () => {
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, action: "searchAgreementLogs" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+          "#agreement-log-reference",
+        );
+        expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+          "Agreement reference missing.",
+        );
+        expect($("#agreementLogsDocument").length).toBe(0);
+      });
+
+      it("shows document information when requested", async () => {
+        getAgreementLogsDocument.mockResolvedValue({
+          document: { some: "value", another: "entry" },
+        });
+
+        const agreementLogReference = "someReference";
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: adminAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, agreementLogReference, action: "searchAgreementLogs" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($("#agreementLogsDocument").length).toBe(1);
+        expect($("#agreementLogsDocument").text()).toContain("entry");
       });
     });
   });

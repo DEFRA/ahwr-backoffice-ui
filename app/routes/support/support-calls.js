@@ -1,7 +1,8 @@
 import wreck from "@hapi/wreck";
 import { config } from "../../config/index.js";
 
-const { applicationApiUri, paymentProxyApiUri, messageGeneratorApiUri } = config;
+const { applicationApiUri, paymentProxyApiUri, messageGeneratorApiUri, documentGeneratorApiUri } =
+  config;
 export const getApplicationDocument = async (applicationReference) => {
   try {
     const { payload } = await wreck.get(
@@ -98,6 +99,24 @@ export const getClaimMessagesDocument = async (claimReference) => {
   } catch (error) {
     if (error.data.res.statusCode === 404) {
       return "No claim message found";
+    }
+
+    throw error;
+  }
+};
+
+export const getAgreementLogsDocument = async (agreementReference) => {
+  try {
+    const { payload } = await wreck.get(
+      `${documentGeneratorApiUri}/support/document-logs?agreementReference=${agreementReference}`,
+      {
+        json: true,
+      },
+    );
+    return payload;
+  } catch (error) {
+    if (error.data.res.statusCode === 404) {
+      return "No Logs found";
     }
 
     throw error;

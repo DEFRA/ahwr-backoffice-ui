@@ -22,7 +22,7 @@
       isPageHeading: false
     },
     id: "application-reference",
-    name: "applicationReference",
+    name: "applicationReference"
   }) }}
 
   {{ govukButton({
@@ -126,7 +126,7 @@
   }) }}
 
   {{ govukButton({
-    text: "Search for Payment"
+    text: "Search for Agreement Messages"
   }) }}
   <input type="hidden" name="crumb" value="{{ crumb }}"/>
   <input type="hidden" name="action" value="searchAgreementMessages"/>
@@ -151,7 +151,7 @@
   }) }}
 
   {{ govukButton({
-    text: "Search for Payment"
+    text: "Search for Claim Messages"
   }) }}
   <input type="hidden" name="crumb" value="{{ crumb }}"/>
   <input type="hidden" name="action" value="searchClaimMessages"/>
@@ -161,6 +161,31 @@
 {{ govukInsetText({
   text: claimMessagesDocument,
   id: "claimMessagesDocument"
+}) }}
+{% endif %}
+
+<form method="POST" action="/support" class="ahwr-agreement-logs-search-form">
+  {{ govukInput({
+    label: {
+      text: "Agreement Document Logs",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "agreement-log-reference",
+    name: "agreementLogReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Document Logs"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchAgreementLogs"/>
+</form>
+
+{% if agreementLogsDocument %}
+{{ govukInsetText({
+  text: agreementLogsDocument,
+  id: "agreementLogsDocument"
 }) }}
 {% endif %}
 
