@@ -4,4 +4,5 @@ export const permissions = {
   user: "user",
   recommender: "recommender",
   authoriser: "authoriser",
+  support: "support",
 };

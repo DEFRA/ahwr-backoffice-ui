@@ -14,14 +14,14 @@ import {
   getPaymentDocument,
 } from "../../../../app/routes/support/support-calls.js";
 
-const { administrator, user, processor, recommender, authoriser } = permissions;
+const { administrator, user, processor, recommender, authoriser, support } = permissions;
 
 jest.mock("../../../../app/routes/support/support-calls.js");
 
 describe("support-routes", () => {
-  const adminAuth = {
+  const supportAuth = {
     strategy: "session-auth",
-    credentials: { scope: [administrator], account: { name: "test admin" } },
+    credentials: { scope: [support], account: { name: "test admin" } },
   };
 
   let crumb;
@@ -45,7 +45,7 @@ describe("support-routes", () => {
         const options = {
           method: "GET",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
         };
         response = await server.inject(options);
@@ -93,14 +93,14 @@ describe("support-routes", () => {
       expect(response.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
     });
 
-    it("returns 403 for user without admin permissions", async () => {
+    it("returns 403 for user without support permissions", async () => {
       const options = {
         method: "GET",
         url: "/support",
         auth: {
           strategy: "session-auth",
           credentials: {
-            scope: [user, processor, recommender, authoriser],
+            scope: [user, processor, recommender, authoriser, administrator],
             account: { name: "test user" },
           },
         },
@@ -123,7 +123,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, applicationReference, action: "delete" },
         };
@@ -144,7 +144,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, action: "searchApplication" },
         };
@@ -168,7 +168,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, applicationReference, action: "searchApplication" },
         };
@@ -186,7 +186,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, action: "searchClaim" },
         };
@@ -210,7 +210,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, claimReference, action: "searchClaim" },
         };
@@ -228,7 +228,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, action: "searchHerd" },
         };
@@ -250,7 +250,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, herdId, action: "searchHerd" },
         };
@@ -268,7 +268,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, action: "searchPayment" },
         };
@@ -292,7 +292,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, paymentReference, action: "searchPayment" },
         };
@@ -310,7 +310,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, action: "searchAgreementMessages" },
         };
@@ -336,7 +336,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, agreementMessageReference, action: "searchAgreementMessages" },
         };
@@ -354,7 +354,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, action: "searchClaimMessages" },
         };
@@ -380,7 +380,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, claimMessageReference, action: "searchClaimMessages" },
         };
@@ -398,7 +398,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, action: "searchAgreementLogs" },
         };
@@ -424,7 +424,7 @@ describe("support-routes", () => {
         const options = {
           method: "POST",
           url: "/support",
-          auth: adminAuth,
+          auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
           payload: { crumb, agreementLogReference, action: "searchAgreementLogs" },
         };

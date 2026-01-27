@@ -10,7 +10,7 @@ import {
   getPaymentDocument,
 } from "./support-calls.js";
 
-const { administrator } = permissions;
+const { support } = permissions;
 
 const createView = async ({
   request,
@@ -94,7 +94,7 @@ const getSupportRoute = {
   path: "/support",
   options: {
     auth: {
-      scope: [administrator],
+      scope: [support],
     },
     handler: getSupportHandler,
   },
@@ -105,7 +105,7 @@ const postSupportRoute = {
   path: "/support",
   options: {
     auth: {
-      scope: [administrator],
+      scope: [support],
     },
     validate: {
       payload: Joi.alternatives().conditional(".action", {

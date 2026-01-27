@@ -19,9 +19,11 @@ export const cookiePlugin = {
         if (request.response.source?.manager?._context) {
           if (request.auth?.credentials?.account) {
             request.response.source.manager._context.user = request.auth?.credentials?.account;
+            request.response.source.manager._context.scope = request.auth?.credentials.scope;
           } else {
             // This is so that we arent caching the previous context user
             request.response.source.manager._context.user = undefined;
+            request.response.source.manager._context.scope = undefined;
           }
         }
 
