@@ -1,14 +1,13 @@
 import Joi from "joi";
 import { permissions } from "../../auth/permissions.js";
-import {
-  getAgreementLogsDocument,
-  getAgreementMessagesDocument,
-  getApplicationDocument,
-  getClaimDocument,
-  getClaimMessagesDocument,
-  getHerdDocument,
-  getPaymentDocument,
-} from "./support-calls.js";
+
+import { searchApplication } from "./search-application-handler.js";
+import { searchClaim } from "./search-claim-handler.js";
+import { searchHerd } from "./search-herd-handler.js";
+import { searchPayment } from "./search-payment-handler.js";
+import { searchAgreementMessages } from "./search-agreement-messages-handler.js";
+import { searchClaimMessages } from "./search-claim-messages-handler.js";
+import { searchAgreementLogs } from "./search-agreement-logs-handler.js";
 
 const { support } = permissions;
 
@@ -16,55 +15,6 @@ const supportTemplate = "support";
 
 const getSupportHandler = (_request, h) => {
   return h.view(supportTemplate);
-};
-
-const searchApplicationHandler = async (request, h) => {
-  const { applicationReference } = request.payload;
-  const rawDocument = await getApplicationDocument(applicationReference);
-  const applicationDocument = JSON.stringify(rawDocument);
-  return h.view(supportTemplate, { applicationDocument });
-};
-
-const searchClaimHandler = async (request, h) => {
-  const { claimReference } = request.payload;
-  const rawDocument = await getClaimDocument(claimReference);
-  const claimDocument = JSON.stringify(rawDocument);
-  return h.view(supportTemplate, { claimDocument });
-};
-
-const searchHerdHandler = async (request, h) => {
-  const { herdId } = request.payload;
-  const rawDocument = await getHerdDocument(herdId);
-  const herdDocument = JSON.stringify(rawDocument);
-  return h.view(supportTemplate, { herdDocument });
-};
-
-const searchPaymentHandler = async (request, h) => {
-  const { paymentReference } = request.payload;
-  const rawDocument = await getPaymentDocument(paymentReference);
-  const paymentDocument = JSON.stringify(rawDocument);
-  return h.view(supportTemplate, { paymentDocument });
-};
-
-const searchAgreementMessagesHandler = async (request, h) => {
-  const { agreementMessagesReference } = request.payload;
-  const rawDocument = await getAgreementMessagesDocument(agreementMessagesReference);
-  const agreementMessagesDocument = JSON.stringify(rawDocument);
-  return h.view(supportTemplate, { agreementMessagesDocument });
-};
-
-const searchClaimMessagesHandler = async (request, h) => {
-  const { claimMessagesReference } = request.payload;
-  const rawDocument = await getClaimMessagesDocument(claimMessagesReference);
-  const claimMessagesDocument = JSON.stringify(rawDocument);
-  return h.view(supportTemplate, { claimMessagesDocument });
-};
-
-const searchAgreementLogsHandler = async (request, h) => {
-  const { agreementLogReference } = request.payload;
-  const rawDocument = await getAgreementLogsDocument(agreementLogReference);
-  const agreementLogsDocument = JSON.stringify(rawDocument);
-  return h.view(supportTemplate, { agreementLogsDocument });
 };
 
 const getSupportRoute = {
@@ -89,53 +39,32 @@ const postSupportRoute = {
       payload: Joi.alternatives().conditional(".action", {
         switch: [
           {
-            is: "searchApplication",
-            then: Joi.object({
-              applicationReference: Joi.string().required(),
-              action: Joi.string().required(),
-            }),
+            is: searchApplication.action,
+            then: searchApplication.validation,
           },
           {
-            is: "searchClaim",
-            then: Joi.object({
-              claimReference: Joi.string().required(),
-              action: Joi.string().required(),
-            }),
+            is: searchClaim.action,
+            then: searchClaim.validation,
           },
           {
-            is: "searchHerd",
-            then: Joi.object({
-              herdId: Joi.string().required(),
-              action: Joi.string().required(),
-            }),
+            is: searchHerd.action,
+            then: searchHerd.validation,
           },
           {
-            is: "searchPayment",
-            then: Joi.object({
-              paymentReference: Joi.string().required(),
-              action: Joi.string().required(),
-            }),
+            is: searchPayment.action,
+            then: searchPayment.validation,
           },
           {
-            is: "searchAgreementMessages",
-            then: Joi.object({
-              agreementMessageReference: Joi.string().required(),
-              action: Joi.string().required(),
-            }),
+            is: searchAgreementMessages.action,
+            then: searchAgreementMessages.validation,
           },
           {
-            is: "searchClaimMessages",
-            then: Joi.object({
-              claimMessageReference: Joi.string().required(),
-              action: Joi.string().required(),
-            }),
+            is: searchClaimMessages.action,
+            then: searchClaimMessages.validation,
           },
           {
-            is: "searchAgreementLogs",
-            then: Joi.object({
-              agreementLogReference: Joi.string().required(),
-              action: Joi.string().required(),
-            }),
+            is: searchAgreementLogs.action,
+            then: searchAgreementLogs.validation,
           },
         ],
       }),
@@ -147,60 +76,32 @@ const postSupportRoute = {
               return { ...receivedError, message: `Action ${action} is not supported.` };
             }
 
-            if (receivedError.message.includes('"applicationReference"')) {
-              return {
-                ...receivedError,
-                message: "Application reference missing.",
-                href: "#application-reference",
-              };
+            if (receivedError.message.includes(searchApplication.errorIdentifier)) {
+              return searchApplication.errorHandler(receivedError);
             }
 
-            if (receivedError.message.includes('"claimReference"')) {
-              return {
-                ...receivedError,
-                message: "Claim reference missing.",
-                href: "#claim-reference",
-              };
+            if (receivedError.message.includes(searchClaim.errorIdentifier)) {
+              return searchClaim.errorHandler(receivedError);
             }
 
-            if (receivedError.message.includes('"herdId"')) {
-              return {
-                ...receivedError,
-                message: "Herd id missing.",
-                href: "#herd-id",
-              };
+            if (receivedError.message.includes(searchHerd.errorIdentifier)) {
+              return searchHerd.errorHandler(receivedError);
             }
 
-            if (receivedError.message.includes('"paymentReference"')) {
-              return {
-                ...receivedError,
-                message: "Payment reference missing.",
-                href: "#payment-reference",
-              };
+            if (receivedError.message.includes(searchPayment.errorIdentifier)) {
+              return searchPayment.errorHandler(receivedError);
             }
 
-            if (receivedError.message.includes('"agreementMessageReference"')) {
-              return {
-                ...receivedError,
-                message: "Agreement reference missing.",
-                href: "#agreement-message-reference",
-              };
+            if (receivedError.message.includes(searchAgreementMessages.errorIdentifier)) {
+              return searchAgreementMessages.errorHandler(receivedError);
             }
 
-            if (receivedError.message.includes('"claimMessageReference"')) {
-              return {
-                ...receivedError,
-                message: "Claim reference missing.",
-                href: "#claim-message-reference",
-              };
+            if (receivedError.message.includes(searchClaimMessages.errorIdentifier)) {
+              return searchClaimMessages.errorHandler(receivedError);
             }
 
-            if (receivedError.message.includes('"agreementLogReference"')) {
-              return {
-                ...receivedError,
-                message: "Agreement reference missing.",
-                href: "#agreement-log-reference",
-              };
+            if (receivedError.message.includes(searchAgreementLogs.errorIdentifier)) {
+              return searchAgreementLogs.errorHandler(receivedError);
             }
 
             return null;
@@ -217,26 +118,26 @@ const postSupportRoute = {
     },
     handler: async (request, h) => {
       const { action } = request.payload;
-      if (action === "searchApplication") {
-        return searchApplicationHandler(request, h);
+      if (action === searchApplication.action) {
+        return searchApplication.handler(request, h);
       }
-      if (action === "searchClaim") {
-        return searchClaimHandler(request, h);
+      if (action === searchClaim.action) {
+        return searchClaim.handler(request, h);
       }
-      if (action === "searchHerd") {
-        return searchHerdHandler(request, h);
+      if (action === searchHerd.action) {
+        return searchHerd.handler(request, h);
       }
-      if (action === "searchPayment") {
-        return searchPaymentHandler(request, h);
+      if (action === searchPayment.action) {
+        return searchPayment.handler(request, h);
       }
-      if (action === "searchAgreementMessages") {
-        return searchAgreementMessagesHandler(request, h);
+      if (action === searchAgreementMessages.action) {
+        return searchAgreementMessages.handler(request, h);
       }
-      if (action === "searchClaimMessages") {
-        return searchClaimMessagesHandler(request, h);
+      if (action === searchClaimMessages.action) {
+        return searchClaimMessages.handler(request, h);
       }
-      if (action === "searchAgreementLogs") {
-        return searchAgreementLogsHandler(request, h);
+      if (action === searchAgreementLogs.action) {
+        return searchAgreementLogs.handler(request, h);
       }
     },
   },
