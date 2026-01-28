@@ -8,6 +8,7 @@ import {
   getClaimMessagesDocument,
   getHerdDocument,
   getPaymentDocument,
+  getPaymentStatus,
 } from "./support-calls";
 import { StatusCodes } from "http-status-codes";
 
@@ -171,7 +172,7 @@ describe("getHerdDocument", () => {
   });
 });
 
-describe("getPaymentDocument", () => {
+describe("getPaymentStatus", () => {
   it("calls with the expected parameters", async () => {
     const wreckResponse = {
       payload: {},
@@ -180,7 +181,7 @@ describe("getPaymentDocument", () => {
       },
     };
     wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
-    const result = await getPaymentDocument("123", mockLogger);
+    const result = await getPaymentStatus("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-payment-proxy:3001/api/support/payments/123/request-status",
       {
@@ -194,13 +195,58 @@ describe("getPaymentDocument", () => {
     wreck.get = jest.fn().mockImplementation(() => {
       throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
     });
-    const result = await getPaymentDocument("123", mockLogger);
+    const result = await getPaymentStatus("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-payment-proxy:3001/api/support/payments/123/request-status",
       {
         json: true,
       },
     );
+    expect(result).toStrictEqual("No payment status found");
+  });
+
+  it("logs error", async () => {
+    const mockError = new Error("Request failed");
+    wreck.get = jest.fn().mockRejectedValue(mockError);
+    try {
+      await getPaymentStatus("123", mockLogger);
+      // This is to fail if no exception thrown
+      throw new Error("Expected getPaymenStatus to throw");
+    } catch (error) {
+      expect(error).toBe(mockError);
+      expect(wreck.get).toHaveBeenCalledWith(
+        "http://ahwr-payment-proxy:3001/api/support/payments/123/request-status",
+        { json: true },
+      );
+      expect(mockLogger.error).toHaveBeenCalled();
+    }
+  });
+});
+
+describe("getPaymentDocument", () => {
+  it("calls with the expected parameters", async () => {
+    const wreckResponse = {
+      payload: {},
+      res: {
+        statusCode: 200,
+      },
+    };
+    wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
+    const result = await getPaymentDocument("123", mockLogger);
+    expect(wreck.get).toHaveBeenCalledWith("http://ahwr-payment-proxy:3001/api/payments/123", {
+      json: true,
+    });
+    expect(result).toStrictEqual({});
+  });
+
+  it("returns correct not found message", async () => {
+    wreck.get = jest.fn().mockImplementation(() => {
+      throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
+    });
+    const result = await getPaymentDocument("123", mockLogger);
+    expect(wreck.get).toHaveBeenCalledWith("http://ahwr-payment-proxy:3001/api/payments/123", {
+      json: true,
+    });
     expect(result).toStrictEqual("No payment found");
   });
 
@@ -213,10 +259,9 @@ describe("getPaymentDocument", () => {
       throw new Error("Expected getPaymenDocument to throw");
     } catch (error) {
       expect(error).toBe(mockError);
-      expect(wreck.get).toHaveBeenCalledWith(
-        "http://ahwr-payment-proxy:3001/api/support/payments/123/request-status",
-        { json: true },
-      );
+      expect(wreck.get).toHaveBeenCalledWith("http://ahwr-payment-proxy:3001/api/payments/123", {
+        json: true,
+      });
       expect(mockLogger.error).toHaveBeenCalled();
     }
   });

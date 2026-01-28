@@ -43,10 +43,14 @@ export const getHerdDocument = async (herdId, logger) => {
   return makeCall(`${applicationApiUri}/support/herds/${herdId}`, "No herd found", logger);
 };
 
-export const getPaymentDocument = async (paymentReference, logger) => {
+export const getPaymentDocument = async (claimReference, logger) => {
+  return makeCall(`${paymentProxyApiUri}/payments/${claimReference}`, "No payment found", logger);
+};
+
+export const getPaymentStatus = async (claimReference, logger) => {
   return makeCall(
-    `${paymentProxyApiUri}/support/payments/${paymentReference}/request-status`,
-    "No payment found",
+    `${paymentProxyApiUri}/support/payments/${claimReference}/request-status`,
+    "No payment status found",
     logger,
   );
 };

@@ -114,6 +114,40 @@
 
 {% endif %}
 
+<form method="POST" action="/support" class="ahwr-payment-status-search-form">
+  {{ govukInput({
+    label: {
+      text: "Payments Request Status",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "payment-status-reference",
+    name: "paymentStatusReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Payment Status"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchPaymentStatus"/>
+</form>
+
+{% if paymentStatus %}
+{{ govukInsetText({
+  text: paymentStatus,
+  id: "paymentStatus"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyPaymentStatus"
+  }
+}) }}
+
+{% endif %}
+
 <form method="POST" action="/support" class="ahwr-payment-search-form">
   {{ govukInput({
     label: {

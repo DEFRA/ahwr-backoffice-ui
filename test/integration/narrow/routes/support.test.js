@@ -12,6 +12,7 @@ import {
   getAgreementLogsDocument,
   getHerdDocument,
   getPaymentDocument,
+  getPaymentStatus,
 } from "../../../../app/routes/support/support-calls.js";
 
 const { administrator, user, processor, recommender, authoriser, support } = permissions;
@@ -263,7 +264,49 @@ describe("support-routes", () => {
       });
     });
 
-    describe("search payment", () => {
+    describe("search payment status", () => {
+      it("throws error if no payment reference passed", async () => {
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: supportAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, action: "searchPaymentStatus" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+          "#payment-status-reference",
+        );
+        expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+          "Payment status reference missing.",
+        );
+        expect($("#paymentStatus").length).toBe(0);
+      });
+
+      it("shows payment information when requested", async () => {
+        getPaymentStatus.mockResolvedValue({ document: { some: "value", another: "entry" } });
+
+        const paymentStatusReference = "someReference";
+        const options = {
+          method: "POST",
+          url: "/support",
+          auth: supportAuth,
+          headers: { cookie: `crumb=${crumb}` },
+          payload: { crumb, paymentStatusReference, action: "searchPaymentStatus" },
+        };
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($("#paymentStatus").length).toBe(1);
+        expect($("#paymentStatus").text()).toContain("entry");
+      });
+    });
+
+    describe("search payment document", () => {
       it("throws error if no payment reference passed", async () => {
         const options = {
           method: "POST",

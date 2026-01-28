@@ -5,6 +5,7 @@ import { searchApplication } from "./search-application-handler.js";
 import { searchClaim } from "./search-claim-handler.js";
 import { searchHerd } from "./search-herd-handler.js";
 import { searchPayment } from "./search-payment-handler.js";
+import { searchPaymentStatus } from "./search-payment-status-handler.js";
 import { searchAgreementMessages } from "./search-agreement-messages-handler.js";
 import { searchClaimMessages } from "./search-claim-messages-handler.js";
 import { searchAgreementLogs } from "./search-agreement-logs-handler.js";
@@ -33,6 +34,7 @@ const actions = [
   searchClaim,
   searchHerd,
   searchPayment,
+  searchPaymentStatus,
   searchAgreementMessages,
   searchClaimMessages,
   searchAgreementLogs,
