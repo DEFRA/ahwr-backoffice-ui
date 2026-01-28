@@ -23,6 +23,7 @@ jest.mock("../../../app/config", () => ({
 
 const mockLogger = {
   error: jest.fn(),
+  info: jest.fn(),
 };
 
 describe("getApplicationDocument", () => {
