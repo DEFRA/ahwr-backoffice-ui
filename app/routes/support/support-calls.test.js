@@ -22,7 +22,6 @@ jest.mock("../../../app/config", () => ({
 }));
 
 describe("getApplicationDocument", () => {
-  // NOSONAR
   it("calls with the expected parameters", async () => {
     const wreckResponse = {
       payload: {},
@@ -39,7 +38,6 @@ describe("getApplicationDocument", () => {
     expect(result).toStrictEqual({});
   });
 
-  // NOSONAR
   it("returns correct not found message", async () => {
     wreck.get = jest.fn().mockImplementation(() => {
       throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
@@ -54,7 +52,6 @@ describe("getApplicationDocument", () => {
 });
 
 describe("getClaimDocument", () => {
-  // NOSONAR
   it("calls with the expected parameters", async () => {
     const wreckResponse = {
       payload: {},
@@ -71,7 +68,6 @@ describe("getClaimDocument", () => {
     expect(result).toStrictEqual({});
   });
 
-  // NOSONAR
   it("returns correct not found message", async () => {
     wreck.get = jest.fn().mockImplementation(() => {
       throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
@@ -86,7 +82,6 @@ describe("getClaimDocument", () => {
 });
 
 describe("getHerdDocument", () => {
-  // NOSONAR
   it("calls with the expected parameters", async () => {
     const wreckResponse = {
       payload: {},
@@ -103,7 +98,6 @@ describe("getHerdDocument", () => {
     expect(result).toStrictEqual({});
   });
 
-  // NOSONAR
   it("returns correct not found message", async () => {
     wreck.get = jest.fn().mockImplementation(() => {
       throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
@@ -118,7 +112,6 @@ describe("getHerdDocument", () => {
 });
 
 describe("getPaymentDocument", () => {
-  // NOSONAR
   it("calls with the expected parameters", async () => {
     const wreckResponse = {
       payload: {},
@@ -137,7 +130,6 @@ describe("getPaymentDocument", () => {
     expect(result).toStrictEqual({});
   });
 
-  // NOSONAR
   it("returns correct not found message", async () => {
     wreck.get = jest.fn().mockImplementation(() => {
       throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
@@ -154,7 +146,6 @@ describe("getPaymentDocument", () => {
 });
 
 describe("getAgreementMessagesDocument", () => {
-  // NOSONAR
   it("calls with the expected parameters", async () => {
     const wreckResponse = {
       payload: {},
@@ -171,7 +162,6 @@ describe("getAgreementMessagesDocument", () => {
     expect(result).toStrictEqual({});
   });
 
-  // NOSONAR
   it("returns correct not found message", async () => {
     wreck.get = jest.fn().mockImplementation(() => {
       throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
@@ -186,7 +176,6 @@ describe("getAgreementMessagesDocument", () => {
 });
 
 describe("getClaimMessagesDocument", () => {
-  // NOSONAR
   it("calls with the expected parameters", async () => {
     const wreckResponse = {
       payload: {},
@@ -203,7 +192,6 @@ describe("getClaimMessagesDocument", () => {
     expect(result).toStrictEqual({});
   });
 
-  // NOSONAR
   it("returns correct not found message", async () => {
     wreck.get = jest.fn().mockImplementation(() => {
       throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
@@ -218,7 +206,6 @@ describe("getClaimMessagesDocument", () => {
 });
 
 describe("getAgreementLogsDocument", () => {
-  // NOSONAR
   it("calls with the expected parameters", async () => {
     const wreckResponse = {
       payload: {},
@@ -235,7 +222,6 @@ describe("getAgreementLogsDocument", () => {
     expect(result).toStrictEqual({});
   });
 
-  // NOSONAR
   it("returns correct not found message", async () => {
     wreck.get = jest.fn().mockImplementation(() => {
       throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
