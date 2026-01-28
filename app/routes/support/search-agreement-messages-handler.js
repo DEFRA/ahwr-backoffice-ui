@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { getAgreementMessagesDocument } from "./support-calls";
+import { getAgreementMessagesDocument } from "./support-calls.js";
 
 export const searchAgreementMessages = {
   action: "searchAgreementMessages",
