@@ -9,7 +9,7 @@ export const searchClaim = {
   }),
   handler: async (request, h) => {
     const { claimReference } = request.payload;
-    const rawDocument = await getClaimDocument(claimReference);
+    const rawDocument = await getClaimDocument(claimReference, request.logger);
     const claimDocument = JSON.stringify(rawDocument);
     return h.view("support", { claimDocument });
   },

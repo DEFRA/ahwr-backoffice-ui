@@ -9,7 +9,7 @@ export const searchAgreementLogs = {
   }),
   handler: async (request, h) => {
     const { agreementLogReference } = request.payload;
-    const rawDocument = await getAgreementLogsDocument(agreementLogReference);
+    const rawDocument = await getAgreementLogsDocument(agreementLogReference, request.logger);
     const agreementLogsDocument = JSON.stringify(rawDocument);
     return h.view("support", { agreementLogsDocument });
   },

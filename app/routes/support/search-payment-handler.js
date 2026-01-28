@@ -9,7 +9,7 @@ export const searchPayment = {
   }),
   handler: async (request, h) => {
     const { paymentReference } = request.payload;
-    const rawDocument = await getPaymentDocument(paymentReference);
+    const rawDocument = await getPaymentDocument(paymentReference, request.logger);
     const paymentDocument = JSON.stringify(rawDocument);
     return h.view("support", { paymentDocument });
   },

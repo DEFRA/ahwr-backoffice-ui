@@ -9,7 +9,7 @@ export const searchHerd = {
   }),
   handler: async (request, h) => {
     const { herdId } = request.payload;
-    const rawDocument = await getHerdDocument(herdId);
+    const rawDocument = await getHerdDocument(herdId, request.logger);
     const herdDocument = JSON.stringify(rawDocument);
     return h.view("support", { herdDocument });
   },

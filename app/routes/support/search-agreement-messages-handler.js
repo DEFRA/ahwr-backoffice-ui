@@ -9,7 +9,10 @@ export const searchAgreementMessages = {
   }),
   handler: async (request, h) => {
     const { agreementMessagesReference } = request.payload;
-    const rawDocument = await getAgreementMessagesDocument(agreementMessagesReference);
+    const rawDocument = await getAgreementMessagesDocument(
+      agreementMessagesReference,
+      request.logger,
+    );
     const agreementMessagesDocument = JSON.stringify(rawDocument);
     return h.view("support", { agreementMessagesDocument });
   },

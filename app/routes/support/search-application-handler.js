@@ -9,7 +9,7 @@ export const searchApplication = {
   }),
   handler: async (request, h) => {
     const { applicationReference } = request.payload;
-    const rawDocument = await getApplicationDocument(applicationReference);
+    const rawDocument = await getApplicationDocument(applicationReference, request.logger);
     const applicationDocument = JSON.stringify(rawDocument);
     return h.view("support", { applicationDocument });
   },
