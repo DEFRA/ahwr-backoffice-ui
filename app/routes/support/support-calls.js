@@ -5,7 +5,7 @@ import { StatusCodes } from "http-status-codes";
 const { applicationApiUri, paymentProxyApiUri, messageGeneratorApiUri, documentGeneratorApiUri } =
   config;
 
-const makeCall = async (url, parameter, notFoundMessage) => {
+const makeCall = async (url, notFoundMessage) => {
   try {
     const { payload } = await wreck.get(`${url}`, {
       json: true,
@@ -13,7 +13,7 @@ const makeCall = async (url, parameter, notFoundMessage) => {
     return payload;
   } catch (error) {
     if (error.data.res.statusCode === StatusCodes.NOT_FOUND) {
-      return "No application found";
+      return notFoundMessage;
     }
 
     throw error;
@@ -32,7 +32,7 @@ export const getClaimDocument = async (claimReference) => {
 };
 
 export const getHerdDocument = async (herdId) => {
-  return makeCall(`${applicationApiUri}/support/herds/${herdId}`, "No claim found");
+  return makeCall(`${applicationApiUri}/support/herds/${herdId}`, "No herd found");
 };
 
 export const getPaymentDocument = async (paymentReference) => {
@@ -52,13 +52,13 @@ export const getAgreementMessagesDocument = async (agreementReference) => {
 export const getClaimMessagesDocument = async (claimReference) => {
   return makeCall(
     `${messageGeneratorApiUri}/support/message-generation?claimReference=${claimReference}`,
-    "No claim message found",
+    "No claim messages found",
   );
 };
 
 export const getAgreementLogsDocument = async (agreementReference) => {
   return makeCall(
     `${documentGeneratorApiUri}/support/document-logs?agreementReference=${agreementReference}`,
-    "No Logs found",
+    "No agreement logs found",
   );
 };
