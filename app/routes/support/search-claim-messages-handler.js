@@ -4,7 +4,7 @@ import { getClaimMessagesDocument } from "./support-calls.js";
 export const searchClaimMessages = {
   action: "searchClaimMessages",
   validation: Joi.object({
-    claimMessageReference: Joi.string().required(),
+    claimMessagesReference: Joi.string().required(),
     action: Joi.string().required(),
   }),
   handler: async (request, h) => {
@@ -13,10 +13,10 @@ export const searchClaimMessages = {
     const claimMessagesDocument = JSON.stringify(rawDocument);
     return h.view("support", { claimMessagesDocument });
   },
-  errorIdentifier: '"claimMessageReference"',
+  errorIdentifier: '"claimMessagesReference"',
   errorHandler: (receivedError) => ({
     ...receivedError,
     message: "Claim reference missing.",
-    href: "#claim-message-reference",
+    href: "#claim-messages-reference",
   }),
 };

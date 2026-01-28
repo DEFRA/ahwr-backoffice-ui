@@ -7,6 +7,7 @@ const { applicationApiUri, paymentProxyApiUri, messageGeneratorApiUri, documentG
 
 const makeCall = async (url, notFoundMessage, logger) => {
   try {
+    logger.info(`Call to ${url}`);
     const { payload } = await wreck.get(`${url}`, {
       json: true,
     });

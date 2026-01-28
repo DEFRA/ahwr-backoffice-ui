@@ -319,7 +319,7 @@ describe("support-routes", () => {
 
         const $ = cheerio.load(response.payload);
         expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
-          "#agreement-message-reference",
+          "#agreement-messages-reference",
         );
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Agreement reference missing.",
@@ -332,13 +332,13 @@ describe("support-routes", () => {
           document: { some: "value", another: "entry" },
         });
 
-        const agreementMessageReference = "someReference";
+        const agreementMessagesReference = "someReference";
         const options = {
           method: "POST",
           url: "/support",
           auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, agreementMessageReference, action: "searchAgreementMessages" },
+          payload: { crumb, agreementMessagesReference, action: "searchAgreementMessages" },
         };
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
@@ -363,7 +363,7 @@ describe("support-routes", () => {
 
         const $ = cheerio.load(response.payload);
         expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
-          "#claim-message-reference",
+          "#claim-messages-reference",
         );
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Claim reference missing.",
@@ -376,13 +376,13 @@ describe("support-routes", () => {
           document: { some: "value", another: "entry" },
         });
 
-        const claimMessageReference = "someReference";
+        const claimMessagesReference = "someReference";
         const options = {
           method: "POST",
           url: "/support",
           auth: supportAuth,
           headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, claimMessageReference, action: "searchClaimMessages" },
+          payload: { crumb, claimMessagesReference, action: "searchClaimMessages" },
         };
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);

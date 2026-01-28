@@ -4,7 +4,7 @@ import { getAgreementMessagesDocument } from "./support-calls.js";
 export const searchAgreementMessages = {
   action: "searchAgreementMessages",
   validation: Joi.object({
-    agreementMessageReference: Joi.string().required(),
+    agreementMessagesReference: Joi.string().required(),
     action: Joi.string().required(),
   }),
   handler: async (request, h) => {
@@ -16,10 +16,10 @@ export const searchAgreementMessages = {
     const agreementMessagesDocument = JSON.stringify(rawDocument);
     return h.view("support", { agreementMessagesDocument });
   },
-  errorIdentifier: '"agreementMessageReference"',
+  errorIdentifier: '"agreementMessagesReference"',
   errorHandler: (receivedError) => ({
     ...receivedError,
     message: "Agreement reference missing.",
-    href: "#agreement-message-reference",
+    href: "#agreement-messages-reference",
   }),
 };
