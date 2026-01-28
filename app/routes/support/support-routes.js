@@ -21,49 +21,49 @@ const getSupportHandler = (_request, h) => {
 const searchApplicationHandler = async (request, h) => {
   const { applicationReference } = request.payload;
   const rawDocument = await getApplicationDocument(applicationReference);
-  const applicationDocument = JSON.stringify(rawDocument, null, 4);
+  const applicationDocument = JSON.stringify(rawDocument);
   return h.view(supportTemplate, { applicationDocument });
 };
 
 const searchClaimHandler = async (request, h) => {
   const { claimReference } = request.payload;
   const rawDocument = await getClaimDocument(claimReference);
-  const claimDocument = JSON.stringify(rawDocument, null, 4);
+  const claimDocument = JSON.stringify(rawDocument);
   return h.view(supportTemplate, { claimDocument });
 };
 
 const searchHerdHandler = async (request, h) => {
   const { herdId } = request.payload;
   const rawDocument = await getHerdDocument(herdId);
-  const herdDocument = JSON.stringify(rawDocument, null, 4);
+  const herdDocument = JSON.stringify(rawDocument);
   return h.view(supportTemplate, { herdDocument });
 };
 
 const searchPaymentHandler = async (request, h) => {
   const { paymentReference } = request.payload;
   const rawDocument = await getPaymentDocument(paymentReference);
-  const paymentDocument = JSON.stringify(rawDocument, null, 4);
+  const paymentDocument = JSON.stringify(rawDocument);
   return h.view(supportTemplate, { paymentDocument });
 };
 
 const searchAgreementMessagesHandler = async (request, h) => {
   const { agreementMessagesReference } = request.payload;
   const rawDocument = await getAgreementMessagesDocument(agreementMessagesReference);
-  const agreementMessagesDocument = JSON.stringify(rawDocument, null, 4);
+  const agreementMessagesDocument = JSON.stringify(rawDocument);
   return h.view(supportTemplate, { agreementMessagesDocument });
 };
 
 const searchClaimMessagesHandler = async (request, h) => {
   const { claimMessagesReference } = request.payload;
   const rawDocument = await getClaimMessagesDocument(claimMessagesReference);
-  const claimMessagesDocument = JSON.stringify(rawDocument, null, 4);
+  const claimMessagesDocument = JSON.stringify(rawDocument);
   return h.view(supportTemplate, { claimMessagesDocument });
 };
 
 const searchAgreementLogsHandler = async (request, h) => {
   const { agreementLogReference } = request.payload;
   const rawDocument = await getAgreementLogsDocument(agreementLogReference);
-  const agreementLogsDocument = JSON.stringify(rawDocument, null, 4);
+  const agreementLogsDocument = JSON.stringify(rawDocument);
   return h.view(supportTemplate, { agreementLogsDocument });
 };
 
