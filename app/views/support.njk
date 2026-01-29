@@ -117,7 +117,7 @@
 <form method="POST" action="/support" class="ahwr-payment-status-search-form">
   {{ govukInput({
     label: {
-      text: "Payments Request Status",
+      text: "Request Payment Status",
       classes: "govuk-label--m",
       isPageHeading: false
     },
@@ -126,7 +126,7 @@
   }) }}
 
   {{ govukButton({
-    text: "Search for Payment Status"
+    text: "REQUEST Payment Status"
   }) }}
   <input type="hidden" name="crumb" value="{{ crumb }}"/>
   <input type="hidden" name="action" value="searchPaymentStatus"/>
