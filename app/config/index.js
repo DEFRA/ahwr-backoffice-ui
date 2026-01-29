@@ -39,6 +39,7 @@ const getConfigSchema = () =>
     paymentProxyApiUri: joi.string().uri().required(),
     messageGeneratorApiUri: joi.string().uri().required(),
     documentGeneratorApiUri: joi.string().uri().required(),
+    commsProxyApiUri: joi.string().uri().required(),
     displayPageSize: joi.number().required(),
     superAdmins: joi.array().items(joi.string()).required(),
     proxy: joi.string().optional(),
@@ -86,6 +87,7 @@ const buildConfig = () => {
     paymentProxyApiUri: process.env.AHWR_PAYMENT_PROXY_URL,
     messageGeneratorApiUri: process.env.AHWR_MESSAGE_GENERATOR_URL,
     documentGeneratorApiUri: process.env.AHWR_DOCUMENT_GENERATOR_URL,
+    commsProxyApiUri: process.env.AHWR_COMMS_PROXY_URL,
     displayPageSize: Number(process.env.DISPLAY_PAGE_SIZE ?? "20"),
     superAdmins: process.env.SUPER_ADMINS
       ? process.env.SUPER_ADMINS.split(",").map((user) => user.trim().toLowerCase())

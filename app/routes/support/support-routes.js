@@ -9,6 +9,8 @@ import { searchPaymentStatus } from "./search-payment-status-handler.js";
 import { searchAgreementMessages } from "./search-agreement-messages-handler.js";
 import { searchClaimMessages } from "./search-claim-messages-handler.js";
 import { searchAgreementLogs } from "./search-agreement-logs-handler.js";
+import { searchAgreementComms } from "./search-agreement-comms-handler.js";
+import { searchClaimComms } from "./search-claim-comms-handler.js";
 
 const { support } = permissions;
 
@@ -38,6 +40,8 @@ const actions = [
   searchAgreementMessages,
   searchClaimMessages,
   searchAgreementLogs,
+  searchAgreementComms,
+  searchClaimComms,
 ];
 
 const actionHandlers = actions.reduce((acc, { action, handler }) => {

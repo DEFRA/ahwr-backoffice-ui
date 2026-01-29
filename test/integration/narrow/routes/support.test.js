@@ -13,6 +13,8 @@ import {
   getHerdDocument,
   getPaymentDocument,
   getPaymentStatus,
+  getClaimCommsDocument,
+  getAgreementCommsDocument,
 } from "../../../../app/routes/support/support-calls.js";
 
 const { administrator, user, processor, recommender, authoriser, support } = permissions;
@@ -478,6 +480,94 @@ describe("support-routes", () => {
         expect($("#agreementLogsDocument").length).toBe(1);
         expect($("#agreementLogsDocument").text()).toContain("entry");
       });
+    });
+  });
+
+  describe("search agreement comms", () => {
+    it("throws error if no agreement reference passed", async () => {
+      const options = {
+        method: "POST",
+        url: "/support",
+        auth: supportAuth,
+        headers: { cookie: `crumb=${crumb}` },
+        payload: { crumb, action: "searchAgreementComms" },
+      };
+      const response = await server.inject(options);
+      expect(response.statusCode).toBe(StatusCodes.OK);
+
+      const $ = cheerio.load(response.payload);
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+        "#agreement-comms-reference",
+      );
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Agreement reference missing.",
+      );
+      expect($("#agreementCommsDocument").length).toBe(0);
+    });
+
+    it("shows agreement information when requested", async () => {
+      getAgreementCommsDocument.mockResolvedValue({
+        document: { some: "value", another: "entry" },
+      });
+
+      const agreementCommsReference = "someReference";
+      const options = {
+        method: "POST",
+        url: "/support",
+        auth: supportAuth,
+        headers: { cookie: `crumb=${crumb}` },
+        payload: { crumb, agreementCommsReference, action: "searchAgreementComms" },
+      };
+      const response = await server.inject(options);
+      expect(response.statusCode).toBe(StatusCodes.OK);
+
+      const $ = cheerio.load(response.payload);
+      expect($("#agreementCommsDocument").length).toBe(1);
+      expect($("#agreementCommsDocument").text()).toContain("entry");
+    });
+  });
+
+  describe("search claim comms", () => {
+    it("throws error if no claim reference passed", async () => {
+      const options = {
+        method: "POST",
+        url: "/support",
+        auth: supportAuth,
+        headers: { cookie: `crumb=${crumb}` },
+        payload: { crumb, action: "searchClaimComms" },
+      };
+      const response = await server.inject(options);
+      expect(response.statusCode).toBe(StatusCodes.OK);
+
+      const $ = cheerio.load(response.payload);
+      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe(
+        "#claim-comms-reference",
+      );
+      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
+        "Claim reference missing.",
+      );
+      expect($("#claimCommsDocument").length).toBe(0);
+    });
+
+    it("shows claim information when requested", async () => {
+      getClaimCommsDocument.mockResolvedValue({
+        document: { some: "value", another: "entry" },
+      });
+
+      const claimCommsReference = "someReference";
+      const options = {
+        method: "POST",
+        url: "/support",
+        auth: supportAuth,
+        headers: { cookie: `crumb=${crumb}` },
+        payload: { crumb, claimCommsReference, action: "searchClaimComms" },
+      };
+      const response = await server.inject(options);
+      expect(response.statusCode).toBe(StatusCodes.OK);
+
+      const $ = cheerio.load(response.payload);
+      expect($("#claimCommsDocument").length).toBe(1);
+      expect($("#claimCommsDocument").text()).toContain("entry");
     });
   });
 });

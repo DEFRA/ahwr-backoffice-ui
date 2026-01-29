@@ -1,9 +1,11 @@
 import wreck from "@hapi/wreck";
 import Boom from "@hapi/boom";
 import {
+  getAgreementCommsDocument,
   getAgreementLogsDocument,
   getAgreementMessagesDocument,
   getApplicationDocument,
+  getClaimCommsDocument,
   getClaimDocument,
   getClaimMessagesDocument,
   getHerdDocument,
@@ -19,6 +21,7 @@ jest.mock("../../../app/config", () => ({
     paymentProxyApiUri: "http://ahwr-payment-proxy:3001/api",
     messageGeneratorApiUri: "http://ahwr-message-generator:3001/api",
     documentGeneratorApiUri: "http://ahwr-document-generator:3001/api",
+    commsProxyApiUri: "http://ahwr-sfd-comms-proxy:3001/api",
   },
 }));
 
@@ -401,6 +404,100 @@ describe("getAgreementLogsDocument", () => {
       expect(error).toBe(mockError);
       expect(wreck.get).toHaveBeenCalledWith(
         "http://ahwr-document-generator:3001/api/support/document-logs?agreementReference=123",
+        { json: true },
+      );
+      expect(mockLogger.error).toHaveBeenCalled();
+    }
+  });
+});
+
+describe("getAgreementCommsDocument", () => {
+  it("calls with the expected parameters", async () => {
+    const wreckResponse = {
+      payload: {},
+      res: {
+        statusCode: 200,
+      },
+    };
+    wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
+    const result = await getAgreementCommsDocument("123", mockLogger);
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-sfd-comms-proxy:3001/api/support/comms-requests?agreementReference=123",
+      { json: true },
+    );
+    expect(result).toStrictEqual({});
+  });
+
+  it("returns correct not found message", async () => {
+    wreck.get = jest.fn().mockImplementation(() => {
+      throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
+    });
+    const result = await getAgreementCommsDocument("123", mockLogger);
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-sfd-comms-proxy:3001/api/support/comms-requests?agreementReference=123",
+      { json: true },
+    );
+    expect(result).toStrictEqual("No agreement comms found");
+  });
+
+  it("logs error", async () => {
+    const mockError = new Error("Request failed");
+    wreck.get = jest.fn().mockRejectedValue(mockError);
+    try {
+      await getAgreementCommsDocument("123", mockLogger);
+      // This is to fail if no exception thrown
+      throw new Error("Expected getAgreementCommsDocument to throw");
+    } catch (error) {
+      expect(error).toBe(mockError);
+      expect(wreck.get).toHaveBeenCalledWith(
+        "http://ahwr-sfd-comms-proxy:3001/api/support/comms-requests?agreementReference=123",
+        { json: true },
+      );
+      expect(mockLogger.error).toHaveBeenCalled();
+    }
+  });
+});
+
+describe("getClaimCommsDocument", () => {
+  it("calls with the expected parameters", async () => {
+    const wreckResponse = {
+      payload: {},
+      res: {
+        statusCode: 200,
+      },
+    };
+    wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
+    const result = await getClaimCommsDocument("123", mockLogger);
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-sfd-comms-proxy:3001/api/support/comms-requests?claimReference=123",
+      { json: true },
+    );
+    expect(result).toStrictEqual({});
+  });
+
+  it("returns correct not found message", async () => {
+    wreck.get = jest.fn().mockImplementation(() => {
+      throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
+    });
+    const result = await getClaimCommsDocument("123", mockLogger);
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-sfd-comms-proxy:3001/api/support/comms-requests?claimReference=123",
+      { json: true },
+    );
+    expect(result).toStrictEqual("No claim comms found");
+  });
+
+  it("logs error", async () => {
+    const mockError = new Error("Request failed");
+    wreck.get = jest.fn().mockRejectedValue(mockError);
+    try {
+      await getClaimCommsDocument("123", mockLogger);
+      // This is to fail if no exception thrown
+      throw new Error("Expected getClaimCommsDocument to throw");
+    } catch (error) {
+      expect(error).toBe(mockError);
+      expect(wreck.get).toHaveBeenCalledWith(
+        "http://ahwr-sfd-comms-proxy:3001/api/support/comms-requests?claimReference=123",
         { json: true },
       );
       expect(mockLogger.error).toHaveBeenCalled();

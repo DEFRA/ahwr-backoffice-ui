@@ -284,4 +284,72 @@
 
 {% endif %}
 
+<form method="POST" action="/support" class="ahwr-agreement-comms-search-form">
+  {{ govukInput({
+    label: {
+      text: "Agreement Comms",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "agreement-comms-reference",
+    name: "agreementCommsReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Agreement Comms"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchAgreementComms"/>
+</form>
+
+{% if agreementCommsDocument %}
+{{ govukInsetText({
+  text: agreementCommsDocument,
+  id: "agreementCommsDocument"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyAgreementCommsDocument"
+  }
+}) }}
+
+{% endif %}
+
+<form method="POST" action="/support" class="ahwr-claim-comms-search-form">
+  {{ govukInput({
+    label: {
+      text: "Claim Comms",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "claim-comms-reference",
+    name: "claimCommsReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Claim Comms"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchClaimComms"/>
+</form>
+
+{% if claimCommsDocument %}
+{{ govukInsetText({
+  text: claimCommsDocument,
+  id: "claimCommsDocument"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyClaimCommsDocument"
+  }
+}) }}
+
+{% endif %}
+
 {% endblock %}

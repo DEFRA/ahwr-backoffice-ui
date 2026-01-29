@@ -2,8 +2,13 @@ import wreck from "@hapi/wreck";
 import { config } from "../../config/index.js";
 import { StatusCodes } from "http-status-codes";
 
-const { applicationApiUri, paymentProxyApiUri, messageGeneratorApiUri, documentGeneratorApiUri } =
-  config;
+const {
+  applicationApiUri,
+  paymentProxyApiUri,
+  messageGeneratorApiUri,
+  documentGeneratorApiUri,
+  commsProxyApiUri,
+} = config;
 
 const makeCall = async (url, notFoundMessage, logger) => {
   try {
@@ -75,6 +80,22 @@ export const getAgreementLogsDocument = async (agreementReference, logger) => {
   return makeCall(
     `${documentGeneratorApiUri}/support/document-logs?agreementReference=${agreementReference}`,
     "No agreement logs found",
+    logger,
+  );
+};
+
+export const getAgreementCommsDocument = async (agreementReference, logger) => {
+  return makeCall(
+    `${commsProxyApiUri}/support/comms-requests?agreementReference=${agreementReference}`,
+    "No agreement comms found",
+    logger,
+  );
+};
+
+export const getClaimCommsDocument = async (claimReference, logger) => {
+  return makeCall(
+    `${commsProxyApiUri}/support/comms-requests?claimReference=${claimReference}`,
+    "No claim comms found",
     logger,
   );
 };

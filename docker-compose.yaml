@@ -21,5 +21,6 @@ services:
       AHWR_PAYMENT_PROXY_URL: http://ahwr-payment-proxy:3001/api
       AHWR_MESSAGE_GENERATOR_URL: http://ahwr-message-generator-backend:3001/api
       AHWR_DOCUMENT_GENERATOR_URL: http://ahwr-document-generator-backend:3001/api
+      AHWR_COMMS_PROXY_URL: http://ahwr-sfd-comms-proxy:3001/api
       DISPLAY_PAGE_SIZE: 20
       SUPER_ADMINS: ${SUPER_ADMINS}
