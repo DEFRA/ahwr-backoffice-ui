@@ -183,9 +183,9 @@ describe("getPaymentStatus", () => {
         statusCode: 200,
       },
     };
-    wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
+    wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
     const result = await getPaymentStatus("123", mockLogger);
-    expect(wreck.get).toHaveBeenCalledWith(
+    expect(wreck.post).toHaveBeenCalledWith(
       "http://ahwr-payment-proxy:3001/api/support/payments/123/request-status",
       {
         json: true,
@@ -195,11 +195,11 @@ describe("getPaymentStatus", () => {
   });
 
   it("returns correct not found message", async () => {
-    wreck.get = jest.fn().mockImplementation(() => {
+    wreck.post = jest.fn().mockImplementation(() => {
       throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
     });
     const result = await getPaymentStatus("123", mockLogger);
-    expect(wreck.get).toHaveBeenCalledWith(
+    expect(wreck.post).toHaveBeenCalledWith(
       "http://ahwr-payment-proxy:3001/api/support/payments/123/request-status",
       {
         json: true,
@@ -210,14 +210,14 @@ describe("getPaymentStatus", () => {
 
   it("logs error", async () => {
     const mockError = new Error("Request failed");
-    wreck.get = jest.fn().mockRejectedValue(mockError);
+    wreck.post = jest.fn().mockRejectedValue(mockError);
     try {
       await getPaymentStatus("123", mockLogger);
       // This is to fail if no exception thrown
       throw new Error("Expected getPaymenStatus to throw");
     } catch (error) {
       expect(error).toBe(mockError);
-      expect(wreck.get).toHaveBeenCalledWith(
+      expect(wreck.post).toHaveBeenCalledWith(
         "http://ahwr-payment-proxy:3001/api/support/payments/123/request-status",
         { json: true },
       );
