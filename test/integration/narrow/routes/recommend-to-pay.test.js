@@ -53,7 +53,6 @@ describe("Recommended To Pay test", () => {
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           reference,
-          claimOrAgreement: "claim",
           page: 1,
           returnPage: "claims",
           confirm: "checkedAgainstChecklist",
@@ -84,7 +83,6 @@ describe("Recommended To Pay test", () => {
           headers: { cookie: `crumb=${crumb}` },
           payload: {
             reference,
-            claimOrAgreement: "claim",
             page: 1,
             returnPage: "claims",
             confirm: ["checkedAgainstChecklist", "sentChecklist"],
@@ -113,7 +111,6 @@ describe("Recommended To Pay test", () => {
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           reference,
-          claimOrAgreement: "claim",
           page: 1,
           confirm: ["checkedAgainstChecklist", "sentChecklist"],
           crumb,
@@ -140,7 +137,6 @@ describe("Recommended To Pay test", () => {
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           reference,
-          claimOrAgreement: "claim",
           page: 1,
           confirm: ["sentChecklist"],
           crumb,
@@ -171,7 +167,6 @@ describe("Recommended To Pay test", () => {
         payload: {
           page: 1,
           reference: 123,
-          claimOrAgreement: "claim",
           confirm: ["recommendToPay", "sentChecklist"],
           crumb,
         },

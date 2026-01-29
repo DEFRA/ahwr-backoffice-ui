@@ -2,7 +2,6 @@ import joi from "joi";
 import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { preSubmissionHandler } from "./utils/pre-submission-handler.js";
 import { encodeErrorsForUI } from "./utils/encode-errors-for-ui.js";
-import { updateApplicationStatus } from "../api/applications.js";
 import { updateClaimStatus } from "../api/claims.js";
 import { STATUS } from "ffc-ahwr-common-library";
 import { permissions } from "../auth/permissions.js";
@@ -17,7 +16,6 @@ export const recommendToPayRoute = {
     pre: [{ method: preSubmissionHandler }],
     validate: {
       payload: joi.object({
-        claimOrAgreement: joi.string().valid("claim", "agreement").required(),
         confirm: joi
           .array()
           .items(
@@ -34,7 +32,7 @@ export const recommendToPayRoute = {
         returnPage: joi.string().optional().allow("").valid("agreement", "claims"),
       }),
       failAction: async (request, h, error) => {
-        const { claimOrAgreement, page, reference, returnPage } = request.payload;
+        const { page, reference, returnPage } = request.payload;
         request.logger.error({ error, reference });
 
         const errors = encodeErrorsForUI(error.details, "#recommend-to-pay");
@@ -44,15 +42,13 @@ export const recommendToPayRoute = {
           errors,
         });
 
-        if (claimOrAgreement === "claim") {
-          query.append("returnPage", returnPage);
-        }
+        query.append("returnPage", returnPage);
 
-        return h.redirect(`/view-${claimOrAgreement}/${reference}?${query.toString()}`).takeover();
+        return h.redirect(`/view-claim/${reference}?${query.toString()}`).takeover();
       },
     },
     handler: async (request, h) => {
-      const { claimOrAgreement, page, reference, returnPage } = request.payload;
+      const { page, reference, returnPage } = request.payload;
       const { name } = request.auth.credentials.account;
 
       // TODO - look at removing setBindings here
@@ -61,14 +57,10 @@ export const recommendToPayRoute = {
       await generateNewCrumb(request, h);
       const query = new URLSearchParams({ page });
 
-      if (claimOrAgreement === "claim") {
-        query.append("returnPage", returnPage);
-        await updateClaimStatus(reference, name, STATUS.RECOMMENDED_TO_PAY, request.logger);
-      } else {
-        await updateApplicationStatus(reference, name, STATUS.RECOMMENDED_TO_PAY, request.logger);
-      }
+      query.append("returnPage", returnPage);
+      await updateClaimStatus(reference, name, STATUS.RECOMMENDED_TO_PAY, request.logger);
 
-      return h.redirect(`/view-${claimOrAgreement}/${reference}?${query.toString()}`);
+      return h.redirect(`/view-claim/${reference}?${query.toString()}`);
     },
   },
 };

@@ -46,15 +46,6 @@
           </div>
         {% endfor %}
       </dl>
-      {% if withdrawForm %}
-        {% include "./includes/withdraw-form.njk" %}
-      {% endif %}
-      {% if moveToInCheckForm %}
-        {%  include "./includes/move-to-in-check-form.njk" %}
-      {% endif %}
-      {% if updateStatusForm %}
-        {% include "./includes/update-status-form.njk" %}
-      {% endif %}
       {% if updateVetsNameForm %}
         {% include "./includes/update-vets-name-form.njk" %}
       {% endif %}
@@ -69,13 +60,6 @@
       {% endif %}
 
       {% include "./includes/application-tabs.njk" %}
-
-      {% if withdrawAction %}
-        {% include "./includes/withdraw-action.njk" %}
-      {% endif %}
-      {% if moveToInCheckAction %}
-        {% include "./includes/move-to-in-check-action.njk" %}
-      {% endif %}
     </div>
   </div>
 {% endblock %}

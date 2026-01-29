@@ -16,7 +16,6 @@ export const rejectApplicationClaimRoute = {
     pre: [{ method: preSubmissionHandler }],
     validate: {
       payload: joi.object({
-        claimOrAgreement: joi.string().valid("claim", "agreement").required(),
         confirm: joi
           .array()
           .items(
@@ -33,36 +32,33 @@ export const rejectApplicationClaimRoute = {
         returnPage: joi.string().optional().allow("").valid("agreement", "claims"),
       }),
       failAction: async (request, h, error) => {
-        const { claimOrAgreement, page, reference, returnPage } = request.payload;
+        const { page, reference, returnPage } = request.payload;
 
         request.logger.error({ error, reference });
 
         const errors = encodeErrorsForUI(error.details, "#reject");
         const query = new URLSearchParams({ page, reject: "true", errors });
 
-        if (claimOrAgreement === "claim") {
-          query.append("returnPage", returnPage);
-        }
+        query.append("returnPage", returnPage);
 
-        return h.redirect(`/view-${claimOrAgreement}/${reference}?${query.toString()}`).takeover();
+        return h.redirect(`/view-claim/${reference}?${query.toString()}`).takeover();
       },
     },
     handler: async (request, h) => {
-      const { claimOrAgreement, page, reference, returnPage } = request.payload;
+      const { page, reference, returnPage } = request.payload;
       const { name } = request.auth.credentials.account;
 
       // TODO - look at removing setBindings here
       request.logger.setBindings({ reference });
 
       await generateNewCrumb(request, h);
+
       const query = new URLSearchParams({ page });
+      query.append("returnPage", returnPage);
 
-      if (claimOrAgreement === "claim") {
-        query.append("returnPage", returnPage);
-        await updateClaimStatus(reference, name, STATUS.REJECTED, request.logger);
-      }
+      await updateClaimStatus(reference, name, STATUS.REJECTED, request.logger);
 
-      return h.redirect(`/view-${claimOrAgreement}/${reference}?${query.toString()}`);
+      return h.redirect(`/view-claim/${reference}?${query.toString()}`);
     },
   },
 };

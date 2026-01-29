@@ -7,6 +7,7 @@ import { updateApplicationStatus } from "../../../../app/api/applications";
 import { StatusCodes } from "http-status-codes";
 import { preSubmissionHandler } from "../../../../app/routes/utils/pre-submission-handler";
 import boom from "@hapi/boom";
+import { updateClaimStatus } from "../../../../app/api/claims";
 
 jest.mock("../../../../app/auth");
 jest.mock("../../../../app/api/applications");
@@ -61,7 +62,6 @@ describe("Reject On Hold (move to In Check) Application test", () => {
         auth,
         payload: {
           reference,
-          claimOrAgreement: "application",
         },
       };
       const res = await server.inject(options);
@@ -92,7 +92,6 @@ describe("Reject On Hold (move to In Check) Application test", () => {
         url,
         payload: {
           reference,
-          claimOrAgreement: "agreement",
           confirm: ["recommendToMoveOnHoldClaim", "updateIssuesLog"],
           page: 1,
           crumb: testCrumb,
@@ -107,40 +106,6 @@ describe("Reject On Hold (move to In Check) Application test", () => {
       phaseBannerOk($);
       expect($(".govuk-heading-l").text()).toEqual("403 - Forbidden");
       preSubmissionHandler.mockImplementation((_arg, h) => h.continue);
-    });
-
-    test.each([
-      [authoriser, "authoriser"],
-      [administrator, "authoriser"],
-      [recommender, "authoriser"],
-    ])("Reject application claim processed", async (scope, role) => {
-      auth = {
-        strategy: "session-auth",
-        credentials: {
-          scope: [scope],
-          account: { homeAccountId: "testId", name: "admin" },
-        },
-      };
-      const options = {
-        method: "POST",
-        url,
-        auth,
-        headers: { cookie: `crumb=${crumb}` },
-        payload: {
-          reference,
-          claimOrAgreement: "agreement",
-          confirm: ["recommendToMoveOnHoldClaim", "updateIssuesLog"],
-          page: 1,
-          crumb,
-        },
-      };
-
-      const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      const logger = expect.any(Object);
-      expect(updateApplicationStatus).toHaveBeenCalledWith(reference, "admin", "IN_CHECK", logger);
-      expect(updateApplicationStatus).toHaveBeenCalledTimes(1);
-      expect(res.headers.location).toEqual(`/view-agreement/${reference}?page=1`);
     });
 
     test.each([authoriser, administrator, recommender])("Reject claim processed", async (scope) => {
@@ -158,7 +123,6 @@ describe("Reject On Hold (move to In Check) Application test", () => {
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           reference,
-          claimOrAgreement: "claim",
           confirm: ["recommendToMoveOnHoldClaim", "updateIssuesLog"],
           page: 1,
           returnPage: "claims",
@@ -171,7 +135,7 @@ describe("Reject On Hold (move to In Check) Application test", () => {
       expect(res.headers.location).toEqual(`/view-claim/${reference}?page=1&returnPage=claims`);
     });
 
-    test("Reject application invalid reference", async () => {
+    test("Reject claim invalid reference", async () => {
       auth = {
         strategy: "session-auth",
         credentials: {
@@ -187,9 +151,9 @@ describe("Reject On Hold (move to In Check) Application test", () => {
         payload: {
           page: 1,
           reference: 123,
-          claimOrAgreement: "agreement",
           confirm: ["recommendToMoveOnHoldClaim", "updateIssuesLog"],
           crumb,
+          returnPage: "claims",
         },
       };
 
@@ -199,11 +163,11 @@ describe("Reject On Hold (move to In Check) Application test", () => {
         "W3sidGV4dCI6IlwicmVmZXJlbmNlXCIgbXVzdCBiZSBhIHN0cmluZyIsImhyZWYiOiIjbW92ZS10by1pbi1jaGVjayIsImtleSI6InJlZmVyZW5jZSJ9XQ%3D%3D";
 
       expect(res.headers.location).toEqual(
-        `/view-agreement/123?page=1&moveToInCheck=true&errors=${encodedErrors}`,
+        `/view-claim/123?page=1&moveToInCheck=true&errors=${encodedErrors}&returnPage=claims`,
       );
     });
 
-    test("Reject application with one unchecked checkbox", async () => {
+    test("Reject claim with one unchecked checkbox", async () => {
       auth = {
         strategy: "session-auth",
         credentials: {
@@ -219,9 +183,9 @@ describe("Reject On Hold (move to In Check) Application test", () => {
         payload: {
           page: 1,
           reference,
-          claimOrAgreement: "agreement",
           confirm: ["recommendToMoveOnHoldClaim"],
           crumb,
+          returnPage: "claims",
         },
       };
 
@@ -230,11 +194,11 @@ describe("Reject On Hold (move to In Check) Application test", () => {
       const encodedErrors =
         "W3sidGV4dCI6IlwiY29uZmlybVwiIGRvZXMgbm90IGNvbnRhaW4gMSByZXF1aXJlZCB2YWx1ZShzKSIsImhyZWYiOiIjbW92ZS10by1pbi1jaGVjayIsImtleSI6ImNvbmZpcm0ifV0%3D";
       expect(res.headers.location).toEqual(
-        `/view-agreement/${reference}?page=1&moveToInCheck=true&errors=${encodedErrors}`,
+        `/view-claim/${reference}?page=1&moveToInCheck=true&errors=${encodedErrors}&returnPage=claims`,
       );
     });
 
-    test("Reject application invalid permission", async () => {
+    test("Reject claim invalid permission", async () => {
       auth = {
         strategy: "session-auth",
         credentials: {
@@ -250,7 +214,6 @@ describe("Reject On Hold (move to In Check) Application test", () => {
         payload: {
           page: 1,
           reference,
-          claimOrAgreement: "agreement",
           confirm: ["recommendToMoveOnHoldClaim", "updateIssuesLog"],
           crumb,
         },
@@ -261,7 +224,7 @@ describe("Reject On Hold (move to In Check) Application test", () => {
       expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
     });
 
-    test("Reject application claim not processed", async () => {
+    test("Reject claim not processed", async () => {
       auth = {
         strategy: "session-auth",
         credentials: {
@@ -276,14 +239,13 @@ describe("Reject On Hold (move to In Check) Application test", () => {
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           reference,
-          claimOrAgreement: "agreement",
           page: 1,
           crumb,
         },
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      expect(updateApplicationStatus).not.toHaveBeenCalled();
+      expect(updateClaimStatus).not.toHaveBeenCalled();
     });
   });
 
@@ -295,14 +257,13 @@ describe("Reject On Hold (move to In Check) Application test", () => {
       headers: { cookie: `crumb=${crumb}` },
       payload: {
         reference,
-        claimOrAgreement: "agreement",
         page: 1,
         crumb,
       },
     };
     const res = await server.inject(options);
     expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-    expect(updateApplicationStatus).not.toHaveBeenCalled();
+    expect(updateClaimStatus).not.toHaveBeenCalled();
   });
 
   test("Redirect to view claim with 302 status", async () => {
@@ -315,7 +276,6 @@ describe("Reject On Hold (move to In Check) Application test", () => {
       headers: { cookie: `crumb=${crumb}` },
       payload: {
         reference,
-        claimOrAgreement: "claim",
         page: 1,
         returnPage: "claims",
         crumb,
@@ -323,7 +283,7 @@ describe("Reject On Hold (move to In Check) Application test", () => {
     };
     const res = await server.inject(options);
     expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-    expect(updateApplicationStatus).not.toHaveBeenCalled();
+    expect(updateClaimStatus).not.toHaveBeenCalled();
     expect(res.headers.location).toEqual(
       `/view-claim/${reference}?page=1&moveToInCheck=true&errors=${encodedErrors}&returnPage=claims`,
     );

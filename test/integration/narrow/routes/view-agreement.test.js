@@ -19,14 +19,6 @@ jest.mock("../../../../app/auth");
 const { administrator } = permissions;
 const { reference } = oldWorldApplication;
 
-function expectWithdrawLink($, reference, isWithdrawLinkVisible) {
-  if (isWithdrawLinkVisible) {
-    const withdrawLink = $(".govuk-button");
-    expect(withdrawLink.text()).toMatch("Withdraw");
-    expect(withdrawLink.attr("href")).toMatch(`/view-agreement/${reference}?page=1&withdraw=true`);
-  }
-}
-
 function expectApplicationDetails($) {
   expect($("#organisation-details .govuk-summary-list__row").length).toEqual(5);
 
@@ -73,18 +65,6 @@ function expectRecommendButtons($, areRecommendButtonsVisible) {
     expect($("#btn-recommend-to-pay").length).toEqual(0);
     expect($("#btn-recommend-to-reject").length).toEqual(0);
   }
-}
-
-function expectWithdrawConfirmationPanel($, istWithdrawConfirmationPanelVisible) {
-  const panelText = $('h1:contains("Withdraw agreement")').text();
-  const confirmButtonText = $('button:contains("Confirm and continue")').text();
-
-  istWithdrawConfirmationPanelVisible
-    ? expect(panelText).toBeDefined()
-    : expect(panelText).not.toBeDefined();
-  istWithdrawConfirmationPanelVisible
-    ? expect(confirmButtonText).toBeDefined()
-    : expect(confirmButtonText).not.toBeDefined();
 }
 
 describe("View Application test", () => {
@@ -152,14 +132,10 @@ describe("View Application test", () => {
       expect(getClaimViewStates).not.toHaveBeenCalled();
     });
 
-    test.each([
-      ["administrator", true],
-      ["authoriser", true],
-      ["processor", false],
-      ["user", false],
-    ])(
-      "Withdrawl link feature flag enabled, link displayed as expected for role %s",
-      async (authScope, isWithdrawLinkVisible) => {
+    test.each([["administrator"], ["processor"], ["user"]])(
+      "returns 200 application agreed - %s role",
+      async (authScope) => {
+        const status = "Agreed";
         auth = {
           strategy: "session-auth",
           credentials: { scope: [authScope], account: { username: "test" } },
@@ -171,105 +147,49 @@ describe("View Application test", () => {
           url,
           auth,
         };
-
         const res = await server.inject(options);
+        expect(res.statusCode).toBe(StatusCodes.OK);
         const $ = cheerio.load(res.payload);
+        expect($("h1.govuk-caption-l").text()).toContain(`Agreement number: ${reference}`);
+        expect($("h2.govuk-heading-l").text()).toContain(status);
+        expect($("title").text()).toContain("Administration: User Agreement");
 
-        expectWithdrawLink($, reference, isWithdrawLinkVisible);
+        expectApplicationDetails($);
+
+        expect($("#application .govuk-summary-list__row:nth-child(1) dt").text()).toContain(
+          "Status",
+        );
+        expect($("#application .govuk-summary-list__row:nth-child(1) dd").text()).toContain(status);
+        expect($("#application .govuk-summary-list__row:nth-child(2) dt").text()).toContain(
+          "Date of agreement",
+        );
+        expect($("#application .govuk-summary-list__row:nth-child(2) dd").text()).toContain(
+          new Intl.DateTimeFormat("en-GB").format(new Date(oldWorldApplication.createdAt)),
+        );
+        expect($("#application .govuk-summary-list__row:nth-child(3) dt").text()).toContain(
+          "Business details correct",
+        );
+        expect($("#application .govuk-summary-list__row:nth-child(3) dd").text()).toContain("Yes");
+        expect($("#application .govuk-summary-list__row:nth-child(4) dt").text()).toContain(
+          "Type of review",
+        );
+        expect(
+          $("#application .govuk-summary-list__row:nth-child(4) dd").text().toLowerCase(),
+        ).toContain(oldWorldApplication.data.whichReview);
+        expect($("#application .govuk-summary-list__row:nth-child(5) dt").text()).toContain(
+          "Number of livestock",
+        );
+        expect($("#application .govuk-summary-list__row:nth-child(5) dd").text()).toContain(
+          "Minimum 11",
+        );
+        expect($("#application .govuk-summary-list__row:nth-child(6) dt").text()).toContain(
+          "Agreement accepted",
+        );
+        expect($("#application .govuk-summary-list__row:nth-child(6) dd").text()).toContain("Yes");
+
+        phaseBannerOk($);
       },
     );
-
-    test.each([
-      ["administrator", true],
-      ["authoriser", true],
-      ["recommender", false],
-      ["processor", false],
-      ["user", false],
-    ])(
-      "Withdraw link feature flag disabled, link not displayed for role %s",
-      async (authScope, withdrawAction) => {
-        auth = {
-          strategy: "session-auth",
-          credentials: { scope: [authScope], account: { username: "test" } },
-        };
-        getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "AGREED" });
-
-        getClaimViewStates.mockReturnValueOnce({
-          withdrawAction,
-        });
-
-        const options = {
-          method: "GET",
-          url,
-          auth,
-        };
-
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-
-        expectWithdrawLink($, reference, withdrawAction);
-      },
-    );
-
-    test.each([
-      ["administrator", true],
-      ["processor", false],
-      ["user", false],
-    ])("returns 200 application agreed - %s role", async (authScope, isWithdrawLinkVisible) => {
-      const status = "Agreed";
-      auth = {
-        strategy: "session-auth",
-        credentials: { scope: [authScope], account: { username: "test" } },
-      };
-      getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "AGREED" });
-
-      const options = {
-        method: "GET",
-        url,
-        auth,
-      };
-      const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.OK);
-      const $ = cheerio.load(res.payload);
-      expect($("h1.govuk-caption-l").text()).toContain(`Agreement number: ${reference}`);
-      expect($("h2.govuk-heading-l").text()).toContain(status);
-      expect($("title").text()).toContain("Administration: User Agreement");
-
-      expectApplicationDetails($);
-
-      expect($("#application .govuk-summary-list__row:nth-child(1) dt").text()).toContain("Status");
-      expect($("#application .govuk-summary-list__row:nth-child(1) dd").text()).toContain(status);
-      expect($("#application .govuk-summary-list__row:nth-child(2) dt").text()).toContain(
-        "Date of agreement",
-      );
-      expect($("#application .govuk-summary-list__row:nth-child(2) dd").text()).toContain(
-        new Intl.DateTimeFormat("en-GB").format(new Date(oldWorldApplication.createdAt)),
-      );
-      expect($("#application .govuk-summary-list__row:nth-child(3) dt").text()).toContain(
-        "Business details correct",
-      );
-      expect($("#application .govuk-summary-list__row:nth-child(3) dd").text()).toContain("Yes");
-      expect($("#application .govuk-summary-list__row:nth-child(4) dt").text()).toContain(
-        "Type of review",
-      );
-      expect(
-        $("#application .govuk-summary-list__row:nth-child(4) dd").text().toLowerCase(),
-      ).toContain(oldWorldApplication.data.whichReview);
-      expect($("#application .govuk-summary-list__row:nth-child(5) dt").text()).toContain(
-        "Number of livestock",
-      );
-      expect($("#application .govuk-summary-list__row:nth-child(5) dd").text()).toContain(
-        "Minimum 11",
-      );
-      expect($("#application .govuk-summary-list__row:nth-child(6) dt").text()).toContain(
-        "Agreement accepted",
-      );
-      expect($("#application .govuk-summary-list__row:nth-child(6) dd").text()).toContain("Yes");
-
-      expectWithdrawLink($, reference, isWithdrawLinkVisible);
-
-      phaseBannerOk($);
-    });
 
     test.each([["administrator"], ["processor"], ["user"]])(
       "returns 200 application in check - %s role",
@@ -351,30 +271,6 @@ describe("View Application test", () => {
         phaseBannerOk($);
       },
     );
-    test("withdraw link hidden and withdraw confirmation displayed when withdraw link selected by user", async () => {
-      auth = {
-        strategy: "session-auth",
-        credentials: {
-          scope: ["administrator"],
-          account: { username: "test" },
-        },
-      };
-      getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "AGREED" });
-
-      const url = `/view-agreement/${reference}?page=1&withdraw=${true}`;
-      const options = {
-        method: "GET",
-        url,
-        auth,
-      };
-
-      const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.OK);
-
-      const $ = cheerio.load(res.payload);
-      expectWithdrawLink($, reference, false);
-      expectWithdrawConfirmationPanel($, true);
-    });
 
     test("returns 200 application - valid history tab", async () => {
       getApplication.mockReturnValueOnce({ ...oldWorldApplication, status: "NOT_AGREED" });

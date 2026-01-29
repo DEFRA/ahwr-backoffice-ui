@@ -4,11 +4,7 @@
     <p class="govuk-body">This customer has been recommended for payment.</p>
     <p class="govuk-body">If you do not agree with this action, contact {{ contactPerson }} who recommended it and discuss it with them.</p>
     <p>
-      {% if claimOrAgreement == 'agreement' %}
-        <a class="govuk-button" href="/view-agreement/{{ reference }}?page={{ page }}&approve=true#authorise">Pay</a>
-      {% elif claimOrAgreement == 'claim' %}
-        <a class="govuk-button" href="/view-claim/{{ reference }}?page={{ page }}&returnPage={{ returnPage }}&approve=true#authorise">Pay</a>
-      {% endif %}
+      <a class="govuk-button" href="/view-claim/{{ reference }}?page={{ page }}&returnPage={{ returnPage }}&approve=true#authorise">Pay</a>
     </p>
   </div>
 </div>

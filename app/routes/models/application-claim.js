@@ -13,7 +13,6 @@ const claimDataStatus = new Set([
 
 export const getApplicationClaimDetails = (
   application,
-  statusActions,
   visitDateActions,
   vetsNameActions,
   vetRCVSNumberActions,
@@ -38,7 +37,6 @@ export const getApplicationClaimDetails = (
       value: {
         html: `<span class="govuk-tag app-long-tag ${statusClass}">${statusLabel}</span>`,
       },
-      actions: statusActions,
     },
     {
       key: { text: "Date of review" },
