@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { getPaymentStatus } from "./support-calls.js";
+import { getPaymentDocumentWithRefresh } from "./support-calls.js";
 
 export const searchPaymentStatus = {
   action: "searchPaymentStatus",
@@ -9,7 +9,7 @@ export const searchPaymentStatus = {
   }),
   handler: async (request, h) => {
     const { paymentStatusReference } = request.payload;
-    const rawDocument = await getPaymentStatus(paymentStatusReference, request.logger);
+    const rawDocument = await getPaymentDocumentWithRefresh(paymentStatusReference, request.logger);
     const paymentStatus = JSON.stringify(rawDocument);
     return h.view("support", { paymentStatus });
   },

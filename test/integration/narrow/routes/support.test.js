@@ -12,7 +12,7 @@ import {
   getAgreementLogsDocument,
   getHerdDocument,
   getPaymentDocument,
-  getPaymentStatus,
+  getPaymentDocumentWithRefresh,
   getClaimCommsDocument,
   getAgreementCommsDocument,
 } from "../../../../app/routes/support/support-calls.js";
@@ -289,7 +289,9 @@ describe("support-routes", () => {
       });
 
       it("shows payment information when requested", async () => {
-        getPaymentStatus.mockResolvedValue({ document: { some: "value", another: "entry" } });
+        getPaymentDocumentWithRefresh.mockResolvedValue({
+          document: { some: "value", another: "entry" },
+        });
 
         const paymentStatusReference = "someReference";
         const options = {

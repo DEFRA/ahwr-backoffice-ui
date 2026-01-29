@@ -74,12 +74,13 @@ export const getPaymentDocument = async (claimReference, logger) => {
   );
 };
 
-export const getPaymentStatus = async (claimReference, logger) => {
-  return makePostCall(
+export const getPaymentDocumentWithRefresh = async (claimReference, logger) => {
+  makePostCall(
     `${paymentProxyApiUri}/support/payments/${claimReference}/request-status`,
     "No payment status found",
     logger,
   );
+  return getPaymentDocument(claimReference, logger);
 };
 
 export const getAgreementMessagesDocument = async (agreementReference, logger) => {
