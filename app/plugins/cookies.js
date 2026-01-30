@@ -21,7 +21,7 @@ export const cookiePlugin = {
             request.response.source.manager._context.user = request.auth?.credentials?.account;
             request.response.source.manager._context.scope = request.auth?.credentials?.scope;
             request.logger.info(
-              `User: ${request.auth?.credentials?.account}, scope: ${request.auth?.credentials?.scope}`,
+              `User: ${request.auth?.credentials?.account.username}, scope: ${request.auth?.credentials?.scope}`,
             );
           } else {
             // This is so that we arent caching the previous context user
