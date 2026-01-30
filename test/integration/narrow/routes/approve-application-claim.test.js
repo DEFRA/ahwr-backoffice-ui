@@ -85,7 +85,6 @@ describe("/approve-application-claim", () => {
         url,
         payload: {
           reference,
-          claimOrAgreement: "agreement",
           confirm: ["approveClaim", "sentChecklist"],
           page: 1,
           crumb,
@@ -119,10 +118,10 @@ describe("/approve-application-claim", () => {
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
-          claimOrAgreement: "agreement",
           page: 1,
           reference: 123,
           confirm: ["approveClaim", "sentChecklist"],
+          returnPage: "claims",
           crumb,
         },
       };
@@ -131,7 +130,7 @@ describe("/approve-application-claim", () => {
 
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
       expect(res.headers.location).toEqual(
-        `/view-agreement/123?page=1&approve=true&errors=${errors}`,
+        `/view-claim/123?page=1&approve=true&errors=${errors}&returnPage=claims`,
       );
     });
 
@@ -153,37 +152,6 @@ describe("/approve-application-claim", () => {
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           reference,
-          claimOrAgreement: "agreement",
-          confirm: ["approveClaim", "sentChecklist"],
-          page: 1,
-          crumb,
-        },
-      };
-      const res = await server.inject(options);
-
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      expect(res.headers.location).toEqual(`/view-agreement/${reference}?page=1`);
-    });
-
-    test.each([
-      [authoriser, "authoriser"],
-      [administrator, "authoriser"],
-    ])("Approve application claim processed", async (scope, role) => {
-      auth = {
-        strategy: "session-auth",
-        credentials: {
-          scope: [scope],
-          account: { homeAccountId: "testId", name: "admin" },
-        },
-      };
-      const options = {
-        method: "POST",
-        url,
-        auth,
-        headers: { cookie: `crumb=${crumb}` },
-        payload: {
-          reference,
-          claimOrAgreement: "claim",
           confirm: ["approveClaim", "sentChecklist"],
           page: 1,
           returnPage: "claims",
@@ -207,16 +175,16 @@ describe("/approve-application-claim", () => {
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           reference,
-          claimOrAgreement: "agreement",
           confirm: ["sentChecklist"],
           page: 1,
+          returnPage: "claims",
           crumb,
         },
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
       expect(res.headers.location).toEqual(
-        `/view-agreement/${reference}?page=1&approve=true&errors=${errors}`,
+        `/view-claim/${reference}?page=1&approve=true&errors=${errors}&returnPage=claims`,
       );
     });
 
@@ -234,7 +202,6 @@ describe("/approve-application-claim", () => {
         auth,
         headers: { cookie: `crumb=${crumb}` },
         payload: {
-          claimOrAgreement: "agreement",
           confirm: ["approveClaim", "sentChecklist"],
           reference,
           crumb,

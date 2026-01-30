@@ -3,7 +3,7 @@ import { getStyleClassByStatus } from "../../constants/status.js";
 import { speciesNumbers } from "../../constants/species-numbers.js";
 import { STATUS } from "ffc-ahwr-common-library";
 
-export const getApplicationDetails = (application, statusActions, eligiblePiiRedactionActions) => {
+export const getApplicationDetails = (application, eligiblePiiRedactionActions) => {
   const { data, createdAt, status, eligiblePiiRedaction } = application;
   const formattedDate = formattedDateToUk(createdAt);
 
@@ -16,7 +16,6 @@ export const getApplicationDetails = (application, statusActions, eligiblePiiRed
       value: {
         html: `<span class="govuk-tag app-long-tag ${statusClass}">${statusLabel}</span>`,
       },
-      actions: statusActions,
     },
     {
       key: {

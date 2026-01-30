@@ -3,13 +3,11 @@ import { oldWorldApplication } from "../../../../data/ow-application.js";
 
 describe("Application-claim model", () => {
   test("getClaimData - Valid Data with date of claim in application data", async () => {
-    const statusActions = { items: [{ test: "change status" }] };
     const visitDateActions = { items: [{ test: "change visit date" }] };
     const vetsNameActions = { items: [{ test: "change vets name" }] };
     const vetRCVSActions = { items: [{ test: "change RCVS" }] };
     const res = getApplicationClaimDetails(
       oldWorldApplication,
-      statusActions,
       visitDateActions,
       vetsNameActions,
       vetRCVSActions,
@@ -21,7 +19,6 @@ describe("Application-claim model", () => {
         value: {
           html: '<span class="govuk-tag app-long-tag govuk-tag">Ready to pay</span>',
         },
-        actions: statusActions,
       },
       {
         key: { text: "Date of review" },
@@ -67,13 +64,11 @@ describe("Application-claim model", () => {
   });
 
   test("getClaimData - Valid Data with no date of testing", async () => {
-    const statusActions = { items: [{ test: "change status" }] };
     const visitDateActions = { items: [{ test: "change visit date" }] };
     const vetsNameActions = { items: [{ test: "change vets name" }] };
     const vetRCVSActions = { items: [{ test: "change RCVS" }] };
     const res = getApplicationClaimDetails(
       { ...oldWorldApplication, data: { ...oldWorldApplication.data, dateOfTesting: undefined } },
-      statusActions,
       visitDateActions,
       vetsNameActions,
       vetRCVSActions,
@@ -85,7 +80,6 @@ describe("Application-claim model", () => {
         value: {
           html: '<span class="govuk-tag app-long-tag govuk-tag">Ready to pay</span>',
         },
-        actions: statusActions,
       },
       {
         key: { text: "Date of review" },
@@ -129,13 +123,11 @@ describe("Application-claim model", () => {
   });
 
   test("getClaimData - Data returned for paid status", async () => {
-    const statusActions = { items: [{ test: "change status" }] };
     const visitDateActions = { items: [{ test: "change visit date" }] };
     const vetsNameActions = { items: [{ test: "change vets name" }] };
     const vetRCVSActions = { items: [{ test: "change RCVS" }] };
     const res = getApplicationClaimDetails(
       { ...oldWorldApplication, status: "PAID" },
-      statusActions,
       visitDateActions,
       vetsNameActions,
       vetRCVSActions,
@@ -147,7 +139,6 @@ describe("Application-claim model", () => {
         value: {
           html: '<span class="govuk-tag app-long-tag govuk-tag--blue">Paid</span>',
         },
-        actions: statusActions,
       },
       {
         key: { text: "Date of review" },

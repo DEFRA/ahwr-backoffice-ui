@@ -56,7 +56,6 @@ describe("Reject Application test", () => {
         auth,
         payload: {
           reference,
-          claimOrAgreement: "agreement",
         },
       };
       const res = await server.inject(options);
@@ -87,10 +86,10 @@ describe("Reject Application test", () => {
         url,
         payload: {
           reference,
-          claimOrAgreement: "agreement",
           confirm: ["rejectClaim", "sentChecklist"],
           page: 1,
           crumb,
+          returnPage: "claims",
         },
         headers: { cookie: `crumb=${crumb}` },
       };
@@ -123,17 +122,18 @@ describe("Reject Application test", () => {
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           reference,
-          claimOrAgreement: "agreement",
           confirm: ["rejectClaim", "sentChecklist"],
           page: 1,
           crumb,
+          returnPage: "claims",
         },
       };
       const res = await server.inject(options);
 
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      expect(res.headers.location).toEqual(`/view-agreement/${reference}?page=1`);
+      expect(res.headers.location).toEqual(`/view-claim/${reference}?page=1&returnPage=claims`);
     });
+
     test("Reject claim processed", async () => {
       auth = {
         strategy: "session-auth",
@@ -149,10 +149,10 @@ describe("Reject Application test", () => {
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           reference,
-          claimOrAgreement: "claim",
           confirm: ["rejectClaim", "sentChecklist"],
           page: 1,
           crumb,
+          returnPage: "claims",
         },
       };
 
@@ -160,6 +160,7 @@ describe("Reject Application test", () => {
 
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
     });
+
     test("Reject application invalid reference", async () => {
       const errors =
         "W3sidGV4dCI6IlwicmVmZXJlbmNlXCIgbXVzdCBiZSBhIHN0cmluZyIsImhyZWYiOiIjcmVqZWN0Iiwia2V5IjoicmVmZXJlbmNlIn1d";
@@ -178,8 +179,8 @@ describe("Reject Application test", () => {
         payload: {
           page: 1,
           reference: 123,
-          claimOrAgreement: "agreement",
           confirm: ["rejectClaim", "sentChecklist"],
+          returnPage: "claims",
           crumb,
         },
       };
@@ -188,7 +189,7 @@ describe("Reject Application test", () => {
 
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
       expect(res.headers.location).toEqual(
-        `/view-agreement/123?page=1&reject=true&errors=${errors}`,
+        `/view-claim/123?page=1&reject=true&errors=${errors}&returnPage=claims`,
       );
     });
 
@@ -202,39 +203,20 @@ describe("Reject Application test", () => {
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           reference,
-          claimOrAgreement: "agreement",
           confirm: ["sentChecklist"],
           page: 1,
+          returnPage: "claims",
           crumb,
         },
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
       expect(res.headers.location).toEqual(
-        `/view-agreement/${reference}?page=1&reject=true&errors=${errors}`,
+        `/view-claim/${reference}?page=1&reject=true&errors=${errors}&returnPage=claims`,
       );
     });
   });
 
-  test("retuns 400 Bad Request", async () => {
-    const options = {
-      method: "POST",
-      url,
-      auth,
-      headers: { cookie: `crumb=${crumb}` },
-      payload: {
-        reference,
-        claimOrAgreement: "agreement",
-        page: 1,
-        crumb,
-      },
-    };
-    const res = await server.inject(options);
-    expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-    expect(res.headers.location).toEqual(
-      `/view-agreement/${reference}?page=1&reject=true&errors=${encodedErrors}`,
-    );
-  });
   test("retuns 400 Bad Request for claim", async () => {
     const options = {
       method: "POST",
@@ -243,7 +225,6 @@ describe("Reject Application test", () => {
       headers: { cookie: `crumb=${crumb}` },
       payload: {
         reference,
-        claimOrAgreement: "claim",
         page: 1,
         returnPage: "claims",
         crumb,

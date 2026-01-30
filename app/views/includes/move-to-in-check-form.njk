@@ -1,10 +1,6 @@
 <div class="govuk-panel govuk-panel--confirmation govuk-!-text-align-left" id="move-to-in-check">
   <form method="post" action="/move-to-in-check" class="ahwr-update-form">
-    {% if claimOrAgreement == 'agreement' %}
-      <a href="/view-agreement/{{ reference }}?page={{ page }}" class="govuk-link govuk-body">Back</a>
-    {% elif claimOrAgreement == 'claim' %}
-      <a href="/view-claim/{{ reference }}?page={{ page }}&returnPage={{ returnPage }}" class="govuk-link govuk-body">Back</a>
-    {% endif %}
+    <a href="/view-claim/{{ reference }}?page={{ page }}&returnPage={{ returnPage }}" class="govuk-link govuk-body">Back</a>
     {{ govukCheckboxes({
       name: "confirm",
       fieldset: {
@@ -30,7 +26,6 @@
       text: "Confirm and continue",
       preventDoubleClick: true
     }) }}
-    <input type="hidden" name="claimOrAgreement" value="{{ claimOrAgreement }}" />
     <input type="hidden" name="reference" value="{{ reference }}" />
     <input type="hidden" name="page" value="{{ page }}" />
     <input type="hidden" name="returnPage" value="{{ returnPage }}" />

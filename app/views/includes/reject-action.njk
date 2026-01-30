@@ -4,11 +4,7 @@
     <p class="govuk-body">This claim has been recommended for rejection.</p>
     <p class="govuk-body">If you do not agree with this action, contact {{ contactPerson }} who recommended it and discuss it with them.</p>
     <p>
-      {% if claimOrAgreement == 'agreement' %}
-        <a class="govuk-button" href="/view-agreement/{{ reference }}?page={{ page }}&reject=true#reject">Reject</a>
-      {% elif claimOrAgreement == 'claim' %}
-        <a class="govuk-button" href="/view-claim/{{ reference }}?page={{ page }}&returnPage={{ returnPage }}&reject=true#reject">Reject</a>
-      {% endif %}
+    <a class="govuk-button" href="/view-claim/{{ reference }}?page={{ page }}&returnPage={{ returnPage }}&reject=true#reject">Reject</a>
     </p>
   </div>
 </div>
