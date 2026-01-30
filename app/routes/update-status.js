@@ -1,6 +1,6 @@
 import joi from "joi";
 import { permissions } from "../auth/permissions.js";
-import { updateClaimFailAction, updateClaimHandler } from "./claim/update-claim-actions.js";
+import { updateClaimFailAction, updateClaimHandler } from "./claim/build-update-claim-route.js";
 
 export const updateStatusRoute = {
   method: "post",

@@ -1,6 +1,8 @@
 import { encodeErrorsForUI } from "../utils/encode-errors-for-ui.js";
 import { generateNewCrumb } from "../utils/crumb-cache.js";
 import { updateClaimStatus } from "../../api/claims.js";
+import { preSubmissionHandler } from "../utils/pre-submission-handler.js";
+import Joi from "joi";
 
 export const updateClaimFailAction = (request, h, error, errorHref, searchParam) => {
   const { page, reference, returnPage } = request.payload;
@@ -34,3 +36,36 @@ export const updateClaimHandler = async (request, h, status) => {
 
   return h.redirect(`/view-claim/${reference}?${query.toString()}`);
 };
+
+export const buildUpdateClaimRoute = ({
+  path,
+  permissions,
+  confirmValues,
+  errorHref,
+  searchParam,
+  status,
+}) => ({
+  method: "post",
+  path,
+  options: {
+    auth: { scope: permissions },
+    pre: [{ method: preSubmissionHandler }],
+    validate: {
+      payload: Joi.object({
+        confirm: Joi.array()
+          .items(...confirmValues.map((value) => Joi.string().valid(value).required()))
+          .required()
+          .messages({
+            "any.required": "Select all checkboxes",
+            "array.base": "Select all checkboxes",
+          }),
+        reference: Joi.string().required(),
+        page: Joi.number().greater(0).default(1),
+        returnPage: Joi.string().optional().allow("").valid("agreement", "claims"),
+      }),
+      failAction: (request, h, error) =>
+        updateClaimFailAction(request, h, error, errorHref, searchParam),
+    },
+    handler: (request, h) => updateClaimHandler(request, h, status),
+  },
+});
