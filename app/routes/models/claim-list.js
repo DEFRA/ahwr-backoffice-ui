@@ -110,10 +110,10 @@ export const getClaimTableRows = (claims, page, returnPage, showSBI = true) =>
       ...(showSBI
         ? [
             {
-              text: claim.application.organisation.sbi,
+              text: claim.application.organisation?.sbi,
               format: "numeric",
               attributes: {
-                "data-sort-value": claim.application.organisation.sbi,
+                "data-sort-value": claim.application.organisation?.sbi,
               },
               classes: `${respText} align-left`,
             },
@@ -128,14 +128,14 @@ export const getClaimTableRows = (claims, page, returnPage, showSBI = true) =>
         classes: `${respText} align-left`,
       },
       {
-        html: `<span class="app-long-tag"><span class="govuk-tag ${respText} ${getStyleClassByStatus(claim.status)}">${upperFirstLetter(claim.status.toLowerCase()).replaceAll("_", " ")}</span></span>`,
+        html: `<span class="app-long-tag"><span class="govuk-tag ${respText} ${getStyleClassByStatus(claim.status)}">${upperFirstLetter(claim.status?.toLowerCase()).replaceAll("_", " ")}</span></span>`,
         attributes: {
           "data-sort-value": `${claim.status}`,
         },
       },
     ];
 
-    if (application.flags.length) {
+    if (application.flags?.length) {
       return row.map((rowItem) => ({
         ...rowItem,
         classes: rowItem?.classes ? `${rowItem.classes} flagged-item` : "flagged-item",

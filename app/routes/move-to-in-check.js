@@ -1,10 +1,8 @@
 import joi from "joi";
-import { updateClaimStatus } from "../api/claims.js";
 import { preSubmissionHandler } from "./utils/pre-submission-handler.js";
 import { permissions } from "../auth/permissions.js";
-import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { STATUS } from "ffc-ahwr-common-library";
-import { encodeErrorsForUI } from "./utils/encode-errors-for-ui.js";
+import { updateClaimFailAction, updateClaimHandler } from "./claim/update-claim-actions.js";
 
 const { administrator, recommender, authoriser } = permissions;
 
@@ -32,35 +30,11 @@ export const moveToInCheckRoute = {
         returnPage: joi.string().allow("").optional(),
       }),
       failAction: async (request, h, error) => {
-        const { page, reference, returnPage } = request.payload;
-
-        request.logger.error({ error, reference });
-
-        const errors = encodeErrorsForUI(error.details, "#move-to-in-check");
-        const query = new URLSearchParams({
-          page,
-          moveToInCheck: "true",
-          errors,
-        });
-
-        query.append("returnPage", returnPage);
-
-        return h.redirect(`/view-claim/${reference}?${query.toString()}`).takeover();
+        return updateClaimFailAction(request, h, error, "#move-to-in-check", "moveToInCheck");
       },
     },
     handler: async (request, h) => {
-      const { page, reference, returnPage } = request.payload;
-      const { name } = request.auth.credentials.account;
-
-      // TODO - look at removing setBindings here
-      request.logger.setBindings({ reference });
-      await generateNewCrumb(request, h);
-      const query = new URLSearchParams({ page });
-
-      query.append("returnPage", returnPage);
-      await updateClaimStatus(reference, name, STATUS.IN_CHECK, request.logger);
-
-      return h.redirect(`/view-claim/${reference}?${query.toString()}`);
+      return updateClaimHandler(request, h, STATUS.RECOMMENDED_TO_PAY);
     },
   },
 };

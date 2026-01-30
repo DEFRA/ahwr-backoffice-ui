@@ -1,8 +1,6 @@
 import joi from "joi";
 import { permissions } from "../auth/permissions.js";
-import { updateClaimStatus } from "../api/claims.js";
-import { generateNewCrumb } from "./utils/crumb-cache.js";
-import { encodeErrorsForUI } from "./utils/encode-errors-for-ui.js";
+import { updateClaimFailAction, updateClaimHandler } from "./claim/update-claim-actions.js";
 
 export const updateStatusRoute = {
   method: "post",
@@ -21,37 +19,12 @@ export const updateStatusRoute = {
         returnPage: joi.string().optional().allow("").valid("agreement", "claims"),
       }),
       failAction: async (request, h, error) => {
-        const { page, reference, returnPage } = request.payload;
-
-        request.logger.error({ error, reference });
-
-        const errors = encodeErrorsForUI(error.details, "#update-status");
-        const query = new URLSearchParams({
-          page,
-          updateStatus: "true",
-          errors,
-        });
-
-        query.append("returnPage", returnPage);
-
-        return h.redirect(`/view-claim/${reference}?${query.toString()}`).takeover();
+        return updateClaimFailAction(request, h, error, "#update-status", "updateStatus");
       },
     },
     handler: async (request, h) => {
-      const { page, reference, returnPage, status, note } = request.payload;
-      const { name } = request.auth.credentials.account;
-
-      // TODO - look at removing setBindings here
-      request.logger.setBindings({ status, reference });
-
-      await generateNewCrumb(request, h);
-
-      const query = new URLSearchParams({ page });
-      query.append("returnPage", returnPage);
-
-      await updateClaimStatus(reference, name, status, request.logger, note);
-
-      return h.redirect(`/view-claim/${reference}?${query.toString()}`);
+      const { status } = request.payload;
+      return updateClaimHandler(request, h, status);
     },
   },
 };
