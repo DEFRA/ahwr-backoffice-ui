@@ -17,7 +17,7 @@
 <form method="POST" action="/support" class="ahwr-application-search-form">
   {{ govukInput({
     label: {
-      text: "Application Document",
+      text: "Agreement Document",
       classes: "govuk-label--m",
       isPageHeading: false
     },
@@ -26,7 +26,7 @@
   }) }}
 
   {{ govukButton({
-    text: "Search for Application"
+    text: "Search for Agreement Document"
   }) }}
   <input type="hidden" name="crumb" value="{{ crumb }}"/>
   <input type="hidden" name="action" value="searchApplication"/>
@@ -262,7 +262,7 @@
   }) }}
 
   {{ govukButton({
-    text: "Search for Document Logs"
+    text: "Search for Agreement Document Logs"
   }) }}
   <input type="hidden" name="crumb" value="{{ crumb }}"/>
   <input type="hidden" name="action" value="searchAgreementLogs"/>
