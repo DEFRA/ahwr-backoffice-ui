@@ -1,0 +1,355 @@
+{% extends './layouts/layout.njk' %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% block pageTitle %}
+  Support
+{% endblock %}
+{% block content %}
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-7">Support</h1>
+
+{% if errors.length %}
+   {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: errors
+   }) }}
+{% endif %}
+
+<form method="POST" action="/support" class="ahwr-application-search-form">
+  {{ govukInput({
+    label: {
+      text: "Application Document",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "application-reference",
+    name: "applicationReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Application"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchApplication"/>
+</form>
+
+{% if applicationDocument %}
+{{ govukInsetText({
+  text: applicationDocument,
+  id: "applicationDocument"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyApplicationDocument"
+  }
+}) }}
+{% endif %}
+    
+<form method="POST" action="/support" class="ahwr-claim-search-form">
+  {{ govukInput({
+    label: {
+      text: "Claim Document",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "claim-reference",
+    name: "claimReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Claim"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchClaim"/>
+</form>
+
+{% if claimDocument %}
+{{ govukInsetText({
+  text: claimDocument,
+  id: "claimDocument"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyClaimDocument"
+  }
+}) }}
+{% endif %}
+
+<form method="POST" action="/support" class="ahwr-herd-search-form">
+  {{ govukInput({
+    label: {
+      text: "Herd Document",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "herd-id",
+    name: "herdId"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Herd"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchHerd"/>
+</form>
+
+{% if herdDocument %}
+{{ govukInsetText({
+  text: herdDocument,
+  id: "herdDocument"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyHerdDocument"
+  }
+}) }}
+
+{% endif %}
+
+<form method="POST" action="/support" class="ahwr-payment-status-search-form">
+  {{ govukInput({
+    label: {
+      text: "Request Payment Status",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "payment-status-reference",
+    name: "paymentStatusReference"
+  }) }}
+
+  {{ govukButton({
+    text: "REQUEST Payment Status"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchPaymentStatus"/>
+</form>
+
+{% if paymentStatus %}
+{{ govukInsetText({
+  text: paymentStatus,
+  id: "paymentStatus"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyPaymentStatus"
+  }
+}) }}
+
+{% endif %}
+
+<form method="POST" action="/support" class="ahwr-payment-search-form">
+  {{ govukInput({
+    label: {
+      text: "Payments Document",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "payment-reference",
+    name: "paymentReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Payment"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchPayment"/>
+</form>
+
+{% if paymentDocument %}
+{{ govukInsetText({
+  text: paymentDocument,
+  id: "paymentDocument"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyPaymentDocument"
+  }
+}) }}
+
+{% endif %}
+
+<form method="POST" action="/support" class="ahwr-agreement-messages-search-form">
+  {{ govukInput({
+    label: {
+      text: "Agreement Messages",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "agreement-messages-reference",
+    name: "agreementMessagesReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Agreement Messages"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchAgreementMessages"/>
+</form>
+
+{% if agreementMessagesDocument %}
+{{ govukInsetText({
+  text: agreementMessagesDocument,
+  id: "agreementMessagesDocument"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyAgreementMessagesDocument"
+  }
+}) }}
+
+{% endif %}
+
+<form method="POST" action="/support" class="ahwr-claim-messages-search-form">
+  {{ govukInput({
+    label: {
+      text: "Claim Messages",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "claim-messages-reference",
+    name: "claimMessagesReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Claim Messages"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchClaimMessages"/>
+</form>
+
+{% if claimMessagesDocument %}
+{{ govukInsetText({
+  text: claimMessagesDocument,
+  id: "claimMessagesDocument"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyClaimMessagesDocument"
+  }
+}) }}
+
+{% endif %}
+
+<form method="POST" action="/support" class="ahwr-agreement-logs-search-form">
+  {{ govukInput({
+    label: {
+      text: "Agreement Document Logs",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "agreement-log-reference",
+    name: "agreementLogReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Document Logs"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchAgreementLogs"/>
+</form>
+
+{% if agreementLogsDocument %}
+{{ govukInsetText({
+  text: agreementLogsDocument,
+  id: "agreementLogsDocument"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyAgreementLogsDocument"
+  }
+}) }}
+
+{% endif %}
+
+<form method="POST" action="/support" class="ahwr-agreement-comms-search-form">
+  {{ govukInput({
+    label: {
+      text: "Agreement Comms",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "agreement-comms-reference",
+    name: "agreementCommsReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Agreement Comms"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchAgreementComms"/>
+</form>
+
+{% if agreementCommsDocument %}
+{{ govukInsetText({
+  text: agreementCommsDocument,
+  id: "agreementCommsDocument"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyAgreementCommsDocument"
+  }
+}) }}
+
+{% endif %}
+
+<form method="POST" action="/support" class="ahwr-claim-comms-search-form">
+  {{ govukInput({
+    label: {
+      text: "Claim Comms",
+      classes: "govuk-label--m",
+      isPageHeading: false
+    },
+    id: "claim-comms-reference",
+    name: "claimCommsReference"
+  }) }}
+
+  {{ govukButton({
+    text: "Search for Claim Comms"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="searchClaimComms"/>
+</form>
+
+{% if claimCommsDocument %}
+{{ govukInsetText({
+  text: claimCommsDocument,
+  id: "claimCommsDocument"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyClaimCommsDocument"
+  }
+}) }}
+
+{% endif %}
+
+{% endblock %}

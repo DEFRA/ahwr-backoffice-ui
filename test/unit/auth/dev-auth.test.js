@@ -30,14 +30,21 @@ describe("Dev auth test", () => {
         name: "Developer",
         username: "developer@defra.gov.uk",
       },
-      ["administrator", "processor", "user", "recommender", "authoriser"],
+      ["administrator", "processor", "user", "recommender", "authoriser", "support"],
     );
 
     expect(MOCK_COOKIE_AUTH_SET).toHaveBeenCalledTimes(1);
     expect(MOCK_COOKIE_AUTH_SET).toHaveBeenCalledWith({ id: FAKE_SESSION_ID });
 
     expect(user).toBe("developer@defra.gov.uk");
-    expect(roles).toEqual(["administrator", "processor", "user", "recommender", "authoriser"]);
+    expect(roles).toEqual([
+      "administrator",
+      "processor",
+      "user",
+      "recommender",
+      "authoriser",
+      "support",
+    ]);
   });
 
   test("authenticate test with userId provided", async () => {
@@ -52,14 +59,21 @@ describe("Dev auth test", () => {
         name: "Developer-abc123",
         username: "developer+abc123@defra.gov.uk",
       },
-      ["administrator", "processor", "user", "recommender", "authoriser"],
+      ["administrator", "processor", "user", "recommender", "authoriser", "support"],
     );
 
     expect(MOCK_COOKIE_AUTH_SET).toHaveBeenCalledTimes(1);
     expect(MOCK_COOKIE_AUTH_SET).toHaveBeenCalledWith({ id: FAKE_SESSION_ID });
 
     expect(user).toBe("developer+abc123@defra.gov.uk");
-    expect(roles).toEqual(["administrator", "processor", "user", "recommender", "authoriser"]);
+    expect(roles).toEqual([
+      "administrator",
+      "processor",
+      "user",
+      "recommender",
+      "authoriser",
+      "support",
+    ]);
   });
 
   test("logout test", () => {

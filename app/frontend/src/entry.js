@@ -22,3 +22,21 @@ document.querySelectorAll("th.govuk-table__header > button").forEach((button) =>
     window.location.reload();
   }),
 );
+
+[
+  { buttonId: "copyApplicationDocument", inputId: "applicationDocument" },
+  { buttonId: "copyClaimDocument", inputId: "claimDocument" },
+  { buttonId: "copyHerdDocument", inputId: "herdDocument" },
+  { buttonId: "copyPaymentDocument", inputId: "paymentDocument" },
+  { buttonId: "copyAgreementMessagesDocument", inputId: "agreementMessagesDocument" },
+  { buttonId: "copyClaimMessagesDocument", inputId: "claimMessagesDocument" },
+  { buttonId: "copyAgreementLogsDocument", inputId: "agreementLogsDocument" },
+].forEach(({ buttonId, inputId }) => {
+  const btn = document.getElementById(buttonId);
+  if (btn) {
+    btn.addEventListener("click", function (e) {
+      var copyText = document.getElementById(inputId).innerText;
+      navigator.clipboard.writeText(copyText);
+    });
+  }
+});

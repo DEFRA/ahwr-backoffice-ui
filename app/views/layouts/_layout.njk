@@ -58,9 +58,15 @@
       ] %}
       
       {% if user %}
-        {% set nav = nav.slice(0, 1)
+        {% set nav = nav.slice(0, nav | length -1)
           .concat([{ href: "/account", text: user.name }])
-          .concat(nav.slice(1)) %}
+          .concat(nav.slice(nav | length -1)) %}
+      {% endif %}
+
+      {% if scope and 'support' in scope %}
+        {% set nav = nav.slice(0, nav | length -1)
+          .concat([{ href: "/support", text: "Support" }])
+          .concat(nav.slice(nav | length -1)) %}
       {% endif %}
 
       {{ govukServiceNavigation({

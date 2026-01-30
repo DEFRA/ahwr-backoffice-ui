@@ -13,11 +13,12 @@ import { setupProxy } from "./lib/setup-proxy.js";
 import { getCacheEngine } from "./cache/get-cache-engine.js";
 import { requestLogger } from "./logging/request-logger.js";
 
-export async function createServer() {
+export async function createServer(options) {
   setupProxy();
+  const { testPort } = options ?? {};
   const server = Hapi.server({
     cache: [getCacheEngine()],
-    port: config.port,
+    port: testPort ?? config.port,
     routes: {
       validate: {
         options: {

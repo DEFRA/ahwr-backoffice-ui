@@ -1,6 +1,6 @@
 import { permissions } from "./permissions.js";
 
-const { administrator, processor, user, recommender, authoriser } = permissions;
+const { administrator, processor, user, recommender, authoriser, support } = permissions;
 
 const getDevAccount = (userId) => {
   if (userId) {
@@ -25,7 +25,7 @@ export const getAuthenticationUrl = (userId) => {
 };
 
 export const authenticate = async (userId, auth, cookieAuth) => {
-  const roles = [administrator, processor, user, recommender, authoriser];
+  const roles = [administrator, processor, user, recommender, authoriser, support];
   const account = getDevAccount(userId);
   const sessionId = await auth.createSession(account, roles);
   cookieAuth.set({ id: sessionId });
