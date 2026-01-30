@@ -10,5 +10,5 @@ export const moveToInCheckRoute = buildUpdateClaimRoute({
   confirmValues: ["recommendToMoveOnHoldClaim", "updateIssuesLog"],
   errorHref: "#move-to-in-check",
   searchParam: "moveToInCheck",
-  status: STATUS.RECOMMENDED_TO_PAY,
+  status: STATUS.IN_CHECK,
 });
