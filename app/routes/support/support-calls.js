@@ -21,7 +21,6 @@ const makeGetCall = async (url, notFoundMessage, logger) => {
       return notFoundMessage;
     }
 
-    console.log({ payload });
     if (Array.isArray(payload?.data) && payload.data.length === 0) {
       return notFoundMessage;
     }
