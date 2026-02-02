@@ -63,7 +63,7 @@
           .concat(nav.slice(nav | length -1)) %}
       {% endif %}
 
-      {% if scope and 'support' in scope %}
+      {% if scope and 'Support' in scope %}
         {% set nav = nav.slice(0, nav | length -1)
           .concat([{ href: "/support", text: "Support" }])
           .concat(nav.slice(nav | length -1)) %}
