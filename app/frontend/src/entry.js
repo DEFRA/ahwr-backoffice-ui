@@ -28,9 +28,12 @@ document.querySelectorAll("th.govuk-table__header > button").forEach((button) =>
   { buttonId: "copyClaimDocument", inputId: "claimDocument" },
   { buttonId: "copyHerdDocument", inputId: "herdDocument" },
   { buttonId: "copyPaymentDocument", inputId: "paymentDocument" },
+  { buttonId: "copyPaymentStatus", inputId: "paymentStatus" },
   { buttonId: "copyAgreementMessagesDocument", inputId: "agreementMessagesDocument" },
   { buttonId: "copyClaimMessagesDocument", inputId: "claimMessagesDocument" },
   { buttonId: "copyAgreementLogsDocument", inputId: "agreementLogsDocument" },
+  { buttonId: "copyAgreementCommsDocument", inputId: "agreementCommsDocument" },
+  { buttonId: "copyClaimCommsDocument", inputId: "claimCommsDocument" },
 ].forEach(({ buttonId, inputId }) => {
   const btn = document.getElementById(buttonId);
   if (btn) {
