@@ -4,7 +4,7 @@ import { getHerdDocument } from "./support-calls.js";
 export const searchHerd = {
   action: "searchHerd",
   validation: Joi.object({
-    herdId: Joi.string().required(),
+    herdId: Joi.string().trim().required(),
     action: Joi.string().required(),
   }),
   handler: async (request, h) => {

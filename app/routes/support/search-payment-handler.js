@@ -4,7 +4,7 @@ import { getPaymentDocument } from "./support-calls.js";
 export const searchPayment = {
   action: "searchPayment",
   validation: Joi.object({
-    paymentReference: Joi.string().required(),
+    paymentReference: Joi.string().trim().required(),
     action: Joi.string().required(),
   }),
   handler: async (request, h) => {

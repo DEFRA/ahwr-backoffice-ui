@@ -4,7 +4,7 @@ import { getAgreementCommsDocument } from "./support-calls.js";
 export const searchAgreementComms = {
   action: "searchAgreementComms",
   validation: Joi.object({
-    agreementCommsReference: Joi.string().required(),
+    agreementCommsReference: Joi.string().trim().required(),
     action: Joi.string().required(),
   }),
   handler: async (request, h) => {

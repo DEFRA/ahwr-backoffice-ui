@@ -4,7 +4,7 @@ import { getAgreementLogsDocument } from "./support-calls.js";
 export const searchAgreementLogs = {
   action: "searchAgreementLogs",
   validation: Joi.object({
-    agreementLogReference: Joi.string().required(),
+    agreementLogReference: Joi.string().trim().required(),
     action: Joi.string().required(),
   }),
   handler: async (request, h) => {

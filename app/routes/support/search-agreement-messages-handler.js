@@ -4,7 +4,7 @@ import { getAgreementMessagesDocument } from "./support-calls.js";
 export const searchAgreementMessages = {
   action: "searchAgreementMessages",
   validation: Joi.object({
-    agreementMessagesReference: Joi.string().required(),
+    agreementMessagesReference: Joi.string().trim().required(),
     action: Joi.string().required(),
   }),
   handler: async (request, h) => {

@@ -4,7 +4,7 @@ import { getClaimDocument } from "./support-calls.js";
 export const searchClaim = {
   action: "searchClaim",
   validation: Joi.object({
-    claimReference: Joi.string().required(),
+    claimReference: Joi.string().trim().required(),
     action: Joi.string().required(),
   }),
   handler: async (request, h) => {

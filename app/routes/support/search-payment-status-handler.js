@@ -4,7 +4,7 @@ import { getPaymentDocumentWithRefresh } from "./support-calls.js";
 export const searchPaymentStatus = {
   action: "searchPaymentStatus",
   validation: Joi.object({
-    paymentStatusReference: Joi.string().required(),
+    paymentStatusReference: Joi.string().trim().required(),
     action: Joi.string().required(),
   }),
   handler: async (request, h) => {
