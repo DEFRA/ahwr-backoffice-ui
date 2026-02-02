@@ -83,7 +83,8 @@
     "@azure/msal-node": {
       "jsonwebtoken": "9.0.3"
     },
-    "brace-expansion": "2.0.2"
+    "brace-expansion": "2.0.2",
+    "fast-xml-parser": "5.3.4"
   },
   "nodemonConfig": {
     "ignore": [

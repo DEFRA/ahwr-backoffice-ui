@@ -30,7 +30,7 @@ describe("Dev auth test", () => {
         name: "Developer",
         username: "developer@defra.gov.uk",
       },
-      ["administrator", "processor", "user", "recommender", "authoriser", "support"],
+      ["administrator", "processor", "user", "recommender", "authoriser", "Support"],
     );
 
     expect(MOCK_COOKIE_AUTH_SET).toHaveBeenCalledTimes(1);
@@ -43,7 +43,7 @@ describe("Dev auth test", () => {
       "user",
       "recommender",
       "authoriser",
-      "support",
+      "Support",
     ]);
   });
 
@@ -59,7 +59,7 @@ describe("Dev auth test", () => {
         name: "Developer-abc123",
         username: "developer+abc123@defra.gov.uk",
       },
-      ["administrator", "processor", "user", "recommender", "authoriser", "support"],
+      ["administrator", "processor", "user", "recommender", "authoriser", "Support"],
     );
 
     expect(MOCK_COOKIE_AUTH_SET).toHaveBeenCalledTimes(1);
@@ -72,7 +72,7 @@ describe("Dev auth test", () => {
       "user",
       "recommender",
       "authoriser",
-      "support",
+      "Support",
     ]);
   });
 
