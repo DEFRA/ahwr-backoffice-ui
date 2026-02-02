@@ -15,16 +15,20 @@
 {% endif %}
 
 <form method="POST" action="/support" class="ahwr-application-search-form">
+<span>
   {{ govukInput({
     label: {
-      text: "Agreement Document",
-      classes: "govuk-label--m",
+    text: "Agreement",
+    classes: "govuk-label--m",
       isPageHeading: false
+    },
+    classes: "govuk-input--width-20",
+    hint: {
+        text: "Agreement reference"
     },
     id: "application-reference",
     name: "applicationReference"
   }) }}
-
   {{ govukButton({
     text: "Search for Agreement Document"
   }) }}
@@ -50,9 +54,13 @@
 <form method="POST" action="/support" class="ahwr-claim-search-form">
   {{ govukInput({
     label: {
-      text: "Claim Document",
+      text: "Claim",
       classes: "govuk-label--m",
       isPageHeading: false
+    },
+    classes: "govuk-input--width-20",
+    hint: {
+      text: "Claim reference"
     },
     id: "claim-reference",
     name: "claimReference"
@@ -83,9 +91,13 @@
 <form method="POST" action="/support" class="ahwr-herd-search-form">
   {{ govukInput({
     label: {
-      text: "Herd Document",
+      text: "Herd",
       classes: "govuk-label--m",
       isPageHeading: false
+    },
+    classes: "govuk-input--width-20",
+    hint: {
+      text: "Herd id."
     },
     id: "herd-id",
     name: "herdId"
@@ -121,12 +133,16 @@
       classes: "govuk-label--m",
       isPageHeading: false
     },
+    classes: "govuk-input--width-20",
+    hint: {
+        text: "Claim reference. This changes the backend DB"
+    },
     id: "payment-status-reference",
     name: "paymentStatusReference"
   }) }}
 
   {{ govukButton({
-    text: "REQUEST Payment Status"
+    text: "Request Payment Status"
   }) }}
   <input type="hidden" name="crumb" value="{{ crumb }}"/>
   <input type="hidden" name="action" value="searchPaymentStatus"/>
@@ -151,9 +167,13 @@
 <form method="POST" action="/support" class="ahwr-payment-search-form">
   {{ govukInput({
     label: {
-      text: "Payments Document",
+      text: "Payments",
       classes: "govuk-label--m",
       isPageHeading: false
+    },
+    classes: "govuk-input--width-20",
+    hint: {
+        text: "Claim reference"
     },
     id: "payment-reference",
     name: "paymentReference"
@@ -189,6 +209,10 @@
       classes: "govuk-label--m",
       isPageHeading: false
     },
+    classes: "govuk-input--width-20",
+    hint: {
+        text: "Agreement reference"
+    },
     id: "agreement-messages-reference",
     name: "agreementMessagesReference"
   }) }}
@@ -223,6 +247,10 @@
       classes: "govuk-label--m",
       isPageHeading: false
     },
+    classes: "govuk-input--width-20",
+    hint: {
+        text: "Claim reference"
+    },
     id: "claim-messages-reference",
     name: "claimMessagesReference"
   }) }}
@@ -253,9 +281,13 @@
 <form method="POST" action="/support" class="ahwr-agreement-logs-search-form">
   {{ govukInput({
     label: {
-      text: "Agreement Document Logs",
+      text: "Agreement Logs",
       classes: "govuk-label--m",
       isPageHeading: false
+    },
+    classes: "govuk-input--width-20",
+    hint: {
+        text: "Agreement reference"
     },
     id: "agreement-log-reference",
     name: "agreementLogReference"
@@ -291,6 +323,10 @@
       classes: "govuk-label--m",
       isPageHeading: false
     },
+    classes: "govuk-input--width-20",
+    hint: {
+        text: "Agreement reference"
+    },
     id: "agreement-comms-reference",
     name: "agreementCommsReference"
   }) }}
@@ -324,6 +360,10 @@
       text: "Claim Comms",
       classes: "govuk-label--m",
       isPageHeading: false
+    },
+    classes: "govuk-input--width-20",
+    hint: {
+        text: "Claim reference"
     },
     id: "claim-comms-reference",
     name: "claimCommsReference"
