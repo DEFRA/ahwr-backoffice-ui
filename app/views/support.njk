@@ -5,6 +5,16 @@
   Support
 {% endblock %}
 {% block content %}
+{% if scrollTo %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var element = document.getElementById('{{ scrollTo }}');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+</script>
+{% endif %}
 <h1 class="govuk-heading-xl govuk-!-margin-bottom-7">Support</h1>
 
 {% if errors.length %}

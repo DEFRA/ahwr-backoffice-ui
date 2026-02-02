@@ -11,7 +11,7 @@ export const searchHerd = {
     const { herdId } = request.payload;
     const rawDocument = await getHerdDocument(herdId, request.logger);
     const herdDocument = JSON.stringify(rawDocument);
-    return h.view("support", { herdDocument });
+    return h.view("support", { herdDocument, scrollTo: "herdDocument" });
   },
   errorIdentifier: '"herdId"',
   errorHandler: (receivedError) => ({

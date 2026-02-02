@@ -11,7 +11,7 @@ export const searchPaymentStatus = {
     const { paymentStatusReference } = request.payload;
     const rawDocument = await getPaymentDocumentWithRefresh(paymentStatusReference, request.logger);
     const paymentStatus = JSON.stringify(rawDocument);
-    return h.view("support", { paymentStatus });
+    return h.view("support", { paymentStatus, scrollTo: "paymentStatus" });
   },
   errorIdentifier: '"paymentStatusReference"',
   errorHandler: (receivedError) => ({

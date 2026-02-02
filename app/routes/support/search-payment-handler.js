@@ -11,7 +11,7 @@ export const searchPayment = {
     const { paymentReference } = request.payload;
     const rawDocument = await getPaymentDocument(paymentReference, request.logger);
     const paymentDocument = JSON.stringify(rawDocument);
-    return h.view("support", { paymentDocument });
+    return h.view("support", { paymentDocument, scrollTo: "paymentDocument" });
   },
   errorIdentifier: '"paymentReference"',
   errorHandler: (receivedError) => ({

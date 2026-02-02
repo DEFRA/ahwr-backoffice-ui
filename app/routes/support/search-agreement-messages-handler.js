@@ -14,7 +14,7 @@ export const searchAgreementMessages = {
       request.logger,
     );
     const agreementMessagesDocument = JSON.stringify(rawDocument);
-    return h.view("support", { agreementMessagesDocument });
+    return h.view("support", { agreementMessagesDocument, scrollTo: "agreementMessagesDocument" });
   },
   errorIdentifier: '"agreementMessagesReference"',
   errorHandler: (receivedError) => ({

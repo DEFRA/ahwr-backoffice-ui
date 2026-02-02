@@ -11,7 +11,7 @@ export const searchApplication = {
     const { applicationReference } = request.payload;
     const rawDocument = await getApplicationDocument(applicationReference, request.logger);
     const applicationDocument = JSON.stringify(rawDocument);
-    return h.view("support", { applicationDocument });
+    return h.view("support", { applicationDocument, scrollTo: "applicationDocument" });
   },
   errorIdentifier: '"applicationReference"',
   errorHandler: (receivedError) => ({

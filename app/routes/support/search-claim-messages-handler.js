@@ -11,7 +11,7 @@ export const searchClaimMessages = {
     const { claimMessagesReference } = request.payload;
     const rawDocument = await getClaimMessagesDocument(claimMessagesReference, request.logger);
     const claimMessagesDocument = JSON.stringify(rawDocument);
-    return h.view("support", { claimMessagesDocument });
+    return h.view("support", { claimMessagesDocument, scrollTo: "claimMessagesDocument" });
   },
   errorIdentifier: '"claimMessagesReference"',
   errorHandler: (receivedError) => ({

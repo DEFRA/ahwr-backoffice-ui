@@ -11,7 +11,7 @@ export const searchAgreementComms = {
     const { agreementCommsReference } = request.payload;
     const rawDocument = await getAgreementCommsDocument(agreementCommsReference, request.logger);
     const agreementCommsDocument = JSON.stringify(rawDocument);
-    return h.view("support", { agreementCommsDocument });
+    return h.view("support", { agreementCommsDocument, scrollTo: "agreementCommsDocument" });
   },
   errorIdentifier: '"agreementCommsReference"',
   errorHandler: (receivedError) => ({

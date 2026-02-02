@@ -11,7 +11,7 @@ export const searchClaimComms = {
     const { claimCommsReference } = request.payload;
     const rawDocument = await getClaimCommsDocument(claimCommsReference, request.logger);
     const claimCommsDocument = JSON.stringify(rawDocument);
-    return h.view("support", { claimCommsDocument });
+    return h.view("support", { claimCommsDocument, scrollTo: "claimCommsDocument" });
   },
   errorIdentifier: '"claimCommsReference"',
   errorHandler: (receivedError) => ({
