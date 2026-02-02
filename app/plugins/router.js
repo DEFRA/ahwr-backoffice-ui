@@ -21,7 +21,6 @@ import { rejectApplicationClaimRoute } from "../routes/reject-application-claim.
 import { updateStatusRoute } from "../routes/update-status.js";
 import { viewAgreementRoute } from "../routes/view-agreement.js";
 import { viewClaimRoute } from "../routes/view-claim.js";
-import { withdrawAgreementRoute } from "../routes/withdraw-agreement.js";
 import { updateEligiblePiiRedactionRoute } from "../routes/agreements-eligible-pii-redaction.js";
 import { missingPagesRoute } from "../routes/missing-routes.js";
 import { config } from "../config/index.js";
@@ -51,7 +50,6 @@ const routes = [
   updateStatusRoute,
   viewAgreementRoute,
   viewClaimRoute,
-  withdrawAgreementRoute,
   updateEligiblePiiRedactionRoute,
   missingPagesRoute,
 ];

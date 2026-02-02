@@ -5,7 +5,6 @@ import { getStyleClassByStatus } from "../constants/status.js";
 import { getClaimViewStates } from "./utils/get-claim-view-states.js";
 import { getCurrentStatusEvent } from "./utils/get-current-status-event.js";
 import { getErrorMessagesByKey } from "./utils/get-error-messages-by-key.js";
-import { getStatusUpdateOptions } from "./utils/get-status-update-options.js";
 import { getContactHistory, displayContactHistory } from "../api/contact-history.js";
 import { upperFirstLetter } from "../lib/display-helper.js";
 import { getOrganisationDetails } from "./models/organisation-details.js";
@@ -28,11 +27,6 @@ export const viewAgreementRoute = {
       query: joi.object({
         page: joi.number().greater(0).default(1),
         errors: joi.string().allow(null),
-        withdraw: joi.bool().default(false),
-        moveToInCheck: joi.bool().default(false),
-        approve: joi.bool().default(false),
-        reject: joi.bool().default(false),
-        updateStatus: joi.bool().default(false),
         updateVetsName: joi.bool().default(false),
         updateDateOfVisit: joi.bool().default(false),
         updateVetRCVSNumber: joi.bool().default(false),
@@ -56,12 +50,6 @@ export const viewAgreementRoute = {
       const isRedacted = application.redacted;
 
       const {
-        withdrawAction,
-        withdrawForm,
-        moveToInCheckAction,
-        moveToInCheckForm,
-        updateStatusAction,
-        updateStatusForm,
         updateVetsNameAction,
         updateVetsNameForm,
         updateVetRCVSNumberAction,
@@ -76,8 +64,6 @@ export const viewAgreementRoute = {
         ? JSON.parse(Buffer.from(request.query.errors, "base64").toString("utf8"))
         : [];
 
-      const statusOptions = getStatusUpdateOptions(status);
-
       const getAction = (query, visuallyHiddenText, id) => ({
         items: [
           {
@@ -87,9 +73,6 @@ export const viewAgreementRoute = {
           },
         ],
       });
-      const statusActions = updateStatusAction
-        ? getAction("updateStatus", "status", "update-status")
-        : null;
       const dateOfVisitActions = updateDateOfVisitAction
         ? getAction("updateDateOfVisit", "date of review", "update-date-of-visit")
         : null;
@@ -111,15 +94,10 @@ export const viewAgreementRoute = {
       const contactHistoryDetails = displayContactHistory(contactHistory);
       const { organisation } = application;
       const organisationDetails = getOrganisationDetails(organisation, contactHistoryDetails);
-      const applicationDetails = getApplicationDetails(
-        application,
-        statusActions,
-        eligiblePiiRedactionActions,
-      );
+      const applicationDetails = getApplicationDetails(application, eligiblePiiRedactionActions);
       const historyDetails = getHistoryDetails(historyRecords);
       const applicationClaimDetails = getApplicationClaimDetails(
         application,
-        statusActions,
         dateOfVisitActions,
         vetsNameActions,
         vetRCVSNumberActions,
@@ -130,7 +108,6 @@ export const viewAgreementRoute = {
         page,
         reference: application.reference,
         claimOrAgreement: "agreement",
-        status,
         statusLabel,
         statusClass,
         organisationName: organisation.name,
@@ -141,18 +118,12 @@ export const viewAgreementRoute = {
         applicationDetails,
         historyDetails,
         applicationClaimDetails,
-        withdrawAction,
-        withdrawForm,
-        moveToInCheckAction,
-        moveToInCheckForm,
-        updateStatusForm,
         updateDateOfVisitForm,
         updateVetsNameForm,
         updateVetRCVSNumberForm,
         updateEligiblePiiRedactionAction,
         updateEligiblePiiRedactionForm,
         eligiblePiiRedaction: application.eligiblePiiRedaction,
-        statusOptions,
         errorMessages,
         errors,
       });

@@ -54,7 +54,6 @@ describe("Recommended To Reject test", () => {
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           reference,
-          claimOrAgreement: "claim",
           page: 1,
           returnPage: "claims",
           confirm: "checkedAgainstChecklist",
@@ -86,7 +85,6 @@ describe("Recommended To Reject test", () => {
         headers: { cookie: `crumb=${crumb}` },
         payload: {
           reference,
-          claimOrAgreement: "claim",
           page: 1,
           returnPage: "claims",
           confirm: ["checkedAgainstChecklist", "sentChecklist"],
