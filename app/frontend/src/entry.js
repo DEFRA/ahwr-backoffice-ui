@@ -38,6 +38,8 @@ document.querySelectorAll("th.govuk-table__header > button").forEach((button) =>
   const btn = document.getElementById(buttonId);
   if (btn) {
     btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
       var copyText = document.getElementById(inputId).innerText;
       navigator.clipboard.writeText(copyText);
     });
