@@ -4,14 +4,14 @@ import { getClaimDocument } from "./support-calls.js";
 export const searchClaim = {
   action: "searchClaim",
   validation: Joi.object({
-    claimReference: Joi.string().required(),
+    claimReference: Joi.string().trim().required(),
     action: Joi.string().required(),
   }),
   handler: async (request, h) => {
     const { claimReference } = request.payload;
     const rawDocument = await getClaimDocument(claimReference, request.logger);
     const claimDocument = JSON.stringify(rawDocument);
-    return h.view("support", { claimDocument });
+    return h.view("support", { claimDocument, scrollTo: "claimDocument" });
   },
   errorIdentifier: '"claimReference"',
   errorHandler: (receivedError) => ({

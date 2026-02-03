@@ -4,14 +4,14 @@ import { getHerdDocument } from "./support-calls.js";
 export const searchHerd = {
   action: "searchHerd",
   validation: Joi.object({
-    herdId: Joi.string().required(),
+    herdId: Joi.string().trim().required(),
     action: Joi.string().required(),
   }),
   handler: async (request, h) => {
     const { herdId } = request.payload;
     const rawDocument = await getHerdDocument(herdId, request.logger);
     const herdDocument = JSON.stringify(rawDocument);
-    return h.view("support", { herdDocument });
+    return h.view("support", { herdDocument, scrollTo: "herdDocument" });
   },
   errorIdentifier: '"herdId"',
   errorHandler: (receivedError) => ({

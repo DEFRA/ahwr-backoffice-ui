@@ -145,6 +145,22 @@ describe("getHerdDocument", () => {
     expect(result).toStrictEqual({});
   });
 
+  it("returns correct not found message if empty array returned", async () => {
+    const wreckResponse = {
+      payload: [],
+      res: {
+        statusCode: 200,
+      },
+    };
+    wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
+    const result = await getHerdDocument("123", mockLogger);
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-application-backend:3001/api/support/herds/123",
+      { json: true },
+    );
+    expect(result).toStrictEqual("No herd found");
+  });
+
   it("returns correct not found message", async () => {
     wreck.get = jest.fn().mockImplementation(() => {
       throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
@@ -309,6 +325,22 @@ describe("getAgreementMessagesDocument", () => {
     expect(result).toStrictEqual({});
   });
 
+  it("returns correct not found message if no data returned", async () => {
+    const wreckResponse = {
+      payload: { data: [] },
+      res: {
+        statusCode: 200,
+      },
+    };
+    wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
+    const result = await getAgreementMessagesDocument("123", mockLogger);
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-message-generator:3001/api/support/message-generation?agreementReference=123",
+      { json: true },
+    );
+    expect(result).toStrictEqual("No agreement messages found");
+  });
+
   it("returns correct not found message", async () => {
     wreck.get = jest.fn().mockImplementation(() => {
       throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
@@ -354,6 +386,22 @@ describe("getClaimMessagesDocument", () => {
       { json: true },
     );
     expect(result).toStrictEqual({});
+  });
+
+  it("returns correct not found message if no data returned", async () => {
+    const wreckResponse = {
+      payload: { data: [] },
+      res: {
+        statusCode: 200,
+      },
+    };
+    wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
+    const result = await getClaimMessagesDocument("123", mockLogger);
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-message-generator:3001/api/support/message-generation?claimReference=123",
+      { json: true },
+    );
+    expect(result).toStrictEqual("No claim messages found");
   });
 
   it("returns correct not found message", async () => {

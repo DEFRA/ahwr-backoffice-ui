@@ -16,6 +16,15 @@ const makeGetCall = async (url, notFoundMessage, logger) => {
     const { payload } = await wreck.get(`${url}`, {
       json: true,
     });
+
+    if (Array.isArray(payload) && payload.length === 0) {
+      return notFoundMessage;
+    }
+
+    if (Array.isArray(payload?.data) && payload.data.length === 0) {
+      return notFoundMessage;
+    }
+
     return payload;
   } catch (error) {
     if (error.data?.res?.statusCode === StatusCodes.NOT_FOUND) {

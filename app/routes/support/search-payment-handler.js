@@ -4,14 +4,14 @@ import { getPaymentDocument } from "./support-calls.js";
 export const searchPayment = {
   action: "searchPayment",
   validation: Joi.object({
-    paymentReference: Joi.string().required(),
+    paymentReference: Joi.string().trim().required(),
     action: Joi.string().required(),
   }),
   handler: async (request, h) => {
     const { paymentReference } = request.payload;
     const rawDocument = await getPaymentDocument(paymentReference, request.logger);
     const paymentDocument = JSON.stringify(rawDocument);
-    return h.view("support", { paymentDocument });
+    return h.view("support", { paymentDocument, scrollTo: "paymentDocument" });
   },
   errorIdentifier: '"paymentReference"',
   errorHandler: (receivedError) => ({
