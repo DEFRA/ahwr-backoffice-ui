@@ -40,8 +40,8 @@ document.querySelectorAll("th.govuk-table__header > button").forEach((button) =>
     btn.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-      var copyText = document.getElementById(inputId).innerText;
-      navigator.clipboard.writeText(copyText);
+      const copyText = document.getElementById(inputId).innerText;
+      navigator.clipboard.writeText(copyText).then();
     });
   }
 });
