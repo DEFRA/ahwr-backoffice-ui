@@ -10,6 +10,7 @@ export const authPlugin = {
       await server.register(authCookie);
 
       const sessionCache = server.cache({
+        cache: config.cache.name,
         segment: SESSION_AUTH,
         expiresIn: config.cache.expiresIn,
       });

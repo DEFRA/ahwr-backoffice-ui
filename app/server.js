@@ -31,11 +31,12 @@ export async function createServer(options) {
     },
   });
 
-  const submissionCrumbCache = server.cache({
+  // 24 hours
+  server.app.submissionCrumbCache = server.cache({
     expiresIn: 1000 * 60 * 60 * 24,
     segment: "submissionCrumbs",
-  }); // 24 hours
-  server.app.submissionCrumbCache = submissionCrumbCache;
+    cache: config.cache.name,
+  });
 
   await server.register(authPlugin);
   await server.register(crumbPlugin);
