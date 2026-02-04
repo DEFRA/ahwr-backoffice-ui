@@ -9,6 +9,7 @@ const getConfigSchema = () =>
   joi.object({
     cache: {
       expiresIn: joi.number().required(),
+      name: joi.string().required(),
       options: {
         host: joi.string(),
         keyPrefix: joi.string(),
@@ -55,9 +56,10 @@ const buildConfig = () => {
   const conf = {
     cache: {
       expiresIn: MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_HALF_DAY,
+      name: "session",
       options: {
         host: process.env.REDIS_HOST || "redis-hostname.default",
-        keyPrefix: process.env.REDIS_KEY_PREFIX || "ahwr-backoffice-ui",
+        keyPrefix: process.env.REDIS_KEY_PREFIX || "ahwr-backoffice-ui:",
         username: process.env.REDIS_USERNAME,
         password: process.env.REDIS_PASSWORD,
         useSingleInstanceCache: process.env.NODE_ENV !== "production",
