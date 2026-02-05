@@ -4,47 +4,60 @@ import { config } from "../config/index.js";
 import { mapAuth } from "./map-auth.js";
 import { getLogger } from "../logging/logger.js";
 
-let perfTestAuthMode = false;
+let cachedToggleAuthMode = null;
 
-const getAuth = () => {
-  if (config.perfTestEnabled && perfTestAuthMode) {
-    return devAuth;
-  } else if (config.auth.enabled) {
+const getAuth = async () => {
+  if (config.perfTestEnabled) {
+    const toggledMode = await cachedToggleAuthMode.get("perf-test-mode");
+    if (toggledMode) {
+      console.log("Perf test mode enabled");
+      return devAuth;
+    } else {
+      return realAuth;
+    }
+  }
+
+  if (config.auth.enabled) {
     return realAuth;
   } else {
     return devAuth;
   }
 };
 
-const initAuth = () => {
+const initAuth = (server) => {
   if (config.auth.enabled) {
     realAuth.init();
   }
+  cachedToggleAuthMode = server.cache({
+    cache: config.cache.name,
+    segment: "perf-test-mode",
+    expiresIn: config.cache.expiresIn,
+  });
 };
 
-const toggleAuthMode = (possibleUserId) => {
+const toggleAuthMode = async (possibleUserId) => {
   if (config.perfTestEnabled && possibleUserId) {
     if (possibleUserId.toLowerCase().startsWith("perfteston")) {
       getLogger().info("Enabling perf test auth mode");
-      perfTestAuthMode = true;
+      await cachedToggleAuthMode.set("perf-test-mode", true);
     } else if (possibleUserId.toLowerCase().startsWith("perftestoff")) {
       getLogger().info("Disabling perf test auth mode");
-      perfTestAuthMode = false;
+      await cachedToggleAuthMode.set("perf-test-mode", false);
     }
   }
 };
 
 const authenticate = async (redirectCode, authPlugin, cookieAuth) => {
-  return getAuth().authenticate(redirectCode, authPlugin, cookieAuth);
+  return (await getAuth()).authenticate(redirectCode, authPlugin, cookieAuth);
 };
 
 const logout = async (account) => {
-  return getAuth().logout(account);
+  return (await getAuth()).logout(account);
 };
 
-const getAuthenticationUrl = (userId) => {
-  toggleAuthMode(userId);
-  return getAuth().getAuthenticationUrl(userId);
+const getAuthenticationUrl = async (userId) => {
+  await toggleAuthMode(userId);
+  return (await getAuth()).getAuthenticationUrl(userId);
 };
 
 export const auth = {
