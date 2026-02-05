@@ -10,7 +10,6 @@ const getAuth = async () => {
   if (config.perfTestEnabled) {
     const toggledMode = await cachedToggleAuthMode.get("perf-test-mode");
     if (toggledMode) {
-      console.log("Perf test mode enabled");
       return devAuth;
     } else {
       return realAuth;
