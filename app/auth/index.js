@@ -4,11 +4,12 @@ import { config } from "../config/index.js";
 import { mapAuth } from "./map-auth.js";
 import { getLogger } from "../logging/logger.js";
 
+const PERF_TEST_MODE_KEY = "perf-test-mode";
 let cachedToggleAuthMode = null;
 
 const getAuth = async () => {
   if (config.perfTestEnabled) {
-    const toggledMode = await cachedToggleAuthMode.get("perf-test-mode");
+    const toggledMode = await cachedToggleAuthMode.get(PERF_TEST_MODE_KEY);
     if (toggledMode) {
       return devAuth;
     } else {
@@ -29,7 +30,7 @@ const initAuth = (server) => {
   }
   cachedToggleAuthMode = server.cache({
     cache: config.cache.name,
-    segment: "perf-test-mode",
+    segment: PERF_TEST_MODE_KEY,
     expiresIn: config.cache.expiresIn,
   });
 };
@@ -38,10 +39,10 @@ const toggleAuthMode = async (possibleUserId) => {
   if (config.perfTestEnabled && possibleUserId) {
     if (possibleUserId.toLowerCase().startsWith("perfteston")) {
       getLogger().info("Enabling perf test auth mode");
-      await cachedToggleAuthMode.set("perf-test-mode", true);
+      await cachedToggleAuthMode.set(PERF_TEST_MODE_KEY, true);
     } else if (possibleUserId.toLowerCase().startsWith("perftestoff")) {
       getLogger().info("Disabling perf test auth mode");
-      await cachedToggleAuthMode.set("perf-test-mode", false);
+      await cachedToggleAuthMode.set(PERF_TEST_MODE_KEY, false);
     }
   }
 };
