@@ -24,8 +24,19 @@ export const getAuthenticationUrl = (userId) => {
   return "/dev-auth";
 };
 
+const rolesByUserId = new Map([
+  ["user", [user]],
+  ["recommender", [user, recommender]],
+  ["administrator", [user, administrator]],
+  ["processor", [user, processor]],
+  ["authoriser", [user, authoriser]],
+  ["support", [user, support]],
+]);
+
 export const authenticate = async (userId, auth, cookieAuth) => {
-  const roles = [administrator, processor, user, recommender, authoriser, support];
+  const roles = rolesByUserId.has(userId)
+    ? rolesByUserId.get(userId)
+    : [administrator, processor, user, recommender, authoriser, support];
   const account = getDevAccount(userId);
   const sessionId = await auth.createSession(account, roles);
   cookieAuth.set({ id: sessionId });
