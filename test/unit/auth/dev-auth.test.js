@@ -76,6 +76,28 @@ describe("Dev auth test", () => {
     ]);
   });
 
+  test("authentice with userId as target role", async () => {
+    const mockAuth = { createSession: MOCK_AUTH_CREATESESSION };
+    const mockCookieAuth = { set: MOCK_COOKIE_AUTH_SET };
+
+    const [user, roles] = await authenticate("support", mockAuth, mockCookieAuth);
+
+    expect(MOCK_AUTH_CREATESESSION).toHaveBeenCalledTimes(1);
+    expect(MOCK_AUTH_CREATESESSION).toHaveBeenCalledWith(
+      {
+        name: "Developer-support",
+        username: "developer+support@defra.gov.uk",
+      },
+      ["user", "Support"],
+    );
+
+    expect(MOCK_COOKIE_AUTH_SET).toHaveBeenCalledTimes(1);
+    expect(MOCK_COOKIE_AUTH_SET).toHaveBeenCalledWith({ id: FAKE_SESSION_ID });
+
+    expect(user).toBe("developer+support@defra.gov.uk");
+    expect(roles).toEqual(["user", "Support"]);
+  });
+
   test("logout test", () => {
     expect(logout).toBeDefined();
   });
