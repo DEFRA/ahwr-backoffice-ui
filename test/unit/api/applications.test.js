@@ -34,20 +34,24 @@ describe("Application API", () => {
         statusCode: 502,
       },
     };
-    const options = {
+    const expectedOptions = {
       payload: {
         search: { text: searchText, type: searchType },
         limit,
         offset,
       },
       json: true,
+      headers: { "x-api-key": process.env.BACKEND_API_KEY },
     };
     wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
     const response = await getApplications(searchType, searchText, limit, offset);
 
     expect(response).toEqual(wreckResponse.payload);
     expect(wreck.post).toHaveBeenCalledTimes(1);
-    expect(wreck.post).toHaveBeenCalledWith(`${applicationApiUri}/applications/search`, options);
+    expect(wreck.post).toHaveBeenCalledWith(
+      `${applicationApiUri}/applications/search`,
+      expectedOptions,
+    );
   });
 
   it("getApplication should return null application", async () => {
@@ -57,13 +61,16 @@ describe("Application API", () => {
         statusCode: 502,
       },
     };
-    const options = { json: true };
+    const expectedOptions = { json: true, headers: { "x-api-key": process.env.BACKEND_API_KEY } };
     wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
     const response = await getApplication(appRef);
 
     expect(response).toEqual(wreckResponse.payload);
     expect(wreck.get).toHaveBeenCalledTimes(1);
-    expect(wreck.get).toHaveBeenCalledWith(`${applicationApiUri}/applications/${appRef}`, options);
+    expect(wreck.get).toHaveBeenCalledWith(
+      `${applicationApiUri}/applications/${appRef}`,
+      expectedOptions,
+    );
   });
 
   it("getApplication should return an application", async () => {
@@ -76,20 +83,23 @@ describe("Application API", () => {
         statusCode: 200,
       },
     };
-    const options = { json: true };
+    const expectedOptions = { json: true, headers: { "x-api-key": process.env.BACKEND_API_KEY } };
     wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
     const response = await getApplication(appRef);
 
     expect(response).toEqual(wreckResponse.payload);
     expect(wreck.get).toHaveBeenCalledTimes(1);
-    expect(wreck.get).toHaveBeenCalledWith(`${applicationApiUri}/applications/${appRef}`, options);
+    expect(wreck.get).toHaveBeenCalledWith(
+      `${applicationApiUri}/applications/${appRef}`,
+      expectedOptions,
+    );
   });
 
   it("getApplications should throw errors", async () => {
     const filter = [];
     const sort = "ASC";
 
-    const options = {
+    const expectedOptions = {
       payload: {
         search: { text: searchText, type: searchType },
         limit,
@@ -98,6 +108,7 @@ describe("Application API", () => {
         sort,
       },
       json: true,
+      headers: { "x-api-key": process.env.BACKEND_API_KEY },
     };
     wreck.post = jest.fn().mockRejectedValueOnce("getApplications boom");
     const logger = { error: jest.fn() };
@@ -106,11 +117,14 @@ describe("Application API", () => {
       await getApplications(searchType, searchText, limit, offset, filter, sort, logger);
     }).rejects.toBe("getApplications boom");
     expect(wreck.post).toHaveBeenCalledTimes(1);
-    expect(wreck.post).toHaveBeenCalledWith(`${applicationApiUri}/applications/search`, options);
+    expect(wreck.post).toHaveBeenCalledWith(
+      `${applicationApiUri}/applications/search`,
+      expectedOptions,
+    );
   });
 
   it("getApplication should throw errors", async () => {
-    const options = { json: true };
+    const expectedOptions = { json: true, headers: { "x-api-key": process.env.BACKEND_API_KEY } };
     wreck.get = jest.fn().mockRejectedValueOnce("getApplication boom");
     const logger = { error: jest.fn() };
 
@@ -119,16 +133,20 @@ describe("Application API", () => {
     }).rejects.toBe("getApplication boom");
 
     expect(wreck.get).toHaveBeenCalledTimes(1);
-    expect(wreck.get).toHaveBeenCalledWith(`${applicationApiUri}/applications/${appRef}`, options);
+    expect(wreck.get).toHaveBeenCalledWith(
+      `${applicationApiUri}/applications/${appRef}`,
+      expectedOptions,
+    );
   });
 
   it("updateApplicationStatus should throw errors", async () => {
-    const options = {
+    const expectedOptions = {
       payload: {
         user: "test",
         status: 2,
       },
       json: true,
+      headers: { "x-api-key": process.env.BACKEND_API_KEY },
     };
     wreck.put = jest.fn().mockRejectedValueOnce("updateApplicationStatus boom");
     const logger = { error: jest.fn() };
@@ -138,16 +156,20 @@ describe("Application API", () => {
     }).rejects.toBe("updateApplicationStatus boom");
 
     expect(wreck.put).toHaveBeenCalledTimes(1);
-    expect(wreck.put).toHaveBeenCalledWith(`${applicationApiUri}/applications/${appRef}`, options);
+    expect(wreck.put).toHaveBeenCalledWith(
+      `${applicationApiUri}/applications/${appRef}`,
+      expectedOptions,
+    );
   });
 
   it("updateApplicationStatus should return on success", async () => {
-    const options = {
+    const expectedOptions = {
       payload: {
         user: "test",
         status: 2,
       },
       json: true,
+      headers: { "x-api-key": process.env.BACKEND_API_KEY },
     };
     const wreckResponse = {
       payload: {},
@@ -161,7 +183,10 @@ describe("Application API", () => {
 
     expect(response).toEqual(wreckResponse.payload);
     expect(wreck.put).toHaveBeenCalledTimes(1);
-    expect(wreck.put).toHaveBeenCalledWith(`${applicationApiUri}/applications/${appRef}`, options);
+    expect(wreck.put).toHaveBeenCalledWith(
+      `${applicationApiUri}/applications/${appRef}`,
+      expectedOptions,
+    );
   });
 
   test("updateApplicationData", async () => {
@@ -234,7 +259,9 @@ describe("Application API", () => {
 
       const result = await redactPiiData(logger);
 
-      expect(wreck.post).toHaveBeenCalledWith(endpoint, {});
+      expect(wreck.post).toHaveBeenCalledWith(endpoint, {
+        headers: { "x-api-key": process.env.BACKEND_API_KEY },
+      });
       expect(result).toEqual({});
       expect(logger.error).not.toHaveBeenCalled();
     });
@@ -280,6 +307,7 @@ describe("Application API", () => {
           updateEligiblePiiRedaction: true,
           user: "John Doe",
         },
+        headers: { "x-api-key": process.env.BACKEND_API_KEY },
       });
       expect(result).toEqual({});
       expect(logger.error).not.toHaveBeenCalled();

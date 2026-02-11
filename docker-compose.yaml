@@ -24,3 +24,4 @@ services:
       AHWR_COMMS_PROXY_URL: http://ahwr-sfd-comms-proxy:3001/api
       DISPLAY_PAGE_SIZE: 20
       SUPER_ADMINS: ${SUPER_ADMINS}
+      BACKEND_API_KEY: "446dcdbe-e02c-4d16-a266-001bbbd5f089"

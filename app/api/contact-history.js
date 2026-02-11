@@ -8,7 +8,10 @@ const { applicationApiUri } = config;
 export async function getContactHistory(reference, logger) {
   const endpoint = `${applicationApiUri}/applications/contact-history/${reference}`;
   try {
-    const { payload } = await wreck.get(endpoint, { json: true });
+    const { payload } = await wreck.get(endpoint, {
+      json: true,
+      headers: { "x-api-key": process.env.BACKEND_API_KEY },
+    });
 
     return payload;
   } catch (error) {

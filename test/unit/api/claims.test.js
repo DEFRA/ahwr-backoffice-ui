@@ -35,6 +35,7 @@ describe("Claims API", () => {
 
     expect(wreck.get).toHaveBeenCalledWith(expect.stringMatching("/claims/RESH-1111-1111"), {
       json: true,
+      headers: { "x-api-key": process.env.BACKEND_API_KEY },
     });
     expect(response).toEqual(wreckResponse.payload);
   });

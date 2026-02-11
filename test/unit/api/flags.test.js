@@ -71,6 +71,7 @@ describe("Flags API", () => {
           user: username,
           deletedNote,
         },
+        headers: { "x-api-key": process.env.BACKEND_API_KEY },
       });
       expect(mockLogger.error).not.toHaveBeenCalled();
       expect(metricsCounter).toHaveBeenCalledWith("flag_deleted");
@@ -113,6 +114,7 @@ describe("Flags API", () => {
         {
           json: true,
           payload,
+          headers: { "x-api-key": process.env.BACKEND_API_KEY },
         },
       );
 

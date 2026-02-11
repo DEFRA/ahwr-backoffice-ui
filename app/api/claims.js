@@ -7,7 +7,10 @@ const { applicationApiUri } = config;
 export async function getClaim(reference, logger) {
   const endpoint = `${applicationApiUri}/claims/${reference}`;
   try {
-    const { payload } = await wreck.get(endpoint, { json: true });
+    const { payload } = await wreck.get(endpoint, {
+      json: true,
+      headers: { "x-api-key": process.env.BACKEND_API_KEY },
+    });
     return payload;
   } catch (error) {
     logger.error({ error, endpoint });
@@ -26,6 +29,7 @@ export async function getClaims(searchType, searchText, filter, limit, offset, s
       sort,
     },
     json: true,
+    headers: { "x-api-key": process.env.BACKEND_API_KEY },
   };
   try {
     const { payload } = await wreck.post(endpoint, options);
@@ -47,6 +51,7 @@ export async function updateClaimStatus(reference, user, status, logger, note) {
       note,
     },
     json: true,
+    headers: { "x-api-key": process.env.BACKEND_API_KEY },
   };
   try {
     const { payload } = await wreck.put(endpoint, options);
@@ -67,6 +72,7 @@ export async function updateClaimData(reference, data, note, name, logger) {
       note,
       user: name,
     },
+    headers: { "x-api-key": process.env.BACKEND_API_KEY },
   };
 
   try {
@@ -82,7 +88,10 @@ export async function updateClaimData(reference, data, note, name, logger) {
 export async function getClaimHistory(claimRef, logger) {
   const endpoint = `${applicationApiUri}/claims/${claimRef}/history`;
   try {
-    const { payload } = await wreck.get(endpoint, { json: true });
+    const { payload } = await wreck.get(endpoint, {
+      json: true,
+      headers: { "x-api-key": process.env.BACKEND_API_KEY },
+    });
     return payload;
   } catch (error) {
     logger.error({ error, endpoint });
