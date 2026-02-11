@@ -41,24 +41,25 @@ To use the correct version of Node.js for this application, via nvm:
 cd ahwr-backoffice-ui
 nvm use
 ```
+
 # Service purpose
 
 The backoffice UI service is responsible for the internal user interactions for administering applications and claims.
-The feature-set includes the ability to list, and search for applications and claims, 
-navigate to the details of and manage application and claim, and to perform actions such as approving or rejecting 
+The feature-set includes the ability to list, and search for applications and claims,
+navigate to the details of and manage application and claim, and to perform actions such as approving or rejecting
 claims. Applications can be flagged, which highlights them and all of their associated claims inside the backoffice.
 
 # User authentication and authorisation
 
-Access to the backoffice UI is protected by Azure Active Directory (AAD) authentication and authorisation. 
-Only users with at least the 'user' role can access the application when deployed to non-local environments. 
+Access to the backoffice UI is protected by Azure Active Directory (AAD) authentication and authorisation.
+Only users with at least the 'user' role can access the application when deployed to non-local environments.
 Specialist roles are provided for access to functionality that updates records.
 Roles must be requested via service now requests per environment.
 
 ## Role list
 
 | Role name     | Description                                                                                                        |
-|---------------|--------------------------------------------------------------------------------------------------------------------|
+| ------------- | ------------------------------------------------------------------------------------------------------------------ |
 | user          | Can access the backoffice UI and view applications, claims and flags. No updates can be performed                  |
 | recommender   | In addition to user, can also move the status of claims to Recommended to pay, or recommended to reject            |
 | authoriser    | In addition to user, can also move the status of claims to Ready to pay, or Rejected                               |
@@ -69,7 +70,9 @@ Roles must be requested via service now requests per environment.
 # Management features
 
 ## Status updates
+
 Claims can be moved through the following statuses:
+
 - On Hold
 - In Check
 - Recommended to pay
@@ -78,32 +81,34 @@ Claims can be moved through the following statuses:
 - Rejected
 
 Claims will be created in either of In check or On Hold status, and once they are in check, they must be manually moved
-into recommended to pay or reject, and then ready to pay or rejected. 
+into recommended to pay or reject, and then ready to pay or rejected.
 Claims that are on hold can be moved into in check, but not directly into recommended to pay or reject.
-The flow of statuses is one way only, with the exception of being able to move a claim back to in check status from 
+The flow of statuses is one way only, with the exception of being able to move a claim back to in check status from
 either recommended to pay or reject, by a Super Admin. Once a claim is Ready to pay, the status can no longer be updated.
 
 There is a 2 step process for moving claims into recommended to pay or reject, and then ready to pay or rejected.
-This is to allow for a 2 stage approval process, where one user can recommend a claim for payment or rejection, 
+This is to allow for a 2 stage approval process, where one user can recommend a claim for payment or rejection,
 and then another user can authorise that recommendation.
 
 ## Data updates
+
 There are a limited number of data updates that can be performed on claims and applications, which currently
 are:
+
 - Update the date of visit for an application or claim
 - Update the Vets name for a claim
 - Update the Vets RCVS for a claim
 - Mark an application as eligible/ineligible for data redaction by automated processes
-- 
-These updates are only available to users with the SuperAdmin role, and are designed to allow for correction of mistakes 
-in data entry etc. They are not intended to allow for regular updates to claims and applications.
-All such changes must be accompanied by a note, and the change will be audited.
+- These updates are only available to users with the SuperAdmin role, and are designed to allow for correction of mistakes
+  in data entry etc. They are not intended to allow for regular updates to claims and applications.
+  All such changes must be accompanied by a note, and the change will be audited.
 
 ## Flags
+
 Flags can be added to applications, which will highlight the application and all of its associated claims in the UI.
 Administrators can add flags, and delete them, and all users can see the highlights as a result of adding a flag.
-Flags are designed to allow for easy identification of applications and claims that require special attention, 
-such as those might need to be investigated for fraud, or have been identified as having a high risk of fraud. 
+Flags are designed to allow for easy identification of applications and claims that require special attention,
+such as those might need to be investigated for fraud, or have been identified as having a high risk of fraud.
 They are not intended to be used for regular use cases such as marking an application as urgent etc.
 
 # Caching
@@ -144,15 +149,16 @@ To run the application in `development` mode run:
 ```bash
 ./scripts/start
 ```
+
 This will run the service is dockerised form, and will require you to also run an application-backend in order to serve
 up the data for the frontend.
 
 When running locally there is a dev auth mode, which will allow you inside without needing to authenticate with Azure AD.
 To disable this, set the environment variable `AADAR_ENABLED` to `true` in your local `.env` file.
 
-The dev auth will pick a random username by default, but this can be overridden by 
+The dev auth will pick a random username by default, but this can be overridden by
 navigating to `service/login?userId=<yourchosenuser>`.
-You can choose to login as a user with a specific role by setting the userId to the name of the role, 
+You can choose to login as a user with a specific role by setting the userId to the name of the role,
 e.g userId=authoriser, which will give you authoriser access.
 
 ### Npm scripts
