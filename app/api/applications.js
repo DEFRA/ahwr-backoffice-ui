@@ -1,14 +1,14 @@
 import wreck from "@hapi/wreck";
 import { config } from "../config/index.js";
 
-const { applicationApiUri } = config;
+const { applicationApiUri, apiKeys } = config;
 
 export async function getApplication(applicationReference, logger) {
   const endpoint = `${applicationApiUri}/applications/${applicationReference}`;
   try {
     const { payload } = await wreck.get(endpoint, {
       json: true,
-      headers: { "x-api-key": process.env.BACKEND_API_KEY },
+      headers: { "x-api-key": apiKeys.backofficeUiApiKey },
     });
     return payload;
   } catch (error) {
@@ -36,7 +36,7 @@ export async function getApplications(
       sort,
     },
     json: true,
-    headers: { "x-api-key": process.env.BACKEND_API_KEY },
+    headers: { "x-api-key": apiKeys.backofficeUiApiKey },
   };
   try {
     const { payload } = await wreck.post(endpoint, options);
@@ -56,7 +56,7 @@ export async function updateApplicationStatus(reference, user, status, logger, n
       note,
     },
     json: true,
-    headers: { "x-api-key": process.env.BACKEND_API_KEY },
+    headers: { "x-api-key": apiKeys.backofficeUiApiKey },
   };
   try {
     const { payload } = await wreck.put(endpoint, options);
@@ -75,7 +75,7 @@ export async function updateApplicationData(reference, data, note, name, logger)
       note,
       user: name,
     },
-    headers: { "x-api-key": process.env.BACKEND_API_KEY },
+    headers: { "x-api-key": apiKeys.backofficeUiApiKey },
   };
 
   try {
@@ -91,7 +91,7 @@ export async function redactPiiData(logger) {
   const endpoint = `${applicationApiUri}/redact/pii`;
   try {
     const { payload } = await wreck.post(endpoint, {
-      headers: { "x-api-key": process.env.BACKEND_API_KEY },
+      headers: { "x-api-key": apiKeys.backofficeUiApiKey },
     });
     return payload;
   } catch (error) {
@@ -108,7 +108,7 @@ export async function updateEligiblePiiRedaction(reference, data, note, name, lo
       note,
       user: name,
     },
-    headers: { "x-api-key": process.env.BACKEND_API_KEY },
+    headers: { "x-api-key": apiKeys.backofficeUiApiKey },
   };
 
   try {
@@ -125,7 +125,7 @@ export async function getOldWorldApplicationHistory(oldWorldAppRef, logger) {
   try {
     const { payload } = await wreck.get(endpoint, {
       json: true,
-      headers: { "x-api-key": process.env.BACKEND_API_KEY },
+      headers: { "x-api-key": apiKeys.backofficeUiApiKey },
     });
     return payload;
   } catch (error) {

@@ -9,10 +9,13 @@ import {
   getClaimHistory,
 } from "../../../app/api/claims.js";
 import { metricsCounter } from "../../../app/lib/metrics.js";
+import { config } from "../../../app/config";
 
 jest.mock("@hapi/wreck");
 jest.mock("../../../app/config");
 jest.mock("../../../app/lib/metrics.js");
+
+const { apiKeys } = config;
 
 describe("Claims API", () => {
   const applicationReference = "AHWR-1234-APP1";
@@ -37,7 +40,7 @@ describe("Claims API", () => {
 
       expect(wreck.get).toHaveBeenCalledWith(expect.stringMatching("/claims/RESH-1111-1111"), {
         json: true,
-        headers: { "x-api-key": process.env.BACKEND_API_KEY },
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
       });
       expect(response).toEqual(wreckResponse.payload);
     });
@@ -207,7 +210,7 @@ describe("Claims API", () => {
         expect.stringMatching("/claims/RESH-1111-1111/history"),
         {
           json: true,
-          headers: { "x-api-key": process.env.BACKEND_API_KEY },
+          headers: { "x-api-key": apiKeys.backofficeUiApiKey },
         },
       );
       expect(response).toEqual(wreckResponse.payload);

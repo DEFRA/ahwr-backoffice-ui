@@ -13,7 +13,7 @@ import {
 jest.mock("@hapi/wreck");
 jest.mock("../../../app/config");
 
-const { applicationApiUri } = config;
+const { applicationApiUri, apiKeys } = config;
 const appRef = "ABC-1234";
 const limit = 20;
 const offset = 0;
@@ -43,7 +43,7 @@ describe("Application API", () => {
           offset,
         },
         json: true,
-        headers: { "x-api-key": process.env.BACKEND_API_KEY },
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
       };
       wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
       const response = await getApplications(searchType, searchText, limit, offset);
@@ -69,7 +69,7 @@ describe("Application API", () => {
           sort,
         },
         json: true,
-        headers: { "x-api-key": process.env.BACKEND_API_KEY },
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
       };
       wreck.post = jest.fn().mockRejectedValueOnce("getApplications boom");
       const logger = { error: jest.fn() };
@@ -93,7 +93,10 @@ describe("Application API", () => {
           statusCode: 502,
         },
       };
-      const expectedOptions = { json: true, headers: { "x-api-key": process.env.BACKEND_API_KEY } };
+      const expectedOptions = {
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      };
       wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
       const response = await getApplication(appRef);
 
@@ -115,7 +118,10 @@ describe("Application API", () => {
           statusCode: 200,
         },
       };
-      const expectedOptions = { json: true, headers: { "x-api-key": process.env.BACKEND_API_KEY } };
+      const expectedOptions = {
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      };
       wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
       const response = await getApplication(appRef);
 
@@ -128,7 +134,10 @@ describe("Application API", () => {
     });
 
     it("throws errors when error raised", async () => {
-      const expectedOptions = { json: true, headers: { "x-api-key": process.env.BACKEND_API_KEY } };
+      const expectedOptions = {
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      };
       wreck.get = jest.fn().mockRejectedValueOnce("getApplication boom");
       const logger = { error: jest.fn() };
 
@@ -152,7 +161,7 @@ describe("Application API", () => {
           status: 2,
         },
         json: true,
-        headers: { "x-api-key": process.env.BACKEND_API_KEY },
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
       };
       wreck.put = jest.fn().mockRejectedValueOnce("updateApplicationStatus boom");
       const logger = { error: jest.fn() };
@@ -175,7 +184,7 @@ describe("Application API", () => {
           status: 2,
         },
         json: true,
-        headers: { "x-api-key": process.env.BACKEND_API_KEY },
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
       };
       const wreckResponse = {
         payload: {},
@@ -269,7 +278,7 @@ describe("Application API", () => {
       const result = await redactPiiData(logger);
 
       expect(wreck.post).toHaveBeenCalledWith(endpoint, {
-        headers: { "x-api-key": process.env.BACKEND_API_KEY },
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
       });
       expect(result).toEqual({});
       expect(logger.error).not.toHaveBeenCalled();
@@ -316,7 +325,7 @@ describe("Application API", () => {
           updateEligiblePiiRedaction: true,
           user: "John Doe",
         },
-        headers: { "x-api-key": process.env.BACKEND_API_KEY },
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
       });
       expect(result).toEqual({});
       expect(logger.error).not.toHaveBeenCalled();
@@ -354,7 +363,10 @@ describe("Application API", () => {
           statusCode: 200,
         },
       };
-      const expectedOptions = { json: true, headers: { "x-api-key": process.env.BACKEND_API_KEY } };
+      const expectedOptions = {
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      };
       wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
       const response = await getOldWorldApplicationHistory(appRef);
 
@@ -367,7 +379,10 @@ describe("Application API", () => {
     });
 
     it("should throw errors", async () => {
-      const expectedOptions = { json: true, headers: { "x-api-key": process.env.BACKEND_API_KEY } };
+      const expectedOptions = {
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      };
       wreck.get = jest.fn().mockRejectedValueOnce("getApplication boom");
       const logger = { error: jest.fn() };
 

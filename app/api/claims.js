@@ -2,14 +2,14 @@ import wreck from "@hapi/wreck";
 import { config } from "../config/index.js";
 import { metricsCounter } from "../lib/metrics.js";
 
-const { applicationApiUri } = config;
+const { applicationApiUri, apiKeys } = config;
 
 export async function getClaim(reference, logger) {
   const endpoint = `${applicationApiUri}/claims/${reference}`;
   try {
     const { payload } = await wreck.get(endpoint, {
       json: true,
-      headers: { "x-api-key": process.env.BACKEND_API_KEY },
+      headers: { "x-api-key": apiKeys.backofficeUiApiKey },
     });
     return payload;
   } catch (error) {
@@ -29,7 +29,7 @@ export async function getClaims(searchType, searchText, filter, limit, offset, s
       sort,
     },
     json: true,
-    headers: { "x-api-key": process.env.BACKEND_API_KEY },
+    headers: { "x-api-key": apiKeys.backofficeUiApiKey },
   };
   try {
     const { payload } = await wreck.post(endpoint, options);
@@ -51,7 +51,7 @@ export async function updateClaimStatus(reference, user, status, logger, note) {
       note,
     },
     json: true,
-    headers: { "x-api-key": process.env.BACKEND_API_KEY },
+    headers: { "x-api-key": apiKeys.backofficeUiApiKey },
   };
   try {
     const { payload } = await wreck.put(endpoint, options);
@@ -72,7 +72,7 @@ export async function updateClaimData(reference, data, note, name, logger) {
       note,
       user: name,
     },
-    headers: { "x-api-key": process.env.BACKEND_API_KEY },
+    headers: { "x-api-key": apiKeys.backofficeUiApiKey },
   };
 
   try {
@@ -90,7 +90,7 @@ export async function getClaimHistory(claimRef, logger) {
   try {
     const { payload } = await wreck.get(endpoint, {
       json: true,
-      headers: { "x-api-key": process.env.BACKEND_API_KEY },
+      headers: { "x-api-key": apiKeys.backofficeUiApiKey },
     });
     return payload;
   } catch (error) {

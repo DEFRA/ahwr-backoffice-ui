@@ -10,6 +10,8 @@ jest.mock("@hapi/wreck");
 jest.mock("../../../app/config");
 jest.mock("../../../app/lib/metrics.js");
 
+const { apiKeys } = config;
+
 const mockLogger = {
   error: jest.fn(),
 };
@@ -71,7 +73,7 @@ describe("Flags API", () => {
           user: username,
           deletedNote,
         },
-        headers: { "x-api-key": process.env.BACKEND_API_KEY },
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
       });
       expect(mockLogger.error).not.toHaveBeenCalled();
       expect(metricsCounter).toHaveBeenCalledWith("flag_deleted");
@@ -114,7 +116,7 @@ describe("Flags API", () => {
         {
           json: true,
           payload,
-          headers: { "x-api-key": process.env.BACKEND_API_KEY },
+          headers: { "x-api-key": apiKeys.backofficeUiApiKey },
         },
       );
 
