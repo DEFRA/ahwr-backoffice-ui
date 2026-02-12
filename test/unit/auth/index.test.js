@@ -25,19 +25,19 @@ describe("auth index", () => {
   describe("initAuth", () => {
     it("calls realAuth.init when auth is enabled", async () => {
       config.auth.enabled = true;
-      authIndex.initAuth(mockServer);
+      authIndex.initAuth();
       expect(init).toHaveBeenCalled();
     });
     it("does not call realAuth.init when auth is not enabled", async () => {
       config.auth.enabled = false;
-      authIndex.initAuth(mockServer);
+      authIndex.initAuth();
       expect(init).not.toHaveBeenCalled();
     });
   });
 
   describe("authenticate", () => {
     beforeEach(() => {
-      authIndex.initAuth(mockServer);
+      authIndex.initAuth();
       config.perfTestEnabled = false;
     });
     it("when auth is enabled calls realAuth authenticate", async () => {
@@ -80,7 +80,7 @@ describe("auth index", () => {
 
   describe("logout", () => {
     beforeEach(() => {
-      authIndex.initAuth(mockServer);
+      authIndex.initAuth();
       config.perfTestEnabled = false;
     });
     it("when auth is enabled calls realAuth logout", async () => {
@@ -96,52 +96,6 @@ describe("auth index", () => {
       await authIndex.logout(mockAccount);
       expect(devAuth.logout).toHaveBeenCalledWith(mockAccount);
       expect(realAuth.logout).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("toggleAuthMode", () => {
-    const mockLogger = {
-      info: jest.fn(),
-    };
-
-    beforeEach(() => {
-      getLogger.mockReturnValue(mockLogger);
-      config.auth.enabled = true;
-      authIndex.initAuth(mockServer);
-    });
-    it('enables perf test auth mode when userId starts with "perfteston"', async () => {
-      config.perfTestEnabled = true;
-      mockGet.mockReturnValueOnce(true);
-
-      await authIndex.getAuthenticationUrl("perfteston123");
-      expect(mockLogger.info).toHaveBeenCalledWith("Enabling perf test auth mode");
-      expect(mockSet).toHaveBeenCalledWith("perf-test-mode", true);
-      // after toggle on, should call through to dev auth method
-      expect(devAuth.getAuthenticationUrl).toHaveBeenCalled();
-      expect(realAuth.getAuthenticationUrl).not.toHaveBeenCalled();
-    });
-    it('disables perf test auth mode when userId starts with "perftestoff"', async () => {
-      config.perfTestEnabled = true;
-      mockGet.mockReturnValueOnce(false);
-
-      await authIndex.getAuthenticationUrl("perftestoff123");
-      expect(mockLogger.info).toHaveBeenCalledWith("Disabling perf test auth mode");
-      expect(mockSet).toHaveBeenCalledWith("perf-test-mode", false);
-      // after toggle off, should call through to real auth method
-      expect(realAuth.getAuthenticationUrl).toHaveBeenCalled();
-      expect(devAuth.getAuthenticationUrl).not.toHaveBeenCalled();
-    });
-    it("does not change perf test auth mode when userId does not start with perf test strings", async () => {
-      config.perfTestEnabled = true;
-      mockGet.mockReturnValue(true);
-      await authIndex.getAuthenticationUrl("perfteston123");
-
-      await authIndex.getAuthenticationUrl("regularuser");
-      // just called once on initial switch
-      expect(mockLogger.info).toHaveBeenCalledTimes(1);
-      expect(mockSet).toHaveBeenCalledTimes(1);
-      // but both calls go through to dev auth as mode remains on
-      expect(devAuth.getAuthenticationUrl).toHaveBeenCalledTimes(2);
     });
   });
 });
