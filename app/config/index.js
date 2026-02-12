@@ -48,7 +48,7 @@ const getConfigSchema = () =>
     name: joi.string().required(),
     logLevel: joi.string().required(),
     logFormat: joi.string().required(),
-    logRedact: joi.array().items(joi.string())
+    logRedact: joi.array().items(joi.string()),
   });
 
 const buildConfig = () => {
