@@ -48,8 +48,8 @@ export const agreementRoutes = [
         const { reference: applicationReference } = request.params;
 
         await generateNewCrumb(request, h);
-        const application = await getApplication(applicationReference);
-        const contactHistory = await getContactHistory(applicationReference);
+        const application = await getApplication(applicationReference, request.logger);
+        const contactHistory = await getContactHistory(applicationReference, request.logger);
         const contactHistoryDetails = displayContactHistory(contactHistory);
 
         if (!application) {
