@@ -17,6 +17,7 @@ import { StatusCodes } from "http-status-codes";
 jest.mock("@hapi/wreck");
 jest.mock("../../../app/config", () => ({
   config: {
+    apiKeys: { backofficeUiApiKey: "something" },
     applicationApiUri: "http://ahwr-application-backend:3001/api",
     paymentProxyApiUri: "http://ahwr-payment-proxy:3001/api",
     messageGeneratorApiUri: "http://ahwr-message-generator:3001/api",
@@ -46,7 +47,7 @@ describe("getApplicationDocument", () => {
     const result = await getApplicationDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-application-backend:3001/api/support/applications/123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual({});
   });
@@ -58,7 +59,7 @@ describe("getApplicationDocument", () => {
     const result = await getApplicationDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-application-backend:3001/api/support/applications/123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual("No application found");
   });
@@ -74,7 +75,7 @@ describe("getApplicationDocument", () => {
       expect(error).toBe(mockError);
       expect(wreck.get).toHaveBeenCalledWith(
         "http://ahwr-application-backend:3001/api/support/applications/123",
-        { json: true },
+        { json: true, headers: { "x-api-key": "something" } },
       );
       expect(mockLogger.error).toHaveBeenCalled();
     }
@@ -93,7 +94,7 @@ describe("getClaimDocument", () => {
     const result = await getClaimDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-application-backend:3001/api/support/claims/123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual({});
   });
@@ -105,7 +106,7 @@ describe("getClaimDocument", () => {
     const result = await getClaimDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-application-backend:3001/api/support/claims/123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual("No claim found");
   });
@@ -121,7 +122,7 @@ describe("getClaimDocument", () => {
       expect(error).toBe(mockError);
       expect(wreck.get).toHaveBeenCalledWith(
         "http://ahwr-application-backend:3001/api/support/claims/123",
-        { json: true },
+        { json: true, headers: { "x-api-key": "something" } },
       );
       expect(mockLogger.error).toHaveBeenCalled();
     }
@@ -140,7 +141,7 @@ describe("getHerdDocument", () => {
     const result = await getHerdDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-application-backend:3001/api/support/herds/123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual({});
   });
@@ -156,7 +157,7 @@ describe("getHerdDocument", () => {
     const result = await getHerdDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-application-backend:3001/api/support/herds/123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual("No herd found");
   });
@@ -168,7 +169,7 @@ describe("getHerdDocument", () => {
     const result = await getHerdDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-application-backend:3001/api/support/herds/123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual("No herd found");
   });
@@ -184,7 +185,7 @@ describe("getHerdDocument", () => {
       expect(error).toBe(mockError);
       expect(wreck.get).toHaveBeenCalledWith(
         "http://ahwr-application-backend:3001/api/support/herds/123",
-        { json: true },
+        { json: true, headers: { "x-api-key": "something" } },
       );
       expect(mockLogger.error).toHaveBeenCalled();
     }
@@ -206,10 +207,12 @@ describe("getPaymentDocumentWithRefresh", () => {
       "http://ahwr-payment-proxy:3001/api/support/payments/123/request-status",
       {
         json: true,
+        headers: { "x-api-key": "something" },
       },
     );
     expect(wreck.get).toHaveBeenCalledWith("http://ahwr-payment-proxy:3001/api/payments/123", {
       json: true,
+      headers: { "x-api-key": "something" },
     });
     expect(result).toStrictEqual({});
   });
@@ -226,10 +229,12 @@ describe("getPaymentDocumentWithRefresh", () => {
       "http://ahwr-payment-proxy:3001/api/support/payments/123/request-status",
       {
         json: true,
+        headers: { "x-api-key": "something" },
       },
     );
     expect(wreck.get).toHaveBeenCalledWith("http://ahwr-payment-proxy:3001/api/payments/123", {
       json: true,
+      headers: { "x-api-key": "something" },
     });
     expect(result).toStrictEqual("No payment found");
   });
@@ -254,10 +259,12 @@ describe("getPaymentDocumentWithRefresh", () => {
         "http://ahwr-payment-proxy:3001/api/support/payments/123/request-status",
         {
           json: true,
+          headers: { "x-api-key": "something" },
         },
       );
       expect(wreck.get).toHaveBeenCalledWith("http://ahwr-payment-proxy:3001/api/payments/123", {
         json: true,
+        headers: { "x-api-key": "something" },
       });
       expect(mockLogger.error).toHaveBeenCalled();
     }
@@ -276,6 +283,7 @@ describe("getPaymentDocument", () => {
     const result = await getPaymentDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith("http://ahwr-payment-proxy:3001/api/payments/123", {
       json: true,
+      headers: { "x-api-key": "something" },
     });
     expect(result).toStrictEqual({});
   });
@@ -287,6 +295,7 @@ describe("getPaymentDocument", () => {
     const result = await getPaymentDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith("http://ahwr-payment-proxy:3001/api/payments/123", {
       json: true,
+      headers: { "x-api-key": "something" },
     });
     expect(result).toStrictEqual("No payment found");
   });
@@ -302,6 +311,7 @@ describe("getPaymentDocument", () => {
       expect(error).toBe(mockError);
       expect(wreck.get).toHaveBeenCalledWith("http://ahwr-payment-proxy:3001/api/payments/123", {
         json: true,
+        headers: { "x-api-key": "something" },
       });
       expect(mockLogger.error).toHaveBeenCalled();
     }
@@ -320,7 +330,7 @@ describe("getAgreementMessagesDocument", () => {
     const result = await getAgreementMessagesDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-message-generator:3001/api/support/message-generation?agreementReference=123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual({});
   });
@@ -336,7 +346,7 @@ describe("getAgreementMessagesDocument", () => {
     const result = await getAgreementMessagesDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-message-generator:3001/api/support/message-generation?agreementReference=123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual("No agreement messages found");
   });
@@ -348,7 +358,7 @@ describe("getAgreementMessagesDocument", () => {
     const result = await getAgreementMessagesDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-message-generator:3001/api/support/message-generation?agreementReference=123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual("No agreement messages found");
   });
@@ -364,7 +374,7 @@ describe("getAgreementMessagesDocument", () => {
       expect(error).toBe(mockError);
       expect(wreck.get).toHaveBeenCalledWith(
         "http://ahwr-message-generator:3001/api/support/message-generation?agreementReference=123",
-        { json: true },
+        { json: true, headers: { "x-api-key": "something" } },
       );
       expect(mockLogger.error).toHaveBeenCalled();
     }
@@ -383,7 +393,7 @@ describe("getClaimMessagesDocument", () => {
     const result = await getClaimMessagesDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-message-generator:3001/api/support/message-generation?claimReference=123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual({});
   });
@@ -399,7 +409,7 @@ describe("getClaimMessagesDocument", () => {
     const result = await getClaimMessagesDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-message-generator:3001/api/support/message-generation?claimReference=123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual("No claim messages found");
   });
@@ -411,7 +421,7 @@ describe("getClaimMessagesDocument", () => {
     const result = await getClaimMessagesDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-message-generator:3001/api/support/message-generation?claimReference=123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual("No claim messages found");
   });
@@ -427,7 +437,7 @@ describe("getClaimMessagesDocument", () => {
       expect(error).toBe(mockError);
       expect(wreck.get).toHaveBeenCalledWith(
         "http://ahwr-message-generator:3001/api/support/message-generation?claimReference=123",
-        { json: true },
+        { json: true, headers: { "x-api-key": "something" } },
       );
       expect(mockLogger.error).toHaveBeenCalled();
     }
@@ -446,7 +456,7 @@ describe("getAgreementLogsDocument", () => {
     const result = await getAgreementLogsDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-document-generator:3001/api/support/document-logs?agreementReference=123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual({});
   });
@@ -458,7 +468,7 @@ describe("getAgreementLogsDocument", () => {
     const result = await getAgreementLogsDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-document-generator:3001/api/support/document-logs?agreementReference=123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual("No agreement logs found");
   });
@@ -474,7 +484,7 @@ describe("getAgreementLogsDocument", () => {
       expect(error).toBe(mockError);
       expect(wreck.get).toHaveBeenCalledWith(
         "http://ahwr-document-generator:3001/api/support/document-logs?agreementReference=123",
-        { json: true },
+        { json: true, headers: { "x-api-key": "something" } },
       );
       expect(mockLogger.error).toHaveBeenCalled();
     }
@@ -493,7 +503,7 @@ describe("getAgreementCommsDocument", () => {
     const result = await getAgreementCommsDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-sfd-comms-proxy:3001/api/support/comms-requests?agreementReference=123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual({});
   });
@@ -505,7 +515,7 @@ describe("getAgreementCommsDocument", () => {
     const result = await getAgreementCommsDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-sfd-comms-proxy:3001/api/support/comms-requests?agreementReference=123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual("No agreement comms found");
   });
@@ -521,7 +531,7 @@ describe("getAgreementCommsDocument", () => {
       expect(error).toBe(mockError);
       expect(wreck.get).toHaveBeenCalledWith(
         "http://ahwr-sfd-comms-proxy:3001/api/support/comms-requests?agreementReference=123",
-        { json: true },
+        { json: true, headers: { "x-api-key": "something" } },
       );
       expect(mockLogger.error).toHaveBeenCalled();
     }
@@ -540,7 +550,7 @@ describe("getClaimCommsDocument", () => {
     const result = await getClaimCommsDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-sfd-comms-proxy:3001/api/support/comms-requests?claimReference=123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual({});
   });
@@ -552,7 +562,7 @@ describe("getClaimCommsDocument", () => {
     const result = await getClaimCommsDocument("123", mockLogger);
     expect(wreck.get).toHaveBeenCalledWith(
       "http://ahwr-sfd-comms-proxy:3001/api/support/comms-requests?claimReference=123",
-      { json: true },
+      { json: true, headers: { "x-api-key": "something" } },
     );
     expect(result).toStrictEqual("No claim comms found");
   });
@@ -568,7 +578,7 @@ describe("getClaimCommsDocument", () => {
       expect(error).toBe(mockError);
       expect(wreck.get).toHaveBeenCalledWith(
         "http://ahwr-sfd-comms-proxy:3001/api/support/comms-requests?claimReference=123",
-        { json: true },
+        { json: true, headers: { "x-api-key": "something" } },
       );
       expect(mockLogger.error).toHaveBeenCalled();
     }

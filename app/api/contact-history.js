@@ -3,12 +3,15 @@ import { config } from "../config/index.js";
 import { contactHistory } from "./../constants/contact-history.js";
 
 const { fieldsNames, labels, notAvailable } = contactHistory;
-const { applicationApiUri } = config;
+const { applicationApiUri, apiKeys } = config;
 
 export async function getContactHistory(reference, logger) {
   const endpoint = `${applicationApiUri}/applications/contact-history/${reference}`;
   try {
-    const { payload } = await wreck.get(endpoint, { json: true });
+    const { payload } = await wreck.get(endpoint, {
+      json: true,
+      headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+    });
 
     return payload;
   } catch (error) {

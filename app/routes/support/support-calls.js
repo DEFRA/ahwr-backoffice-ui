@@ -4,6 +4,7 @@ import { StatusCodes } from "http-status-codes";
 
 const {
   applicationApiUri,
+  apiKeys,
   paymentProxyApiUri,
   messageGeneratorApiUri,
   documentGeneratorApiUri,
@@ -15,6 +16,7 @@ const makeGetCall = async (url, notFoundMessage, logger) => {
     logger.info(`Call to ${url}`);
     const { payload } = await wreck.get(`${url}`, {
       json: true,
+      headers: { "x-api-key": apiKeys.backofficeUiApiKey },
     });
 
     if (Array.isArray(payload) && payload.length === 0) {
@@ -42,6 +44,7 @@ const makePostCall = async (url, notFoundMessage, logger) => {
     logger.info(`Call to ${url}`);
     const { payload } = await wreck.post(`${url}`, {
       json: true,
+      headers: { "x-api-key": apiKeys.backofficeUiApiKey },
     });
     return payload;
   } catch (error) {
