@@ -3,7 +3,6 @@ import { auth as authIndex } from "../../../app/auth/index.js";
 import { init } from "../../../app/auth/azure-auth.js";
 import * as realAuth from "../../../app/auth/azure-auth.js";
 import * as devAuth from "../../../app/auth/dev-auth.js";
-import { getLogger } from "../../../app/logging/logger.js";
 
 jest.mock("../../../app/auth/azure-auth.js");
 jest.mock("../../../app/auth/dev-auth.js");
