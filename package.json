@@ -45,7 +45,7 @@
     "govuk-frontend": "5.10.0",
     "hapi-pino": "12.1.0",
     "http-status-codes": "2.3.0",
-    "ioredis": "5.6.1",
+    "ioredis": "5.9.1",
     "joi": "17.13.3",
     "jquery": "3.7.1",
     "nunjucks": "3.2.4",
