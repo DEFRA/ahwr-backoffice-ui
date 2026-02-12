@@ -25,8 +25,8 @@ describe("Application API", () => {
     jest.clearAllMocks();
   });
 
-  describe("getApplications", () => {
-    it("getApplications should return applications", async () => {
+  describe("POST getApplications", () => {
+    it("returns applications when all is ok", async () => {
       const wreckResponse = {
         payload: {
           applications: [{}, {}],
@@ -56,7 +56,7 @@ describe("Application API", () => {
       );
     });
 
-    it("getApplications should throw errors", async () => {
+    it("throws error when error raised", async () => {
       const filter = [];
       const sort = "ASC";
 
@@ -85,8 +85,8 @@ describe("Application API", () => {
     });
   });
 
-  describe("getApplications", () => {
-    it("getApplication should return null application", async () => {
+  describe("GET getApplications", () => {
+    it("returns null application on bad gateway", async () => {
       const wreckResponse = {
         payload: null,
         res: {
@@ -105,7 +105,7 @@ describe("Application API", () => {
       );
     });
 
-    it("getApplication should return an application", async () => {
+    it("returns an application when found", async () => {
       const applicationData = {
         reference: appRef,
       };
@@ -127,7 +127,7 @@ describe("Application API", () => {
       );
     });
 
-    it("getApplication should throw errors", async () => {
+    it("throws errors when error raised", async () => {
       const expectedOptions = { json: true, headers: { "x-api-key": process.env.BACKEND_API_KEY } };
       wreck.get = jest.fn().mockRejectedValueOnce("getApplication boom");
       const logger = { error: jest.fn() };
@@ -144,8 +144,8 @@ describe("Application API", () => {
     });
   });
 
-  describe("updateApplicationStatus", () => {
-    it("updateApplicationStatus should throw errors", async () => {
+  describe("PUT updateApplicationStatus", () => {
+    it("throws error if error returned", async () => {
       const expectedOptions = {
         payload: {
           user: "test",
@@ -168,7 +168,7 @@ describe("Application API", () => {
       );
     });
 
-    it("updateApplicationStatus should return on success", async () => {
+    it("returns payload if everything is ok", async () => {
       const expectedOptions = {
         payload: {
           user: "test",
@@ -196,8 +196,8 @@ describe("Application API", () => {
     });
   });
 
-  describe("updateApplicationData", () => {
-    test("updateApplicationData", async () => {
+  describe("PUT updateApplicationData", () => {
+    test("returns payload if everything is ok", async () => {
       const wreckResponse = {
         payload: {},
         res: {
@@ -224,7 +224,7 @@ describe("Application API", () => {
       expect(response).toEqual(wreckResponse.payload);
     });
 
-    test("updateApplicationData error", async () => {
+    test("throws error if error returned", async () => {
       const wreckResponse = {
         payload: {},
         res: {
@@ -252,7 +252,7 @@ describe("Application API", () => {
     });
   });
 
-  describe("redactPiiData", () => {
+  describe("POST redactPiiData", () => {
     const logger = {
       error: jest.fn(),
     };
@@ -288,7 +288,7 @@ describe("Application API", () => {
     });
   });
 
-  describe("updateEligiblePiiRedaction", () => {
+  describe("PUT updateEligiblePiiRedaction", () => {
     const logger = {
       error: jest.fn(),
     };
@@ -343,7 +343,7 @@ describe("Application API", () => {
     });
   });
 
-  describe("getOldWorldApplicationHistory", () => {
+  describe("GET getOldWorldApplicationHistory", () => {
     it("returns payload if everything is ok", async () => {
       const applicationData = {
         reference: appRef,

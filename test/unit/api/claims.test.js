@@ -21,8 +21,8 @@ describe("Claims API", () => {
     jest.clearAllMocks();
   });
 
-  describe("getClaim", () => {
-    test("getClaim", async () => {
+  describe("GET getClaim", () => {
+    test("returns payload if everything ok", async () => {
       const wreckResponse = {
         payload: claims[0],
         res: {
@@ -42,7 +42,7 @@ describe("Claims API", () => {
       expect(response).toEqual(wreckResponse.payload);
     });
 
-    test("getClaim error", async () => {
+    test("throws error if error returned", async () => {
       const wreckResponse = {
         res: {
           statusCode: 404,
@@ -59,8 +59,8 @@ describe("Claims API", () => {
     });
   });
 
-  describe("getClaims", () => {
-    test("getClaims (post)", async () => {
+  describe("POST getClaims", () => {
+    test("returns payload if everything is ok", async () => {
       const wreckResponse = {
         payload: { claims, total: claims.length },
         res: {
@@ -76,7 +76,7 @@ describe("Claims API", () => {
       expect(response).toEqual(wreckResponse.payload);
     });
 
-    test("getClaims (post) error", async () => {
+    test("throws error if error returned", async () => {
       const wreckResponse = {
         res: {
           statusCode: 500,
@@ -94,8 +94,8 @@ describe("Claims API", () => {
     });
   });
 
-  describe("updateClaimStatus", () => {
-    test("updateClaimStatus", async () => {
+  describe("PUT updateClaimStatus", () => {
+    test("returns payload if all ok", async () => {
       const wreckResponse = {
         payload: claims[0],
         res: {
@@ -112,7 +112,7 @@ describe("Claims API", () => {
       expect(metricsCounter).toHaveBeenCalledWith("claim_status_update");
     });
 
-    test("updateClaimStatus error", async () => {
+    test("throws error if error returned", async () => {
       const wreckResponse = {
         payload: claims[0],
         res: {
@@ -131,8 +131,8 @@ describe("Claims API", () => {
     });
   });
 
-  describe("updateClaimData", () => {
-    test("updateClaimData", async () => {
+  describe("PUT updateClaimData", () => {
+    test("returns payload if everything is ok", async () => {
       const wreckResponse = {
         payload: {},
         res: {
@@ -160,7 +160,7 @@ describe("Claims API", () => {
       expect(metricsCounter).toHaveBeenCalledWith("claim_data_update");
     });
 
-    test("updateClaimData error", async () => {
+    test("throws error if error returned", async () => {
       const wreckResponse = {
         payload: {},
         res: {
@@ -189,7 +189,7 @@ describe("Claims API", () => {
     });
   });
 
-  describe("getClaimHistory", () => {
+  describe("GET getClaimHistory", () => {
     test("returns payload if all fine", async () => {
       const wreckResponse = {
         payload: claims[0],
