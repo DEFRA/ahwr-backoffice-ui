@@ -22,7 +22,7 @@ const getConfigSchema = () =>
       },
     },
     apiKeys: {
-      backofficeUiApiKey: joi.string().required,
+      backofficeUiApiKey: joi.string().required(),
     },
     cookie: {
       cookieNameCookiePolicy: joi.string().required(),
