@@ -128,7 +128,7 @@ export const claimsDataRoutes = [
               .valid("updateVetsName", "updateDateOfVisit", "updateVetRCVSNumber"),
             returnPage: joi.string().optional().allow("").valid("agreement", "claims"),
             reference: joi.string().required(),
-            dateOfVisit: joi.string(),
+            dateOfVisit: joi.string().allow(""),
           })
           .required(),
         failAction: async (request, h, error) => {

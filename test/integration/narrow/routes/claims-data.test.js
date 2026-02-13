@@ -332,5 +332,41 @@ describe("Claims data tests", () => {
       );
       expect(updateApplicationData).toHaveBeenCalledTimes(0);
     });
+
+    test("returns 302 and updates claim data when dateOfVisit is empty", async () => {
+      const options = {
+        method: "POST",
+        url: "/claims/data",
+        auth,
+        headers: { cookie: `crumb=${crumb}` },
+        payload: {
+          crumb,
+          claimOrAgreement: "agreement",
+          form: "updateDateOfVisit",
+          day: 1,
+          month: 2,
+          year: 2028,
+          note: "Updated value",
+          reference: "AAAA",
+          returnPage: "agreement",
+          dateOfVisit: "",
+        },
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+
+      expect(res.headers.location).toBe("/view-agreement/AAAA?page=1");
+      expect(updateApplicationData).toHaveBeenCalledWith(
+        "AAAA",
+        {
+          visitDate: "2028-02-01T00:00:00.000Z",
+          vetRcvs: undefined,
+          vetName: undefined,
+        },
+        "Updated value",
+        "test user",
+        expect.any(Object),
+      );
+    });
   });
 });
