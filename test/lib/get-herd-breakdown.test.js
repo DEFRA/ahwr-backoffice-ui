@@ -59,6 +59,19 @@ const pigsClaimWithHerd = {
   },
 };
 
+const pigsClaimWithNoHerd = {
+  id: "b318fd90-bf09-48a9-9eff-2bb867329bd2",
+  reference: "REPI-3AHD-TCZ4",
+  applicationReference: "IAHW-B5TU-EXLN",
+  data: {
+    herdId: "3a8f0534-cef1-4d59-b8b2-256b99a406d3",
+    herdVersion: 1,
+    typeOfLivestock: "pigs",
+    herdAssociatedAt: "2025-05-29T08:33:30.076Z",
+  },
+  herd: {},
+};
+
 const beefClaimWithHerd = {
   id: "9f572ce2-74da-4479-83ae-b6fa41cbf588",
   reference: "REBC-GIKY-AA7F",
@@ -92,6 +105,7 @@ const beefClaimNoHerd = {
   data: {
     typeOfLivestock: "beef",
   },
+  herd: {},
 };
 
 const sheepClaimTwoWithSheepiesHerd = {
@@ -155,11 +169,12 @@ describe("getHerdBreakdown", () => {
       pigsClaimWithHerd,
       beefClaimWithHerd,
       beefClaimNoHerd,
+      pigsClaimWithNoHerd,
     ];
     const result = getHerdBreakdown(strippedDownClaims);
 
     expect(result).toEqual({
-      herdBreakdown: { beef: 2, dairy: 0, pigs: 1, sheep: 1 },
+      herdBreakdown: { beef: 2, dairy: 0, pigs: 2, sheep: 1 },
     });
   });
 
