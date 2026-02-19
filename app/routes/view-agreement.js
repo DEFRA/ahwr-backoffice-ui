@@ -64,7 +64,7 @@ export const viewAgreementRoute = {
         ? JSON.parse(Buffer.from(request.query.errors, "base64").toString("utf8"))
         : [];
 
-      const getAction = (createItems, query, visuallyHiddenText, id) => {
+      const getAction = (query, visuallyHiddenText, id) => {
         return {
           items: [
             {
@@ -77,27 +77,16 @@ export const viewAgreementRoute = {
       };
 
       const dateOfVisitActions = updateDateOfVisitAction
-        ? getAction(
-            updateDateOfVisitAction,
-            "updateDateOfVisit",
-            "date of review",
-            "update-date-of-visit",
-          )
+        ? getAction("updateDateOfVisit", "date of review", "update-date-of-visit")
         : null;
       const vetsNameActions = updateVetsNameAction
-        ? getAction(updateVetsNameAction, "updateVetsName", "vet's name", "update-vets-name")
+        ? getAction("updateVetsName", "vet's name", "update-vets-name")
         : null;
       const vetRCVSNumberActions = updateVetRCVSNumberAction
-        ? getAction(
-            updateVetRCVSNumberAction,
-            "updateVetRCVSNumber",
-            "RCVS number",
-            "update-vet-rcvs-number",
-          )
+        ? getAction("updateVetRCVSNumber", "RCVS number", "update-vet-rcvs-number")
         : null;
       const eligiblePiiRedactionActions = updateEligiblePiiRedactionAction
         ? getAction(
-            updateEligiblePiiRedactionAction,
             "updateEligiblePiiRedaction",
             "eligible for automated data redaction",
             "update-eligible-pii-redaction",
