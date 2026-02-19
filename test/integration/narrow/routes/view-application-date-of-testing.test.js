@@ -65,14 +65,15 @@ describe("View Application test with Date of Testing enabled", () => {
       const { reference, organisation } = oldWorldApplication;
       const status = "Ready to pay";
       getApplication.mockReturnValueOnce(oldWorldApplication);
-      getOldWorldApplicationHistory.mockResolvedValue({ historyRecords: [] });
-
+      getOldWorldApplicationHistory.mockResolvedValueOnce({ historyRecords: [] });
       const options = {
         method: "GET",
         url: `/view-agreement/${reference}`,
         auth,
       };
+
       const res = await server.inject(options);
+
       expect(res.statusCode).toBe(StatusCodes.OK);
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-caption-l").text()).toContain(`Agreement number: ${reference}`);
@@ -140,13 +141,13 @@ describe("View Application test with Date of Testing enabled", () => {
         updateDateOfVisitAction: false,
         updateDateOfVisitForm: false,
       });
-      const { reference } = oldWorldApplication;
       const auth = {
         strategy: "session-auth",
         credentials: { scope: [user], account: { username: "" } },
       };
       getApplication.mockReturnValueOnce(oldWorldApplication);
-      getOldWorldApplicationHistory.mockResolvedValue({ historyRecords: [] });
+      getOldWorldApplicationHistory.mockResolvedValueOnce({ historyRecords: [] });
+      const { reference } = oldWorldApplication;
       const options = {
         method: "GET",
         url: `/view-agreement/${reference}`,

@@ -65,9 +65,6 @@ export const viewAgreementRoute = {
         : [];
 
       const getAction = (createItems, query, visuallyHiddenText, id) => {
-        if (!createItems) {
-          return null;
-        }
         return {
           items: [
             {
