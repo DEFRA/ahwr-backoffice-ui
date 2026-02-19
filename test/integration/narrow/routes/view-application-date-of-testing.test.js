@@ -50,7 +50,7 @@ describe("View Application test with Date of Testing enabled", () => {
       rejectForm: false,
       updateStatusForm: false,
       updateDateOfVisitAction: true,
-      updateDateOfVisitForm: false
+      updateDateOfVisitForm: false,
     });
 
     server = await createServer();
@@ -140,7 +140,7 @@ describe("View Application test with Date of Testing enabled", () => {
         updateDateOfVisitAction: false,
         updateDateOfVisitForm: false,
       });
-      const { reference} = oldWorldApplication;
+      const { reference } = oldWorldApplication;
       const auth = {
         strategy: "session-auth",
         credentials: { scope: [user], account: { username: "" } },
