@@ -8,7 +8,7 @@ import { createServer } from "../../../../app/server";
 import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states";
 import { StatusCodes } from "http-status-codes";
 
-const { administrator } = permissions;
+const { user, administrator } = permissions;
 
 jest.mock("../../../../app/api/applications");
 jest.mock("../../../../app/routes/utils/get-claim-view-states");
@@ -49,6 +49,8 @@ describe("View Application test with Date of Testing enabled", () => {
       rejectAction: false,
       rejectForm: false,
       updateStatusForm: false,
+      updateDateOfVisitAction: true,
+      updateDateOfVisitForm: false
     });
 
     server = await createServer();
@@ -125,9 +127,38 @@ describe("View Application test with Date of Testing enabled", () => {
         oldWorldApplication.data.urnResult,
       );
 
+      expect($("a.govuk-link").length).toBe(1);
+      expect($("a.govuk-link").text()).toContain(`Change`);
+
       expectWithdrawLink($, reference, false);
 
       phaseBannerOk($);
+    });
+
+    test("returns 200 application claim - change links hidden when user not admin", async () => {
+      getClaimViewStates.mockReturnValueOnce({
+        updateDateOfVisitAction: false,
+        updateDateOfVisitForm: false,
+      });
+      const { reference} = oldWorldApplication;
+      const auth = {
+        strategy: "session-auth",
+        credentials: { scope: [user], account: { username: "" } },
+      };
+      getApplication.mockReturnValueOnce(oldWorldApplication);
+      getOldWorldApplicationHistory.mockResolvedValue({ historyRecords: [] });
+      const options = {
+        method: "GET",
+        url: `/view-agreement/${reference}`,
+        auth,
+      };
+
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-caption-l").text()).toContain(`Agreement number: ${reference}`);
+      expect($("a.govuk-link").length).toBe(0);
     });
   });
 });
