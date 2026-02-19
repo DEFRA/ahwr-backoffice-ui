@@ -85,7 +85,7 @@
       "jsonwebtoken": "9.0.3"
     },
     "brace-expansion": "2.0.2",
-    "fast-xml-parser": "^5.3.6"
+    "fast-xml-parser": "5.3.6"
   },
   "nodemonConfig": {
     "ignore": [
