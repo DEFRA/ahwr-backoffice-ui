@@ -28,13 +28,17 @@ const ERRORS = {
 
 const createView = async (request, h, deleteFlagId, createFlag, errors) => {
   await generateNewCrumb(request, h);
-  const { isAdministrator } = mapAuth(request);
+  const { isAdministrator, isSuperAdmin } = mapAuth(request);
+
+  // check if user is allowed to create/delete flags
+  const deleteFlagIdAfterUserCheck = !isSuperAdmin ? undefined : deleteFlagId;
+  const createFlagAfterUserCheck = !isSuperAdmin ? undefined : createFlag;
 
   return h.view("flags", {
     ...(await createFlagsTableData({
       logger: request.logger,
-      flagIdToDelete: deleteFlagId,
-      createFlag,
+      flagIdToDelete: deleteFlagIdAfterUserCheck,
+      createFlag: createFlagAfterUserCheck,
       isAdmin: isAdministrator,
     })),
     errors,

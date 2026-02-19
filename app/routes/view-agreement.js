@@ -64,26 +64,43 @@ export const viewAgreementRoute = {
         ? JSON.parse(Buffer.from(request.query.errors, "base64").toString("utf8"))
         : [];
 
-      const getAction = (query, visuallyHiddenText, id) => ({
-        items: [
-          {
-            href: `/view-agreement/${application.reference}?${query}=true&page=${page}#${id}`,
-            text: "Change",
-            visuallyHiddenText,
-          },
-        ],
-      });
+      const getAction = (createItems, query, visuallyHiddenText, id) => {
+        if (!createItems) {
+          return null;
+        }
+        return {
+          items: [
+            {
+              href: `/view-agreement/${application.reference}?${query}=true&page=${page}#${id}`,
+              text: "Change",
+              visuallyHiddenText,
+            },
+          ],
+        };
+      };
+
       const dateOfVisitActions = updateDateOfVisitAction
-        ? getAction("updateDateOfVisit", "date of review", "update-date-of-visit")
+        ? getAction(
+            updateDateOfVisitAction,
+            "updateDateOfVisit",
+            "date of review",
+            "update-date-of-visit",
+          )
         : null;
       const vetsNameActions = updateVetsNameAction
-        ? getAction("updateVetsName", "vet's name", "update-vets-name")
+        ? getAction(updateVetsNameAction, "updateVetsName", "vet's name", "update-vets-name")
         : null;
       const vetRCVSNumberActions = updateVetRCVSNumberAction
-        ? getAction("updateVetRCVSNumber", "RCVS number", "update-vet-rcvs-number")
+        ? getAction(
+            updateVetRCVSNumberAction,
+            "updateVetRCVSNumber",
+            "RCVS number",
+            "update-vet-rcvs-number",
+          )
         : null;
       const eligiblePiiRedactionActions = updateEligiblePiiRedactionAction
         ? getAction(
+            updateEligiblePiiRedactionAction,
             "updateEligiblePiiRedaction",
             "eligible for automated data redaction",
             "update-eligible-pii-redaction",

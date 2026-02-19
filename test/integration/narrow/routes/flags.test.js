@@ -14,7 +14,7 @@ jest.mock("../../../../app/api/flags");
 jest.mock("../../../../app/auth/map-auth");
 jest.mock("../../../../app/auth");
 
-mapAuth.mockResolvedValue({ isAdministrator: true });
+mapAuth.mockReturnValue({ isAdministrator: true, isSuperAdmin: true });
 getAllFlags.mockResolvedValue(flags);
 
 describe("Flags tests", () => {
@@ -122,11 +122,6 @@ describe("Flags tests", () => {
     });
 
     test("the create form links to the flags endpoint", async () => {
-      const auth = {
-        strategy: "session-auth",
-        credentials: { scope: [user], account: { name: "test user" } },
-      };
-
       const options = {
         method: "GET",
         url: "/flags?createFlag=true",
@@ -145,17 +140,13 @@ describe("Flags tests", () => {
     });
 
     test("the delete form links to the flags endpoint", async () => {
-      const auth = {
-        strategy: "session-auth",
-        credentials: { scope: [user], account: { name: "test user" } },
-      };
-
       const options = {
         method: "GET",
         url: "/flags?deleteFlag=abc123",
         auth,
         headers: { cookie: `crumb=${crumb}` },
       };
+
       const res = await server.inject(options);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
@@ -164,6 +155,54 @@ describe("Flags tests", () => {
       expect($("title").text()).toContain("AHWR Flags");
 
       expect($(".ahwr-update-form").attr("action")).toBe("/flags");
+      phaseBannerOk($);
+    });
+
+    test("the create form is not shown when user isn't an administrator", async () => {
+      mapAuth.mockReturnValueOnce({ isAdministrator: false, isSuperAdmin: false });
+      const auth = {
+        strategy: "session-auth",
+        credentials: { scope: [user], account: { name: "test user" } },
+      };
+      const options = {
+        method: "GET",
+        url: "/flags?createFlag=true",
+        auth,
+        headers: { cookie: `crumb=${crumb}` },
+      };
+
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+
+      expect($(".ahwr-update-form").length).toBe(0);
+      phaseBannerOk($);
+    });
+
+    test("the delete form is not shown when user isn't an administrator", async () => {
+      mapAuth.mockReturnValueOnce({ isAdministrator: false, isSuperAdmin: false });
+      const auth = {
+        strategy: "session-auth",
+        credentials: { scope: [user], account: { name: "test user" } },
+      };
+      const options = {
+        method: "GET",
+        url: "/flags?deleteFlag=abc123",
+        auth,
+        headers: { cookie: `crumb=${crumb}` },
+      };
+
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+      expect($("h1.govuk-heading-l").text()).toContain("Flags");
+      expect($("title").text()).toContain("AHWR Flags");
+
+      expect($(".ahwr-update-form").length).toBe(0);
       phaseBannerOk($);
     });
   });
