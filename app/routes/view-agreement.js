@@ -73,7 +73,6 @@ export const viewAgreementRoute = {
           },
         ],
       });
-
       const dateOfVisitActions = updateDateOfVisitAction
         ? getAction("updateDateOfVisit", "date of review", "update-date-of-visit")
         : null;
