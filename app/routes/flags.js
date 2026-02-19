@@ -31,8 +31,8 @@ const createView = async (request, h, deleteFlagId, createFlag, errors) => {
   const { isAdministrator, isSuperAdmin } = mapAuth(request);
 
   // check if user is allowed to create/delete flags
-  const deleteFlagIdAfterUserCheck = !isSuperAdmin ? undefined : deleteFlagId;
-  const createFlagAfterUserCheck = !isSuperAdmin ? undefined : createFlag;
+  const deleteFlagIdAfterUserCheck = isSuperAdmin ? deleteFlagId : undefined;
+  const createFlagAfterUserCheck = isSuperAdmin ? createFlag : undefined;
 
   return h.view("flags", {
     ...(await createFlagsTableData({
