@@ -64,17 +64,15 @@ export const viewAgreementRoute = {
         ? JSON.parse(Buffer.from(request.query.errors, "base64").toString("utf8"))
         : [];
 
-      const getAction = (query, visuallyHiddenText, id) => {
-        return {
-          items: [
-            {
-              href: `/view-agreement/${application.reference}?${query}=true&page=${page}#${id}`,
-              text: "Change",
-              visuallyHiddenText,
-            },
-          ],
-        };
-      };
+      const getAction = (query, visuallyHiddenText, id) => ({
+        items: [
+          {
+            href: `/view-agreement/${application.reference}?${query}=true&page=${page}#${id}`,
+            text: "Change",
+            visuallyHiddenText,
+          },
+        ],
+      });
 
       const dateOfVisitActions = updateDateOfVisitAction
         ? getAction("updateDateOfVisit", "date of review", "update-date-of-visit")
