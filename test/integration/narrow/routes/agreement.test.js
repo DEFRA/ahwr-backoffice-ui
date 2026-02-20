@@ -49,7 +49,7 @@ displayContactHistory.mockReturnValue({
 });
 
 getClaimViewStates.mockReturnValue({
-  updateEligiblePiiRedactionAction: false,
+  updateEligiblePiiRedactionAction: true,
   updateEligiblePiiRedactionForm: false,
 });
 
@@ -131,6 +131,30 @@ describe("Claims test", () => {
         ...applicationsData.applications[0],
         redacted: true,
       });
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+
+      const actions = $(".govuk-summary-list__actions");
+      expect(actions.find("a.govuk-link").length).toBe(0);
+    });
+
+    test("returns 200 and hides actions when user not super admin", async () => {
+      getClaimViewStates.mockReturnValue({
+        updateEligiblePiiRedactionAction: false, // driven by isSuperAdmin
+        updateEligiblePiiRedactionForm: false,
+      });
+      getApplication.mockReturnValue({
+        ...applicationsData.applications[0],
+        redacted: false,
+      });
+
       const options = {
         method: "GET",
         url: `${url}?page=1`,
