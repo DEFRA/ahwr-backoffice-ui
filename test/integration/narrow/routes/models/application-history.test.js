@@ -64,6 +64,15 @@ test("renders table", () => {
       updatedBy: "admin",
       updatedProperty: "laboratoryUrn",
     },
+    {
+      eventType: "application-eligiblePiiRedaction",
+      newValue: true,
+      note: "Eligible PII Redaction was incorrectly entered, and has been updated",
+      oldValue: false,
+      updatedAt: "2025-03-28T14:54:18.927Z",
+      updatedBy: "admin",
+      updatedProperty: "eligiblePiiRedaction",
+    },
   ];
 
   const expected = {
@@ -144,6 +153,23 @@ test("renders table", () => {
         },
         {
           text: "URN was incorrectly entered, and has been updated",
+        },
+      ],
+      [
+        {
+          text: "28/03/2025",
+        },
+        {
+          text: "14:54:18",
+        },
+        {
+          text: "Eligible for automated data redaction updated from false to true",
+        },
+        {
+          text: "admin",
+        },
+        {
+          text: "Eligible PII Redaction was incorrectly entered, and has been updated",
         },
       ],
     ],
