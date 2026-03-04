@@ -1,6 +1,7 @@
 {% extends './layouts/layout.njk' %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% block pageTitle %}
   Support
 {% endblock %}
@@ -389,7 +390,7 @@
 {% if claimCommsDocument %}
 {{ govukInsetText({
   text: claimCommsDocument,
-  id: "claimCommsDocument"
+id: "claimCommsDocument"
 }) }}
 
 {{ govukButton({
@@ -397,6 +398,59 @@
   attributes: {
     type: "button",
     id: "copyClaimCommsDocument"
+  }
+}) }}
+
+{% endif %}
+
+<form method="POST" action="/support" class="ahwr-retrieve-queue-messages-form">
+{% call govukFieldset({
+  legend: {
+    text: "Queue messages",
+    classes: "govuk-fieldset__legend--m",
+    isPageHeading: false
+  }
+}) %}
+
+  {{ govukInput({
+    label: {
+      text: "Queue URL"
+    },
+    classes: "govuk-input--width-20",
+    id: "queue-url",
+    name: "queueUrl"
+  }) }}
+
+  {{ govukInput({
+    label: {
+      text: "Number of messages"
+    },
+    classes: "govuk-input--width-20",
+    id: "message-count",
+    name: "messageCount",
+    inputmode: "numeric"
+  }) }}
+  {% endcall %}
+
+
+  {{ govukButton({
+    text: "Retrieve queue messages"
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="retrieveQueueMessages"/>
+</form>
+
+{% if messagesDocument %}
+{{ govukInsetText({
+  text: messagesDocument,
+  id: "messagesDocument"
+}) }}
+
+{{ govukButton({
+  text: "Copy to Clipboard",
+  attributes: {
+    type: "button",
+    id: "copyMessagesDocument"
   }
 }) }}
 

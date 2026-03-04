@@ -54,6 +54,10 @@ const getConfigSchema = () =>
     logLevel: joi.string().required(),
     logFormat: joi.string().required(),
     logRedact: joi.array().items(joi.string()),
+    aws: {
+      region: joi.string().required(),
+      endpointUrl: joi.string().required(),
+    },
   });
 
 const buildConfig = () => {
@@ -108,6 +112,10 @@ const buildConfig = () => {
     logRedact: process.env.LOG_REDACT
       ? process.env.LOG_REDACT.split(",")
       : ["req.headers", "res.headers"],
+    aws: {
+      region: process.env.AWS_REGION ?? "eu-west-2",
+      endpointUrl: process.env.AWS_ENDPOINT_URL,
+    },
   };
 
   if (process.env.NODE_ENV === "test") {

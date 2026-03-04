@@ -11,6 +11,7 @@ import { searchClaimMessages } from "./search-claim-messages-handler.js";
 import { searchAgreementLogs } from "./search-agreement-logs-handler.js";
 import { searchAgreementComms } from "./search-agreement-comms-handler.js";
 import { searchClaimComms } from "./search-claim-comms-handler.js";
+import { retrieveQueueMessages } from "./retrieve-queue-messages-handler.js";
 
 const { support } = permissions;
 
@@ -42,6 +43,7 @@ const actions = [
   searchAgreementLogs,
   searchAgreementComms,
   searchClaimComms,
+  retrieveQueueMessages,
 ];
 
 const actionHandlers = actions.reduce((acc, { action, handler }) => {
@@ -63,6 +65,10 @@ const postSupportRoute = {
           then: actionHandler.validation,
         })),
       }),
+      options: {
+        convert: true,
+        abortEarly: false,
+      },
       failAction: async (request, h, error) => {
         const errors = error.details
           .map((receivedError) => {
