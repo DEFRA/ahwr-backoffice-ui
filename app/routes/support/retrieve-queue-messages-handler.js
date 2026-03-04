@@ -2,7 +2,7 @@ import Joi from "joi";
 import { SQSClient, ReceiveMessageCommand } from "@aws-sdk/client-sqs";
 import { config } from "../../config/index.js";
 
-export const peekMessages = async (queueUrl, limit, logger) => {
+const peekMessages = async (queueUrl, limit, logger) => {
   logger.info("Creating SQS client");
   const client = new SQSClient({ region: config.aws.region, endpoint: config.aws.endpointUrl });
   logger.info("Created SQS client");
