@@ -1,53 +1,54 @@
 import Joi from "joi";
-import { SQSClient, ReceiveMessageCommand } from "@aws-sdk/client-sqs";
-import { config } from "../../config/index.js";
-
-const peekMessages = async (queueUrl, limit, logger) => {
-  logger.info("Creating SQS client");
-  const client = new SQSClient({ region: config.aws.region, endpoint: config.aws.endpointUrl });
-  logger.info("Created SQS client");
-
-  const command = new ReceiveMessageCommand({
-    QueueUrl: queueUrl,
-    MaxNumberOfMessages: limit,
-    VisibilityTimeout: 2,
-    WaitTimeSeconds: 0,
-    AttributeNames: ["All"],
-    MessageAttributeNames: ["All"],
-  });
-  const res = await client.send(command);
-
-  logger.info(`Retrieved ${res.Messages?.length || 0} messages`);
-
-  return (res.Messages || []).map((msg) => ({
-    id: msg.MessageId,
-    body: msg.Body,
-    attributes: msg.Attributes,
-    messageAttributes: msg.MessageAttributes,
-  }));
-};
+import {
+  getApplicationQueueMessages,
+  getDocumentGeneratorQueueMessages,
+  getMessageGeneratorQueueMessages,
+  getPaymentProxyQueueMessages,
+  getSfdCommsProxyQueueMessages,
+} from "./support-calls.js";
 
 export const retrieveQueueMessages = {
   action: "retrieveQueueMessages",
   validation: {
     queueUrl: Joi.string().trim().required(),
     messageCount: Joi.number().integer().empty("").min(1).default(1),
+    service: Joi.string().required(),
     action: Joi.string().required(),
   },
   handler: async (request, h) => {
-    const { queueUrl, messageCount } = request.payload;
+    const { queueUrl, messageCount, service } = request.payload;
     const logger = request.logger;
 
-    let messagesDocument;
+    let queueMessages;
     try {
-      const messages = await peekMessages(queueUrl, messageCount, logger);
-      messagesDocument = JSON.stringify(messages);
+      const actionByService = new Map([
+        [
+          "ahwr-application-backend",
+          () => getApplicationQueueMessages(queueUrl, messageCount, logger),
+        ],
+        [
+          "ahwr-document-generator",
+          () => getDocumentGeneratorQueueMessages(queueUrl, messageCount, logger),
+        ],
+        [
+          "ahwr-message-generator",
+          () => getMessageGeneratorQueueMessages(queueUrl, messageCount, logger),
+        ],
+        ["ahwr-payment-proxy", () => getPaymentProxyQueueMessages(queueUrl, messageCount, logger)],
+        [
+          "ahwr-sfd-comms-proxy",
+          () => getSfdCommsProxyQueueMessages(queueUrl, messageCount, logger),
+        ],
+      ]);
+
+      const result = await actionByService.get(service)();
+      queueMessages = JSON.stringify(result);
     } catch (error) {
       logger.error({ error });
-      messagesDocument = error.message;
+      queueMessages = error.message;
     }
 
-    return h.view("support", { messagesDocument, scrollTo: "messagesDocument" });
+    return h.view("support", { queueMessages, scrollTo: "queueMessages" });
   },
   errorIdentifier: '"queueUrl"',
   errorHandler: (receivedError) => ({

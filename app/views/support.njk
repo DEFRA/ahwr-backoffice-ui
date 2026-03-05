@@ -2,6 +2,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
 {% block pageTitle %}
   Support
 {% endblock %}
@@ -403,35 +404,65 @@
 
 {% endif %}
 
+
 <form method="POST" action="/support" class="ahwr-retrieve-queue-messages-form">
-{% call govukFieldset({
-  legend: {
-    text: "Queue messages",
-    classes: "govuk-fieldset__legend--m",
-    isPageHeading: false
-  }
-}) %}
-
-  {{ govukInput({
+  {% call govukFieldset({
+    legend: {
+      text: "Queue messages",
+      classes: "govuk-fieldset__legend--m",
+      isPageHeading: false
+    }
+  }) %}
+  {{ govukSelect({
+    id: "service",
+    name: "service",
     label: {
-      text: "Queue URL"
+      text: "Service"
     },
-    classes: "govuk-input--width-20",
-    id: "queue-url",
-    name: "queueUrl"
+    items: [
+      {
+        value: "ahwr-application-backend",
+        text: "ahwr-application-backend",
+        selected: true
+      },
+      {
+        value: "ahwr-document-generator",
+        text: "ahwr-document-generator"
+      },
+      {
+        value: "ahwr-message-generator",
+        text: "ahwr-message-generator"
+      },
+      {
+        value: "ahwr-payment-proxy",
+        text: "ahwr-payment-proxy"
+      },
+      {
+        value: "ahwr-sfd-comms-proxy",
+        text: "ahwr-sfd-comms-proxy"
+      }
+    ]
   }) }}
+    {{ govukInput({
+      label: {
+        text: "Queue URL"
+      },
+      classes: "govuk-input--width-20",
+      id: "queue-url",
+      name: "queueUrl"
+    }) }}
 
-  {{ govukInput({
-    label: {
-      text: "Number of messages"
-    },
-    classes: "govuk-input--width-20",
-    id: "message-count",
-    name: "messageCount",
-    inputmode: "numeric"
-  }) }}
+    {{ govukInput({
+      label: {
+        text: "Number of messages"
+      },
+      classes: "govuk-input--width-20",
+      id: "message-count",
+      name: "messageCount",
+      inputmode: "numeric",
+      pattern: "[0-9]*"
+    }) }}
   {% endcall %}
-
 
   {{ govukButton({
     text: "Retrieve queue messages"
@@ -440,17 +471,17 @@
   <input type="hidden" name="action" value="retrieveQueueMessages"/>
 </form>
 
-{% if messagesDocument %}
+{% if queueMessages %}
 {{ govukInsetText({
-  text: messagesDocument,
-  id: "messagesDocument"
+  text: queueMessages,
+  id: "queueMessages"
 }) }}
 
 {{ govukButton({
   text: "Copy to Clipboard",
   attributes: {
     type: "button",
-    id: "copyMessagesDocument"
+    id: "copyQueueMessages"
   }
 }) }}
 

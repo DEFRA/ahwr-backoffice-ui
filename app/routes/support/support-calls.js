@@ -134,3 +134,43 @@ export const getClaimCommsDocument = async (claimReference, logger) => {
     logger,
   );
 };
+
+export const getApplicationQueueMessages = async (queueUrl, limit, logger) => {
+  return makeGetCall(
+    `${applicationApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
+    "No messages found",
+    logger,
+  );
+};
+
+export const getDocumentGeneratorQueueMessages = async (queueUrl, limit, logger) => {
+  return makeGetCall(
+    `${documentGeneratorApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
+    "No messages found",
+    logger,
+  );
+};
+
+export const getMessageGeneratorQueueMessages = async (queueUrl, limit, logger) => {
+  return makeGetCall(
+    `${messageGeneratorApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
+    "No messages found",
+    logger,
+  );
+};
+
+export const getPaymentProxyQueueMessages = async (queueUrl, limit, logger) => {
+  return makeGetCall(
+    `${paymentProxyApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
+    "No messages found",
+    logger,
+  );
+};
+
+export const getSfdCommsProxyQueueMessages = async (queueUrl, limit, logger) => {
+  return makeGetCall(
+    `${commsProxyApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
+    "No messages found",
+    logger,
+  );
+};
