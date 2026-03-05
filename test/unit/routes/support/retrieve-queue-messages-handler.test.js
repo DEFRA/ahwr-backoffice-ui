@@ -1,5 +1,5 @@
 import { retrieveQueueMessages } from "../../../../app/routes/support/retrieve-queue-messages-handler";
-import { SQSClient } from "@aws-sdk/client-sqs";
+import { getApplicationQueueMessages, getDocumentGeneratorQueueMessages, getMessageGeneratorQueueMessages, getPaymentProxyQueueMessages, getSfdCommsProxyQueueMessages } from "../../../../app/routes/support/support-calls";
 
 jest.mock("@aws-sdk/client-sqs");
 jest.mock("../../../../app/config/index.js", () => ({
@@ -10,24 +10,30 @@ jest.mock("../../../../app/config/index.js", () => ({
     },
   },
 }));
+jest.mock('../../../../app/routes/support/support-calls')
 
 describe("retrieveQueueMessages.handler", () => {
-  const sendMock = jest.fn();
-
-  SQSClient.mockImplementation(() => ({
-    send: sendMock,
-  }));
-
   const request = {
     payload: {
       queueUrl: "queue-url",
       messageCount: 2,
+      service: 'ahwr-application-backend',
     },
     logger: {
       info: jest.fn(),
       error: jest.fn(),
     },
   };
+  const messages = [
+    {
+      id: "1",
+      body: { sbi: "123456789", claimRef: "FUBC-JTTU-SDQ7" },
+      attributes: { attr: "value" },
+      messageAttributes: {
+        eventType: { DataType: "String", StringValue: "uk.gov.ffc.ahwr.set.paid.status" },
+      },
+    },
+  ]
 
   const h = {
     view: jest.fn(),
@@ -37,67 +43,52 @@ describe("retrieveQueueMessages.handler", () => {
     jest.clearAllMocks();
   });
 
-  it("should retrieve messages and render them", async () => {
-    sendMock.mockResolvedValue({
-      Messages: [
+  it.each([
+    { service: 'ahwr-application-backend', action: getApplicationQueueMessages },
+    { service: 'ahwr-document-generator', action: getDocumentGeneratorQueueMessages },
+    { service: 'ahwr-message-generator', action: getMessageGeneratorQueueMessages },
+    { service: 'ahwr-payment-proxy', action: getPaymentProxyQueueMessages },
+    { service: 'ahwr-sfd-comms-proxy', action: getSfdCommsProxyQueueMessages },
+
+  ])(
+    'should retrieve messages from $service and render them',
+    async ({ service, action }) => {
+      action.mockResolvedValueOnce(messages)
+
+      await retrieveQueueMessages.handler(
         {
-          MessageId: "1",
-          Body: { sbi: "123456789", claimRef: "FUBC-JTTU-SDQ7" },
-          Attributes: { attr: "value" },
-          MessageAttributes: {
-            eventType: { DataType: "String", StringValue: "uk.gov.ffc.ahwr.set.paid.status" },
-          },
-        },
-      ],
+          ...request, payload: { ...request.payload, service, }
+        }, h);
+
+      expect(action).toHaveBeenCalledWith("queue-url", 2, request.logger)
+      expect(h.view).toHaveBeenCalledWith("support", {
+        queueMessages: JSON.stringify(messages),
+        scrollTo: "queueMessages",
+      });
+      expect(request.logger.error).not.toHaveBeenCalled();
     });
-
-    await retrieveQueueMessages.handler(request, h);
-
-    expect(SQSClient).toHaveBeenCalledWith({
-      region: "eu-west-1",
-      endpoint: "http://localhost:4566",
-    });
-
-    expect(sendMock).toHaveBeenCalled();
-
-    expect(h.view).toHaveBeenCalledWith("support", {
-      messagesDocument: JSON.stringify([
-        {
-          id: "1",
-          body: { sbi: "123456789", claimRef: "FUBC-JTTU-SDQ7" },
-          attributes: { attr: "value" },
-          messageAttributes: {
-            eventType: { DataType: "String", StringValue: "uk.gov.ffc.ahwr.set.paid.status" },
-          },
-        },
-      ]),
-      scrollTo: "messagesDocument",
-    });
-
-    expect(request.logger.error).not.toHaveBeenCalled();
-  });
 
   it("should return empty array when no messages", async () => {
-    sendMock.mockResolvedValue({});
+    getApplicationQueueMessages.mockResolvedValueOnce([])
 
     await retrieveQueueMessages.handler(request, h);
 
     expect(h.view).toHaveBeenCalledWith("support", {
-      messagesDocument: JSON.stringify([]),
-      scrollTo: "messagesDocument",
+      queueMessages: JSON.stringify([]),
+      scrollTo: "queueMessages",
     });
   });
 
   it("should handle SQS errors and render error message", async () => {
-    sendMock.mockRejectedValue(new Error("SQS failure"));
+    getApplicationQueueMessages.mockRejectedValue(new Error("SQS failure"));
 
     await retrieveQueueMessages.handler(request, h);
 
     expect(request.logger.error).toHaveBeenCalled();
 
     expect(h.view).toHaveBeenCalledWith("support", {
-      messagesDocument: "SQS failure",
-      scrollTo: "messagesDocument",
+      queueMessages: "SQS failure",
+      scrollTo: "queueMessages",
     });
   });
 });

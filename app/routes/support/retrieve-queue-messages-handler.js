@@ -22,26 +22,14 @@ export const retrieveQueueMessages = {
     let queueMessages;
     try {
       const actionByService = new Map([
-        [
-          "ahwr-application-backend",
-          () => getApplicationQueueMessages(queueUrl, messageCount, logger),
-        ],
-        [
-          "ahwr-document-generator",
-          () => getDocumentGeneratorQueueMessages(queueUrl, messageCount, logger),
-        ],
-        [
-          "ahwr-message-generator",
-          () => getMessageGeneratorQueueMessages(queueUrl, messageCount, logger),
-        ],
-        ["ahwr-payment-proxy", () => getPaymentProxyQueueMessages(queueUrl, messageCount, logger)],
-        [
-          "ahwr-sfd-comms-proxy",
-          () => getSfdCommsProxyQueueMessages(queueUrl, messageCount, logger),
-        ],
+        ["ahwr-application-backend", getApplicationQueueMessages],
+        ["ahwr-document-generator", getDocumentGeneratorQueueMessages],
+        ["ahwr-message-generator", getMessageGeneratorQueueMessages],
+        ["ahwr-payment-proxy", getPaymentProxyQueueMessages],
+        ["ahwr-sfd-comms-proxy", getSfdCommsProxyQueueMessages],
       ]);
 
-      const result = await actionByService.get(service)();
+      const result = await actionByService.get(service)(queueUrl, messageCount, logger);
       queueMessages = JSON.stringify(result);
     } catch (error) {
       logger.error({ error });
