@@ -7,15 +7,6 @@ import {
   getSfdCommsProxyQueueMessages,
 } from "../../../../app/routes/support/support-calls";
 
-jest.mock("@aws-sdk/client-sqs");
-jest.mock("../../../../app/config/index.js", () => ({
-  config: {
-    aws: {
-      region: "eu-west-1",
-      endpointUrl: "http://localhost:4566",
-    },
-  },
-}));
 jest.mock("../../../../app/routes/support/support-calls");
 
 describe("retrieveQueueMessages.handler", () => {
@@ -85,15 +76,15 @@ describe("retrieveQueueMessages.handler", () => {
     });
   });
 
-  it("should handle SQS errors and render error message", async () => {
-    getApplicationQueueMessages.mockRejectedValue(new Error("SQS failure"));
+  it("should handle errors from service and render error message", async () => {
+    getApplicationQueueMessages.mockRejectedValue(new Error("Queue not found"));
 
     await retrieveQueueMessages.handler(request, h);
 
     expect(request.logger.error).toHaveBeenCalled();
 
     expect(h.view).toHaveBeenCalledWith("support", {
-      queueMessages: "SQS failure",
+      queueMessages: "Queue not found",
       scrollTo: "queueMessages",
     });
   });
