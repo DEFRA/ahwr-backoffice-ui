@@ -1,5 +1,11 @@
 import { retrieveQueueMessages } from "../../../../app/routes/support/retrieve-queue-messages-handler";
-import { getApplicationQueueMessages, getDocumentGeneratorQueueMessages, getMessageGeneratorQueueMessages, getPaymentProxyQueueMessages, getSfdCommsProxyQueueMessages } from "../../../../app/routes/support/support-calls";
+import {
+  getApplicationQueueMessages,
+  getDocumentGeneratorQueueMessages,
+  getMessageGeneratorQueueMessages,
+  getPaymentProxyQueueMessages,
+  getSfdCommsProxyQueueMessages,
+} from "../../../../app/routes/support/support-calls";
 
 jest.mock("@aws-sdk/client-sqs");
 jest.mock("../../../../app/config/index.js", () => ({
@@ -10,14 +16,14 @@ jest.mock("../../../../app/config/index.js", () => ({
     },
   },
 }));
-jest.mock('../../../../app/routes/support/support-calls')
+jest.mock("../../../../app/routes/support/support-calls");
 
 describe("retrieveQueueMessages.handler", () => {
   const request = {
     payload: {
       queueUrl: "queue-url",
       messageCount: 2,
-      service: 'ahwr-application-backend',
+      service: "ahwr-application-backend",
     },
     logger: {
       info: jest.fn(),
@@ -33,7 +39,7 @@ describe("retrieveQueueMessages.handler", () => {
         eventType: { DataType: "String", StringValue: "uk.gov.ffc.ahwr.set.paid.status" },
       },
     },
-  ]
+  ];
 
   const h = {
     view: jest.fn(),
@@ -44,32 +50,32 @@ describe("retrieveQueueMessages.handler", () => {
   });
 
   it.each([
-    { service: 'ahwr-application-backend', action: getApplicationQueueMessages },
-    { service: 'ahwr-document-generator', action: getDocumentGeneratorQueueMessages },
-    { service: 'ahwr-message-generator', action: getMessageGeneratorQueueMessages },
-    { service: 'ahwr-payment-proxy', action: getPaymentProxyQueueMessages },
-    { service: 'ahwr-sfd-comms-proxy', action: getSfdCommsProxyQueueMessages },
+    { service: "ahwr-application-backend", action: getApplicationQueueMessages },
+    { service: "ahwr-document-generator", action: getDocumentGeneratorQueueMessages },
+    { service: "ahwr-message-generator", action: getMessageGeneratorQueueMessages },
+    { service: "ahwr-payment-proxy", action: getPaymentProxyQueueMessages },
+    { service: "ahwr-sfd-comms-proxy", action: getSfdCommsProxyQueueMessages },
+  ])("should retrieve messages from $service and render them", async ({ service, action }) => {
+    action.mockResolvedValueOnce(messages);
 
-  ])(
-    'should retrieve messages from $service and render them',
-    async ({ service, action }) => {
-      action.mockResolvedValueOnce(messages)
+    await retrieveQueueMessages.handler(
+      {
+        ...request,
+        payload: { ...request.payload, service },
+      },
+      h,
+    );
 
-      await retrieveQueueMessages.handler(
-        {
-          ...request, payload: { ...request.payload, service, }
-        }, h);
-
-      expect(action).toHaveBeenCalledWith("queue-url", 2, request.logger)
-      expect(h.view).toHaveBeenCalledWith("support", {
-        queueMessages: JSON.stringify(messages),
-        scrollTo: "queueMessages",
-      });
-      expect(request.logger.error).not.toHaveBeenCalled();
+    expect(action).toHaveBeenCalledWith("queue-url", 2, request.logger);
+    expect(h.view).toHaveBeenCalledWith("support", {
+      queueMessages: JSON.stringify(messages),
+      scrollTo: "queueMessages",
     });
+    expect(request.logger.error).not.toHaveBeenCalled();
+  });
 
   it("should return empty array when no messages", async () => {
-    getApplicationQueueMessages.mockResolvedValueOnce([])
+    getApplicationQueueMessages.mockResolvedValueOnce([]);
 
     await retrieveQueueMessages.handler(request, h);
 
