@@ -25,7 +25,3 @@ services:
       DISPLAY_PAGE_SIZE: 20
       SUPER_ADMINS: ${SUPER_ADMINS}
       BACKOFFICE_UI_API_KEY: ${BACKOFFICE_UI_API_KEY:-446dcdbe-e02c-4d16-a266-001bbbd5f089}
-      AWS_ENDPOINT_URL: http://localstack:4566
-      AWS_ACCESS_KEY_ID: test
-      AWS_SECRET_ACCESS_KEY: test
-      AWS_REGION: eu-west-2
