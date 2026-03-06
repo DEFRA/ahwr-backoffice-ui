@@ -40,7 +40,8 @@ const getAction = (updatedProperty, newValue, oldValue) => {
     agreementFlag: `Agreement was moved from ${oldValue} to ${newValue}`,
     testResults: `Test results updated from ${oldValue} to ${newValue}`,
     herdName: `Herd details were updated from ${oldValue} to ${newValue}`,
-    laboratoryUrn: `Laboratory URN was updated from ${oldValue} to ${newValue}`,
+    laboratoryUrn: `Laboratory URN was updated from ${oldValue} to ${newValue}`, // want to remove this but can't due to old data
+    laboratoryURN: `Laboratory URN was updated from ${oldValue} to ${newValue}`,
     eligiblePiiRedaction: `Eligible for automated data redaction updated from ${oldValue} to ${newValue}`,
   };
 
