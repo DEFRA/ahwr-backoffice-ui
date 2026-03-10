@@ -637,7 +637,7 @@ describe("getApplicationQueueMessages", () => {
       "http://ahwr-application-backend:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
       { json: true, headers: { "x-api-key": "something" } },
     );
-    expect(result).toStrictEqual("Queue not found");
+    expect(result).toStrictEqual("No messages found");
   });
 
   it("logs and throws error when service returns an error", async () => {
@@ -702,7 +702,7 @@ describe("getDocumentGeneratorQueueMessages", () => {
       "http://ahwr-document-generator:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
       { json: true, headers: { "x-api-key": "something" } },
     );
-    expect(result).toStrictEqual("Queue not found");
+    expect(result).toStrictEqual("No messages found");
   });
 
   it("logs and throws error when service returns an error", async () => {
@@ -767,7 +767,7 @@ describe("getMessageGeneratorQueueMessages", () => {
       "http://ahwr-message-generator:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
       { json: true, headers: { "x-api-key": "something" } },
     );
-    expect(result).toStrictEqual("Queue not found");
+    expect(result).toStrictEqual("No messages found");
   });
 
   it("logs and throws error when service returns an error", async () => {
@@ -832,7 +832,7 @@ describe("getPaymentProxyQueueMessages", () => {
       "http://ahwr-payment-proxy:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
       { json: true, headers: { "x-api-key": "something" } },
     );
-    expect(result).toStrictEqual("Queue not found");
+    expect(result).toStrictEqual("No messages found");
   });
 
   it("logs and throws error when service returns an error", async () => {
@@ -897,7 +897,7 @@ describe("getSfdCommsProxyQueueMessages", () => {
       "http://ahwr-sfd-comms-proxy:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
       { json: true, headers: { "x-api-key": "something" } },
     );
-    expect(result).toStrictEqual("Queue not found");
+    expect(result).toStrictEqual("No messages found");
   });
 
   it("logs and throws error when service returns an error", async () => {
