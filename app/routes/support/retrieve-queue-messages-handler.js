@@ -11,7 +11,7 @@ export const retrieveQueueMessages = {
   action: "retrieveQueueMessages",
   validation: {
     queueUrl: Joi.string().trim().required(),
-    messageCount: Joi.number().integer().empty("").min(1).default(1),
+    messageCount: Joi.number().integer().empty("").min(1).max(10).default(1),
     service: Joi.string().required(),
     action: Joi.string().required(),
   },
