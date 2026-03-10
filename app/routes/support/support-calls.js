@@ -11,7 +11,7 @@ const {
   commsProxyApiUri,
 } = config;
 
-const QUEUE_NOT_FOUND = "Queue not found";
+const MESSAGES_NOT_FOUND = "No messages found";
 
 const makeGetCall = async (url, notFoundMessage, logger) => {
   try {
@@ -140,7 +140,7 @@ export const getClaimCommsDocument = async (claimReference, logger) => {
 export const getApplicationQueueMessages = async (queueUrl, limit, logger) => {
   return makeGetCall(
     `${applicationApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
-    QUEUE_NOT_FOUND,
+    MESSAGES_NOT_FOUND,
     logger,
   );
 };
@@ -148,7 +148,7 @@ export const getApplicationQueueMessages = async (queueUrl, limit, logger) => {
 export const getDocumentGeneratorQueueMessages = async (queueUrl, limit, logger) => {
   return makeGetCall(
     `${documentGeneratorApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
-    QUEUE_NOT_FOUND,
+    MESSAGES_NOT_FOUND,
     logger,
   );
 };
@@ -156,7 +156,7 @@ export const getDocumentGeneratorQueueMessages = async (queueUrl, limit, logger)
 export const getMessageGeneratorQueueMessages = async (queueUrl, limit, logger) => {
   return makeGetCall(
     `${messageGeneratorApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
-    QUEUE_NOT_FOUND,
+    MESSAGES_NOT_FOUND,
     logger,
   );
 };
@@ -164,7 +164,7 @@ export const getMessageGeneratorQueueMessages = async (queueUrl, limit, logger) 
 export const getPaymentProxyQueueMessages = async (queueUrl, limit, logger) => {
   return makeGetCall(
     `${paymentProxyApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
-    QUEUE_NOT_FOUND,
+    MESSAGES_NOT_FOUND,
     logger,
   );
 };
@@ -172,7 +172,7 @@ export const getPaymentProxyQueueMessages = async (queueUrl, limit, logger) => {
 export const getSfdCommsProxyQueueMessages = async (queueUrl, limit, logger) => {
   return makeGetCall(
     `${commsProxyApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
-    QUEUE_NOT_FOUND,
+    MESSAGES_NOT_FOUND,
     logger,
   );
 };
