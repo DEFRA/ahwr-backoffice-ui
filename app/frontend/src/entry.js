@@ -34,6 +34,7 @@ document.querySelectorAll("th.govuk-table__header > button").forEach((button) =>
   { buttonId: "copyAgreementLogsDocument", inputId: "agreementLogsDocument" },
   { buttonId: "copyAgreementCommsDocument", inputId: "agreementCommsDocument" },
   { buttonId: "copyClaimCommsDocument", inputId: "claimCommsDocument" },
+  { buttonId: "copyQueueMessages", inputId: "queueMessages" },
 ].forEach(({ buttonId, inputId }) => {
   const btn = document.getElementById(buttonId);
   if (btn) {

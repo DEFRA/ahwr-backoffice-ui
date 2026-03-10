@@ -5,12 +5,17 @@ import {
   getAgreementLogsDocument,
   getAgreementMessagesDocument,
   getApplicationDocument,
+  getApplicationQueueMessages,
   getClaimCommsDocument,
   getClaimDocument,
   getClaimMessagesDocument,
+  getDocumentGeneratorQueueMessages,
   getHerdDocument,
+  getMessageGeneratorQueueMessages,
   getPaymentDocument,
   getPaymentDocumentWithRefresh,
+  getPaymentProxyQueueMessages,
+  getSfdCommsProxyQueueMessages,
 } from "./support-calls";
 import { StatusCodes } from "http-status-codes";
 
@@ -582,5 +587,330 @@ describe("getClaimCommsDocument", () => {
       );
       expect(mockLogger.error).toHaveBeenCalled();
     }
+  });
+});
+
+describe("getApplicationQueueMessages", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  const queueMessaages = [
+    {
+      id: "e8b834aa-aaad-40a6-85fc-a69ec0e6e6d6",
+      body: '{"crn":"1060000000","sbi":"987654321","applicationReference":"IAHW-896I-FTN9","documentLocation":"987654321/IAHW-896I-FTN9.pdf","userType":"newUser"}',
+      attributes: {
+        SenderId: "000000000000",
+        SentTimestamp: "1772709757010",
+        ApproximateReceiveCount: "2",
+        ApproximateFirstReceiveTimestamp: "1772710857588",
+      },
+    },
+  ];
+
+  it("calls service with the expected parameters and returns result", async () => {
+    const wreckResponse = {
+      payload: queueMessaages,
+      res: {
+        statusCode: 200,
+      },
+    };
+    wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
+
+    const result = await getApplicationQueueMessages("localhost:4566", 10, mockLogger);
+
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-application-backend:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+      { json: true, headers: { "x-api-key": "something" } },
+    );
+    expect(result).toStrictEqual(queueMessaages);
+  });
+
+  it("returns not found message when service returns 404", async () => {
+    wreck.get = jest.fn().mockImplementation(() => {
+      throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
+    });
+
+    const result = await getApplicationQueueMessages("localhost:4566", 10, mockLogger);
+
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-application-backend:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+      { json: true, headers: { "x-api-key": "something" } },
+    );
+    expect(result).toStrictEqual("No messages found");
+  });
+
+  it("logs and throws error when service returns an error", async () => {
+    const mockError = new Error("Request failed");
+    wreck.get = jest.fn().mockRejectedValue(mockError);
+
+    await expect(getApplicationQueueMessages("localhost:4566", 10, mockLogger)).rejects.toThrow(
+      "Request failed",
+    );
+
+    expect(mockLogger.error).toHaveBeenCalledWith({
+      error: mockError,
+      url: "http://ahwr-application-backend:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+    });
+  });
+});
+
+describe("getDocumentGeneratorQueueMessages", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  const queueMessaages = [
+    {
+      id: "e8b834aa-aaad-40a6-85fc-a69ec0e6e6d6",
+      body: '{"crn":"1060000000","sbi":"987654321","applicationReference":"IAHW-896I-FTN9","documentLocation":"987654321/IAHW-896I-FTN9.pdf","userType":"newUser"}',
+      attributes: {
+        SenderId: "000000000000",
+        SentTimestamp: "1772709757010",
+        ApproximateReceiveCount: "2",
+        ApproximateFirstReceiveTimestamp: "1772710857588",
+      },
+    },
+  ];
+
+  it("calls service with the expected parameters and returns result", async () => {
+    const wreckResponse = {
+      payload: queueMessaages,
+      res: {
+        statusCode: 200,
+      },
+    };
+    wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
+
+    const result = await getDocumentGeneratorQueueMessages("localhost:4566", 10, mockLogger);
+
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-document-generator:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+      { json: true, headers: { "x-api-key": "something" } },
+    );
+    expect(result).toStrictEqual(queueMessaages);
+  });
+
+  it("returns not found message when service returns 404", async () => {
+    wreck.get = jest.fn().mockImplementation(() => {
+      throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
+    });
+
+    const result = await getDocumentGeneratorQueueMessages("localhost:4566", 10, mockLogger);
+
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-document-generator:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+      { json: true, headers: { "x-api-key": "something" } },
+    );
+    expect(result).toStrictEqual("No messages found");
+  });
+
+  it("logs and throws error when service returns an error", async () => {
+    const mockError = new Error("Request failed");
+    wreck.get = jest.fn().mockRejectedValue(mockError);
+
+    await expect(
+      getDocumentGeneratorQueueMessages("localhost:4566", 10, mockLogger),
+    ).rejects.toThrow("Request failed");
+
+    expect(mockLogger.error).toHaveBeenCalledWith({
+      error: mockError,
+      url: "http://ahwr-document-generator:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+    });
+  });
+});
+
+describe("getMessageGeneratorQueueMessages", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  const queueMessaages = [
+    {
+      id: "e8b834aa-aaad-40a6-85fc-a69ec0e6e6d6",
+      body: '{"crn":"1060000000","sbi":"987654321","applicationReference":"IAHW-896I-FTN9","documentLocation":"987654321/IAHW-896I-FTN9.pdf","userType":"newUser"}',
+      attributes: {
+        SenderId: "000000000000",
+        SentTimestamp: "1772709757010",
+        ApproximateReceiveCount: "2",
+        ApproximateFirstReceiveTimestamp: "1772710857588",
+      },
+    },
+  ];
+
+  it("calls service with the expected parameters and returns result", async () => {
+    const wreckResponse = {
+      payload: queueMessaages,
+      res: {
+        statusCode: 200,
+      },
+    };
+    wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
+
+    const result = await getMessageGeneratorQueueMessages("localhost:4566", 10, mockLogger);
+
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-message-generator:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+      { json: true, headers: { "x-api-key": "something" } },
+    );
+    expect(result).toStrictEqual(queueMessaages);
+  });
+
+  it("returns not found message when service returns 404", async () => {
+    wreck.get = jest.fn().mockImplementation(() => {
+      throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
+    });
+
+    const result = await getMessageGeneratorQueueMessages("localhost:4566", 10, mockLogger);
+
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-message-generator:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+      { json: true, headers: { "x-api-key": "something" } },
+    );
+    expect(result).toStrictEqual("No messages found");
+  });
+
+  it("logs and throws error when service returns an error", async () => {
+    const mockError = new Error("Request failed");
+    wreck.get = jest.fn().mockRejectedValue(mockError);
+
+    await expect(
+      getMessageGeneratorQueueMessages("localhost:4566", 10, mockLogger),
+    ).rejects.toThrow("Request failed");
+
+    expect(mockLogger.error).toHaveBeenCalledWith({
+      error: mockError,
+      url: "http://ahwr-message-generator:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+    });
+  });
+});
+
+describe("getPaymentProxyQueueMessages", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  const queueMessaages = [
+    {
+      id: "e8b834aa-aaad-40a6-85fc-a69ec0e6e6d6",
+      body: '{"crn":"1060000000","sbi":"987654321","applicationReference":"IAHW-896I-FTN9","documentLocation":"987654321/IAHW-896I-FTN9.pdf","userType":"newUser"}',
+      attributes: {
+        SenderId: "000000000000",
+        SentTimestamp: "1772709757010",
+        ApproximateReceiveCount: "2",
+        ApproximateFirstReceiveTimestamp: "1772710857588",
+      },
+    },
+  ];
+
+  it("calls service with the expected parameters and returns result", async () => {
+    const wreckResponse = {
+      payload: queueMessaages,
+      res: {
+        statusCode: 200,
+      },
+    };
+    wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
+
+    const result = await getPaymentProxyQueueMessages("localhost:4566", 10, mockLogger);
+
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-payment-proxy:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+      { json: true, headers: { "x-api-key": "something" } },
+    );
+    expect(result).toStrictEqual(queueMessaages);
+  });
+
+  it("returns not found message when service returns 404", async () => {
+    wreck.get = jest.fn().mockImplementation(() => {
+      throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
+    });
+
+    const result = await getPaymentProxyQueueMessages("localhost:4566", 10, mockLogger);
+
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-payment-proxy:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+      { json: true, headers: { "x-api-key": "something" } },
+    );
+    expect(result).toStrictEqual("No messages found");
+  });
+
+  it("logs and throws error when service returns an error", async () => {
+    const mockError = new Error("Request failed");
+    wreck.get = jest.fn().mockRejectedValue(mockError);
+
+    await expect(getPaymentProxyQueueMessages("localhost:4566", 10, mockLogger)).rejects.toThrow(
+      "Request failed",
+    );
+
+    expect(mockLogger.error).toHaveBeenCalledWith({
+      error: mockError,
+      url: "http://ahwr-payment-proxy:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+    });
+  });
+});
+
+describe("getSfdCommsProxyQueueMessages", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  const queueMessaages = [
+    {
+      id: "e8b834aa-aaad-40a6-85fc-a69ec0e6e6d6",
+      body: '{"crn":"1060000000","sbi":"987654321","applicationReference":"IAHW-896I-FTN9","documentLocation":"987654321/IAHW-896I-FTN9.pdf","userType":"newUser"}',
+      attributes: {
+        SenderId: "000000000000",
+        SentTimestamp: "1772709757010",
+        ApproximateReceiveCount: "2",
+        ApproximateFirstReceiveTimestamp: "1772710857588",
+      },
+    },
+  ];
+
+  it("calls service with the expected parameters and returns result", async () => {
+    const wreckResponse = {
+      payload: queueMessaages,
+      res: {
+        statusCode: 200,
+      },
+    };
+    wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
+
+    const result = await getSfdCommsProxyQueueMessages("localhost:4566", 10, mockLogger);
+
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-sfd-comms-proxy:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+      { json: true, headers: { "x-api-key": "something" } },
+    );
+    expect(result).toStrictEqual(queueMessaages);
+  });
+
+  it("returns not found message when service returns 404", async () => {
+    wreck.get = jest.fn().mockImplementation(() => {
+      throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
+    });
+
+    const result = await getSfdCommsProxyQueueMessages("localhost:4566", 10, mockLogger);
+
+    expect(wreck.get).toHaveBeenCalledWith(
+      "http://ahwr-sfd-comms-proxy:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+      { json: true, headers: { "x-api-key": "something" } },
+    );
+    expect(result).toStrictEqual("No messages found");
+  });
+
+  it("logs and throws error when service returns an error", async () => {
+    const mockError = new Error("Request failed");
+    wreck.get = jest.fn().mockRejectedValue(mockError);
+
+    await expect(getSfdCommsProxyQueueMessages("localhost:4566", 10, mockLogger)).rejects.toThrow(
+      "Request failed",
+    );
+
+    expect(mockLogger.error).toHaveBeenCalledWith({
+      error: mockError,
+      url: "http://ahwr-sfd-comms-proxy:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
+    });
   });
 });

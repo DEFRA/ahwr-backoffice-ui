@@ -11,6 +11,8 @@ const {
   commsProxyApiUri,
 } = config;
 
+const MESSAGES_NOT_FOUND = "No messages found";
+
 const makeGetCall = async (url, notFoundMessage, logger) => {
   try {
     logger.info(`Call to ${url}`);
@@ -131,6 +133,46 @@ export const getClaimCommsDocument = async (claimReference, logger) => {
   return makeGetCall(
     `${commsProxyApiUri}/support/comms-requests?claimReference=${claimReference}`,
     "No claim comms found",
+    logger,
+  );
+};
+
+export const getApplicationQueueMessages = async (queueUrl, limit, logger) => {
+  return makeGetCall(
+    `${applicationApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
+    MESSAGES_NOT_FOUND,
+    logger,
+  );
+};
+
+export const getDocumentGeneratorQueueMessages = async (queueUrl, limit, logger) => {
+  return makeGetCall(
+    `${documentGeneratorApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
+    MESSAGES_NOT_FOUND,
+    logger,
+  );
+};
+
+export const getMessageGeneratorQueueMessages = async (queueUrl, limit, logger) => {
+  return makeGetCall(
+    `${messageGeneratorApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
+    MESSAGES_NOT_FOUND,
+    logger,
+  );
+};
+
+export const getPaymentProxyQueueMessages = async (queueUrl, limit, logger) => {
+  return makeGetCall(
+    `${paymentProxyApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
+    MESSAGES_NOT_FOUND,
+    logger,
+  );
+};
+
+export const getSfdCommsProxyQueueMessages = async (queueUrl, limit, logger) => {
+  return makeGetCall(
+    `${commsProxyApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
+    MESSAGES_NOT_FOUND,
     logger,
   );
 };
