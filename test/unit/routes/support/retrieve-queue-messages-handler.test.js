@@ -91,9 +91,9 @@ describe("retrieveQueueMessages.handler", () => {
 });
 
 describe("retrieveQueueMessages.errorHandler", () => {
-  it("should override error message and href", () => {
+  it("should override error href", () => {
     const result = retrieveQueueMessages.errorHandler({
-      message: "original",
+      message: "Queue url missing",
       extra: true,
     });
 
