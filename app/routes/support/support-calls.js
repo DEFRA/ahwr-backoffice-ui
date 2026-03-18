@@ -11,8 +11,6 @@ const {
   commsProxyApiUri,
 } = config;
 
-const MESSAGES_NOT_FOUND = "No messages found";
-
 const makeGetCall = async (url, notFoundMessage, logger) => {
   try {
     logger.info(`Call to ${url}`);
@@ -146,13 +144,13 @@ const makeGetQueueMessagesCall = async (url, logger) => {
     });
 
     if (Array.isArray(payload) && payload.length === 0) {
-      return 'Messages not found';
+      return "Messages not found";
     }
 
     return payload;
   } catch (error) {
     if (error.data?.res?.statusCode === StatusCodes.NOT_FOUND) {
-      return 'Queue not found';
+      return "Queue not found";
     }
 
     logger.error({ error, url });

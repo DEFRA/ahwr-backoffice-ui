@@ -38,7 +38,7 @@ export const retrieveQueueMessages = {
 
     return h.view("support", { queueMessages, scrollTo: "queueMessages" });
   },
-  errorIdentifier: ['queueUrl', 'messageCount'],
+  errorIdentifier: ["queueUrl", "messageCount"],
   errorHandler: (receivedError) => ({
     ...receivedError,
     href: "#queue-url",
