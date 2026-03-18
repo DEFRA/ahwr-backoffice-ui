@@ -76,10 +76,13 @@ const postSupportRoute = {
               const action = request.payload.action;
               return { ...receivedError, message: `Action ${action} is not supported.` };
             }
-
-            const match = actions.find((item) =>
-              receivedError.message.includes(item.errorIdentifier),
-            );
+            
+            const match = actions.find((item) => {
+              const identifiers = Array.isArray(item.errorIdentifier)
+                ? item.errorIdentifier
+                : [item.errorIdentifier];
+              return identifiers.some((id) => receivedError.message.includes(id));
+            });
 
             if (match) {
               return match.errorHandler(receivedError);

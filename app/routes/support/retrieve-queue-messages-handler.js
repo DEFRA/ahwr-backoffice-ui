@@ -38,10 +38,9 @@ export const retrieveQueueMessages = {
 
     return h.view("support", { queueMessages, scrollTo: "queueMessages" });
   },
-  errorIdentifier: '"queueUrl"',
+  errorIdentifier: ['queueUrl', 'messageCount'],
   errorHandler: (receivedError) => ({
     ...receivedError,
-    message: "Queue url missing",
     href: "#queue-url",
   }),
 };

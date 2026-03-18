@@ -137,42 +137,61 @@ export const getClaimCommsDocument = async (claimReference, logger) => {
   );
 };
 
+const makeGetQueueMessagesCall = async (url, logger) => {
+  try {
+    logger.info(`Retrieving queue messages from: ${url}`);
+    const { payload } = await wreck.get(`${url}`, {
+      json: true,
+      headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+    });
+
+    if (Array.isArray(payload) && payload.length === 0) {
+      return 'Messages not found';
+    }
+
+    return payload;
+  } catch (error) {
+    if (error.data?.res?.statusCode === StatusCodes.NOT_FOUND) {
+      return 'Queue not found';
+    }
+
+    logger.error({ error, url });
+
+    throw error;
+  }
+};
+
 export const getApplicationQueueMessages = async (queueUrl, limit, logger) => {
-  return makeGetCall(
+  return makeGetQueueMessagesCall(
     `${applicationApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
-    MESSAGES_NOT_FOUND,
     logger,
   );
 };
 
 export const getDocumentGeneratorQueueMessages = async (queueUrl, limit, logger) => {
-  return makeGetCall(
+  return makeGetQueueMessagesCall(
     `${documentGeneratorApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
-    MESSAGES_NOT_FOUND,
     logger,
   );
 };
 
 export const getMessageGeneratorQueueMessages = async (queueUrl, limit, logger) => {
-  return makeGetCall(
+  return makeGetQueueMessagesCall(
     `${messageGeneratorApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
-    MESSAGES_NOT_FOUND,
     logger,
   );
 };
 
 export const getPaymentProxyQueueMessages = async (queueUrl, limit, logger) => {
-  return makeGetCall(
+  return makeGetQueueMessagesCall(
     `${paymentProxyApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
-    MESSAGES_NOT_FOUND,
     logger,
   );
 };
 
 export const getSfdCommsProxyQueueMessages = async (queueUrl, limit, logger) => {
-  return makeGetCall(
+  return makeGetQueueMessagesCall(
     `${commsProxyApiUri}/support/queue-messages?queueUrl=${queueUrl}&limit=${limit}`,
-    MESSAGES_NOT_FOUND,
     logger,
   );
 };
