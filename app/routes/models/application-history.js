@@ -37,6 +37,7 @@ const getAction = (updatedProperty, newValue, oldValue) => {
     vetRcvs: `RCVS updated from ${oldValue} to ${newValue}`,
     dateOfVisit: `Date of visit updated from ${formattedDateToUk(oldValue)} to ${formattedDateToUk(newValue)}`,
     visitDate: `Date of review updated from ${formattedDateToUk(oldValue)} to ${formattedDateToUk(newValue)}`,
+    dateOfTesting: `Date of sampling updated from ${formattedDateToUk(oldValue)} to ${formattedDateToUk(newValue)}`,
     agreementFlag: `Agreement was moved from ${oldValue} to ${newValue}`,
     testResults: `Test results updated from ${oldValue} to ${newValue}`,
     herdName: `Herd details were updated from ${oldValue} to ${newValue}`,
