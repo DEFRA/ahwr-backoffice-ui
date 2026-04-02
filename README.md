@@ -30,6 +30,10 @@ Created from Core delivery platform Node.js Frontend Template.
 
 ## Requirements
 
+### pre-commit
+
+Please install [pre-commit](https://pre-commit.com/), as it is used to scan commits for secrets using [Gitleaks](https://github.com/gitleaks/gitleaks).
+
 ### Node.js
 
 Please install [Node.js](http://nodejs.org/) `>= v22` and [npm](https://nodejs.org/) `>= v9`. You will find it

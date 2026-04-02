@@ -34,6 +34,8 @@ jobs:
 
       - name: Test code and Create Test Coverage Reports
         run: |
+          npm run format:check
+          npm run lint
           ./scripts/test
 
       - name: SonarCloud Scan
