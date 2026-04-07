@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { axe } from "../../../helpers/axe-helper.js";
 import { phaseBannerOk } from "../../../utils/phase-banner-expect";
 import { permissions } from "../../../../app/auth/permissions";
 import { getPagination, getPagingData } from "../../../../app/pagination";
@@ -69,6 +70,7 @@ describe("Applications Filter test", () => {
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
       expect($("title").text()).toContain("AHWR Agreements");
@@ -85,6 +87,7 @@ describe("Applications Filter test", () => {
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("govuk-checkboxes__input").filter((s) => s.value === "APPLIED")).toBeTruthy();
       expect(getAppSearch).toHaveBeenCalledTimes(6);
@@ -110,6 +113,7 @@ describe("Applications Filter test", () => {
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
       expect($("title").text()).toContain("AHWR Agreements");

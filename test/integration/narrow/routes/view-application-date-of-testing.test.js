@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { axe } from "../../../helpers/axe-helper.js";
 import { phaseBannerOk } from "../../../utils/phase-banner-expect";
 import { getApplication, getOldWorldApplicationHistory } from "../../../../app/api/applications";
 import { permissions } from "../../../../app/auth/permissions";
@@ -75,6 +76,7 @@ describe("View Application test with Date of Testing enabled", () => {
       const res = await server.inject(options);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-caption-l").text()).toContain(`Agreement number: ${reference}`);
       expect($("h2.govuk-heading-l").text()).toContain(status);
@@ -157,6 +159,7 @@ describe("View Application test with Date of Testing enabled", () => {
       const res = await server.inject(options);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-caption-l").text()).toContain(`Agreement number: ${reference}`);
       expect($("a.govuk-link").length).toBe(0);

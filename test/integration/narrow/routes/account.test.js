@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { axe } from "../../../helpers/axe-helper.js";
 import { phaseBannerOk } from "../../../utils/phase-banner-expect";
 import { upperFirstLetter } from "../../../../app/lib/display-helper";
 import { permissions } from "../../../../app/auth/permissions";
@@ -51,6 +52,7 @@ describe("Account page test", () => {
       };
       const response = await server.inject(options);
       expect(response.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(response.payload)).toHaveNoViolations();
 
       const $ = cheerio.load(response.payload);
       expect($(".govuk-summary-list__row").length).toEqual(3);
