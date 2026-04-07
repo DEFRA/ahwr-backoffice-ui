@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { axe } from "../../../helpers/axe-helper.js";
 import { phaseBannerOk } from "../../../utils/phase-banner-expect";
 import { createServer } from "../../../../app/server";
 import { StatusCodes } from "http-status-codes";
@@ -17,6 +18,7 @@ describe("Accessibility Statement", () => {
     };
     const response = await server.inject(options);
     expect(response.statusCode).toBe(StatusCodes.OK);
+    expect(await axe(response.payload)).toHaveNoViolations();
     const $ = cheerio.load(response.payload);
     expect($("h1.govuk-heading-l").text()).toEqual(
       "Accessibility statement for Administration of the health and welfare of your livestock service",

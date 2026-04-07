@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { axe } from "../../../helpers/axe-helper.js";
 import { phaseBannerOk } from "../../../utils/phase-banner-expect";
 import { permissions } from "../../../../app/auth/permissions";
 import { applicationsData } from "../../../data/applications.js";
@@ -98,6 +99,7 @@ describe("Claims test", () => {
 
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("title").text()).toContain("Administration - My Farm");
       phaseBannerOk($);
@@ -139,6 +141,7 @@ describe("Claims test", () => {
 
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
 
       const actions = $(".govuk-summary-list__actions");
@@ -163,6 +166,7 @@ describe("Claims test", () => {
 
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
 
       const actions = $(".govuk-summary-list__actions");
@@ -183,6 +187,7 @@ describe("Claims test", () => {
       const res = await server.inject(options);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       const redactionRow = $(".govuk-summary-list__row")
         .filter(
@@ -206,6 +211,7 @@ describe("Claims test", () => {
 
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("title").text()).toContain("Administration - My Farm");
       phaseBannerOk($);
@@ -244,6 +250,7 @@ describe("Claims test", () => {
 
         const res = await server.inject(options);
         expect(res.statusCode).toBe(StatusCodes.OK);
+        expect(await axe(res.payload)).toHaveNoViolations();
         const $ = cheerio.load(res.payload);
         expect($("title").text()).toContain("Administration - My Farm");
         phaseBannerOk($);
@@ -270,6 +277,7 @@ describe("Claims test", () => {
 
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("title").text()).toContain("Administration - My Farm");
       phaseBannerOk($);
@@ -287,6 +295,7 @@ describe("Claims test", () => {
       const res = await server.inject(options);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("title").text()).toContain("Administration - My Farm");
       phaseBannerOk($);

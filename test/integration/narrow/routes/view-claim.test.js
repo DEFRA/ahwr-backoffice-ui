@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { axe } from "../../../helpers/axe-helper.js";
 import { getClaim, getClaimHistory, getClaims } from "../../../../app/api/claims";
 import { permissions } from "../../../../app/auth/permissions";
 import { getApplication } from "../../../../app/api/applications";
@@ -380,6 +381,7 @@ describe("View claim test", () => {
       const $ = cheerio.load(res.payload);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
 
       const expectedContent = [
         { key: "Agreement number", value: "IAHW-1234-APP1" },
@@ -454,6 +456,7 @@ describe("View claim test", () => {
       const $ = cheerio.load(res.payload);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
 
       const expectedContent = [
         { key: "Flagged", value: "No" },
@@ -524,6 +527,7 @@ describe("View claim test", () => {
       const $ = cheerio.load(res.payload);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       expect($(".govuk-summary-list__row").length).toEqual(34);
       expect($(".govuk-summary-list__actions").length).toEqual(0);
     });
@@ -543,6 +547,7 @@ describe("View claim test", () => {
       const $ = cheerio.load(res.payload);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       expect($(".govuk-back-link").attr("href")).toEqual("/agreement/IAHW-1234-APP1/claims");
     });
     test("the back link should go to all claims main tab if the user is coming from all claims main tab", async () => {
@@ -560,6 +565,7 @@ describe("View claim test", () => {
       const $ = cheerio.load(res.payload);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       expect($(".govuk-back-link").attr("href")).toEqual("/claims?page=1");
     });
 
@@ -685,6 +691,7 @@ describe("View claim test", () => {
       const $ = cheerio.load(res.payload);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
 
       const expectedContent = [
         { key: "Agreement number", value: "IAHW-1234-APP1" },

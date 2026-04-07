@@ -1,3 +1,12 @@
+const sharedConfig = {
+  transform: {
+    "^.+\\.[j]sx?$": "babel-jest",
+  },
+  transformIgnorePatterns: ["/node_modules/@defra/(?!(hapi-tracing)/)"],
+  modulePathIgnorePatterns: ["node_modules"],
+  testPathIgnorePatterns: [],
+};
+
 module.exports = {
   collectCoverage: true,
   collectCoverageFrom: ["app/**/*.js", "!app/**/*.test.js", "!app/config/**/*.js"],
@@ -11,7 +20,6 @@ module.exports = {
     "<rootDir>/jest.config.cjs",
     "<rootDir>/webpack.config.js",
   ],
-  modulePathIgnorePatterns: ["node_modules"],
   reporters: [
     "default",
     [
@@ -23,12 +31,22 @@ module.exports = {
       },
     ],
   ],
-  transform: {
-    "^.+\\.[j]sx?$": "babel-jest",
-  },
-  transformIgnorePatterns: ["/node_modules/@defra/(?!(hapi-tracing)/)"],
-  testEnvironment: "node",
-  testPathIgnorePatterns: [],
+  projects: [
+    {
+      ...sharedConfig,
+      displayName: "unit",
+      testEnvironment: "node",
+      testMatch: ["<rootDir>/test/unit/**/*.test.js", "<rootDir>/app/**/*.test.js"],
+      setupFilesAfterEnv: ["<rootDir>/test/setup.js"],
+    },
+    {
+      ...sharedConfig,
+      displayName: "integration",
+      testEnvironment: "<rootDir>/test/environments/jsdom-with-node-globals.cjs",
+      testMatch: ["<rootDir>/test/integration/**/*.test.js"],
+      setupFilesAfterEnv: ["<rootDir>/test/setup.js", "<rootDir>/test/integration-setup.js"],
+    },
+  ],
   verbose: true,
   setupFilesAfterEnv: ["<rootDir>/test/setup.js"],
 };

@@ -7,6 +7,10 @@
 - Do not use front end JavaScript frameworks
 - WCAG 2.2 level AA compliant for accessibility
 
+## Integration Tests
+
+- Validate the HTML is WCAG compliant using the assertion `toHaveNoViolations`
+
 ## Commit Messages
 
 Use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
