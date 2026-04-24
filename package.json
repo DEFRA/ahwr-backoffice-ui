@@ -37,7 +37,7 @@
     "@hapi/inert": "6.0.5",
     "@hapi/vision": "6.1.0",
     "@hapi/wreck": "18.1.0",
-    "@hapi/yar": "10.1.1",
+    "@hapi/yar": "11.0.0",
     "@ministryofjustice/frontend": "2.2.5",
     "aws-embedded-metrics": "4.2.1",
     "ffc-ahwr-common-library": "3.5.4",
