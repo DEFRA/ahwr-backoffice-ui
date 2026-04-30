@@ -6,6 +6,8 @@ describe("searchValidation", () => {
     { type: "ref", text: "IAHW-1234-5678" },
     { type: "ref", text: "iahw-ABCD-1234" },
     { type: "ref", text: "IAHW-ABCD-1234" },
+    { type: "ref", text: "POUL-ABCD-1234" },
+    { type: "ref", text: "PORE-ABCD-1234" },
     { type: "organisation", text: "IAHW-1234" },
     { type: "organisation", text: "IAHW-ABCD-1234-EFGH" },
     { type: "sbi", text: "107279003" },
