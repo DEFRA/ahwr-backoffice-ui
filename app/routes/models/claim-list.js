@@ -91,9 +91,13 @@ export const getClaimTableRows = (claims, page, returnPage, showSBI = true) =>
         classes: respText,
       },
       {
-        text: formatSpecies(claim.data?.typeOfLivestock),
+        text: claim.data?.typeOfLivestock
+          ? formatSpecies(claim.data?.typeOfLivestock)
+          : upperFirstLetter(claim.data.typesOfPoultry.join(", ").replaceAll("-", " ")),
         attributes: {
-          "data-sort-value": claim.data?.typeOfLivestock,
+          "data-sort-value":
+            claim.data?.typeOfLivestock ??
+            claim.data.typesOfPoultry.join(", ").replaceAll("-", " "),
         },
         classes: respText,
       },
