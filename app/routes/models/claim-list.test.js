@@ -1,9 +1,6 @@
-import {
-  getClaimTableHeader,
-  getClaimTableRows,
-} from "../../../../../app/routes/models/claim-list";
+import { getClaimTableHeader, getClaimTableRows } from "./claim-list";
 
-jest.mock("../../../../../app/config/index.js", () => ({
+jest.mock("../../config/index.js", () => ({
   config: {
     serviceUri: "test-uri",
   },

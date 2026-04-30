@@ -5,11 +5,12 @@ const sharedConfig = {
   transformIgnorePatterns: ["/node_modules/@defra/(?!(hapi-tracing)/)"],
   modulePathIgnorePatterns: ["node_modules"],
   testPathIgnorePatterns: [],
+  watchPathIgnorePatterns: ["\\.#"],
 };
 
 module.exports = {
   collectCoverage: true,
-  collectCoverageFrom: ["app/**/*.js", "!app/**/*.test.js", "!app/config/**/*.js"],
+  collectCoverageFrom: ["**/*.js", "!**/*.test.js", "!app/config/**/*.js"],
   coverageDirectory: "test-output",
   coverageReporters: ["text-summary", "lcov"],
   coveragePathIgnorePatterns: [
