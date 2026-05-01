@@ -32,23 +32,19 @@ getPagination.mockReturnValue({
   limit: 10,
   offset: 0,
 });
-
 getPagingData.mockReturnValue({
   page: 1,
   totalPages: 1,
   total: 1,
   limit: 10,
 });
-
 getClaims.mockReturnValue({ total: 9, claims });
-
 displayContactHistory.mockReturnValue({
   orgEmail: "Na",
   email: "test12@testvest.com",
   farmerName: "NA",
   address: "NA",
 });
-
 getClaimViewStates.mockReturnValue({
   updateEligiblePiiRedactionAction: true,
   updateEligiblePiiRedactionForm: false,
@@ -555,10 +551,11 @@ describe("Claims test", () => {
       reference: "PORE-1111-6666",
       applicationReference: "POUL-1234-APP1",
       data: {
-        herdId: "site-1-id",
-        herdVersion: 1,
         typesOfPoultry: ["ducks", "geese"],
         dateOfVisit: "2024-03-22T00:00:00.000Z",
+      },
+      herd: {
+        id: "site-1-id",
       },
       type: "REVIEW",
       createdAt: "2024-03-25T12:20:18.307Z",
@@ -570,9 +567,9 @@ describe("Claims test", () => {
 
     test("displays Number of sites for poultry applications", async () => {
       const poultryClaimsWithSites = [
-        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-1-id" } },
-        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-2-id" } },
-        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-3-id" } },
+        { ...poultryClaim, herd: { id: "site-1-id" } },
+        { ...poultryClaim, herd: { id: "site-2-id" } },
+        { ...poultryClaim, herd: { id: "site-3-id" } },
       ];
 
       getApplication.mockReturnValueOnce(poultryApplication);
@@ -608,9 +605,9 @@ describe("Claims test", () => {
     test("counts unique sites for poultry applications", async () => {
       // Same site ID used multiple times should only count once
       const poultryClaimsWithDuplicateSites = [
-        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-1-id" } },
-        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-1-id" } },
-        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-2-id" } },
+        { ...poultryClaim, herd: { id: "site-1-id" } },
+        { ...poultryClaim, herd: { id: "site-1-id" } },
+        { ...poultryClaim, herd: { id: "site-2-id" } },
       ];
 
       getApplication.mockReturnValueOnce(poultryApplication);
@@ -636,10 +633,8 @@ describe("Claims test", () => {
       expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("2");
     });
 
-    test("displays zero sites when no poultry claims have herdId", async () => {
-      const poultryClaimsWithoutSites = [
-        { ...poultryClaim, data: { ...poultryClaim.data, herdId: undefined } },
-      ];
+    test("displays zero sites when no poultry claims have herd", async () => {
+      const poultryClaimsWithoutSites = [{ ...poultryClaim, herd: undefined }];
 
       getApplication.mockReturnValueOnce(poultryApplication);
       getClaims.mockReturnValueOnce({

@@ -975,11 +975,12 @@ describe("View claim test", () => {
       reference: "PORE-1111-6666",
       applicationReference: "POUL-1234-APP1",
       data: {
-        herdId: "site-1-id",
-        herdVersion: 1,
         typesOfPoultry: ["ducks", "geese"],
         dateOfVisit: "2024-03-22T00:00:00.000Z",
         vetsName: "Vet one",
+      },
+      herd: {
+        id: "site-1-id",
       },
       type: "REVIEW",
       createdAt: "2024-03-25T12:20:18.307Z",
@@ -994,9 +995,9 @@ describe("View claim test", () => {
       };
 
       const poultryClaimsWithSites = [
-        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-1-id" } },
-        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-2-id" } },
-        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-3-id" } },
+        { ...poultryClaim, herd: { id: "site-1-id" } },
+        { ...poultryClaim, herd: { id: "site-2-id" } },
+        { ...poultryClaim, herd: { id: "site-3-id" } },
       ];
 
       getClaim.mockReturnValue(poultryClaim);
@@ -1030,9 +1031,9 @@ describe("View claim test", () => {
 
       // Same site ID used multiple times should only count once
       const poultryClaimsWithDuplicateSites = [
-        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-1-id" } },
-        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-1-id" } },
-        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-2-id" } },
+        { ...poultryClaim, herd: { id: "site-1-id" } },
+        { ...poultryClaim, herd: { id: "site-1-id" } },
+        { ...poultryClaim, herd: { id: "site-2-id" } },
       ];
 
       getClaim.mockReturnValue(poultryClaim);
@@ -1050,16 +1051,14 @@ describe("View claim test", () => {
       expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("2");
     });
 
-    test("displays zero sites when no poultry claims have herdId", async () => {
+    test("displays zero sites when no poultry claims have herd", async () => {
       const options = {
         method: "GET",
         url: `${url}/PORE-1111-6666`,
         auth,
       };
 
-      const poultryClaimsWithoutSites = [
-        { ...poultryClaim, data: { ...poultryClaim.data, herdId: undefined } },
-      ];
+      const poultryClaimsWithoutSites = [{ ...poultryClaim, herd: undefined }];
 
       getClaim.mockReturnValue(poultryClaim);
       getClaims.mockReturnValue({ claims: poultryClaimsWithoutSites });

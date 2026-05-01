@@ -192,13 +192,13 @@ const secondPoultryClaim = {
   reference: "PORE-3UC6-B6G8",
   applicationReference: "POUL-B5TU-EXL8",
   data: {
-    herdId: "ac50d45b-f264-4cb0-b044-73d268b24b32",
+    herdId: "bb50d45b-f264-4cb0-b044-73d268b24b32",
     herdVersion: 1,
     typesOfPoultry: "ducks,geese",
     herdAssociatedAt: "2025-05-29T12:29:19.256Z",
   },
   herd: {
-    id: "ac50d45b-f264-4cb0-b044-73d268b24b54",
+    id: "bb50d45b-f264-4cb0-b044-73d268b24b32",
     version: 1,
     applicationReference: "POUL-B5TU-EXL8",
     species: "poultry",
