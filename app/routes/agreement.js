@@ -10,7 +10,7 @@ import { getContactHistory, displayContactHistory } from "../api/contact-history
 import { getClaims } from "../api/claims.js";
 import { getClaimTableHeader, getClaimTableRows } from "./models/claim-list.js";
 import { FLAG_EMOJI } from "./utils/ui-constants.js";
-import { getHerdBreakdown, getSiteBreakdown } from "../lib/get-herd-breakdown.js";
+import { getHerdBreakdown, getSiteBreakdown } from "../lib/get-claim-breakdown.js";
 import { getClaimViewStates } from "./utils/get-claim-view-states.js";
 import { getErrorMessagesByKey } from "./utils/get-error-messages-by-key.js";
 import { getStyleClassByStatus } from "../constants/status.js";

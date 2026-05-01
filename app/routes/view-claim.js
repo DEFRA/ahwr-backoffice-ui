@@ -13,7 +13,7 @@ import { getErrorMessagesByKey } from "./utils/get-error-messages-by-key.js";
 import { getStatusUpdateOptions } from "./utils/get-status-update-options.js";
 import { getLivestockTypes } from "../lib/get-livestock-types.js";
 import { getReviewType } from "../lib/get-review-type.js";
-import { getHerdBreakdown, getSiteBreakdown } from "../lib/get-herd-breakdown.js";
+import { getHerdBreakdown, getSiteBreakdown } from "../lib/get-claim-breakdown.js";
 import { getHerdRowData } from "../lib/get-herd-row-data.js";
 import { getApplication } from "../api/applications.js";
 import { speciesEligibleNumber } from "../constants/species-numbers.js";
