@@ -4,13 +4,7 @@ import { getClaim, getClaimHistory, getClaims } from "../api/claims.js";
 import { getHistoryDetails } from "./models/application-history.js";
 import { getStyleClassByStatus } from "../constants/status.js";
 import { upperFirstLetter, formattedDateToUk } from "../lib/display-helper.js";
-import {
-  TYPE_OF_LIVESTOCK,
-  PIG_GENETIC_SEQUENCING_VALUES,
-  claimType,
-  getScheme,
-  POULTRY_SCHEME,
-} from "ffc-ahwr-common-library";
+import { TYPE_OF_LIVESTOCK, getScheme, POULTRY_SCHEME } from "ffc-ahwr-common-library";
 import { sheepPackages } from "../constants/sheep-test-types.js";
 import { permissions } from "../auth/permissions.js";
 import { getCurrentStatusEvent } from "./utils/get-current-status-event.js";
@@ -22,6 +16,9 @@ import { getReviewType } from "../lib/get-review-type.js";
 import { getHerdBreakdown, getSiteBreakdown } from "../lib/get-herd-breakdown.js";
 import { getHerdRowData } from "../lib/get-herd-row-data.js";
 import { getApplication } from "../api/applications.js";
+import { speciesEligibleNumber } from "../constants/species-numbers.js";
+import { buildKeyValueJson } from "../lib/row-helper.js";
+import { getPigTestResultRows } from "../lib/livestock-claim-rows.js";
 
 const { BEEF, PIGS, DAIRY, SHEEP } = TYPE_OF_LIVESTOCK;
 const { administrator, authoriser, processor, recommender, user } = permissions;
@@ -32,62 +29,9 @@ const backLink = (applicationReference, returnPage, page) => {
     : `/claims?page=${page}`;
 };
 
-const speciesEligibleNumber = {
-  beef: "11 or more beef cattle",
-  dairy: "11 or more dairy cattle",
-  pigs: "51 or more pigs",
-  sheep: "21 or more sheep",
-};
-
 const returnClaimDetailIfExist = (property, value) => property && value;
 
-const buildKeyValueJson = (keyText, valueText, valueAsHtml = false) => {
-  if (valueAsHtml) {
-    return {
-      key: { text: keyText },
-      value: { html: valueText },
-    };
-  }
-
-  return {
-    key: { text: keyText },
-    value: { text: valueText },
-  };
-};
-
 const testResultText = "Test result";
-
-export const getPigTestResultRows = (data, type) => {
-  if (type === claimType.review) {
-    return [
-      {
-        key: { text: testResultText },
-        value: { html: upperFirstLetter(data.testResults) },
-      },
-    ];
-  }
-
-  const testResultType = upperFirstLetter(data.pigsFollowUpTest);
-  const testResult = data[`pigs${testResultType}TestResult`];
-
-  const pigTestResultRows = [
-    buildKeyValueJson(testResultText, `${testResultType.toUpperCase()} ${testResult}`, true),
-  ];
-
-  const geneticSequencing = data?.pigsGeneticSequencing;
-
-  if (geneticSequencing) {
-    const geneticSequencingLabel = PIG_GENETIC_SEQUENCING_VALUES.find(
-      (keyValuePair) => keyValuePair.value === geneticSequencing,
-    ).label;
-
-    pigTestResultRows.push(
-      buildKeyValueJson("Genetic sequencing test results", geneticSequencingLabel, true),
-    );
-  }
-
-  return pigTestResultRows;
-};
 
 const getVaccinationStatusLabel = (vaccinationStatus) => {
   if (vaccinationStatus === "notVaccinated") {
@@ -389,7 +333,7 @@ export const viewClaimRoute = {
         true,
       );
       const herdRowData = getHerdRowData(herd, isSheep);
-      const pigFollowUpTestResultRows = getPigTestResultRows(data, type);
+      const pigFollowUpTestResultRows = getPigTestResultRows(data, type, testResultText);
 
       // There are more common rows than this, but the ordering matters and things get more complicated after these
       const commonRows = [

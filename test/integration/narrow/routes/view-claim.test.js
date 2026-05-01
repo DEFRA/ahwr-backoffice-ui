@@ -5,7 +5,6 @@ import { permissions } from "../../../../app/auth/permissions";
 import { getApplication } from "../../../../app/api/applications";
 import { createServer } from "../../../../app/server";
 import { StatusCodes } from "http-status-codes";
-import { getPigTestResultRows } from "../../../../app/routes/view-claim";
 import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states";
 const { administrator } = permissions;
 
@@ -1073,41 +1072,6 @@ describe("View claim test", () => {
         $(el).find(".govuk-summary-list__key").text().includes("Number of sites"),
       );
       expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("0");
-    });
-  });
-
-  describe("getPigTestResultRows", () => {
-    it("returns the review test result when the claim is a review", () => {
-      const result = getPigTestResultRows(claims[0].data, claims[0].type);
-
-      expect(result).toEqual([{ key: { text: "Test result" }, value: { html: "Positive" } }]);
-    });
-
-    it("returns the ELISA positive when the claim is a follow up", () => {
-      const result = getPigTestResultRows(pigFollowUpClaimElisa.data, pigFollowUpClaimElisa.type);
-
-      expect(result).toEqual([{ key: { text: "Test result" }, value: { html: "ELISA positive" } }]);
-    });
-
-    it("returns the PCR positive when the claim is a follow up", () => {
-      const pigsFollowUpPcr = {
-        ...pigFollowUpClaimElisa,
-        data: {
-          ...pigFollowUpClaimElisa,
-          pigsFollowUpTest: "pcr",
-          pigsPcrTestResult: "positive",
-          pigsGeneticSequencing: "mlv",
-        },
-      };
-      const result = getPigTestResultRows(pigsFollowUpPcr.data, pigsFollowUpPcr.data);
-
-      expect(result).toEqual([
-        { key: { text: "Test result" }, value: { html: "PCR positive" } },
-        {
-          key: { text: "Genetic sequencing test results" },
-          value: { html: "Modified Live virus (MLV) only" },
-        },
-      ]);
     });
   });
 });
