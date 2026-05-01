@@ -143,6 +143,8 @@ export const agreementRoutes = [
         const statusLabel = upperFirstLetter(status.toLowerCase().replaceAll("_", " "));
         const statusClass = getStyleClassByStatus(status);
 
+        const claimsBreakdown = getHerdBreakdown(claims);
+
         return h.view("agreement", {
           backLink: getBackLink(page, reference, returnPage),
           businessName: organisation.name,
@@ -150,7 +152,7 @@ export const agreementRoutes = [
           claimsTotal: total,
           header,
           rows,
-          ...getHerdBreakdown(claims),
+          ...claimsBreakdown,
           updateEligiblePiiRedactionUrl: `/agreement/${applicationReference}/claims?page=${page}&updateEligiblePiiRedaction=true`,
           updateEligiblePiiRedactionAction,
           updateEligiblePiiRedactionForm,

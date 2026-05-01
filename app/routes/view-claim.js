@@ -504,6 +504,8 @@ export const viewClaimRoute = {
         request.logger,
       );
 
+      const claimsBreakdown = getHerdBreakdown(claims);
+
       return h.view("view-claim", {
         page,
         backLink: backLink(applicationReference, returnPage, page),
@@ -537,7 +539,7 @@ export const viewClaimRoute = {
         statusOptions,
         errorMessages,
         errors,
-        ...getHerdBreakdown(claims),
+        ...claimsBreakdown,
       });
     },
   },

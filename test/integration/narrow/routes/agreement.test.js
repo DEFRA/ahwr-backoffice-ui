@@ -303,4 +303,237 @@ describe("Claims test", () => {
       expect($(".govuk-back-link").attr("href")).toEqual("/agreements?page=1");
     });
   });
+
+  describe("herd breakdown display", () => {
+    const baseClaim = claims[0];
+
+    test("displays herd breakdown section with correct counts when claims have herds", async () => {
+      const claimsWithHerds = [
+        {
+          ...baseClaim,
+          data: { ...baseClaim.data, typeOfLivestock: "beef" },
+          herd: { id: "herd-beef-1" },
+        },
+        {
+          ...baseClaim,
+          data: { ...baseClaim.data, typeOfLivestock: "beef" },
+          herd: { id: "herd-beef-2" },
+        },
+        {
+          ...baseClaim,
+          data: { ...baseClaim.data, typeOfLivestock: "dairy" },
+          herd: { id: "herd-dairy-1" },
+        },
+        {
+          ...baseClaim,
+          data: { ...baseClaim.data, typeOfLivestock: "sheep" },
+          herd: { id: "herd-sheep-1" },
+        },
+        {
+          ...baseClaim,
+          data: { ...baseClaim.data, typeOfLivestock: "pigs" },
+          herd: { id: "herd-pigs-1" },
+        },
+        {
+          ...baseClaim,
+          data: { ...baseClaim.data, typeOfLivestock: "pigs" },
+          herd: { id: "herd-pigs-2" },
+        },
+        {
+          ...baseClaim,
+          data: { ...baseClaim.data, typeOfLivestock: "pigs" },
+          herd: { id: "herd-pigs-3" },
+        },
+      ];
+
+      getClaims.mockReturnValueOnce({ total: claimsWithHerds.length, claims: claimsWithHerds });
+
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      // Check for "Number of herds and flocks" label
+      expect($(".govuk-summary-list__key").text()).toContain("Number of herds and flocks");
+
+      // Check for species labels and their counts
+      expect($(".govuk-summary-list__key").text()).toContain("Beef cattle");
+      expect($(".govuk-summary-list__key").text()).toContain("Dairy cattle");
+      expect($(".govuk-summary-list__key").text()).toContain("Sheep");
+      expect($(".govuk-summary-list__key").text()).toContain("Pigs");
+
+      // Get the nested summary list that contains herd breakdown
+      const herdBreakdownRows = $(
+        ".govuk-summary-list .govuk-summary-list .govuk-summary-list__row",
+      );
+
+      // Extract the values for each species
+      const beefRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Beef cattle"),
+      );
+      const dairyRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Dairy cattle"),
+      );
+      const sheepRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Sheep"),
+      );
+      const pigsRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Pigs"),
+      );
+
+      expect(beefRow.find(".govuk-summary-list__value").text().trim()).toBe("2");
+      expect(dairyRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
+      expect(sheepRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
+      expect(pigsRow.find(".govuk-summary-list__value").text().trim()).toBe("3");
+    });
+
+    test("displays herd breakdown with zero counts when no claims have herds of that species", async () => {
+      const claimsWithSingleHerd = [
+        {
+          ...baseClaim,
+          data: { ...baseClaim.data, typeOfLivestock: "pigs" },
+          herd: { id: "herd-pigs-1" },
+        },
+      ];
+
+      getClaims.mockReturnValueOnce({
+        total: claimsWithSingleHerd.length,
+        claims: claimsWithSingleHerd,
+      });
+
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const herdBreakdownRows = $(
+        ".govuk-summary-list .govuk-summary-list .govuk-summary-list__row",
+      );
+
+      const beefRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Beef cattle"),
+      );
+      const dairyRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Dairy cattle"),
+      );
+      const sheepRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Sheep"),
+      );
+      const pigsRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Pigs"),
+      );
+
+      expect(beefRow.find(".govuk-summary-list__value").text().trim()).toBe("0");
+      expect(dairyRow.find(".govuk-summary-list__value").text().trim()).toBe("0");
+      expect(sheepRow.find(".govuk-summary-list__value").text().trim()).toBe("0");
+      expect(pigsRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
+    });
+
+    test("counts claims without herd id once per species", async () => {
+      const claimsWithoutHerds = [
+        {
+          ...baseClaim,
+          data: { ...baseClaim.data, typeOfLivestock: "beef" },
+        },
+        {
+          ...baseClaim,
+          data: { ...baseClaim.data, typeOfLivestock: "beef" },
+        },
+        {
+          ...baseClaim,
+          data: { ...baseClaim.data, typeOfLivestock: "dairy" },
+        },
+      ];
+
+      getClaims.mockReturnValueOnce({
+        total: claimsWithoutHerds.length,
+        claims: claimsWithoutHerds,
+      });
+
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const herdBreakdownRows = $(
+        ".govuk-summary-list .govuk-summary-list .govuk-summary-list__row",
+      );
+
+      const beefRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Beef cattle"),
+      );
+      const dairyRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Dairy cattle"),
+      );
+
+      // Multiple beef claims without herd id should only count as 1
+      expect(beefRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
+      expect(dairyRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
+    });
+
+    test("does not double count the same herd id", async () => {
+      const claimsWithDuplicateHerds = [
+        {
+          ...baseClaim,
+          data: { ...baseClaim.data, typeOfLivestock: "sheep" },
+          herd: { id: "herd-sheep-same" },
+        },
+        {
+          ...baseClaim,
+          data: { ...baseClaim.data, typeOfLivestock: "sheep" },
+          herd: { id: "herd-sheep-same" },
+        },
+        {
+          ...baseClaim,
+          data: { ...baseClaim.data, typeOfLivestock: "sheep" },
+          herd: { id: "herd-sheep-same" },
+        },
+      ];
+
+      getClaims.mockReturnValueOnce({
+        total: claimsWithDuplicateHerds.length,
+        claims: claimsWithDuplicateHerds,
+      });
+
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const herdBreakdownRows = $(
+        ".govuk-summary-list .govuk-summary-list .govuk-summary-list__row",
+      );
+
+      const sheepRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Sheep"),
+      );
+
+      // Same herd id used 3 times should only count as 1
+      expect(sheepRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
+    });
+  });
 });
