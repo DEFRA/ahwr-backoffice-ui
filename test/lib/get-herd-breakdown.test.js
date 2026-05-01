@@ -1,4 +1,4 @@
-import { getHerdBreakdown } from "../../app/lib/get-herd-breakdown";
+import { getHerdBreakdown, getSiteBreakdown } from "../../app/lib/get-herd-breakdown";
 
 const sheepClaimOneWithSheepiesHerd = {
   id: "4e62d9cb-0046-421e-8296-7051a584723b",
@@ -134,6 +134,101 @@ const sheepClaimTwoWithSheepiesHerd = {
     updatedAt: null,
   },
 };
+
+const poultryClaim = {
+  id: "f3fe787c-d0ec-4b83-9dc9-df7f1421e4cd",
+  reference: "PORE-3UC6-B6GS",
+  applicationReference: "POUL-B5TU-EXLN",
+  data: {
+    herdId: "ac50d45b-f264-4cb0-b044-73d268b24b54",
+    herdVersion: 1,
+    typesOfPoultry: "ducks,geese",
+    herdAssociatedAt: "2025-05-29T12:29:19.256Z",
+  },
+  herd: {
+    id: "ac50d45b-f264-4cb0-b044-73d268b24b54",
+    version: 1,
+    applicationReference: "POUL-B5TU-EXLN",
+    species: "poultry",
+    herdName: "Test Site 1",
+    cph: "11/222/3333",
+    herdReasons: ["separateManagementNeeds", "uniqueHealthNeeds"],
+    isCurrent: true,
+    createdBy: "admin",
+    createdAt: "2025-05-29T12:29:19.247Z",
+    updatedBy: null,
+    updatedAt: null,
+  },
+};
+
+const repeatedSitePoultryClaim = {
+  id: "f3fe787c-d0ec-4b83-9dc9-df7f1421e4cd",
+  reference: "PORE-3UC6-B6G3",
+  applicationReference: "POUL-B5TU-EXL3",
+  data: {
+    herdId: "ac50d45b-f264-4cb0-b044-73d268b24b54",
+    herdVersion: 1,
+    typesOfPoultry: "ducks,geese",
+    herdAssociatedAt: "2025-05-29T12:29:19.256Z",
+  },
+  herd: {
+    id: "ac50d45b-f264-4cb0-b044-73d268b24b54",
+    version: 1,
+    applicationReference: "POUL-B5TU-EXL3",
+    species: "poultry",
+    herdName: "Test Site 1",
+    cph: "11/222/3333",
+    herdReasons: ["separateManagementNeeds", "uniqueHealthNeeds"],
+    isCurrent: true,
+    createdBy: "admin",
+    createdAt: "2025-05-29T12:29:19.247Z",
+    updatedBy: null,
+    updatedAt: null,
+  },
+};
+
+const secondPoultryClaim = {
+  id: "f3fe787c-d0ec-4b83-9dc9-df7f1421e4cd",
+  reference: "PORE-3UC6-B6G8",
+  applicationReference: "POUL-B5TU-EXL8",
+  data: {
+    herdId: "ac50d45b-f264-4cb0-b044-73d268b24b32",
+    herdVersion: 1,
+    typesOfPoultry: "ducks,geese",
+    herdAssociatedAt: "2025-05-29T12:29:19.256Z",
+  },
+  herd: {
+    id: "ac50d45b-f264-4cb0-b044-73d268b24b54",
+    version: 1,
+    applicationReference: "POUL-B5TU-EXL8",
+    species: "poultry",
+    herdName: "Test Site 2",
+    cph: "11/222/3333",
+    herdReasons: ["separateManagementNeeds", "uniqueHealthNeeds"],
+    isCurrent: true,
+    createdBy: "admin",
+    createdAt: "2025-05-29T12:29:19.247Z",
+    updatedBy: null,
+    updatedAt: null,
+  },
+};
+
+describe("getSiteBreakdown", () => {
+  test("returns the number of sites", () => {
+    const result = getSiteBreakdown([poultryClaim, secondPoultryClaim]);
+    expect(result).toEqual({ poultryBreakdown: { amount: 2 } });
+  });
+
+  test("individual sites, no repetition", () => {
+    const result = getSiteBreakdown([poultryClaim, repeatedSitePoultryClaim]);
+    expect(result).toEqual({ poultryBreakdown: { amount: 1 } });
+  });
+
+  test("handles no claims", () => {
+    const result = getSiteBreakdown([]);
+    expect(result).toEqual({ poultryBreakdown: { amount: 0 } });
+  });
+});
 
 describe("getHerdBreakdown", () => {
   test("it returns a proper breakdown if all the herds are different", () => {

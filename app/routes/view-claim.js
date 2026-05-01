@@ -8,6 +8,8 @@ import {
   TYPE_OF_LIVESTOCK,
   PIG_GENETIC_SEQUENCING_VALUES,
   claimType,
+  getScheme,
+  POULTRY_SCHEME,
 } from "ffc-ahwr-common-library";
 import { sheepPackages } from "../constants/sheep-test-types.js";
 import { permissions } from "../auth/permissions.js";
@@ -17,7 +19,7 @@ import { getErrorMessagesByKey } from "./utils/get-error-messages-by-key.js";
 import { getStatusUpdateOptions } from "./utils/get-status-update-options.js";
 import { getLivestockTypes } from "../lib/get-livestock-types.js";
 import { getReviewType } from "../lib/get-review-type.js";
-import { getHerdBreakdown } from "../lib/get-herd-breakdown.js";
+import { getHerdBreakdown, getSiteBreakdown } from "../lib/get-herd-breakdown.js";
 import { getHerdRowData } from "../lib/get-herd-row-data.js";
 import { getApplication } from "../api/applications.js";
 
@@ -504,7 +506,9 @@ export const viewClaimRoute = {
         request.logger,
       );
 
-      const claimsBreakdown = getHerdBreakdown(claims);
+      const scheme = getScheme(applicationReference);
+      const claimsBreakdown =
+        scheme === POULTRY_SCHEME ? getSiteBreakdown(claims) : getHerdBreakdown(claims);
 
       return h.view("view-claim", {
         page,

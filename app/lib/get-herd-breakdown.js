@@ -24,3 +24,15 @@ export const getHerdBreakdown = (claims) => {
 
   return { herdBreakdown: initialBreakdown };
 };
+
+export const getSiteBreakdown = (claims) => {
+  const siteIds = new Set();
+
+  for (const claim of claims) {
+    if (claim.data?.herdId) {
+      siteIds.add(claim.data.herdId);
+    }
+  }
+
+  return { poultryBreakdown: { amount: siteIds.size } };
+};

@@ -536,4 +536,132 @@ describe("Claims test", () => {
       expect(sheepRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
     });
   });
+
+  describe("poultry site breakdown display", () => {
+    const poultryUrl = "/agreement/POUL-1234-APP1/claims";
+
+    const poultryApplication = {
+      ...applicationsData.applications[0],
+      reference: "POUL-1234-APP1",
+      organisation: {
+        ...applicationsData.applications[0].organisation,
+        farmerName: "Test Farmer",
+        orgEmail: "org@test.com",
+      },
+    };
+
+    const poultryClaim = {
+      id: "58b297c9-c983-475c-8bdb-db5746899cec",
+      reference: "PORE-1111-6666",
+      applicationReference: "POUL-1234-APP1",
+      data: {
+        herdId: "site-1-id",
+        herdVersion: 1,
+        typesOfPoultry: ["ducks", "geese"],
+        dateOfVisit: "2024-03-22T00:00:00.000Z",
+      },
+      type: "REVIEW",
+      createdAt: "2024-03-25T12:20:18.307Z",
+      status: "IN_CHECK",
+      application: {
+        flags: [],
+      },
+    };
+
+    test("displays Number of sites for poultry applications", async () => {
+      const poultryClaimsWithSites = [
+        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-1-id" } },
+        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-2-id" } },
+        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-3-id" } },
+      ];
+
+      getApplication.mockReturnValueOnce(poultryApplication);
+      getClaims.mockReturnValueOnce({
+        total: poultryClaimsWithSites.length,
+        claims: poultryClaimsWithSites,
+      });
+
+      const options = {
+        method: "GET",
+        url: `${poultryUrl}?page=1`,
+        auth,
+      };
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      // Should display "Number of sites" for poultry
+      expect($(".govuk-summary-list__key").text()).toContain("Number of sites");
+
+      // Should NOT display "Number of herds and flocks" for poultry
+      expect($(".govuk-summary-list__key").text()).not.toContain("Number of herds and flocks");
+
+      // Find the Number of sites row and check the value
+      const sitesRow = $(".govuk-summary-list__row").filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Number of sites"),
+      );
+      expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("3");
+    });
+
+    test("counts unique sites for poultry applications", async () => {
+      // Same site ID used multiple times should only count once
+      const poultryClaimsWithDuplicateSites = [
+        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-1-id" } },
+        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-1-id" } },
+        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-2-id" } },
+      ];
+
+      getApplication.mockReturnValueOnce(poultryApplication);
+      getClaims.mockReturnValueOnce({
+        total: poultryClaimsWithDuplicateSites.length,
+        claims: poultryClaimsWithDuplicateSites,
+      });
+
+      const options = {
+        method: "GET",
+        url: `${poultryUrl}?page=1`,
+        auth,
+      };
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const sitesRow = $(".govuk-summary-list__row").filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Number of sites"),
+      );
+      expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("2");
+    });
+
+    test("displays zero sites when no poultry claims have herdId", async () => {
+      const poultryClaimsWithoutSites = [
+        { ...poultryClaim, data: { ...poultryClaim.data, herdId: undefined } },
+      ];
+
+      getApplication.mockReturnValueOnce(poultryApplication);
+      getClaims.mockReturnValueOnce({
+        total: poultryClaimsWithoutSites.length,
+        claims: poultryClaimsWithoutSites,
+      });
+
+      const options = {
+        method: "GET",
+        url: `${poultryUrl}?page=1`,
+        auth,
+      };
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const sitesRow = $(".govuk-summary-list__row").filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Number of sites"),
+      );
+      expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("0");
+    });
+  });
 });

@@ -10,10 +10,11 @@ import { getContactHistory, displayContactHistory } from "../api/contact-history
 import { getClaims } from "../api/claims.js";
 import { getClaimTableHeader, getClaimTableRows } from "./models/claim-list.js";
 import { FLAG_EMOJI } from "./utils/ui-constants.js";
-import { getHerdBreakdown } from "../lib/get-herd-breakdown.js";
+import { getHerdBreakdown, getSiteBreakdown } from "../lib/get-herd-breakdown.js";
 import { getClaimViewStates } from "./utils/get-claim-view-states.js";
 import { getErrorMessagesByKey } from "./utils/get-error-messages-by-key.js";
 import { getStyleClassByStatus } from "../constants/status.js";
+import { getScheme, POULTRY_SCHEME } from "ffc-ahwr-common-library";
 
 const { administrator, authoriser, processor, recommender, user } = permissions;
 const pageUrl = "/agreement/{reference}/claims";
@@ -143,7 +144,9 @@ export const agreementRoutes = [
         const statusLabel = upperFirstLetter(status.toLowerCase().replaceAll("_", " "));
         const statusClass = getStyleClassByStatus(status);
 
-        const claimsBreakdown = getHerdBreakdown(claims);
+        const scheme = getScheme(applicationReference);
+        const claimsBreakdown =
+          scheme === POULTRY_SCHEME ? getSiteBreakdown(claims) : getHerdBreakdown(claims);
 
         return h.view("agreement", {
           backLink: getBackLink(page, reference, returnPage),

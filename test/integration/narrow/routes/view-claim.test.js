@@ -964,6 +964,119 @@ describe("View claim test", () => {
     });
   });
 
+  describe("poultry site breakdown display", () => {
+    const poultryApplication = {
+      ...application,
+      reference: "POUL-1234-APP1",
+    };
+
+    const poultryClaim = {
+      id: "58b297c9-c983-475c-8bdb-db5746899cec",
+      reference: "PORE-1111-6666",
+      applicationReference: "POUL-1234-APP1",
+      data: {
+        herdId: "site-1-id",
+        herdVersion: 1,
+        typesOfPoultry: ["ducks", "geese"],
+        dateOfVisit: "2024-03-22T00:00:00.000Z",
+        vetsName: "Vet one",
+      },
+      type: "REVIEW",
+      createdAt: "2024-03-25T12:20:18.307Z",
+      status: "IN_CHECK",
+    };
+
+    test("displays Number of sites for poultry applications", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/PORE-1111-6666`,
+        auth,
+      };
+
+      const poultryClaimsWithSites = [
+        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-1-id" } },
+        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-2-id" } },
+        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-3-id" } },
+      ];
+
+      getClaim.mockReturnValue(poultryClaim);
+      getClaims.mockReturnValue({ claims: poultryClaimsWithSites });
+      getApplication.mockReturnValue(poultryApplication);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      // Should display "Number of sites" for poultry
+      expect($(".govuk-summary-list__key").text()).toContain("Number of sites");
+
+      // Should NOT display "Number of herds and flocks" for poultry
+      expect($(".govuk-summary-list__key").text()).not.toContain("Number of herds and flocks");
+
+      // Find the Number of sites row and check the value
+      const sitesRow = $(".govuk-summary-list__row").filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Number of sites"),
+      );
+      expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("3");
+    });
+
+    test("counts unique sites for poultry applications", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/PORE-1111-6666`,
+        auth,
+      };
+
+      // Same site ID used multiple times should only count once
+      const poultryClaimsWithDuplicateSites = [
+        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-1-id" } },
+        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-1-id" } },
+        { ...poultryClaim, data: { ...poultryClaim.data, herdId: "site-2-id" } },
+      ];
+
+      getClaim.mockReturnValue(poultryClaim);
+      getClaims.mockReturnValue({ claims: poultryClaimsWithDuplicateSites });
+      getApplication.mockReturnValue(poultryApplication);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const sitesRow = $(".govuk-summary-list__row").filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Number of sites"),
+      );
+      expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("2");
+    });
+
+    test("displays zero sites when no poultry claims have herdId", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/PORE-1111-6666`,
+        auth,
+      };
+
+      const poultryClaimsWithoutSites = [
+        { ...poultryClaim, data: { ...poultryClaim.data, herdId: undefined } },
+      ];
+
+      getClaim.mockReturnValue(poultryClaim);
+      getClaims.mockReturnValue({ claims: poultryClaimsWithoutSites });
+      getApplication.mockReturnValue(poultryApplication);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const sitesRow = $(".govuk-summary-list__row").filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Number of sites"),
+      );
+      expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("0");
+    });
+  });
+
   describe("getPigTestResultRows", () => {
     it("returns the review test result when the claim is a review", () => {
       const result = getPigTestResultRows(claims[0].data, claims[0].type);
