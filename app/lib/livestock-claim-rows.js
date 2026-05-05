@@ -121,20 +121,15 @@ export function prepareClaimDisplayRows(
   } = getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, type);
 
   // There are more common rows than this, but the ordering matters and things get more complicated after these
-  const { commonRows, typeOfVisit } = createCommonRows(
+  const { commonRows, commonCowRows } = createCommonRows(
     getAction,
     data,
     { claimStatus, createdAt, organisation, herd },
     isReview,
     actions,
     isSheep,
-  );
-
-  const commonCowRows = [
-    ...commonRows.slice(0, commonRows.indexOf(typeOfVisit)),
     reviewTestResults,
-    ...commonRows.slice(commonRows.indexOf(typeOfVisit)),
-  ];
+  );
 
   const beefRows = [
     ...commonCowRows,
@@ -344,6 +339,7 @@ function createCommonRows(
   isReview,
   { updateStatusAction, updateDateOfVisitAction },
   isSheep,
+  reviewTestResults,
 ) {
   const statusActions = getAction(updateStatusAction, "updateStatus", "status", "update-status");
 
@@ -383,17 +379,26 @@ function createCommonRows(
   const dateOfVisit = createDateOfVisitRow(data?.dateOfVisit, dateOfVisitActions);
 
   const herdRowData = getHerdRowData(herd, isSheep);
-  return {
-    commonRows: [
-      status,
-      claimDate,
-      organisationName,
-      livestock,
-      typeOfVisit,
-      dateOfVisit,
-      ...herdRowData,
-    ],
+
+  const commonRows = [
+    status,
+    claimDate,
+    organisationName,
+    livestock,
     typeOfVisit,
+    dateOfVisit,
+    ...herdRowData,
+  ];
+
+  const commonCowRows = [
+    ...commonRows.slice(0, commonRows.indexOf(typeOfVisit)),
+    reviewTestResults,
+    ...commonRows.slice(commonRows.indexOf(typeOfVisit)),
+  ];
+
+  return {
+    commonRows,
+    commonCowRows,
   };
 }
 
