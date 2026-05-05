@@ -19,15 +19,13 @@ export function createDateOfVisitRow(dateOfVisit, dateOfVisitActions) {
   };
 }
 
-export function createVetNameRow(vetsName, updateVetsNameAction, claimReference, page, returnPage) {
+export function createVetNameRow(vetsName, updateVetsNameAction, urlParameters) {
   const vetsNameActions = getAction(
     updateVetsNameAction,
     "updateVetsName",
     "vet's name",
     "update-vets-name",
-    claimReference,
-    page,
-    returnPage,
+    urlParameters,
   );
 
   return {
@@ -40,9 +38,7 @@ const getAction = (
   query,
   visuallyHiddenText,
   id,
-  claimReference,
-  page,
-  returnPage,
+  { claimReference, page, returnPage },
 ) => {
   if (!createItems) {
     return null;

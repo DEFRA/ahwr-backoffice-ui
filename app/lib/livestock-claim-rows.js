@@ -66,8 +66,8 @@ export const getPigTestResultRows = (data, type) => {
 export function prepareClaimDisplayRows(
   data,
   type,
-  { claimReference, page, returnPage },
-  { updateStatusAction, updateDateOfVisitAction, updateVetsNameAction, updateVetRCVSNumberAction },
+  urlParameters,
+  actions,
   claimStatus,
   createdAt,
   organisation,
@@ -84,7 +84,7 @@ export function prepareClaimDisplayRows(
     return {
       items: [
         {
-          href: `/view-claim/${claimReference}?${query}=true&page=${page}&returnPage=${returnPage}#${id}`,
+          href: `/view-claim/${urlParameters.claimReference}?${query}=true&page=${urlParameters.page}&returnPage=${urlParameters.returnPage}#${id}`,
           text: "Change",
           visuallyHiddenText,
         },
@@ -104,15 +104,7 @@ export function prepareClaimDisplayRows(
     true,
   );
 
-  const { vetName, vetRCVSNumber } = getVetRows(
-    data,
-    claimReference,
-    page,
-    returnPage,
-    getAction,
-    updateVetsNameAction,
-    updateVetRCVSNumberAction,
-  );
+  const { vetName, vetRCVSNumber } = getVetRows(data, getAction, actions, urlParameters);
 
   const {
     reviewTestResults,
@@ -142,7 +134,7 @@ export function prepareClaimDisplayRows(
     createdAt,
     organisation,
     isReview,
-    { updateStatusAction, updateDateOfVisitAction },
+    actions,
     herd,
     isSheep,
   );
@@ -240,20 +232,11 @@ export function prepareClaimDisplayRows(
 
 function getVetRows(
   data,
-  claimReference,
-  page,
-  returnPage,
   getAction,
-  updateVetsNameAction,
-  updateVetRCVSNumberAction,
+  { updateVetsNameAction, updateVetRCVSNumberAction },
+  urlParameters,
 ) {
-  const vetName = createVetNameRow(
-    data?.vetsName,
-    updateVetsNameAction,
-    claimReference,
-    page,
-    returnPage,
-  );
+  const vetName = createVetNameRow(data?.vetsName, updateVetsNameAction, urlParameters);
 
   const vetRCVSNumberActions = getAction(
     updateVetRCVSNumberAction,
@@ -270,10 +253,6 @@ function getVetRows(
 }
 
 function getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, type) {
-  const getBiosecurityRow = createBiosecurityRow(data, isEndemicsFollowUp);
-
-  const getSheepDiseasesTestedRow = creatSheepDiseasesTestedRow(data, isEndemicsFollowUp);
-
   const piHunt = buildKeyValueJson("PI hunt", upperFirstLetter(data?.piHunt), true);
   const laboratoryURN = buildKeyValueJson(
     isBeef || isDairy ? "URN or test certificate" : "URN",
@@ -300,14 +279,6 @@ function getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, type) {
     upperFirstLetter(data?.reviewTestResults),
     true,
   );
-  const testResults = returnClaimDetailIfExist(
-    data?.testResults && typeof data?.testResults === "string",
-    buildKeyValueJson(
-      data?.reviewTestResults ? "Follow-up test result" : testResultText,
-      upperFirstLetter(data?.testResults),
-      true,
-    ),
-  );
   const vetVisitsReviewTestResults = buildKeyValueJson(
     "Vet Visits Review Test results",
     upperFirstLetter(data?.vetVisitsReviewTestResults),
@@ -319,11 +290,7 @@ function getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, type) {
     data?.numberOfSamplesTested,
     true,
   );
-  const herdVaccinationStatus = buildKeyValueJson(
-    "Herd vaccination status",
-    data?.herdVaccinationStatus ? getVaccinationStatusLabel(data.herdVaccinationStatus) : undefined,
-    true,
-  );
+
   const sheepEndemicsPackage = buildKeyValueJson(
     "Sheep health package",
     upperFirstLetter(sheepPackages[data?.sheepEndemicsPackage]?.label),
@@ -346,19 +313,38 @@ function getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, type) {
     piHuntRecommendedRow,
     piHuntAllAnimalsRow,
     laboratoryURN,
-    testResults,
-    getBiosecurityRow,
+    testResults: createTestResultsRow(data),
+    getBiosecurityRow: createBiosecurityRow(data, isEndemicsFollowUp),
     numberAnimalsTested,
     vetVisitsReviewTestResults,
     diseaseStatus,
     numberOfSamplesTested,
-    herdVaccinationStatus,
+    herdVaccinationStatus: createHerdVaccinationStatusRow(data),
     sheepEndemicsPackage,
-    getSheepDiseasesTestedRow,
+    getSheepDiseasesTestedRow: creatSheepDiseasesTestedRow(data, isEndemicsFollowUp),
     numberOfOralFluidSamples,
     numberOfBloodSamples,
     pigFollowUpTestResultRows,
   };
+}
+
+function createHerdVaccinationStatusRow(data) {
+  return buildKeyValueJson(
+    "Herd vaccination status",
+    data?.herdVaccinationStatus ? getVaccinationStatusLabel(data.herdVaccinationStatus) : undefined,
+    true,
+  );
+}
+
+function createTestResultsRow(data) {
+  return returnClaimDetailIfExist(
+    data?.testResults && typeof data?.testResults === "string",
+    buildKeyValueJson(
+      data?.reviewTestResults ? "Follow-up test result" : testResultText,
+      upperFirstLetter(data?.testResults),
+      true,
+    ),
+  );
 }
 
 function createCommonRows(
