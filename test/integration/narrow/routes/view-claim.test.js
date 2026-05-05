@@ -1,11 +1,11 @@
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { getClaim, getClaimHistory, getClaims } from "../../../../app/api/claims";
-import { permissions } from "../../../../app/auth/permissions";
-import { getApplication } from "../../../../app/api/applications";
-import { createServer } from "../../../../app/server";
+import { getClaim, getClaimHistory, getClaims } from "../../../../app/api/claims.js";
+import { permissions } from "../../../../app/auth/permissions.js";
+import { getApplication } from "../../../../app/api/applications.js";
+import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
-import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states";
+import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states.js";
 const { administrator } = permissions;
 
 jest.mock("../../../../app/routes/utils/get-claim-view-states");

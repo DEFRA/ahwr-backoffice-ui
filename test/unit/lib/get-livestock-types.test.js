@@ -1,4 +1,4 @@
-import { getLivestockTypes } from "../../../app/lib/get-livestock-types";
+import { getLivestockTypes } from "../../../app/lib/get-livestock-types.js";
 
 describe("getLivestockTypes", () => {
   let typeOfLivestock;

@@ -1,4 +1,4 @@
-import { getStyleClassByStatus } from "../../../app/constants/status";
+import { getStyleClassByStatus } from "../../../app/constants/status.js";
 
 describe("getStyleClassByStatus", () => {
   it("returns orange if the rawStatus arg is undefined", () => {

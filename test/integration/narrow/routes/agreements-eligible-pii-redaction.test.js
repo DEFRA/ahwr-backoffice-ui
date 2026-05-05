@@ -1,11 +1,11 @@
-import { getCrumbs } from "../../../utils/get-crumbs";
-import { permissions } from "../../../../app/auth/permissions";
-import { getClaims } from "../../../../app/api/claims";
-import { getPagination, getPagingData } from "../../../../app/pagination";
-import { createServer } from "../../../../app/server";
+import { getCrumbs } from "../../../utils/get-crumbs.js";
+import { permissions } from "../../../../app/auth/permissions.js";
+import { getClaims } from "../../../../app/api/claims.js";
+import { getPagination, getPagingData } from "../../../../app/pagination.js";
+import { createServer } from "../../../../app/server.js";
 import { claims } from "../../../data/claims.js";
 import { StatusCodes } from "http-status-codes";
-import { updateEligiblePiiRedaction } from "../../../../app/api/applications";
+import { updateEligiblePiiRedaction } from "../../../../app/api/applications.js";
 
 jest.mock("../../../../app/session");
 jest.mock("../../../../app/api/claims");

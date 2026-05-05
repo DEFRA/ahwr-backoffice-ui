@@ -1,6 +1,6 @@
-import { createServer } from "../../../../app/server";
-import { permissions } from "../../../../app/auth/permissions";
-import { getCrumbs } from "../../../utils/get-crumbs";
+import { createServer } from "../../../../app/server.js";
+import { permissions } from "../../../../app/auth/permissions.js";
+import { getCrumbs } from "../../../utils/get-crumbs.js";
 import { STATUS } from "ffc-ahwr-common-library";
 import { StatusCodes } from "http-status-codes";
 

@@ -1,5 +1,5 @@
 import wreck from "@hapi/wreck";
-import { config } from "../../../app/config";
+import { config } from "../../../app/config/index.js";
 import {
   getApplications,
   getApplication,
@@ -8,7 +8,7 @@ import {
   redactPiiData,
   updateEligiblePiiRedaction,
   getOldWorldApplicationHistory,
-} from "../../../app/api/applications";
+} from "../../../app/api/applications.js";
 
 jest.mock("@hapi/wreck");
 jest.mock("../../../app/config");

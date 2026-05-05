@@ -1,4 +1,4 @@
-import { getClaimTableHeader, getClaimTableRows } from "./claim-list";
+import { getClaimTableHeader, getClaimTableRows } from "./claim-list.js";
 
 jest.mock("../../config/index.js", () => ({
   config: {

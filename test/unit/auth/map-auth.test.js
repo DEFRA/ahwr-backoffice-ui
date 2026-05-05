@@ -1,5 +1,5 @@
-import { mapAuth } from "../../../app/auth/map-auth";
-import { permissions } from "../../../app/auth/permissions";
+import { mapAuth } from "../../../app/auth/map-auth.js";
+import { permissions } from "../../../app/auth/permissions.js";
 
 const { administrator, processor, user, recommender, authoriser } = permissions;
 

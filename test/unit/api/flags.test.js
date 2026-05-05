@@ -1,7 +1,7 @@
 import wreck from "@hapi/wreck";
 import { getAllFlags, deleteFlag, createFlag } from "../../../app/api/flags.js";
 import { flags } from "../../data/flags.js";
-import { config } from "../../../app/config";
+import { config } from "../../../app/config/index.js";
 import { metricsCounter } from "../../../app/lib/metrics.js";
 
 const { applicationApiUri } = config;

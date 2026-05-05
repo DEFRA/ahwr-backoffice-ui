@@ -1,7 +1,7 @@
-import { permissions } from "../../../../app/auth/permissions";
-import { getCrumbs } from "../../../utils/get-crumbs";
-import { createServer } from "../../../../app/server";
-import { generateNewCrumb } from "../../../../app/routes/utils/crumb-cache";
+import { permissions } from "../../../../app/auth/permissions.js";
+import { getCrumbs } from "../../../utils/get-crumbs.js";
+import { createServer } from "../../../../app/server.js";
+import { generateNewCrumb } from "../../../../app/routes/utils/crumb-cache.js";
 import { StatusCodes } from "http-status-codes";
 
 jest.mock("../../../../app/api/claims");

@@ -1,4 +1,4 @@
-import { getContactHistory, displayContactHistory } from "../../../app/api/contact-history";
+import { getContactHistory, displayContactHistory } from "../../../app/api/contact-history.js";
 import wreck from "@hapi/wreck";
 
 jest.mock("@hapi/wreck");

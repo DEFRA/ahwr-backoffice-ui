@@ -1,18 +1,18 @@
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect";
-import { permissions } from "../../../../app/auth/permissions";
+import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
+import { permissions } from "../../../../app/auth/permissions.js";
 import { applicationsData } from "../../../data/applications.js";
-import { getApplication } from "../../../../app/api/applications";
-import { getClaims } from "../../../../app/api/claims";
-import { claims } from "../../../data/claims";
-import { displayContactHistory, getContactHistory } from "../../../../app/api/contact-history";
-import { contactHistory } from "../../../data/contact-history";
-import { getPagination, getPagingData } from "../../../../app/pagination";
-import { getClaimSearch } from "../../../../app/session";
-import { createServer } from "../../../../app/server";
+import { getApplication } from "../../../../app/api/applications.js";
+import { getClaims } from "../../../../app/api/claims.js";
+import { claims } from "../../../data/claims.js";
+import { displayContactHistory, getContactHistory } from "../../../../app/api/contact-history.js";
+import { contactHistory } from "../../../data/contact-history.js";
+import { getPagination, getPagingData } from "../../../../app/pagination.js";
+import { getClaimSearch } from "../../../../app/session/index.js";
+import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
-import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states";
+import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states.js";
 
 const { administrator } = permissions;
 

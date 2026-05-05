@@ -1,7 +1,7 @@
-import { getAllFlags } from "../../../../../app/api/flags";
-import { createFlagsTableData } from "../../../../../app/routes/models/flags-list";
+import { getAllFlags } from "../../../../../app/api/flags.js";
+import { createFlagsTableData } from "../../../../../app/routes/models/flags-list.js";
 import { flags } from "../../../../data/flags.js";
-import { config } from "../../../../../app/config";
+import { config } from "../../../../../app/config/index.js";
 
 const { serviceUri } = config;
 

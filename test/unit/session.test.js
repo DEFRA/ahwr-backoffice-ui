@@ -1,4 +1,4 @@
-import * as session from "../../app/session";
+import * as session from "../../app/session/index.js";
 
 describe("session", () => {
   const value = "value";

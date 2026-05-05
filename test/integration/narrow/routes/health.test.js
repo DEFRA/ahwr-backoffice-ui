@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { createServer } from "../../../../app/server";
+import { createServer } from "../../../../app/server.js";
 
 describe("Healthy test", () => {
   let server;

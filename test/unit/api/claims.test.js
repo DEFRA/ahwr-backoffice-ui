@@ -9,7 +9,7 @@ import {
   getClaimHistory,
 } from "../../../app/api/claims.js";
 import { metricsCounter } from "../../../app/lib/metrics.js";
-import { config } from "../../../app/config";
+import { config } from "../../../app/config/index.js";
 
 jest.mock("@hapi/wreck");
 jest.mock("../../../app/config");

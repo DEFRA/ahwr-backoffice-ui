@@ -1,10 +1,10 @@
-import { getCrumbs } from "../../../utils/get-crumbs";
-import { permissions } from "../../../../app/auth/permissions";
-import { claims } from "../../../data/claims";
-import { getClaims, updateClaimData } from "../../../../app/api/claims";
-import { updateApplicationData } from "../../../../app/api/applications";
-import { getPagination, getPagingData } from "../../../../app/pagination";
-import { createServer } from "../../../../app/server";
+import { getCrumbs } from "../../../utils/get-crumbs.js";
+import { permissions } from "../../../../app/auth/permissions.js";
+import { claims } from "../../../data/claims.js";
+import { getClaims, updateClaimData } from "../../../../app/api/claims.js";
+import { updateApplicationData } from "../../../../app/api/applications.js";
+import { getPagination, getPagingData } from "../../../../app/pagination.js";
+import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
 
 const { administrator } = permissions;

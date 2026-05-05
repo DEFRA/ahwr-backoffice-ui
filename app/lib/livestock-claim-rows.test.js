@@ -1,4 +1,4 @@
-import { getPigTestResultRows } from "./livestock-claim-rows";
+import { getPigTestResultRows } from "./livestock-claim-rows.js";
 
 const claims = [
   {

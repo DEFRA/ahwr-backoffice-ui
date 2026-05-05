@@ -1,10 +1,10 @@
-import { createServer } from "../../../../app/server";
+import { createServer } from "../../../../app/server.js";
 import * as cheerio from "cheerio";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect";
-import { permissions } from "../../../../app/auth/permissions";
-import { getCrumbs } from "../../../utils/get-crumbs";
+import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
+import { permissions } from "../../../../app/auth/permissions.js";
+import { getCrumbs } from "../../../utils/get-crumbs.js";
 import { StatusCodes } from "http-status-codes";
-import { preSubmissionHandler } from "../../../../app/routes/utils/pre-submission-handler";
+import { preSubmissionHandler } from "../../../../app/routes/utils/pre-submission-handler.js";
 import boom from "@hapi/boom";
 
 jest.mock("../../../../app/auth");

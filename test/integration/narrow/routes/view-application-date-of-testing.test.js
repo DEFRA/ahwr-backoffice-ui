@@ -1,12 +1,12 @@
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect";
-import { getApplication, getOldWorldApplicationHistory } from "../../../../app/api/applications";
-import { permissions } from "../../../../app/auth/permissions";
+import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
+import { getApplication, getOldWorldApplicationHistory } from "../../../../app/api/applications.js";
+import { permissions } from "../../../../app/auth/permissions.js";
 import { oldWorldApplication } from "../../../data/ow-application.js";
 import { resetAllWhenMocks } from "jest-when";
-import { createServer } from "../../../../app/server";
-import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states";
+import { createServer } from "../../../../app/server.js";
+import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states.js";
 import { StatusCodes } from "http-status-codes";
 
 const { user, administrator } = permissions;

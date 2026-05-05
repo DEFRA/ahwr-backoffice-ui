@@ -1,4 +1,4 @@
-import { getReviewType } from "../../../app/lib/get-review-type";
+import { getReviewType } from "../../../app/lib/get-review-type.js";
 import { claimType } from "ffc-ahwr-common-library";
 
 describe("getReviewType", () => {

@@ -1,4 +1,4 @@
-import { getHerdBreakdown, getSiteBreakdown } from "./get-claim-breakdown";
+import { getHerdBreakdown, getSiteBreakdown } from "./get-claim-breakdown.js";
 
 const sheepClaimOneWithSheepiesHerd = {
   id: "4e62d9cb-0046-421e-8296-7051a584723b",
