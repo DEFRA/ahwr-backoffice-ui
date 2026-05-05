@@ -31,7 +31,7 @@ const getVaccinationStatusLabel = (vaccinationStatus) => {
   return "N/A";
 };
 
-export const getPigTestResultRows = (data, type, testResultText) => {
+export const getPigTestResultRows = (data, type) => {
   if (type === claimType.review) {
     return [
       {
@@ -81,40 +81,9 @@ export function prepareClaimDisplayRows(
   const { isBeef, isDairy, isPigs, isSheep } = getLivestockTypes(data?.typeOfLivestock);
   const { isReview, isEndemicsFollowUp } = getReviewType(type);
 
-  const getBiosecurityRow = () =>
-    data?.biosecurity &&
-    isEndemicsFollowUp &&
-    [PIGS, BEEF, DAIRY].includes(data?.typeOfLivestock) &&
-    buildKeyValueJson(
-      "Biosecurity assessment",
-      data?.typeOfLivestock === PIGS
-        ? upperFirstLetter(
-            `${data?.biosecurity?.biosecurity}, Assessment percentage: ${data?.biosecurity?.assessmentPercentage}%`,
-          )
-        : upperFirstLetter(data?.biosecurity),
-      true,
-    );
+  const getBiosecurityRow = createBiosecurityRow(data, isEndemicsFollowUp);
 
-  const getSheepDiseasesTestedRow = () =>
-    data?.typeOfLivestock === SHEEP &&
-    isEndemicsFollowUp &&
-    typeof data.testResults === "object" &&
-    data.testResults.length
-      ? data.testResults.map((sheepTest, index) => {
-          const key = index === 0 ? "Disease or condition test result" : "";
-          const relevantSheepPackage = sheepPackages[data?.sheepEndemicsPackage];
-          const relevantDiseaseType = relevantSheepPackage.testTypes.find(
-            (test) => test.value === sheepTest.diseaseType,
-          );
-          const value =
-            typeof sheepTest.result === "object"
-              ? sheepTest.result
-                  .map((testResult) => `${testResult.diseaseType} (${testResult.result})</br>`)
-                  .join(" ")
-              : `${relevantSheepPackage.testTypes.find((test) => test.value === sheepTest.diseaseType)?.text} (${relevantDiseaseType.resultType.find((resultType) => resultType.value === sheepTest.result).text})`;
-          return buildKeyValueJson(key, value, true);
-        })
-      : [];
+  const getSheepDiseasesTestedRow = creatSheepDiseasesTestedRow(data, isEndemicsFollowUp);
 
   const getAction = (createItems, query, visuallyHiddenText, id) => {
     if (!createItems) {
@@ -145,31 +114,6 @@ export function prepareClaimDisplayRows(
     "update-vet-rcvs-number",
   );
   const statusOptions = getStatusUpdateOptions(claimStatus);
-
-  const status = createStatusRow(claimStatus, statusActions);
-
-  const claimDate = buildKeyValueJson("Claim date", formattedDateToUk(createdAt), true);
-  const organisationName = buildKeyValueJson(
-    "Business name",
-    upperFirstLetter(organisation?.name),
-    true,
-  );
-  const livestock = buildKeyValueJson(
-    "Livestock",
-    upperFirstLetter(
-      [PIGS, SHEEP].includes(data?.typeOfLivestock)
-        ? data?.typeOfLivestock
-        : `${data?.typeOfLivestock} cattle`,
-    ),
-    true,
-  );
-  const typeOfVisit = buildKeyValueJson(
-    "Type of visit",
-    isReview ? "Animal health and welfare review" : "Endemic disease follow-ups",
-    true,
-  );
-
-  const dateOfVisit = createDateOfVisitRow(data?.dateOfVisit, dateOfVisitActions);
 
   const dateOfSampling = buildKeyValueJson(
     "Date of sampling",
@@ -260,19 +204,20 @@ export function prepareClaimDisplayRows(
     upperFirstLetter(data?.piHuntAllAnimals),
     true,
   );
-  const herdRowData = getHerdRowData(herd, isSheep);
-  const pigFollowUpTestResultRows = getPigTestResultRows(data, type, testResultText);
+  const pigFollowUpTestResultRows = getPigTestResultRows(data, type);
 
   // There are more common rows than this, but the ordering matters and things get more complicated after these
-  const commonRows = [
-    status,
-    claimDate,
-    organisationName,
-    livestock,
-    typeOfVisit,
-    dateOfVisit,
-    ...herdRowData,
-  ];
+  const { commonRows, typeOfVisit } = createCommonRows(
+    claimStatus,
+    statusActions,
+    createdAt,
+    organisation,
+    data,
+    isReview,
+    dateOfVisitActions,
+    herd,
+    isSheep,
+  );
 
   const commonCowRows = [
     ...commonRows.slice(0, commonRows.indexOf(typeOfVisit)),
@@ -363,4 +308,97 @@ export function prepareClaimDisplayRows(
 
   const rows = [...speciesRows()];
   return { rows, statusOptions };
+}
+
+function createCommonRows(
+  claimStatus,
+  statusActions,
+  createdAt,
+  organisation,
+  data,
+  isReview,
+  dateOfVisitActions,
+  herd,
+  isSheep,
+) {
+  const status = createStatusRow(claimStatus, statusActions);
+
+  const claimDate = buildKeyValueJson("Claim date", formattedDateToUk(createdAt), true);
+
+  const organisationName = buildKeyValueJson(
+    "Business name",
+    upperFirstLetter(organisation?.name),
+    true,
+  );
+
+  const livestock = buildKeyValueJson(
+    "Livestock",
+    upperFirstLetter(
+      [PIGS, SHEEP].includes(data?.typeOfLivestock)
+        ? data?.typeOfLivestock
+        : `${data?.typeOfLivestock} cattle`,
+    ),
+    true,
+  );
+
+  const typeOfVisit = buildKeyValueJson(
+    "Type of visit",
+    isReview ? "Animal health and welfare review" : "Endemic disease follow-ups",
+    true,
+  );
+
+  const dateOfVisit = createDateOfVisitRow(data?.dateOfVisit, dateOfVisitActions);
+
+  const herdRowData = getHerdRowData(herd, isSheep);
+  return {
+    commonRows: [
+      status,
+      claimDate,
+      organisationName,
+      livestock,
+      typeOfVisit,
+      dateOfVisit,
+      ...herdRowData,
+    ],
+    typeOfVisit,
+  };
+}
+
+function createBiosecurityRow(data, isEndemicsFollowUp) {
+  return () =>
+    data?.biosecurity &&
+    isEndemicsFollowUp &&
+    [PIGS, BEEF, DAIRY].includes(data?.typeOfLivestock) &&
+    buildKeyValueJson(
+      "Biosecurity assessment",
+      data?.typeOfLivestock === PIGS
+        ? upperFirstLetter(
+            `${data?.biosecurity?.biosecurity}, Assessment percentage: ${data?.biosecurity?.assessmentPercentage}%`,
+          )
+        : upperFirstLetter(data?.biosecurity),
+      true,
+    );
+}
+
+function creatSheepDiseasesTestedRow(data, isEndemicsFollowUp) {
+  return () =>
+    data?.typeOfLivestock === SHEEP &&
+    isEndemicsFollowUp &&
+    typeof data.testResults === "object" &&
+    data.testResults.length
+      ? data.testResults.map((sheepTest, index) => {
+          const key = index === 0 ? "Disease or condition test result" : "";
+          const relevantSheepPackage = sheepPackages[data?.sheepEndemicsPackage];
+          const relevantDiseaseType = relevantSheepPackage.testTypes.find(
+            (test) => test.value === sheepTest.diseaseType,
+          );
+          const value =
+            typeof sheepTest.result === "object"
+              ? sheepTest.result
+                  .map((testResult) => `${testResult.diseaseType} (${testResult.result})</br>`)
+                  .join(" ")
+              : `${relevantSheepPackage.testTypes.find((test) => test.value === sheepTest.diseaseType)?.text} (${relevantDiseaseType.resultType.find((resultType) => resultType.value === sheepTest.result).text})`;
+          return buildKeyValueJson(key, value, true);
+        })
+      : [];
 }
