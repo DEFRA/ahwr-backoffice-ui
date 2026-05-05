@@ -10,7 +10,12 @@ import { getLivestockTypes } from "./get-livestock-types.js";
 import { sheepPackages } from "../constants/sheep-test-types.js";
 import { speciesEligibleNumber } from "../constants/species-numbers.js";
 import { getHerdRowData } from "./get-herd-row-data.js";
-import { createDateOfVisitRow, createStatusRow, createVetNameRow } from "./common-claim-rows.js";
+import {
+  createDateOfVisitRow,
+  createStatusRow,
+  createVetNameRow,
+  getAction,
+} from "./common-claim-rows.js";
 
 const { BEEF, PIGS, DAIRY, SHEEP } = TYPE_OF_LIVESTOCK;
 
@@ -71,22 +76,6 @@ export function prepareClaimDisplayRows(
   const { isBeef, isDairy, isPigs, isSheep } = getLivestockTypes(data?.typeOfLivestock);
   const { isReview, isEndemicsFollowUp } = getReviewType(type);
 
-  const getAction = (createItems, query, visuallyHiddenText, id) => {
-    if (!createItems) {
-      return null;
-    }
-
-    return {
-      items: [
-        {
-          href: `/view-claim/${urlParameters.claimReference}?${query}=true&page=${urlParameters.page}&returnPage=${urlParameters.returnPage}#${id}`,
-          text: "Change",
-          visuallyHiddenText,
-        },
-      ],
-    };
-  };
-
   const dateOfSampling = buildKeyValueJson(
     "Date of sampling",
     data?.dateOfTesting && formattedDateToUk(data?.dateOfTesting),
@@ -98,7 +87,7 @@ export function prepareClaimDisplayRows(
     true,
   );
 
-  const { vetName, vetRCVSNumber } = getVetRows(data, getAction, actions, urlParameters);
+  const { vetName, vetRCVSNumber } = getVetRows(data, actions, urlParameters);
 
   const {
     reviewTestResults,
@@ -122,13 +111,13 @@ export function prepareClaimDisplayRows(
 
   // There are more common rows than this, but the ordering matters and things get more complicated after these
   const { commonRows, commonCowRows } = createCommonRows(
-    getAction,
     data,
     { claimStatus, createdAt, organisation, herd },
     isReview,
     actions,
     isSheep,
     reviewTestResults,
+    urlParameters,
   );
 
   const beefRows = [
@@ -215,12 +204,7 @@ export function prepareClaimDisplayRows(
   return [...speciesRows()];
 }
 
-function getVetRows(
-  data,
-  getAction,
-  { updateVetsNameAction, updateVetRCVSNumberAction },
-  urlParameters,
-) {
+function getVetRows(data, { updateVetsNameAction, updateVetRCVSNumberAction }, urlParameters) {
   const vetName = createVetNameRow(data?.vetsName, updateVetsNameAction, urlParameters);
 
   const vetRCVSNumberActions = getAction(
@@ -228,6 +212,7 @@ function getVetRows(
     "updateVetRCVSNumber",
     "RCVS number",
     "update-vet-rcvs-number",
+    urlParameters,
   );
 
   const vetRCVSNumber = {
@@ -333,15 +318,21 @@ function createTestResultsRow(data) {
 }
 
 function createCommonRows(
-  getAction,
   data,
   { claimStatus, createdAt, organisation, herd },
   isReview,
   { updateStatusAction, updateDateOfVisitAction },
   isSheep,
   reviewTestResults,
+  urlParameters,
 ) {
-  const statusActions = getAction(updateStatusAction, "updateStatus", "status", "update-status");
+  const statusActions = getAction(
+    updateStatusAction,
+    "updateStatus",
+    "status",
+    "update-status",
+    urlParameters,
+  );
 
   const status = createStatusRow(claimStatus, statusActions);
 
@@ -374,6 +365,7 @@ function createCommonRows(
     "updateDateOfVisit",
     "date of review",
     "update-date-of-visit",
+    urlParameters,
   );
 
   const dateOfVisit = createDateOfVisitRow(data?.dateOfVisit, dateOfVisitActions);

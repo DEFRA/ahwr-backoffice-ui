@@ -33,7 +33,8 @@ export function createVetNameRow(vetsName, updateVetsNameAction, urlParameters) 
     actions: vetsNameActions,
   };
 }
-const getAction = (
+
+export const getAction = (
   createItems,
   query,
   visuallyHiddenText,
