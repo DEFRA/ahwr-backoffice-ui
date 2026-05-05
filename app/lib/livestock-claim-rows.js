@@ -75,23 +75,7 @@ export function prepareClaimDisplayRows(data, claimInformation, urlParameters, a
   const typeOfLivestock = createTypeOfLivestockRow(data);
   const vetRows = getVetRows(data, actions, urlParameters);
 
-  const {
-    reviewTestResults,
-    piHuntRows,
-    laboratoryURN,
-    testResults,
-    getBiosecurityRow,
-    numberAnimalsTested,
-    vetVisitsReviewTestResults,
-    diseaseStatus,
-    numberOfSamplesTested,
-    herdVaccinationStatus,
-    sheepEndemicsPackage,
-    getSheepDiseasesTestedRow,
-    numberOfOralFluidSamples,
-    numberOfBloodSamples,
-    pigFollowUpTestResultRows,
-  } = getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, claimInformation.type);
+  const testRows = getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, claimInformation.type);
 
   // There are more common rows than this, but the ordering matters and things get more complicated after these
   const { commonRows, commonCowRows } = createCommonRows(
@@ -100,84 +84,85 @@ export function prepareClaimDisplayRows(data, claimInformation, urlParameters, a
     isReview,
     actions,
     isSheep,
-    reviewTestResults,
+    testRows.reviewTestResults,
     urlParameters,
   );
 
-  const beefRows = [
+  if (isBeef || isDairy)
+    return selectCowRows(
+      commonCowRows,
+      isReview,
+      dateOfSampling,
+      typeOfLivestock,
+      vetRows,
+      testRows,
+      isEndemicsFollowUp,
+    );
+
+  if (isPigs) return selectPigRows(commonRows, dateOfSampling, typeOfLivestock, testRows, vetRows);
+  if (isSheep)
+    return selectSheepRows(commonRows, dateOfSampling, typeOfLivestock, vetRows, testRows);
+  return [];
+}
+
+function selectCowRows(
+  commonCowRows,
+  isReview,
+  dateOfSampling,
+  typeOfLivestock,
+  vetRows,
+  testRows,
+  isEndemicsFollowUp,
+) {
+  return [
     ...commonCowRows,
     isReview && dateOfSampling,
     typeOfLivestock,
     ...vetRows,
-    ...piHuntRows,
+    ...testRows.piHuntRows,
     isEndemicsFollowUp && dateOfSampling,
-    laboratoryURN,
-    testResults,
-    getBiosecurityRow(),
+    testRows.laboratoryURN,
+    testRows.testResults,
+    testRows.getBiosecurityRow(),
   ];
+}
 
-  const dairyRows = [
-    ...commonCowRows,
-    isReview && dateOfSampling,
-    typeOfLivestock,
-    ...vetRows,
-    ...piHuntRows,
-    isEndemicsFollowUp && dateOfSampling,
-    laboratoryURN,
-    testResults,
-    getBiosecurityRow(),
-  ];
-
-  const sheepRows = [
+function selectSheepRows(commonRows, dateOfSampling, typeOfLivestock, vetRows, testRows) {
+  return [
     ...commonRows,
     dateOfSampling,
     typeOfLivestock,
     ...vetRows,
-    laboratoryURN,
-    numberAnimalsTested,
-    testResults,
-    vetVisitsReviewTestResults,
-    diseaseStatus,
-    numberOfSamplesTested,
-    herdVaccinationStatus,
-    sheepEndemicsPackage,
-    getBiosecurityRow(),
-    ...getSheepDiseasesTestedRow(),
+    testRows.laboratoryURN,
+    testRows.numberAnimalsTested,
+    testRows.testResults,
+    testRows.vetVisitsReviewTestResults,
+    testRows.diseaseStatus,
+    testRows.numberOfSamplesTested,
+    testRows.herdVaccinationStatus,
+    testRows.sheepEndemicsPackage,
+    testRows.getBiosecurityRow(),
+    ...testRows.getSheepDiseasesTestedRow(),
   ];
+}
 
-  const pigRows = [
+function selectPigRows(commonRows, dateOfSampling, typeOfLivestock, testRows, vetRows) {
+  return [
     ...commonRows,
     dateOfSampling,
     typeOfLivestock,
-    numberOfOralFluidSamples,
-    numberOfBloodSamples,
+    testRows.numberOfOralFluidSamples,
+    testRows.numberOfBloodSamples,
     ...vetRows,
-    piHuntRows[0],
-    numberAnimalsTested,
-    reviewTestResults,
-    herdVaccinationStatus,
-    laboratoryURN,
-    numberOfSamplesTested,
-    ...pigFollowUpTestResultRows,
-    getBiosecurityRow(),
+    testRows.piHuntRows[0],
+    testRows.numberAnimalsTested,
+    testRows.reviewTestResults,
+    testRows.herdVaccinationStatus,
+    testRows.laboratoryURN,
+    testRows.numberOfSamplesTested,
+    ...testRows.pigFollowUpTestResultRows,
+    testRows.getBiosecurityRow(),
   ];
-
-  const speciesRows = () => {
-    switch (true) {
-      case isBeef:
-        return beefRows;
-      case isDairy:
-        return dairyRows;
-      case isPigs:
-        return pigRows;
-      case isSheep:
-        return sheepRows;
-      default:
-        return [];
-    }
-  };
-
-  return [...speciesRows()];
 }
 
 function createTypeOfLivestockRow(data) {
@@ -281,7 +266,7 @@ function getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, type) {
     numberOfSamplesTested,
     herdVaccinationStatus: createHerdVaccinationStatusRow(data),
     sheepEndemicsPackage,
-    getSheepDiseasesTestedRow: creatSheepDiseasesTestedRow(data, isEndemicsFollowUp),
+    getSheepDiseasesTestedRow: createSheepDiseasesTestedRow(data, isEndemicsFollowUp),
     numberOfOralFluidSamples,
     numberOfBloodSamples,
     pigFollowUpTestResultRows,
@@ -400,7 +385,7 @@ function createBiosecurityRow(data, isEndemicsFollowUp) {
     );
 }
 
-function creatSheepDiseasesTestedRow(data, isEndemicsFollowUp) {
+function createSheepDiseasesTestedRow(data, isEndemicsFollowUp) {
   return () =>
     data?.typeOfLivestock === SHEEP &&
     isEndemicsFollowUp &&
