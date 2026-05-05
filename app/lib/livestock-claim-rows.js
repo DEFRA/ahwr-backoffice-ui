@@ -67,33 +67,17 @@ export const getPigTestResultRows = (data, type) => {
   return pigTestResultRows;
 };
 
-export function prepareClaimDisplayRows(
-  data,
-  { type, claimStatus, createdAt, organisation, herd },
-  urlParameters,
-  actions,
-) {
+export function prepareClaimDisplayRows(data, claimInformation, urlParameters, actions) {
   const { isBeef, isDairy, isPigs, isSheep } = getLivestockTypes(data?.typeOfLivestock);
-  const { isReview, isEndemicsFollowUp } = getReviewType(type);
+  const { isReview, isEndemicsFollowUp } = getReviewType(claimInformation.type);
 
-  const dateOfSampling = buildKeyValueJson(
-    "Date of sampling",
-    data?.dateOfTesting && formattedDateToUk(data?.dateOfTesting),
-    true,
-  );
-  const typeOfLivestock = buildKeyValueJson(
-    speciesEligibleNumber[data?.typeOfLivestock],
-    upperFirstLetter(data?.speciesNumbers),
-    true,
-  );
-
-  const { vetName, vetRCVSNumber } = getVetRows(data, actions, urlParameters);
+  const dateOfSampling = createDateOfSamplingRow(data);
+  const typeOfLivestock = createTypeOfLivestockRow(data);
+  const vetRows = getVetRows(data, actions, urlParameters);
 
   const {
     reviewTestResults,
-    piHunt,
-    piHuntRecommendedRow,
-    piHuntAllAnimalsRow,
+    piHuntRows,
     laboratoryURN,
     testResults,
     getBiosecurityRow,
@@ -107,12 +91,12 @@ export function prepareClaimDisplayRows(
     numberOfOralFluidSamples,
     numberOfBloodSamples,
     pigFollowUpTestResultRows,
-  } = getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, type);
+  } = getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, claimInformation.type);
 
   // There are more common rows than this, but the ordering matters and things get more complicated after these
   const { commonRows, commonCowRows } = createCommonRows(
     data,
-    { claimStatus, createdAt, organisation, herd },
+    claimInformation,
     isReview,
     actions,
     isSheep,
@@ -124,11 +108,8 @@ export function prepareClaimDisplayRows(
     ...commonCowRows,
     isReview && dateOfSampling,
     typeOfLivestock,
-    vetName,
-    vetRCVSNumber,
-    piHunt,
-    piHuntRecommendedRow,
-    piHuntAllAnimalsRow,
+    ...vetRows,
+    ...piHuntRows,
     isEndemicsFollowUp && dateOfSampling,
     laboratoryURN,
     testResults,
@@ -139,11 +120,8 @@ export function prepareClaimDisplayRows(
     ...commonCowRows,
     isReview && dateOfSampling,
     typeOfLivestock,
-    vetName,
-    vetRCVSNumber,
-    piHunt,
-    piHuntRecommendedRow,
-    piHuntAllAnimalsRow,
+    ...vetRows,
+    ...piHuntRows,
     isEndemicsFollowUp && dateOfSampling,
     laboratoryURN,
     testResults,
@@ -154,8 +132,7 @@ export function prepareClaimDisplayRows(
     ...commonRows,
     dateOfSampling,
     typeOfLivestock,
-    vetName,
-    vetRCVSNumber,
+    ...vetRows,
     laboratoryURN,
     numberAnimalsTested,
     testResults,
@@ -174,9 +151,8 @@ export function prepareClaimDisplayRows(
     typeOfLivestock,
     numberOfOralFluidSamples,
     numberOfBloodSamples,
-    vetName,
-    vetRCVSNumber,
-    piHunt,
+    ...vetRows,
+    piHuntRows[0],
     numberAnimalsTested,
     reviewTestResults,
     herdVaccinationStatus,
@@ -204,6 +180,22 @@ export function prepareClaimDisplayRows(
   return [...speciesRows()];
 }
 
+function createTypeOfLivestockRow(data) {
+  return buildKeyValueJson(
+    speciesEligibleNumber[data?.typeOfLivestock],
+    upperFirstLetter(data?.speciesNumbers),
+    true,
+  );
+}
+
+function createDateOfSamplingRow(data) {
+  return buildKeyValueJson(
+    "Date of sampling",
+    data?.dateOfTesting && formattedDateToUk(data?.dateOfTesting),
+    true,
+  );
+}
+
 function getVetRows(data, { updateVetsNameAction, updateVetRCVSNumberAction }, urlParameters) {
   const vetName = createVetNameRow(data?.vetsName, updateVetsNameAction, urlParameters);
 
@@ -219,7 +211,7 @@ function getVetRows(data, { updateVetsNameAction, updateVetRCVSNumberAction }, u
     ...buildKeyValueJson("Vet's RCVS number", data?.vetRCVSNumber, true),
     actions: vetRCVSNumberActions,
   };
-  return { vetName, vetRCVSNumber };
+  return [vetName, vetRCVSNumber];
 }
 
 function getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, type) {
@@ -279,9 +271,7 @@ function getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, type) {
   const pigFollowUpTestResultRows = getPigTestResultRows(data, type);
   return {
     reviewTestResults,
-    piHunt,
-    piHuntRecommendedRow,
-    piHuntAllAnimalsRow,
+    piHuntRows: [piHunt, piHuntRecommendedRow, piHuntAllAnimalsRow],
     laboratoryURN,
     testResults: createTestResultsRow(data),
     getBiosecurityRow: createBiosecurityRow(data, isEndemicsFollowUp),
