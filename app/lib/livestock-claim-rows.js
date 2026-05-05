@@ -88,7 +88,7 @@ export function prepareClaimDisplayRows(data, claimInformation, urlParameters, a
     urlParameters,
   );
 
-  if (isBeef || isDairy)
+  if (isBeef || isDairy) {
     return selectCowRows(
       commonCowRows,
       isReview,
@@ -98,10 +98,16 @@ export function prepareClaimDisplayRows(data, claimInformation, urlParameters, a
       testRows,
       isEndemicsFollowUp,
     );
+  }
 
-  if (isPigs) return selectPigRows(commonRows, dateOfSampling, typeOfLivestock, testRows, vetRows);
-  if (isSheep)
+  if (isPigs) {
+    return selectPigRows(commonRows, dateOfSampling, typeOfLivestock, testRows, vetRows);
+  }
+
+  if (isSheep) {
     return selectSheepRows(commonRows, dateOfSampling, typeOfLivestock, vetRows, testRows);
+  }
+
   return [];
 }
 
