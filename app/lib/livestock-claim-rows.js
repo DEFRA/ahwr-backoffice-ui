@@ -81,10 +81,6 @@ export function prepareClaimDisplayRows(
   const { isBeef, isDairy, isPigs, isSheep } = getLivestockTypes(data?.typeOfLivestock);
   const { isReview, isEndemicsFollowUp } = getReviewType(type);
 
-  const getBiosecurityRow = createBiosecurityRow(data, isEndemicsFollowUp);
-
-  const getSheepDiseasesTestedRow = creatSheepDiseasesTestedRow(data, isEndemicsFollowUp);
-
   const getAction = (createItems, query, visuallyHiddenText, id) => {
     if (!createItems) {
       return null;
@@ -100,19 +96,6 @@ export function prepareClaimDisplayRows(
       ],
     };
   };
-  const statusActions = getAction(updateStatusAction, "updateStatus", "status", "update-status");
-  const dateOfVisitActions = getAction(
-    updateDateOfVisitAction,
-    "updateDateOfVisit",
-    "date of review",
-    "update-date-of-visit",
-  );
-  const vetRCVSNumberActions = getAction(
-    updateVetRCVSNumberAction,
-    "updateVetRCVSNumber",
-    "RCVS number",
-    "update-vet-rcvs-number",
-  );
   const statusOptions = getStatusUpdateOptions(claimStatus);
 
   const dateOfSampling = buildKeyValueJson(
@@ -126,95 +109,46 @@ export function prepareClaimDisplayRows(
     true,
   );
 
-  const vetName = createVetNameRow(
-    data?.vetsName,
-    updateVetsNameAction,
+  const { vetName, vetRCVSNumber } = getVetRows(
+    data,
     claimReference,
     page,
     returnPage,
+    getAction,
+    updateVetsNameAction,
+    updateVetRCVSNumberAction,
   );
 
-  const vetRCVSNumber = {
-    ...buildKeyValueJson("Vet's RCVS number", data?.vetRCVSNumber, true),
-    actions: vetRCVSNumberActions,
-  };
-
-  const piHunt = buildKeyValueJson("PI hunt", upperFirstLetter(data?.piHunt), true);
-  const laboratoryURN = buildKeyValueJson(
-    isBeef || isDairy ? "URN or test certificate" : "URN",
-    data?.laboratoryURN,
-    true,
-  );
-  const numberOfOralFluidSamples = buildKeyValueJson(
-    "Number of oral fluid samples taken",
-    data?.numberOfOralFluidSamples,
-    true,
-  );
-  const numberOfBloodSamples = buildKeyValueJson(
-    "Number of blood samples taken",
-    data?.numberOfBloodSamples,
-    true,
-  );
-  const numberAnimalsTested = buildKeyValueJson(
-    "Number of animals tested",
-    data?.numberAnimalsTested,
-    true,
-  );
-  const reviewTestResults = buildKeyValueJson(
-    "Review test result",
-    upperFirstLetter(data?.reviewTestResults),
-    true,
-  );
-  const testResults = returnClaimDetailIfExist(
-    data?.testResults && typeof data?.testResults === "string",
-    buildKeyValueJson(
-      data?.reviewTestResults ? "Follow-up test result" : testResultText,
-      upperFirstLetter(data?.testResults),
-      true,
-    ),
-  );
-  const vetVisitsReviewTestResults = buildKeyValueJson(
-    "Vet Visits Review Test results",
-    upperFirstLetter(data?.vetVisitsReviewTestResults),
-    true,
-  );
-  const diseaseStatus = buildKeyValueJson("Disease status category", data?.diseaseStatus, true);
-  const numberOfSamplesTested = buildKeyValueJson(
-    "Samples tested",
-    data?.numberOfSamplesTested,
-    true,
-  );
-  const herdVaccinationStatus = buildKeyValueJson(
-    "Herd vaccination status",
-    data?.herdVaccinationStatus ? getVaccinationStatusLabel(data.herdVaccinationStatus) : undefined,
-    true,
-  );
-  const sheepEndemicsPackage = buildKeyValueJson(
-    "Sheep health package",
-    upperFirstLetter(sheepPackages[data?.sheepEndemicsPackage]?.label),
-    true,
-  );
-  const piHuntRecommendedRow = buildKeyValueJson(
-    "Vet recommended PI hunt",
-    upperFirstLetter(data?.piHuntRecommended),
-    true,
-  );
-  const piHuntAllAnimalsRow = buildKeyValueJson(
-    "PI hunt done on all cattle in herd",
-    upperFirstLetter(data?.piHuntAllAnimals),
-    true,
-  );
-  const pigFollowUpTestResultRows = getPigTestResultRows(data, type);
+  const {
+    reviewTestResults,
+    piHunt,
+    piHuntRecommendedRow,
+    piHuntAllAnimalsRow,
+    laboratoryURN,
+    testResults,
+    getBiosecurityRow,
+    numberAnimalsTested,
+    vetVisitsReviewTestResults,
+    diseaseStatus,
+    numberOfSamplesTested,
+    herdVaccinationStatus,
+    sheepEndemicsPackage,
+    getSheepDiseasesTestedRow,
+    numberOfOralFluidSamples,
+    numberOfBloodSamples,
+    pigFollowUpTestResultRows,
+  } = getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, type);
 
   // There are more common rows than this, but the ordering matters and things get more complicated after these
   const { commonRows, typeOfVisit } = createCommonRows(
+    getAction,
+    data,
     claimStatus,
-    statusActions,
     createdAt,
     organisation,
-    data,
     isReview,
-    dateOfVisitActions,
+    updateStatusAction,
+    updateDateOfVisitAction,
     herd,
     isSheep,
   );
@@ -310,17 +244,143 @@ export function prepareClaimDisplayRows(
   return { rows, statusOptions };
 }
 
+function getVetRows(
+  data,
+  claimReference,
+  page,
+  returnPage,
+  getAction,
+  updateVetsNameAction,
+  updateVetRCVSNumberAction,
+) {
+  const vetName = createVetNameRow(
+    data?.vetsName,
+    updateVetsNameAction,
+    claimReference,
+    page,
+    returnPage,
+  );
+
+  const vetRCVSNumberActions = getAction(
+    updateVetRCVSNumberAction,
+    "updateVetRCVSNumber",
+    "RCVS number",
+    "update-vet-rcvs-number",
+  );
+
+  const vetRCVSNumber = {
+    ...buildKeyValueJson("Vet's RCVS number", data?.vetRCVSNumber, true),
+    actions: vetRCVSNumberActions,
+  };
+  return { vetName, vetRCVSNumber };
+}
+
+function getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, type) {
+  const getBiosecurityRow = createBiosecurityRow(data, isEndemicsFollowUp);
+
+  const getSheepDiseasesTestedRow = creatSheepDiseasesTestedRow(data, isEndemicsFollowUp);
+
+  const piHunt = buildKeyValueJson("PI hunt", upperFirstLetter(data?.piHunt), true);
+  const laboratoryURN = buildKeyValueJson(
+    isBeef || isDairy ? "URN or test certificate" : "URN",
+    data?.laboratoryURN,
+    true,
+  );
+  const numberOfOralFluidSamples = buildKeyValueJson(
+    "Number of oral fluid samples taken",
+    data?.numberOfOralFluidSamples,
+    true,
+  );
+  const numberOfBloodSamples = buildKeyValueJson(
+    "Number of blood samples taken",
+    data?.numberOfBloodSamples,
+    true,
+  );
+  const numberAnimalsTested = buildKeyValueJson(
+    "Number of animals tested",
+    data?.numberAnimalsTested,
+    true,
+  );
+  const reviewTestResults = buildKeyValueJson(
+    "Review test result",
+    upperFirstLetter(data?.reviewTestResults),
+    true,
+  );
+  const testResults = returnClaimDetailIfExist(
+    data?.testResults && typeof data?.testResults === "string",
+    buildKeyValueJson(
+      data?.reviewTestResults ? "Follow-up test result" : testResultText,
+      upperFirstLetter(data?.testResults),
+      true,
+    ),
+  );
+  const vetVisitsReviewTestResults = buildKeyValueJson(
+    "Vet Visits Review Test results",
+    upperFirstLetter(data?.vetVisitsReviewTestResults),
+    true,
+  );
+  const diseaseStatus = buildKeyValueJson("Disease status category", data?.diseaseStatus, true);
+  const numberOfSamplesTested = buildKeyValueJson(
+    "Samples tested",
+    data?.numberOfSamplesTested,
+    true,
+  );
+  const herdVaccinationStatus = buildKeyValueJson(
+    "Herd vaccination status",
+    data?.herdVaccinationStatus ? getVaccinationStatusLabel(data.herdVaccinationStatus) : undefined,
+    true,
+  );
+  const sheepEndemicsPackage = buildKeyValueJson(
+    "Sheep health package",
+    upperFirstLetter(sheepPackages[data?.sheepEndemicsPackage]?.label),
+    true,
+  );
+  const piHuntRecommendedRow = buildKeyValueJson(
+    "Vet recommended PI hunt",
+    upperFirstLetter(data?.piHuntRecommended),
+    true,
+  );
+  const piHuntAllAnimalsRow = buildKeyValueJson(
+    "PI hunt done on all cattle in herd",
+    upperFirstLetter(data?.piHuntAllAnimals),
+    true,
+  );
+  const pigFollowUpTestResultRows = getPigTestResultRows(data, type);
+  return {
+    reviewTestResults,
+    piHunt,
+    piHuntRecommendedRow,
+    piHuntAllAnimalsRow,
+    laboratoryURN,
+    testResults,
+    getBiosecurityRow,
+    numberAnimalsTested,
+    vetVisitsReviewTestResults,
+    diseaseStatus,
+    numberOfSamplesTested,
+    herdVaccinationStatus,
+    sheepEndemicsPackage,
+    getSheepDiseasesTestedRow,
+    numberOfOralFluidSamples,
+    numberOfBloodSamples,
+    pigFollowUpTestResultRows,
+  };
+}
+
 function createCommonRows(
+  getAction,
+  data,
   claimStatus,
-  statusActions,
   createdAt,
   organisation,
-  data,
   isReview,
-  dateOfVisitActions,
+  updateStatusAction,
+  updateDateOfVisitAction,
   herd,
   isSheep,
 ) {
+  const statusActions = getAction(updateStatusAction, "updateStatus", "status", "update-status");
+
   const status = createStatusRow(claimStatus, statusActions);
 
   const claimDate = buildKeyValueJson("Claim date", formattedDateToUk(createdAt), true);
@@ -345,6 +405,13 @@ function createCommonRows(
     "Type of visit",
     isReview ? "Animal health and welfare review" : "Endemic disease follow-ups",
     true,
+  );
+
+  const dateOfVisitActions = getAction(
+    updateDateOfVisitAction,
+    "updateDateOfVisit",
+    "date of review",
+    "update-date-of-visit",
   );
 
   const dateOfVisit = createDateOfVisitRow(data?.dateOfVisit, dateOfVisitActions);
