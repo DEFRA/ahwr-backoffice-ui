@@ -64,13 +64,9 @@ export const getPigTestResultRows = (data, type) => {
 
 export function prepareClaimDisplayRows(
   data,
-  type,
+  { type, claimStatus, createdAt, organisation, herd },
   urlParameters,
   actions,
-  claimStatus,
-  createdAt,
-  organisation,
-  herd,
 ) {
   const { isBeef, isDairy, isPigs, isSheep } = getLivestockTypes(data?.typeOfLivestock);
   const { isReview, isEndemicsFollowUp } = getReviewType(type);
@@ -128,12 +124,9 @@ export function prepareClaimDisplayRows(
   const { commonRows, typeOfVisit } = createCommonRows(
     getAction,
     data,
-    claimStatus,
-    createdAt,
-    organisation,
+    { claimStatus, createdAt, organisation, herd },
     isReview,
     actions,
-    herd,
     isSheep,
   );
 
@@ -347,12 +340,9 @@ function createTestResultsRow(data) {
 function createCommonRows(
   getAction,
   data,
-  claimStatus,
-  createdAt,
-  organisation,
+  { claimStatus, createdAt, organisation, herd },
   isReview,
   { updateStatusAction, updateDateOfVisitAction },
-  herd,
   isSheep,
 ) {
   const statusActions = getAction(updateStatusAction, "updateStatus", "status", "update-status");

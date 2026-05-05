@@ -118,7 +118,7 @@ export const viewClaimRoute = {
       const statusOptions = getStatusUpdateOptions(claimStatus);
       const rows = prepareClaimDisplayRows(
         data,
-        type,
+        { type, claimStatus, createdAt, organisation, herd },
         { claimReference, page, returnPage },
         {
           updateStatusAction,
@@ -126,10 +126,6 @@ export const viewClaimRoute = {
           updateVetsNameAction,
           updateVetRCVSNumberAction,
         },
-        claimStatus,
-        createdAt,
-        organisation,
-        herd,
       );
 
       const rowsWithData = rows.filter((row) => row?.value?.html);
