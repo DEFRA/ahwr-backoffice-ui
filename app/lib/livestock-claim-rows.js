@@ -8,7 +8,6 @@ import { formattedDateToUk, upperFirstLetter } from "./display-helper.js";
 import { getReviewType } from "./get-review-type.js";
 import { getLivestockTypes } from "./get-livestock-types.js";
 import { sheepPackages } from "../constants/sheep-test-types.js";
-import { getStatusUpdateOptions } from "../routes/utils/get-status-update-options.js";
 import { speciesEligibleNumber } from "../constants/species-numbers.js";
 import { getHerdRowData } from "./get-herd-row-data.js";
 import { createDateOfVisitRow, createStatusRow, createVetNameRow } from "./common-claim-rows.js";
@@ -91,7 +90,6 @@ export function prepareClaimDisplayRows(
       ],
     };
   };
-  const statusOptions = getStatusUpdateOptions(claimStatus);
 
   const dateOfSampling = buildKeyValueJson(
     "Date of sampling",
@@ -226,8 +224,7 @@ export function prepareClaimDisplayRows(
     }
   };
 
-  const rows = [...speciesRows()];
-  return { rows, statusOptions };
+  return [...speciesRows()];
 }
 
 function getVetRows(

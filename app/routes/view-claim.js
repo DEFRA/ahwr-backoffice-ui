@@ -13,6 +13,7 @@ import { getHerdBreakdown, getSiteBreakdown } from "../lib/get-claim-breakdown.j
 import { getApplication } from "../api/applications.js";
 import { buildKeyValueJson } from "../lib/row-helper.js";
 import { prepareClaimDisplayRows } from "../lib/livestock-claim-rows.js";
+import { getStatusUpdateOptions } from "../routes/utils/get-status-update-options.js";
 
 const { administrator, authoriser, processor, recommender, user } = permissions;
 
@@ -114,7 +115,8 @@ export const viewClaimRoute = {
         updateDateOfVisitForm,
       } = isRedacted ? {} : getClaimViewStates(request, claim.status, currentStatusEvent);
 
-      const { rows, statusOptions } = prepareClaimDisplayRows(
+      const statusOptions = getStatusUpdateOptions(claimStatus);
+      const rows = prepareClaimDisplayRows(
         data,
         type,
         { claimReference, page, returnPage },
