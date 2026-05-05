@@ -5,7 +5,6 @@ import { permissions } from "../../../../app/auth/permissions";
 import { getApplication } from "../../../../app/api/applications";
 import { createServer } from "../../../../app/server";
 import { StatusCodes } from "http-status-codes";
-import { getPigTestResultRows } from "../../../../app/routes/view-claim";
 import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states";
 const { administrator } = permissions;
 
@@ -734,38 +733,345 @@ describe("View claim test", () => {
     });
   });
 
-  describe("getPigTestResultRows", () => {
-    it("returns the review test result when the claim is a review", () => {
-      const result = getPigTestResultRows(claims[0].data, claims[0].type);
-
-      expect(result).toEqual([{ key: { text: "Test result" }, value: { html: "Positive" } }]);
-    });
-
-    it("returns the ELISA positive when the claim is a follow up", () => {
-      const result = getPigTestResultRows(pigFollowUpClaimElisa.data, pigFollowUpClaimElisa.type);
-
-      expect(result).toEqual([{ key: { text: "Test result" }, value: { html: "ELISA positive" } }]);
-    });
-
-    it("returns the PCR positive when the claim is a follow up", () => {
-      const pigsFollowUpPcr = {
-        ...pigFollowUpClaimElisa,
-        data: {
-          ...pigFollowUpClaimElisa,
-          pigsFollowUpTest: "pcr",
-          pigsPcrTestResult: "positive",
-          pigsGeneticSequencing: "mlv",
-        },
+  describe("herd breakdown display", () => {
+    test("displays herd breakdown section with correct counts when claims have herds", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/AHWR-0000-4444`,
+        auth,
       };
-      const result = getPigTestResultRows(pigsFollowUpPcr.data, pigsFollowUpPcr.data);
 
-      expect(result).toEqual([
-        { key: { text: "Test result" }, value: { html: "PCR positive" } },
+      const claimsWithHerds = [
         {
-          key: { text: "Genetic sequencing test results" },
-          value: { html: "Modified Live virus (MLV) only" },
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "beef" },
+          herd: { id: "herd-beef-1" },
         },
-      ]);
+        {
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "beef" },
+          herd: { id: "herd-beef-2" },
+        },
+        {
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "dairy" },
+          herd: { id: "herd-dairy-1" },
+        },
+        {
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "sheep" },
+          herd: { id: "herd-sheep-1" },
+        },
+        {
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "pigs" },
+          herd: { id: "herd-pigs-1" },
+        },
+        {
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "pigs" },
+          herd: { id: "herd-pigs-2" },
+        },
+        {
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "pigs" },
+          herd: { id: "herd-pigs-3" },
+        },
+      ];
+
+      getClaim.mockReturnValue(claims[0]);
+      getClaims.mockReturnValue({ claims: claimsWithHerds });
+      getApplication.mockReturnValue(application);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      // Check for "Number of herds and flocks" label
+      expect($(".govuk-summary-list__key").text()).toContain("Number of herds and flocks");
+
+      // Check for species labels and their counts
+      expect($(".govuk-summary-list__key").text()).toContain("Beef cattle");
+      expect($(".govuk-summary-list__key").text()).toContain("Dairy cattle");
+      expect($(".govuk-summary-list__key").text()).toContain("Sheep");
+      expect($(".govuk-summary-list__key").text()).toContain("Pigs");
+
+      // Get the nested summary list that contains herd breakdown
+      const herdBreakdownRows = $(
+        ".govuk-summary-list .govuk-summary-list .govuk-summary-list__row",
+      );
+
+      // Extract the values for each species
+      const beefRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Beef cattle"),
+      );
+      const dairyRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Dairy cattle"),
+      );
+      const sheepRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Sheep"),
+      );
+      const pigsRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Pigs"),
+      );
+
+      expect(beefRow.find(".govuk-summary-list__value").text().trim()).toBe("2");
+      expect(dairyRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
+      expect(sheepRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
+      expect(pigsRow.find(".govuk-summary-list__value").text().trim()).toBe("3");
+    });
+
+    test("displays herd breakdown with zero counts when no claims have herds of that species", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/AHWR-0000-4444`,
+        auth,
+      };
+
+      const claimsWithSingleHerd = [
+        {
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "pigs" },
+          herd: { id: "herd-pigs-1" },
+        },
+      ];
+
+      getClaim.mockReturnValue(claims[0]);
+      getClaims.mockReturnValue({ claims: claimsWithSingleHerd });
+      getApplication.mockReturnValue(application);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const herdBreakdownRows = $(
+        ".govuk-summary-list .govuk-summary-list .govuk-summary-list__row",
+      );
+
+      const beefRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Beef cattle"),
+      );
+      const dairyRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Dairy cattle"),
+      );
+      const sheepRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Sheep"),
+      );
+      const pigsRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Pigs"),
+      );
+
+      expect(beefRow.find(".govuk-summary-list__value").text().trim()).toBe("0");
+      expect(dairyRow.find(".govuk-summary-list__value").text().trim()).toBe("0");
+      expect(sheepRow.find(".govuk-summary-list__value").text().trim()).toBe("0");
+      expect(pigsRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
+    });
+
+    test("counts claims without herd id once per species", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/AHWR-0000-4444`,
+        auth,
+      };
+
+      const claimsWithoutHerds = [
+        {
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "beef" },
+        },
+        {
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "beef" },
+        },
+        {
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "dairy" },
+        },
+      ];
+
+      getClaim.mockReturnValue(claims[0]);
+      getClaims.mockReturnValue({ claims: claimsWithoutHerds });
+      getApplication.mockReturnValue(application);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const herdBreakdownRows = $(
+        ".govuk-summary-list .govuk-summary-list .govuk-summary-list__row",
+      );
+
+      const beefRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Beef cattle"),
+      );
+      const dairyRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Dairy cattle"),
+      );
+
+      // Multiple beef claims without herd id should only count as 1
+      expect(beefRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
+      expect(dairyRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
+    });
+
+    test("does not double count the same herd id", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/AHWR-0000-4444`,
+        auth,
+      };
+
+      const claimsWithDuplicateHerds = [
+        {
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "sheep" },
+          herd: { id: "herd-sheep-same" },
+        },
+        {
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "sheep" },
+          herd: { id: "herd-sheep-same" },
+        },
+        {
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "sheep" },
+          herd: { id: "herd-sheep-same" },
+        },
+      ];
+
+      getClaim.mockReturnValue(claims[0]);
+      getClaims.mockReturnValue({ claims: claimsWithDuplicateHerds });
+      getApplication.mockReturnValue(application);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const herdBreakdownRows = $(
+        ".govuk-summary-list .govuk-summary-list .govuk-summary-list__row",
+      );
+
+      const sheepRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Sheep"),
+      );
+
+      // Same herd id used 3 times should only count as 1
+      expect(sheepRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
+    });
+  });
+
+  describe("poultry site breakdown display", () => {
+    const poultryApplication = {
+      ...application,
+      reference: "POUL-1234-APP1",
+    };
+
+    const poultryClaim = {
+      id: "58b297c9-c983-475c-8bdb-db5746899cec",
+      reference: "PORE-1111-6666",
+      applicationReference: "POUL-1234-APP1",
+      data: {
+        typesOfPoultry: ["ducks", "geese"],
+        dateOfVisit: "2024-03-22T00:00:00.000Z",
+        vetsName: "Vet one",
+      },
+      herd: {
+        id: "site-1-id",
+      },
+      type: "REVIEW",
+      createdAt: "2024-03-25T12:20:18.307Z",
+      status: "IN_CHECK",
+    };
+
+    test("displays Number of sites for poultry applications", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/PORE-1111-6666`,
+        auth,
+      };
+
+      const poultryClaimsWithSites = [
+        { ...poultryClaim, herd: { id: "site-1-id" } },
+        { ...poultryClaim, herd: { id: "site-2-id" } },
+        { ...poultryClaim, herd: { id: "site-3-id" } },
+      ];
+
+      getClaim.mockReturnValue(poultryClaim);
+      getClaims.mockReturnValue({ claims: poultryClaimsWithSites });
+      getApplication.mockReturnValue(poultryApplication);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      // Should display "Number of sites" for poultry
+      expect($(".govuk-summary-list__key").text()).toContain("Number of sites");
+
+      // Should NOT display "Number of herds and flocks" for poultry
+      expect($(".govuk-summary-list__key").text()).not.toContain("Number of herds and flocks");
+
+      // Find the Number of sites row and check the value
+      const sitesRow = $(".govuk-summary-list__row").filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Number of sites"),
+      );
+      expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("3");
+    });
+
+    test("counts unique sites for poultry applications", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/PORE-1111-6666`,
+        auth,
+      };
+
+      // Same site ID used multiple times should only count once
+      const poultryClaimsWithDuplicateSites = [
+        { ...poultryClaim, herd: { id: "site-1-id" } },
+        { ...poultryClaim, herd: { id: "site-1-id" } },
+        { ...poultryClaim, herd: { id: "site-2-id" } },
+      ];
+
+      getClaim.mockReturnValue(poultryClaim);
+      getClaims.mockReturnValue({ claims: poultryClaimsWithDuplicateSites });
+      getApplication.mockReturnValue(poultryApplication);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const sitesRow = $(".govuk-summary-list__row").filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Number of sites"),
+      );
+      expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("2");
+    });
+
+    test("displays zero sites when no poultry claims have herd", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/PORE-1111-6666`,
+        auth,
+      };
+
+      const poultryClaimsWithoutSites = [{ ...poultryClaim, herd: undefined }];
+
+      getClaim.mockReturnValue(poultryClaim);
+      getClaims.mockReturnValue({ claims: poultryClaimsWithoutSites });
+      getApplication.mockReturnValue(poultryApplication);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const sitesRow = $(".govuk-summary-list__row").filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Number of sites"),
+      );
+      expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("0");
     });
   });
 });

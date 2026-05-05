@@ -80,6 +80,16 @@
             </dl>
           </div>
         {% endif %}
+        {% if poultryBreakdown %}
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+              Number of sites
+            </dt>
+            <dd class="govuk-summary-list__value">
+              {{ poultryBreakdown.amount }}
+            </dd>
+          </div>
+        {% endif %}
       </dl>
       {% if moveToInCheckForm %}
         {% include "./includes/move-to-in-check-form.njk" %}
