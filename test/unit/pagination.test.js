@@ -1,4 +1,4 @@
-import { getPagination, getPagingData } from "../../app/pagination";
+import { getPagination, getPagingData } from "../../app/pagination.js";
 
 describe("Pagination", () => {
   test("getPagination test", () => {

@@ -1,4 +1,4 @@
-import { getHistoryDetails } from "../../../../../app/routes/models/application-history";
+import { getHistoryDetails } from "../../../../../app/routes/models/application-history.js";
 
 test("renders table", () => {
   const historyRecords = [

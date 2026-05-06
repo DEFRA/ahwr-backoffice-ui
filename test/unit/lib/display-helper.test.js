@@ -3,7 +3,7 @@ import {
   formattedDateToUk,
   formatSpecies,
   formatTypeOfVisit,
-} from "../../../app/lib/display-helper";
+} from "../../../app/lib/display-helper.js";
 
 describe("display-helper tests", () => {
   test.each([

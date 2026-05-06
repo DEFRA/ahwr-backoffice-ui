@@ -1,13 +1,13 @@
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect";
-import { getCrumbs } from "../../../utils/get-crumbs";
-import { permissions } from "../../../../app/auth/permissions";
-import { getAppSearch, setAppSearch } from "../../../../app/session";
-import { getPagination, getPagingData } from "../../../../app/pagination";
-import { getApplications } from "../../../../app/api/applications";
-import { applicationsData } from "../../../data/applications";
-import { createServer } from "../../../../app/server";
+import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
+import { getCrumbs } from "../../../utils/get-crumbs.js";
+import { permissions } from "../../../../app/auth/permissions.js";
+import { getAppSearch, setAppSearch } from "../../../../app/session/index.js";
+import { getPagination, getPagingData } from "../../../../app/pagination.js";
+import { getApplications } from "../../../../app/api/applications.js";
+import { applicationsData } from "../../../data/applications.js";
+import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
 
 const { administrator } = permissions;

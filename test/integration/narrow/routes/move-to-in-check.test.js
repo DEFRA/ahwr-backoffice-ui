@@ -1,13 +1,13 @@
 import * as cheerio from "cheerio";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect";
-import { permissions } from "../../../../app/auth/permissions";
-import { getCrumbs } from "../../../utils/get-crumbs";
-import { createServer } from "../../../../app/server";
-import { updateApplicationStatus } from "../../../../app/api/applications";
+import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
+import { permissions } from "../../../../app/auth/permissions.js";
+import { getCrumbs } from "../../../utils/get-crumbs.js";
+import { createServer } from "../../../../app/server.js";
+import { updateApplicationStatus } from "../../../../app/api/applications.js";
 import { StatusCodes } from "http-status-codes";
-import { preSubmissionHandler } from "../../../../app/routes/utils/pre-submission-handler";
+import { preSubmissionHandler } from "../../../../app/routes/utils/pre-submission-handler.js";
 import boom from "@hapi/boom";
-import { updateClaimStatus } from "../../../../app/api/claims";
+import { updateClaimStatus } from "../../../../app/api/claims.js";
 
 jest.mock("../../../../app/auth");
 jest.mock("../../../../app/api/applications");

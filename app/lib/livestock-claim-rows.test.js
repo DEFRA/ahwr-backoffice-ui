@@ -1,4 +1,4 @@
-import { getPigTestResultRows } from "./livestock-claim-rows";
+import { getPigTestResultRows } from "./livestock-claim-rows.js";
 
 const claims = [
   {
@@ -271,17 +271,13 @@ const pigFollowUpClaimElisa = {
 
 describe("getPigTestResultRows", () => {
   it("returns the review test result when the claim is a review", () => {
-    const result = getPigTestResultRows(claims[0].data, claims[0].type, "Test result");
+    const result = getPigTestResultRows(claims[0].data, claims[0].type);
 
     expect(result).toEqual([{ key: { text: "Test result" }, value: { html: "Positive" } }]);
   });
 
   it("returns the ELISA positive when the claim is a follow up", () => {
-    const result = getPigTestResultRows(
-      pigFollowUpClaimElisa.data,
-      pigFollowUpClaimElisa.type,
-      "Test result",
-    );
+    const result = getPigTestResultRows(pigFollowUpClaimElisa.data, pigFollowUpClaimElisa.type);
 
     expect(result).toEqual([{ key: { text: "Test result" }, value: { html: "ELISA positive" } }]);
   });
@@ -296,7 +292,7 @@ describe("getPigTestResultRows", () => {
         pigsGeneticSequencing: "mlv",
       },
     };
-    const result = getPigTestResultRows(pigsFollowUpPcr.data, pigsFollowUpPcr.data, "Test result");
+    const result = getPigTestResultRows(pigsFollowUpPcr.data, pigsFollowUpPcr.data);
 
     expect(result).toEqual([
       { key: { text: "Test result" }, value: { html: "PCR positive" } },

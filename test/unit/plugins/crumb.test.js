@@ -1,4 +1,4 @@
-import { crumbPlugin } from "../../../app/plugins/crumb";
+import { crumbPlugin } from "../../../app/plugins/crumb.js";
 
 describe("crumb plugin", () => {
   test("is correctly configured", () => {

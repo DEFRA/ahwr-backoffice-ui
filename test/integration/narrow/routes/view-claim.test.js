@@ -1,11 +1,11 @@
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { getClaim, getClaimHistory, getClaims } from "../../../../app/api/claims";
-import { permissions } from "../../../../app/auth/permissions";
-import { getApplication } from "../../../../app/api/applications";
-import { createServer } from "../../../../app/server";
+import { getClaim, getClaimHistory, getClaims } from "../../../../app/api/claims.js";
+import { permissions } from "../../../../app/auth/permissions.js";
+import { getApplication } from "../../../../app/api/applications.js";
+import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
-import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states";
+import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states.js";
 const { administrator } = permissions;
 
 jest.mock("../../../../app/routes/utils/get-claim-view-states");
@@ -667,6 +667,139 @@ describe("View claim test", () => {
       const res = await server.inject(options);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
+    });
+
+    test("returns 200 with endemics follow-up claim and beef species", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/AHWR-0000-4444`,
+        auth,
+      };
+
+      getClaim.mockReturnValue(claims[3]);
+      getClaims.mockReturnValue({ claims });
+      getApplication.mockReturnValue(application);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
+
+      const expectedContent = [
+        { key: "Flagged", value: "No" },
+        { key: "Status", value: "Paid" },
+        { key: "Claim date", value: "25/03/2024" },
+        { key: "Business name", value: "Test Farm Lodge" },
+        { key: "Review test result", value: "Positive" },
+        { key: "Livestock", value: "Beef cattle" },
+        { key: "Type of visit", value: "Endemic disease follow-ups" },
+        { key: "Date of visit", value: "22/03/2024" },
+        { key: "11 or more beef cattle", value: "Yes" },
+        { key: "Vet's name", value: "12312312312sdfsdf" },
+        { key: "Vet's RCVS number", value: "1233211" },
+        { key: "Date of sampling", value: "22/03/2024" },
+        { key: "URN or test certificate", value: "123456" },
+        { key: "Follow-up test result", value: "Positive" },
+        { key: "Biosecurity assessment", value: "No" },
+      ];
+
+      for (const expected of expectedContent) {
+        expect($(".govuk-summary-list__key").text()).toMatch(expected.key);
+        expect($(".govuk-summary-list__value").text()).toMatch(expected.value);
+      }
+    });
+
+    test("returns 200 with endemics follow-up claim and dairy species", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/AHWR-0000-4444`,
+        auth,
+      };
+
+      const dairyFollowUpClaim = {
+        ...claims[3],
+        reference: "FUDC-1111-6666",
+        data: {
+          ...claims[3].data,
+          typeOfLivestock: "dairy",
+        },
+      };
+
+      getClaim.mockReturnValue(dairyFollowUpClaim);
+      getClaims.mockReturnValue({ claims });
+      getApplication.mockReturnValue(application);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
+
+      const expectedContent = [
+        { key: "Flagged", value: "No" },
+        { key: "Status", value: "Paid" },
+        { key: "Claim date", value: "25/03/2024" },
+        { key: "Business name", value: "Test Farm Lodge" },
+        { key: "Review test result", value: "Positive" },
+        { key: "Livestock", value: "Dairy cattle" },
+        { key: "Type of visit", value: "Endemic disease follow-ups" },
+        { key: "Date of visit", value: "22/03/2024" },
+        { key: "11 or more dairy cattle", value: "Yes" },
+        { key: "Vet's name", value: "12312312312sdfsdf" },
+        { key: "Vet's RCVS number", value: "1233211" },
+        { key: "Date of sampling", value: "22/03/2024" },
+        { key: "URN or test certificate", value: "123456" },
+        { key: "Follow-up test result", value: "Positive" },
+        { key: "Biosecurity assessment", value: "No" },
+      ];
+
+      for (const expected of expectedContent) {
+        expect($(".govuk-summary-list__key").text()).toMatch(expected.key);
+        expect($(".govuk-summary-list__value").text()).toMatch(expected.value);
+      }
+    });
+
+    test("displays 'Vaccinated' for herdVaccinationStatus when value is vaccinated", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/AHWR-0000-4444`,
+        auth,
+      };
+
+      getClaim.mockReturnValue(claims[2]);
+      getClaims.mockReturnValue({ claims });
+      getApplication.mockReturnValue(application);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
+
+      expect($(".govuk-summary-list__key").text()).toMatch("Herd vaccination status");
+      expect($(".govuk-summary-list__value").text()).toMatch("Vaccinated");
+    });
+
+    test("displays 'Not vaccinated' for herdVaccinationStatus when value is notVaccinated", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/AHWR-0000-4444`,
+        auth,
+      };
+
+      getClaim.mockReturnValue(pigFollowUpClaimElisa);
+      getClaims.mockReturnValue({ claims });
+      getApplication.mockReturnValue(application);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
+
+      expect($(".govuk-summary-list__key").text()).toMatch("Herd vaccination status");
+      expect($(".govuk-summary-list__value").text()).toMatch("Not vaccinated");
     });
 
     it("should hide oral fluid and show blood samples for pigs review when blood tests taken", async () => {

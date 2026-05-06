@@ -1,4 +1,4 @@
-import { authConfig } from "../../../app/config/auth";
+import { authConfig } from "../../../app/config/auth.js";
 
 describe("cache Config Test", () => {
   const OLD_ENV = process.env;

@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
-import { permissions } from "../../../../app/auth/permissions";
-import { createServer } from "../../../../app/server";
+import { permissions } from "../../../../app/auth/permissions.js";
+import { createServer } from "../../../../app/server.js";
 
 const { administrator } = permissions;
 

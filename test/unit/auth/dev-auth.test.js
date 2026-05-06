@@ -1,4 +1,4 @@
-import { getAuthenticationUrl, authenticate, logout } from "../../../app/auth/dev-auth";
+import { getAuthenticationUrl, authenticate, logout } from "../../../app/auth/dev-auth.js";
 
 const FAKE_SESSION_ID = "fake-session-id";
 

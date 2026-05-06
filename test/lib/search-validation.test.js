@@ -1,4 +1,4 @@
-import { searchValidation } from "../../app/lib/search-validation";
+import { searchValidation } from "../../app/lib/search-validation.js";
 
 describe("searchValidation", () => {
   test.each([

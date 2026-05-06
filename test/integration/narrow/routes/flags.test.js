@@ -3,7 +3,7 @@ import { axe } from "../../../helpers/axe-helper.js";
 import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { getCrumbs } from "../../../utils/get-crumbs.js";
 import { permissions } from "../../../../app/auth/permissions.js";
-import { getAllFlags, createFlag, deleteFlag } from "../../../../app/api/flags";
+import { getAllFlags, createFlag, deleteFlag } from "../../../../app/api/flags.js";
 import { flags } from "../../../data/flags.js";
 import { StatusCodes } from "http-status-codes";
 import { mapAuth } from "../../../../app/auth/map-auth.js";

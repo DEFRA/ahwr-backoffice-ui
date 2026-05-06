@@ -1,10 +1,10 @@
 import {
   createModel,
   getApplicationTableHeader,
-} from "../../../../../app/routes/models/application-list";
+} from "../../../../../app/routes/models/application-list.js";
 import { applicationsData } from "../../../../data/applications.js";
-import { getApplications } from "../../../../../app/api/applications";
-import { permissions } from "../../../../../app/auth/permissions";
+import { getApplications } from "../../../../../app/api/applications.js";
+import { permissions } from "../../../../../app/auth/permissions.js";
 
 jest.mock("../../../../../app/api/applications");
 

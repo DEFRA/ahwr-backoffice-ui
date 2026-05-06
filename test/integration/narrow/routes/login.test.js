@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
-import { createServer } from "../../../../app/server";
-import { auth } from "../../../../app/auth";
+import { createServer } from "../../../../app/server.js";
+import { auth } from "../../../../app/auth/index.js";
 
 jest.mock("../../../../app/auth/index.js", () => ({
   auth: {

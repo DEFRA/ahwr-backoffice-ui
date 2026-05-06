@@ -1,6 +1,6 @@
-import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states";
+import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states.js";
 import { STATUS as status } from "ffc-ahwr-common-library";
-import { permissions } from "../../../../app/auth/permissions";
+import { permissions } from "../../../../app/auth/permissions.js";
 const { administrator, recommender, authoriser, user } = permissions;
 
 jest.mock("../../../../app/config", () => ({

@@ -1,9 +1,9 @@
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect";
-import { upperFirstLetter } from "../../../../app/lib/display-helper";
-import { permissions } from "../../../../app/auth/permissions";
-import { createServer } from "../../../../app/server";
+import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
+import { upperFirstLetter } from "../../../../app/lib/display-helper.js";
+import { permissions } from "../../../../app/auth/permissions.js";
+import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
 
 jest.mock("../../../../app/auth");

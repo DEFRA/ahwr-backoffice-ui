@@ -16,7 +16,7 @@ import {
   getPaymentDocumentWithRefresh,
   getPaymentProxyQueueMessages,
   getSfdCommsProxyQueueMessages,
-} from "./support-calls";
+} from "./support-calls.js";
 import { StatusCodes } from "http-status-codes";
 
 jest.mock("@hapi/wreck");

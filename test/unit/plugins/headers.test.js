@@ -1,4 +1,4 @@
-import { createServer } from "../../../app/server";
+import { createServer } from "../../../app/server.js";
 
 describe("headers plugin tests", () => {
   let server;

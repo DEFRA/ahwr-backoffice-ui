@@ -1,13 +1,13 @@
-import { getCrumbs } from "../../../utils/get-crumbs";
-import { permissions } from "../../../../app/auth/permissions";
-import { getClaims } from "../../../../app/api/claims";
-import { getPagination, getPagingData } from "../../../../app/pagination";
-import { createServer } from "../../../../app/server";
+import { getCrumbs } from "../../../utils/get-crumbs.js";
+import { permissions } from "../../../../app/auth/permissions.js";
+import { getClaims } from "../../../../app/api/claims.js";
+import { getPagination, getPagingData } from "../../../../app/pagination.js";
+import { createServer } from "../../../../app/server.js";
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect";
+import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { claims } from "../../../data/claims.js";
-import { getClaimSearch, setClaimSearch } from "../../../../app/session";
+import { getClaimSearch, setClaimSearch } from "../../../../app/session/index.js";
 import { StatusCodes } from "http-status-codes";
 
 jest.mock("../../../../app/session");

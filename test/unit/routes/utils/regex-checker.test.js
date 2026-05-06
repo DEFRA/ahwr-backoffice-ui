@@ -1,4 +1,4 @@
-import { regexChecker } from "../../../../app/routes/utils/regex-checker";
+import { regexChecker } from "../../../../app/routes/utils/regex-checker.js";
 
 describe("regexChecker", () => {
   test("should return false if the string is empty", () => {

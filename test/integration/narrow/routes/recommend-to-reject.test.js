@@ -1,8 +1,8 @@
 import { StatusCodes } from "http-status-codes";
-import { permissions } from "../../../../app/auth/permissions";
-import { generateNewCrumb } from "../../../../app/routes/utils/crumb-cache";
-import { createServer } from "../../../../app/server";
-import { getCrumbs } from "../../../utils/get-crumbs";
+import { permissions } from "../../../../app/auth/permissions.js";
+import { generateNewCrumb } from "../../../../app/routes/utils/crumb-cache.js";
+import { createServer } from "../../../../app/server.js";
+import { getCrumbs } from "../../../utils/get-crumbs.js";
 
 const { administrator, recommender } = permissions;
 

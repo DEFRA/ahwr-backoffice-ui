@@ -1,5 +1,5 @@
-import { createServer } from "../../../../app/server";
-import { auth } from "../../../../app/auth";
+import { createServer } from "../../../../app/server.js";
+import { auth } from "../../../../app/auth/index.js";
 import { StatusCodes } from "http-status-codes";
 import { setUserDetails } from "../../../../app/session/index.js";
 

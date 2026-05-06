@@ -1,11 +1,11 @@
-import { retrieveQueueMessages } from "../../../../app/routes/support/retrieve-queue-messages-handler";
+import { retrieveQueueMessages } from "../../../../app/routes/support/retrieve-queue-messages-handler.js";
 import {
   getApplicationQueueMessages,
   getDocumentGeneratorQueueMessages,
   getMessageGeneratorQueueMessages,
   getPaymentProxyQueueMessages,
   getSfdCommsProxyQueueMessages,
-} from "../../../../app/routes/support/support-calls";
+} from "../../../../app/routes/support/support-calls.js";
 
 jest.mock("../../../../app/routes/support/support-calls");
 
