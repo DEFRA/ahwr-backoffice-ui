@@ -13,7 +13,7 @@ import {
 import { formattedDateToUk, upperFirstLetter } from "./display-helper.js";
 import { buildKeyValueJson } from "./row-helper.js";
 
-export function preparePoultryClaimDisplayRow(data, claimInformation, urlParameters, actions) {
+export function preparePoultryClaimDisplayRows(data, claimInformation, urlParameters, actions) {
   const { claimStatus, createdAt, herd } = claimInformation;
 
   const statusActions = getAction(
@@ -57,7 +57,7 @@ export function preparePoultryClaimDisplayRow(data, claimInformation, urlParamet
   );
 
   const minimumNumberOfBirds = buildKeyValueJson(
-    "Minimum number if birds",
+    "Minimum number of birds",
     upperFirstLetter(data?.minimumNumberOfBirds),
     true,
   );
@@ -114,7 +114,7 @@ function createBiosecurityQuestions(data) {
   );
 
   const costOfChanges = buildKeyValueJson(
-    "Expected cost for biosecurity changes ",
+    "Expected cost for biosecurity changes",
     COST_OF_CHANGES_LABELS[data?.costOfChanges] ||
       upperFirstLetter(data?.costOfChanges?.replaceAll("-", " ")),
     true,

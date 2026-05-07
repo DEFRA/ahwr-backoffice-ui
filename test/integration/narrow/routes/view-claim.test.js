@@ -1246,13 +1246,13 @@ describe("View claim test", () => {
         { key: "Site name", value: "Test Farm" },
         { key: "Site CPH", value: "12/123/1234" },
         { key: "Type of poultry", value: "Ducks, geese, laying hens" },
-        { key: "Minimum number if birds", value: "Yes" },
+        { key: "Minimum number of birds", value: "Yes" },
         { key: "Vet's name", value: "Test Vet" },
         { key: "Vet's RCVS number", value: "1234567" },
         { key: "Biosecurity assessment", value: "Yes" },
         { key: "Biosecurity usefulness", value: "Somewhat useful" },
         { key: "Biosecurity recommended changes", value: "Bird movements, and flock management" },
-        { key: "Expected cost for biosecurity changes ", value: "£3,000 to £4,500" },
+        { key: "Expected cost for biosecurity changes", value: "£3,000 to £4,500" },
         { key: "Evaluation interview", value: "Yes" },
       ];
 

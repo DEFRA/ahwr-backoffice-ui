@@ -14,7 +14,7 @@ import { getApplication } from "../api/applications.js";
 import { buildKeyValueJson } from "../lib/row-helper.js";
 import { prepareLivestockClaimDisplayRows } from "../lib/livestock-claim-rows.js";
 import { getStatusUpdateOptions } from "../routes/utils/get-status-update-options.js";
-import { preparePoultryClaimDisplayRow } from "../lib/poultry-claim-rows.js";
+import { preparePoultryClaimDisplayRows } from "../lib/poultry-claim-rows.js";
 
 const { administrator, authoriser, processor, recommender, user } = permissions;
 
@@ -122,7 +122,7 @@ export const viewClaimRoute = {
 
       const rowPreparation =
         scheme === POULTRY_SCHEME
-          ? preparePoultryClaimDisplayRow
+          ? preparePoultryClaimDisplayRows
           : prepareLivestockClaimDisplayRows;
 
       const rows = rowPreparation(
