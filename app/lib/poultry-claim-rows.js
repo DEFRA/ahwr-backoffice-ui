@@ -64,6 +64,35 @@ export function preparePoultryClaimDisplayRow(data, claimInformation, urlParamet
 
   const vetRows = getVetRows(data, actions, urlParameters);
 
+  const { biosecurity, biosecurityUsefulness, changesInBiosecurity, costOfChanges } =
+    createBiosecurityQuestions(data);
+
+  const interview = buildKeyValueJson(
+    "Evaluation interview",
+    upperFirstLetter(data?.interview),
+    true,
+  );
+
+  return [
+    status,
+    claimNumber,
+    claimDate,
+    dateOfVisit,
+    siteName,
+    siteCPH,
+    isSingleSite,
+    typesOfPoultry,
+    minimumNumberOfBirds,
+    ...vetRows,
+    biosecurity,
+    biosecurityUsefulness,
+    changesInBiosecurity,
+    costOfChanges,
+    interview,
+  ];
+}
+
+function createBiosecurityQuestions(data) {
   const biosecurity = buildKeyValueJson(
     "Biosecurity assessment",
     upperFirstLetter(data?.biosecurity),
@@ -90,28 +119,5 @@ export function preparePoultryClaimDisplayRow(data, claimInformation, urlParamet
       upperFirstLetter(data?.costOfChanges?.replaceAll("-", " ")),
     true,
   );
-
-  const interview = buildKeyValueJson(
-    "Evaluation interview",
-    upperFirstLetter(data?.interview),
-    true,
-  );
-
-  return [
-    status,
-    claimNumber,
-    claimDate,
-    dateOfVisit,
-    siteName,
-    siteCPH,
-    isSingleSite,
-    typesOfPoultry,
-    minimumNumberOfBirds,
-    ...vetRows,
-    biosecurity,
-    biosecurityUsefulness,
-    changesInBiosecurity,
-    costOfChanges,
-    interview,
-  ];
+  return { biosecurity, biosecurityUsefulness, changesInBiosecurity, costOfChanges };
 }
