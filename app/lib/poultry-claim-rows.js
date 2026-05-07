@@ -46,7 +46,7 @@ export function preparePoultryClaimDisplayRows(data, claimInformation, urlParame
 
   const isSingleSite = buildKeyValueJson(
     "Is this the only site associated with this SBI?",
-    upperFirstLetter(herd?.isSingleSite),
+    upperFirstLetter(data?.isOnlyHerdOnSbi),
     true,
   );
 
