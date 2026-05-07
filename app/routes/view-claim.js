@@ -12,8 +12,9 @@ import { getErrorMessagesByKey } from "./utils/get-error-messages-by-key.js";
 import { getHerdBreakdown, getSiteBreakdown } from "../lib/get-claim-breakdown.js";
 import { getApplication } from "../api/applications.js";
 import { buildKeyValueJson } from "../lib/row-helper.js";
-import { prepareClaimDisplayRows } from "../lib/livestock-claim-rows.js";
+import { prepareLivestockClaimDisplayRows } from "../lib/livestock-claim-rows.js";
 import { getStatusUpdateOptions } from "../routes/utils/get-status-update-options.js";
+import { preparePoultryClaimDisplayRow } from "../lib/poultry-claim-rows.js";
 
 const { administrator, authoriser, processor, recommender, user } = permissions;
 
@@ -116,7 +117,15 @@ export const viewClaimRoute = {
       } = isRedacted ? {} : getClaimViewStates(request, claim.status, currentStatusEvent);
 
       const statusOptions = getStatusUpdateOptions(claimStatus);
-      const rows = prepareClaimDisplayRows(
+
+      const scheme = getScheme(applicationReference);
+
+      const rowPreparation =
+        scheme === POULTRY_SCHEME
+          ? preparePoultryClaimDisplayRow
+          : prepareLivestockClaimDisplayRows;
+
+      const rows = rowPreparation(
         data,
         { type, claimStatus, createdAt, organisation, herd },
         { claimReference, page, returnPage },
@@ -144,7 +153,6 @@ export const viewClaimRoute = {
         request.logger,
       );
 
-      const scheme = getScheme(applicationReference);
       const claimsBreakdown =
         scheme === POULTRY_SCHEME ? getSiteBreakdown(claims) : getHerdBreakdown(claims);
 

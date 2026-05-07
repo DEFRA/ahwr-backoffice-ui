@@ -67,7 +67,7 @@ export const getPigTestResultRows = (data, type) => {
   return pigTestResultRows;
 };
 
-export function prepareClaimDisplayRows(data, claimInformation, urlParameters, actions) {
+export function prepareLivestockClaimDisplayRows(data, claimInformation, urlParameters, actions) {
   const { isBeef, isDairy, isPigs, isSheep } = getLivestockTypes(data?.typeOfLivestock);
   const { isReview, isEndemicsFollowUp } = getReviewType(claimInformation.type);
 
