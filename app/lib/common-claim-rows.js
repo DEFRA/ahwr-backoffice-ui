@@ -34,6 +34,28 @@ export function createVetNameRow(vetsName, updateVetsNameAction, urlParameters) 
   };
 }
 
+export function getVetRows(
+  data,
+  { updateVetsNameAction, updateVetRCVSNumberAction },
+  urlParameters,
+) {
+  const vetName = createVetNameRow(data?.vetsName, updateVetsNameAction, urlParameters);
+
+  const vetRCVSNumberActions = getAction(
+    updateVetRCVSNumberAction,
+    "updateVetRCVSNumber",
+    "RCVS number",
+    "update-vet-rcvs-number",
+    urlParameters,
+  );
+
+  const vetRCVSNumber = {
+    ...buildKeyValueJson("Vet's RCVS number", data?.vetRCVSNumber, true),
+    actions: vetRCVSNumberActions,
+  };
+  return [vetName, vetRCVSNumber];
+}
+
 export const getAction = (
   createItems,
   query,

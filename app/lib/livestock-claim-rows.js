@@ -13,8 +13,8 @@ import { getHerdRowData } from "./get-herd-row-data.js";
 import {
   createDateOfVisitRow,
   createStatusRow,
-  createVetNameRow,
   getAction,
+  getVetRows,
 } from "./common-claim-rows.js";
 
 const { BEEF, PIGS, DAIRY, SHEEP } = TYPE_OF_LIVESTOCK;
@@ -67,7 +67,7 @@ export const getPigTestResultRows = (data, type) => {
   return pigTestResultRows;
 };
 
-export function prepareClaimDisplayRows(data, claimInformation, urlParameters, actions) {
+export function prepareLivestockClaimDisplayRows(data, claimInformation, urlParameters, actions) {
   const { isBeef, isDairy, isPigs, isSheep } = getLivestockTypes(data?.typeOfLivestock);
   const { isReview, isEndemicsFollowUp } = getReviewType(claimInformation.type);
 
@@ -185,24 +185,6 @@ function createDateOfSamplingRow(data) {
     data?.dateOfTesting && formattedDateToUk(data?.dateOfTesting),
     true,
   );
-}
-
-function getVetRows(data, { updateVetsNameAction, updateVetRCVSNumberAction }, urlParameters) {
-  const vetName = createVetNameRow(data?.vetsName, updateVetsNameAction, urlParameters);
-
-  const vetRCVSNumberActions = getAction(
-    updateVetRCVSNumberAction,
-    "updateVetRCVSNumber",
-    "RCVS number",
-    "update-vet-rcvs-number",
-    urlParameters,
-  );
-
-  const vetRCVSNumber = {
-    ...buildKeyValueJson("Vet's RCVS number", data?.vetRCVSNumber, true),
-    actions: vetRCVSNumberActions,
-  };
-  return [vetName, vetRCVSNumber];
 }
 
 function getTestRows(data, isEndemicsFollowUp, isBeef, isDairy, type) {

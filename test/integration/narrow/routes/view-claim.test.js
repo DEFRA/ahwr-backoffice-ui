@@ -1107,12 +1107,26 @@ describe("View claim test", () => {
       reference: "PORE-1111-6666",
       applicationReference: "POUL-1234-APP1",
       data: {
-        typesOfPoultry: ["ducks", "geese"],
         dateOfVisit: "2024-03-22T00:00:00.000Z",
-        vetsName: "Vet one",
+        typesOfPoultry: ["ducks", "geese", "laying-hens"],
+        minimumNumberOfBirds: "yes",
+        vetsName: "Test Vet",
+        vetRCVSNumber: "1234567",
+        isOnlyHerdOnSbi: "no",
+        biosecurity: "yes",
+        biosecurityUsefulness: "somewhat-useful",
+        changesInBiosecurity: "movement-and-management",
+        costOfChanges: "3000-4500",
+        interview: "yes",
+        amount: 430,
+        claimType: "REVIEW",
       },
       herd: {
         id: "site-1-id",
+        version: 1,
+        cph: "12/123/1234",
+        name: "Test Farm",
+        associatedAt: "2026-05-06T15:04:09.535Z",
       },
       type: "REVIEW",
       createdAt: "2024-03-25T12:20:18.307Z",
@@ -1205,6 +1219,49 @@ describe("View claim test", () => {
         $(el).find(".govuk-summary-list__key").text().includes("Number of sites"),
       );
       expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("0");
+    });
+
+    test("returns 200 for poultry", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/POUL-0000-4444`,
+        auth,
+      };
+
+      getClaim.mockReturnValue(poultryClaim);
+      getClaims.mockReturnValue({ claims: [poultryClaim] });
+      getApplication.mockReturnValue(poultryApplication);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
+
+      const expectedContent = [
+        { key: "Flagged", value: "No" },
+        { key: "Status", value: "In check" },
+        { key: "Claim number", value: "PORE-1111-6666" },
+        { key: "Claim date", value: "25/03/2024" },
+        { key: "Date of visit", value: "22/03/2024" },
+        { key: "Site name", value: "Test Farm" },
+        { key: "Site CPH", value: "12/123/1234" },
+        { key: "Type of poultry", value: "Ducks, geese, laying hens" },
+        { key: "Minimum number of birds", value: "Yes" },
+        { key: "Is this the only site associated with this SBI?", value: "No" },
+        { key: "Vet's name", value: "Test Vet" },
+        { key: "Vet's RCVS number", value: "1234567" },
+        { key: "Biosecurity assessment", value: "Yes" },
+        { key: "Biosecurity usefulness", value: "Somewhat useful" },
+        { key: "Biosecurity recommended changes", value: "Bird movements, and flock management" },
+        { key: "Expected cost for biosecurity changes", value: "£3,000 to £4,500" },
+        { key: "Evaluation interview", value: "Yes" },
+      ];
+
+      for (const expected of expectedContent) {
+        expect($(".govuk-summary-list__key").text()).toMatch(expected.key);
+        expect($(".govuk-summary-list__value").text()).toMatch(expected.value);
+      }
     });
   });
 });
