@@ -274,6 +274,28 @@ describe("getPaymentDocumentWithRefresh", () => {
       expect(mockLogger.error).toHaveBeenCalled();
     }
   });
+
+  it("propagates error and skips get when post fails with non-404", async () => {
+    const mockError = new Error("Request failed");
+    wreck.post = jest.fn().mockRejectedValue(mockError);
+    wreck.get = jest.fn();
+    try {
+      await getPaymentDocumentWithRefresh("123", mockLogger);
+      // This is to fail if no exception thrown
+      throw new Error("Expected getPaymentDocumentWithRefresh to throw");
+    } catch (error) {
+      expect(error).toBe(mockError);
+      expect(wreck.post).toHaveBeenCalledWith(
+        "http://ahwr-payment-proxy:3001/api/support/payments/123/request-status",
+        {
+          json: true,
+          headers: { "x-api-key": "something" },
+        },
+      );
+      expect(wreck.get).not.toHaveBeenCalled();
+      expect(mockLogger.error).toHaveBeenCalled();
+    }
+  });
 });
 
 describe("getPaymentDocument", () => {
