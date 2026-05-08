@@ -87,7 +87,7 @@ export const getPaymentDocument = async (claimReference, logger) => {
 };
 
 export const getPaymentDocumentWithRefresh = async (claimReference, logger) => {
-  makePostCall(
+  await makePostCall(
     `${paymentProxyApiUri}/support/payments/${claimReference}/request-status`,
     "No payment status found",
     logger,
