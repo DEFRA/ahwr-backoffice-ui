@@ -39,11 +39,11 @@ export const getClaimTableHeader = (sortField, dataURLPrefix = "", showSBI = tru
       classes: col6RespText,
     },
     {
-      text: "Herd name",
+      text: config.poultry.enabled ? "Herd/Site name" : "Herd name",
       classes: `col-25 ${respText}`,
     },
     {
-      text: "Herd CPH",
+      text: config.poultry.enabled ? "Herd/Site CPH" : "Herd CPH",
       classes: col6RespText,
     },
     showSBI && {
