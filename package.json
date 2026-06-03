@@ -75,8 +75,8 @@
     "jest-environment-jsdom": "^30.3.0",
     "jest-junit": "16.0.0",
     "jest-when": "3.7.0",
-    "lint-staged": "^16.4.0",
     "mini-css-extract-plugin": "2.9.2",
+    "nano-staged": "1.0.2",
     "neostandard": "0.12.1",
     "nodemon": "3.1.11",
     "pino-pretty": "8.1.0",
@@ -99,7 +99,7 @@
       "**/test-output/**"
     ]
   },
-  "lint-staged": {
+  "nano-staged": {
     "*.js": [
       "eslint --fix",
       "prettier --write"
