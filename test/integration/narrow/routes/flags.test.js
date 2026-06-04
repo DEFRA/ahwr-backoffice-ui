@@ -79,6 +79,19 @@ describe("Flags tests", () => {
       phaseBannerOk($);
     });
 
+    test("the flags table has no 'Flagged due to multiple herds' column", async () => {
+      const options = {
+        method: "GET",
+        url: "/flags",
+        auth,
+        headers: { cookie: `crumb=${crumb}` },
+      };
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(res.payload).not.toContain("Flagged due to multiple herds");
+    });
+
     test("returns 200 when user is not an admin", async () => {
       const auth = {
         strategy: "session-auth",
@@ -144,7 +157,29 @@ describe("Flags tests", () => {
       phaseBannerOk($);
     });
 
-    test("the delete form links to the flags endpoint", async () => {
+    test("the create form shows only the reference and note, with no multiple herds question or copy", async () => {
+      const options = {
+        method: "GET",
+        url: "/flags?createFlag=true",
+        auth,
+        headers: { cookie: `crumb=${crumb}` },
+      };
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
+      const $ = cheerio.load(res.payload);
+
+      expect($('input[name="appRef"]').length).toBe(1);
+      expect($('textarea[name="note"]').length).toBe(1);
+
+      expect($('input[name="appliesToMh"]').length).toBe(0);
+      expect(res.payload).not.toContain("Is the flag because the owner");
+      expect(res.payload).not.toContain("maximum of 2 flags");
+      expect(res.payload).not.toContain("they will not see the multiple herds pages");
+    });
+
+    test("the delete form links to the flags endpoint and does not reference multiple herds", async () => {
       const options = {
         method: "GET",
         url: "/flags?deleteFlag=abc123",
@@ -161,6 +196,11 @@ describe("Flags tests", () => {
       expect($("title").text()).toContain("AHWR Flags");
 
       expect($(".ahwr-update-form").attr("action")).toBe("/flags");
+      expect(res.payload).toContain(
+        "Are you sure you want to delete the flag from agreement IAHW-U6ZE-5R5E?",
+      );
+      expect(res.payload).not.toContain("multiple herds");
+      expect(res.payload).not.toContain("non-MH");
       phaseBannerOk($);
     });
 
@@ -412,7 +452,6 @@ describe("Flags tests", () => {
           crumb,
           appRef: "IAHW-TEST-REF1",
           note: "Test flag",
-          appliesToMh: "yes",
           action: "create",
         },
       };
@@ -420,7 +459,7 @@ describe("Flags tests", () => {
       expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
     });
 
-    test("returns the user to the flags page when the flag has been created", async () => {
+    test("returns the user to the flags page when the flag has been created, without an appliesToMh answer", async () => {
       createFlag.mockResolvedValueOnce({ res: { statusCode: 201 } });
       const options = {
         method: "POST",
@@ -431,7 +470,6 @@ describe("Flags tests", () => {
           crumb,
           appRef: "IAHW-TEST-REF1",
           note: "Test flag",
-          appliesToMh: "yes",
           action: "create",
         },
       };
@@ -439,39 +477,10 @@ describe("Flags tests", () => {
 
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(createFlag).toHaveBeenCalledWith(
-        { appliesToMh: true, note: "Test flag", user: "test admin" },
+        { note: "Test flag", user: "test admin" },
         "IAHW-TEST-REF1",
         expect.any(Object),
       );
-    });
-
-    test("renders errors when the user has not provided the proper appliesToMh value", async () => {
-      const options = {
-        method: "POST",
-        url: "/flags",
-        auth,
-        headers: { cookie: `crumb=${crumb}` },
-        payload: {
-          crumb,
-          appRef: "IAHW-TEST-REF1",
-          note: "Test flag",
-          appliesToMh: "something",
-          action: "create",
-        },
-      };
-      const res = await server.inject(options);
-
-      expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(await axe(res.payload)).toHaveNoViolations();
-
-      const $ = cheerio.load(res.payload);
-      expect($("h1.govuk-heading-l").text()).toContain("Flags");
-      expect($("title").text()).toContain("AHWR Flags");
-      expect($(".govuk-error-summary__list li:first-child a").attr("href")).toBe("#appliesToMh");
-      expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
-        "Select if the flag is because the user declined multiple herds T&C's.",
-      );
-      phaseBannerOk($);
     });
 
     test("renders errors when the user has not provided the proper appRef value", async () => {
@@ -484,7 +493,6 @@ describe("Flags tests", () => {
           crumb,
           appRef: "IAHW-TEST-RE",
           note: "Test flag",
-          appliesToMh: "yes",
           action: "create",
         },
       };
@@ -515,7 +523,6 @@ describe("Flags tests", () => {
           crumb,
           appRef: "IAHW-TEST-REF1",
           note: "",
-          appliesToMh: "yes",
           action: "create",
         },
       };
@@ -534,7 +541,7 @@ describe("Flags tests", () => {
       phaseBannerOk($);
     });
 
-    test("renders an error when the user is trying to create a flag which already exists", async () => {
+    test("renders the reworded error when the agreement already has an active flag", async () => {
       createFlag.mockImplementationOnce(() => {
         let error = new Error("Flag already exists");
         error = {
@@ -556,7 +563,6 @@ describe("Flags tests", () => {
           crumb,
           appRef: "IAHW-TEST-REF1",
           note: "To be flagged",
-          appliesToMh: "yes",
           action: "create",
         },
       };
@@ -572,8 +578,9 @@ describe("Flags tests", () => {
         "#agreement-reference",
       );
       expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
-        'Flag not created - agreement flag with the same "Flag applies to multiple herds T&C\'s" value already exists.',
+        "This agreement already has an active flag.",
       );
+      expect(res.payload).not.toContain("multiple herds");
       phaseBannerOk($);
     });
 
@@ -599,7 +606,6 @@ describe("Flags tests", () => {
           crumb,
           appRef: "IAHW-TEST-REF1",
           note: "To be flagged",
-          appliesToMh: "yes",
           action: "create",
         },
       };
@@ -645,7 +651,6 @@ describe("Flags tests", () => {
           crumb,
           appRef: "IAHW-TEST-REF1",
           note: "To be flagged",
-          appliesToMh: "yes",
           action: "create",
         },
       };

@@ -91,7 +91,7 @@ describe("Flags API", () => {
   });
 
   describe("createFlag", () => {
-    test("uses the provided application reference in the params of the request, and the payload provided as the payload of the API request", async () => {
+    test("posts the agreement reference and payload, always sending appliesToMh false", async () => {
       const wreckResponse = {
         payload: {},
         res: {
@@ -106,7 +106,6 @@ describe("Flags API", () => {
       const payload = {
         user: "Tom",
         note: "I flagged this",
-        appliesToMh: "yes",
       };
 
       await createFlag(payload, applicationReference, mockLogger);
@@ -115,7 +114,7 @@ describe("Flags API", () => {
         `${applicationApiUri}/applications/${applicationReference}/flag`,
         {
           json: true,
-          payload,
+          payload: { ...payload, appliesToMh: false },
           headers: { "x-api-key": apiKeys.backofficeUiApiKey },
         },
       );
