@@ -36,9 +36,6 @@ const createRows = (flags, isAdmin) => {
       {
         text: formatDate(flag.createdAt),
       },
-      {
-        text: flag.appliesToMh === true ? "Yes" : "No",
-      },
       ...(isAdmin && isAgreementNotRedacted
         ? [
             {
@@ -67,9 +64,6 @@ const createTableHeader = (isAdmin) => {
     {
       text: "Created at",
     },
-    {
-      text: "Flagged due to multiple herds",
-    },
     ...(isAdmin
       ? [
           {
@@ -86,10 +80,6 @@ export const createFlagsTableData = async ({ logger, flagIdToDelete, createFlag,
   const applicationRefOfFlagToDelete = flagIdToDelete
     ? flags.find((flag) => flag.id === flagIdToDelete).applicationReference
     : undefined;
-  const flagIsForMh = flagIdToDelete
-    ? flags.find((flag) => flag.id === flagIdToDelete).appliesToMh
-    : undefined;
-  const appliesToMh = flagIsForMh ? "multiple herds T&C's" : "non-MH";
 
   return {
     model: {
@@ -97,7 +87,6 @@ export const createFlagsTableData = async ({ logger, flagIdToDelete, createFlag,
       rows: createRows(flags, isAdmin),
       flagIdToDelete,
       applicationRefOfFlagToDelete,
-      appliesToMh,
       createFlagUrl: `${serviceUri}/flags?createFlag=true`,
       createFlag,
     },

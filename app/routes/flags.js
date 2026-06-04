@@ -82,7 +82,6 @@ const postFlagHandler = {
             then: Joi.object({
               appRef: Joi.string().min(MIN_APPLICATION_REFERENCE_LENGTH).required(),
               note: Joi.string().min(MIN_NOTE_LENGTH).required(),
-              appliesToMh: Joi.string().valid("yes", "no").required(),
               action: Joi.string().required(),
             }),
           },
@@ -115,14 +114,6 @@ const postFlagHandler = {
                 ...receivedError,
                 message: "Enter a valid agreement reference.",
                 href: AGREEMENT_REFERENCE,
-              };
-            }
-
-            if (receivedError.message.includes("appliesToMh")) {
-              return {
-                ...receivedError,
-                message: "Select if the flag is because the user declined multiple herds T&C's.",
-                href: "#appliesToMh",
               };
             }
 
@@ -182,11 +173,10 @@ const deleteFlagHandler = async (request, h) => {
 const createFlagHandler = async (request, h) => {
   try {
     const { name: userName } = request.auth.credentials.account;
-    const { note, appliesToMh, appRef } = request.payload;
+    const { note, appRef } = request.payload;
     const payload = {
       user: userName,
       note: note.trim(),
-      appliesToMh: appliesToMh === "yes",
     };
 
     const { res } = await createFlagApiCall(payload, appRef.trim(), request.logger);
@@ -224,7 +214,7 @@ const createFlagHandler = async (request, h) => {
     if (error.data.res.statusCode === StatusCodes.NO_CONTENT) {
       formattedErrors = [
         {
-          message: `Flag not created - agreement flag with the same "Flag applies to multiple herds T&C's" value already exists.`,
+          message: "This agreement already has an active flag.",
           path: [],
           type: STRING_EMPTY,
           context: {

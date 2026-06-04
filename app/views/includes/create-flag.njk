@@ -1,12 +1,10 @@
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 <div class="govuk-panel govuk-grid-column-two-thirds govuk-panel--confirmation govuk-!-text-align-left" id="create-flag">
     <form method="POST" action="/flags" class="ahwr-update-form">
       <a href="/flags" class="govuk-link govuk-body">Back</a>
-      <h1 class="govuk-heading-xl govuk-!-margin-top-2 govuk-!-margin-bottom-2">Create flag</h1>
-      <span class="govuk-caption-xl govuk-!-margin-bottom-7">An agreement can have a maximum of 2 flags; one for multiple herds T&C's and one for any other reason.</span>
+      <h1 class="govuk-heading-xl govuk-!-margin-top-2 govuk-!-margin-bottom-7">Create flag</h1>
 
       {% if errors.length %}
         {{ govukErrorSummary({
@@ -14,10 +12,6 @@
             errorList: errors
         }) }}
       {% endif %}
-
-      {{ govukInsetText({
-        text: "If an agreement is flagged for not agreeing to multiple herds T&C's, when the owner of that agreement makes a claim they will not see the multiple herds pages and will not be able to claim for multiple herds."
-      }) }}
 
       {{ govukInput({
         label: {
@@ -46,27 +40,6 @@
         }
       }) }}
 
-      {{ govukRadios({
-        name: "appliesToMh",
-        fieldset: {
-          legend: {
-            text: "Is the flag because the owner of the agreement didn't agree to multiple herds T&C's?",
-            isPageHeading: false,
-            classes: "govuk-fieldset__legend--m"
-          }
-        },
-        items: [
-          {
-            value: "yes",
-            text: "Yes"
-          },
-          {
-            value: "no",
-            text: "No"
-          }
-        ]
-      }) }}
-  
     {{ govukButton({
       text: "Create flag"
     }) }}

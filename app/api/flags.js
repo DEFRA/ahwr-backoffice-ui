@@ -38,7 +38,7 @@ export async function createFlag(payload, appRef, logger) {
   try {
     const res = await wreck.post(endpoint, {
       json: true,
-      payload,
+      payload: { ...payload, appliesToMh: false },
       headers: { "x-api-key": apiKeys.backofficeUiApiKey },
     });
     await metricsCounter("flag_created");
