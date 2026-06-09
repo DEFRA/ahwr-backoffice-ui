@@ -1,7 +1,5 @@
 import { getClaimTableHeader, getClaimTableRows } from "./claim-list.js";
 
-import { config } from "../../config/index.js";
-
 jest.mock("../../config/index.js", () => ({
   config: {
     serviceUri: "test-uri",
@@ -9,27 +7,7 @@ jest.mock("../../config/index.js", () => ({
   },
 }));
 
-describe("getClaimTableHeader with poultry disabled", () => {
-  beforeAll(() => {
-    config.poultry.enabled = false;
-  });
-
-  test("shows 'Herd name' header", () => {
-    const header = getClaimTableHeader(null);
-    expect(header[3].text).toBe("Herd name");
-  });
-
-  test("shows 'Herd CPH' header", () => {
-    const header = getClaimTableHeader(null);
-    expect(header[4].text).toBe("Herd CPH");
-  });
-});
-
-describe("getClaimTableHeader with poultry enabled", () => {
-  beforeAll(() => {
-    config.poultry.enabled = true;
-  });
-
+describe("getClaimTableHeader", () => {
   test("shows 'Herd/Site name' header", () => {
     const header = getClaimTableHeader(null);
     expect(header[3].text).toBe("Herd/Site name");

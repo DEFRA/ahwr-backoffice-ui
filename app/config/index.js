@@ -54,9 +54,6 @@ const getConfigSchema = () =>
     logLevel: joi.string().required(),
     logFormat: joi.string().required(),
     logRedact: joi.array().items(joi.string()),
-    poultry: {
-      enabled: joi.bool().required(),
-    },
   });
 
 const buildConfig = () => {
@@ -111,9 +108,6 @@ const buildConfig = () => {
     logRedact: process.env.LOG_REDACT
       ? process.env.LOG_REDACT.split(",")
       : ["req.headers", "res.headers"],
-    poultry: {
-      enabled: process.env.POULTRY_ENABLED === "true",
-    },
   };
 
   if (process.env.NODE_ENV === "test") {
