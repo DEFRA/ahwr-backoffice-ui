@@ -3,7 +3,7 @@ import "./css/application.scss";
 import "./js/cookies.js";
 import "./js/handleDuplicateFormSubmissions.js";
 import $ from "jquery";
-import moj from "@ministryofjustice/frontend";
+import * as moj from "@ministryofjustice/frontend";
 initAll();
 window.$ = $;
 moj.initAll();
