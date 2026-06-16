@@ -7,7 +7,7 @@
 {% set backLink %}
  /agreements?page={{page}}
 {% endset -%}
-{% block beforeContent %}
+{% block containerStart %}
   {{ govukBackLink({
     text: "Back",
     href: backLink

@@ -19,20 +19,13 @@
 {% from "govuk/components/warning-text/macro.njk"        import govukWarningText %}
 {% from "govuk/components/header/macro.njk"              import govukHeader %}
 {% from "govuk/components/service-navigation/macro.njk"  import govukServiceNavigation %}
-{% from "moj/components/header/macro.njk"                import mojHeader %}
-{%- from "moj/components/filter/macro.njk"               import mojFilter -%}
-{%- from "moj/components/button-menu/macro.njk"          import mojButtonMenu -%}
 
 {% set serviceName = "Administration of the health and welfare of your livestock" %}
 
 {% block pageTitle %}{{serviceName}} - GOV.UK{% endblock %}
 
-{% set govukRebrand = true %}
-
 {% block head %}
   <meta name="robots" content="noindex, nofollow">
-  <link rel="icon" sizes="48x48" href="/assets/rebrand/images/favicon.ico">
-  <link rel="icon" sizes="any" href="/assets/rebrand/images/favicon.svg" type="image/svg+xml">
   <!--[if !IE 8]><!-->
   <% htmlWebpackPlugin.files.css.forEach(file => { %>
     <link href="<%= file %>" rel="stylesheet">
@@ -47,7 +40,6 @@
 
     {% block header %}
       {{ govukHeader({
-        rebrand: true,
         homepageUrl: "https://www.gov.uk/",
         containerClasses: "govuk-width-container"
       }) }}
@@ -86,7 +78,6 @@
 
     {% block footer %}
       {{ govukFooter({
-        rebrand: true,
         meta: {
           items: [
             {
