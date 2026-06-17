@@ -21,7 +21,7 @@ describe("Authentication route tests", () => {
 
   describe("Authenticate POST request", () => {
     const method = "POST";
-    test("POST /authenticate rote redirects to '/claims'", async () => {
+    test("POST /authenticate route redirects to '/claims'", async () => {
       auth.authenticate.mockResolvedValueOnce(["user1", ["role1", "role2"]]);
 
       const response = await server.inject({
