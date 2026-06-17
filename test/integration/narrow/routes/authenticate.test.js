@@ -19,24 +19,31 @@ describe("Authentication route tests", () => {
     await server.stop();
   });
 
-  describe("Authenticate GET request", () => {
-    const method = "GET";
-    test("GET /authenticate route redirects to '/'", async () => {
+  describe("Authenticate POST request", () => {
+    const method = "POST";
+    test("POST /authenticate route redirects to '/claims'", async () => {
       auth.authenticate.mockResolvedValueOnce(["user1", ["role1", "role2"]]);
-      const options = {
-        method,
-        url,
-      };
 
-      const response = await server.inject(options);
+      const response = await server.inject({
+        method: "POST",
+        url,
+        payload: "code=abc123",
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+      });
+
       expect(response.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
       expect(response.headers.location).toEqual("/claims");
 
+      expect(auth.authenticate).toHaveBeenCalledWith(
+        "abc123",
+        expect.anything(),
+        expect.anything(),
+      );
       expect(setUserDetails).toHaveBeenCalledWith(expect.anything(), "user", "user1");
       expect(setUserDetails).toHaveBeenCalledWith(expect.anything(), "roles", "Role1, Role2");
     });
 
-    test("GET /authenticate route returns a 500 error due to try catch", async () => {
+    test("POST /authenticate route returns a 500 error due to try catch", async () => {
       auth.authenticate.mockImplementation(() => {
         throw new Error();
       });

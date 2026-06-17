@@ -4,15 +4,16 @@ import { setUserDetails } from "../session/index.js";
 import { upperFirstLetter } from "../lib/display-helper.js";
 
 export const authenticateRoute = {
-  method: "GET",
+  method: "POST",
   path: "/authenticate",
   options: {
     auth: { mode: "try" },
+    plugins: { crumb: false },
   },
   handler: async (request, h) => {
     try {
       const [username, roles] = await auth.authenticate(
-        request.query.code,
+        request.payload.code,
         request.server.plugins.auth,
         request.cookieAuth,
       );

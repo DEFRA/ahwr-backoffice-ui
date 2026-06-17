@@ -1,8 +1,15 @@
-import { getMsalLoggingSetup } from "../../../app/auth/azure-auth.js";
+import { getMsalLoggingSetup, getAuthenticationUrl, init } from "../../../app/auth/azure-auth.js";
 import { getLogger } from "../../../app/logging/logger.js";
-import { LogLevel } from "@azure/msal-node";
+import { ConfidentialClientApplication, LogLevel, ResponseMode } from "@azure/msal-node";
 
 jest.mock("../../../app/logging/logger.js");
+jest.mock("@azure/msal-node", () => {
+  const actual = jest.requireActual("@azure/msal-node");
+  return {
+    ...actual,
+    ConfidentialClientApplication: jest.fn(),
+  };
+});
 
 const mockLogger = {
   info: jest.fn(),
@@ -34,5 +41,17 @@ describe("Azure auth test", () => {
     getLogger.mockImplementationOnce(() => mockLogger);
     getMsalLoggingSetup().loggerCallback(LogLevel.Info, "test message");
     expect(mockLogger.info).toHaveBeenCalledWith("test message");
+  });
+
+  test("getAuthenticationUrl requests form_post response mode", async () => {
+    const getAuthCodeUrl = jest.fn().mockResolvedValue("https://login.microsoftonline.com/auth");
+    ConfidentialClientApplication.mockImplementation(() => ({ getAuthCodeUrl }));
+    init();
+
+    await getAuthenticationUrl();
+
+    expect(getAuthCodeUrl).toHaveBeenCalledWith(
+      expect.objectContaining({ responseMode: ResponseMode.FORM_POST }),
+    );
   });
 });

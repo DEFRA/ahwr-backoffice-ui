@@ -1,5 +1,5 @@
 import { config } from "../config/index.js";
-import { ConfidentialClientApplication, LogLevel } from "@azure/msal-node";
+import { ConfidentialClientApplication, LogLevel, ResponseMode } from "@azure/msal-node";
 import { getLogger } from "../logging/logger.js";
 
 export const getMsalLoggingSetup = () => {
@@ -38,6 +38,7 @@ export const getAuthenticationUrl = () => {
   const authCodeUrlParameters = {
     prompt: "select_account", // Force the MS account select dialog
     redirectUri: config.auth.redirectUrl,
+    responseMode: ResponseMode.FORM_POST,
   };
 
   return msalApplication.getAuthCodeUrl(authCodeUrlParameters);
