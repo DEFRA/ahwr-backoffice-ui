@@ -3,7 +3,6 @@ import { getClaimTableHeader, getClaimTableRows } from "./claim-list.js";
 jest.mock("../../config/index.js", () => ({
   config: {
     serviceUri: "test-uri",
-    poultry: { enabled: false },
   },
 }));
 
