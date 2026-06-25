@@ -381,7 +381,7 @@ describe("View claim test", () => {
       const $ = cheerio.load(res.payload);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
-      expect($(".govuk-error-summary").length).toBe(0);
+      expect($(".govuk-error-summary")).toHaveLength(0);
       expect(res.payload).not.toContain("Injected link");
     });
 

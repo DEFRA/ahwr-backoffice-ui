@@ -53,7 +53,7 @@ describe("View agreement (old world) test", () => {
 
     expect(res.statusCode).toBe(StatusCodes.OK);
     expect(await axe(res.payload)).toHaveNoViolations();
-    expect($(".govuk-error-summary").length).toBe(0);
+    expect($(".govuk-error-summary")).toHaveLength(0);
   });
 
   test("renders the Change action links when the user can edit the agreement", async () => {
@@ -81,7 +81,7 @@ describe("View agreement (old world) test", () => {
     const $ = cheerio.load(res.payload);
 
     expect(res.statusCode).toBe(StatusCodes.OK);
-    expect($(".govuk-error-summary").length).toBe(0);
+    expect($(".govuk-error-summary")).toHaveLength(0);
     expect(res.payload).not.toContain("Injected link");
   });
 });

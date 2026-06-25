@@ -88,12 +88,14 @@ const buildAgreementClaimsTable = async (request, applicationReference, page) =>
   const dataURLPrefix = `/agreement/${applicationReference}/`;
   const header = getClaimTableHeader(sortField, dataURLPrefix, showSBI);
 
+  const limit = 30;
+  const offset = 0;
   const { claims, total } = await getClaims(
     "appRef",
     applicationReference,
     undefined,
-    30,
-    0,
+    limit,
+    offset,
     sortField,
     request.logger,
   );
@@ -123,9 +125,9 @@ export const buildAgreement = async (
   const flaggedText = isFlagged ? ` ${FLAG_EMOJI}` : "";
   const isRedacted = application.redacted;
 
-  const { updateEligiblePiiRedactionAction, updateEligiblePiiRedactionForm } = !isRedacted
-    ? getClaimViewStates(request, application.status, null, formFlags)
-    : {};
+  const { updateEligiblePiiRedactionAction, updateEligiblePiiRedactionForm } = isRedacted
+    ? {}
+    : getClaimViewStates(request, application.status, null, formFlags);
 
   const applicationSummaryDetails = buildAgreementSummaryDetails(application, {
     applicationReference,

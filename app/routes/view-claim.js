@@ -58,12 +58,14 @@ const prepareClaimSummaryRows = (scheme, claim, organisation, { page, returnPage
 };
 
 const loadClaimsBreakdown = async (scheme, applicationReference, logger) => {
+  const limit = 30;
+  const offset = 0;
   const { claims } = await getClaims(
     "appRef",
     applicationReference,
     undefined,
-    30,
-    0,
+    limit,
+    offset,
     undefined,
     logger,
   );

@@ -277,7 +277,7 @@ describe("Claims data tests", () => {
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(res.headers.location).toBeUndefined();
       expect(res.payload).not.toContain("errors=");
-      expect($(".govuk-error-summary").length).toBe(1);
+      expect($(".govuk-error-summary")).toHaveLength(1);
       expect($(".govuk-error-summary").text()).toContain(
         "Vet's RCVS number should be a 7 digit number or 6 digit number ending with a letter",
       );

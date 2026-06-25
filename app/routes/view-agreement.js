@@ -63,9 +63,9 @@ export const buildViewAgreement = async (
 
   const statusClass = getStyleClassByStatus(status);
 
-  const viewStates = !application.redacted
-    ? getClaimViewStates(request, status, currentStatusEvent, formFlags)
-    : {};
+  const viewStates = application.redacted
+    ? {}
+    : getClaimViewStates(request, status, currentStatusEvent, formFlags);
   const { updateVetsNameForm, updateVetRCVSNumberForm, updateDateOfVisitForm } = viewStates;
   const { updateEligiblePiiRedactionAction, updateEligiblePiiRedactionForm } = viewStates;
 
