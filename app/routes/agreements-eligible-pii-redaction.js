@@ -2,7 +2,10 @@ import joi from "joi";
 import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { permissions } from "../auth/permissions.js";
 import { updateEligiblePiiRedaction } from "../api/applications.js";
-import { encodeErrorsForUI } from "./utils/encode-errors-for-ui.js";
+import { formatErrorsForUI } from "./utils/format-errors-for-ui.js";
+import { getFormFlags } from "./utils/get-form-flags.js";
+import { buildViewAgreement } from "./view-agreement.js";
+import { buildAgreement } from "./agreement.js";
 
 const { administrator } = permissions;
 
@@ -31,20 +34,18 @@ export const updateEligiblePiiRedactionRoute = {
 
         request.logger.error({ error });
 
-        const panelID = "#update-eligible-pii-redaction";
-
-        const errors = encodeErrorsForUI(error.details, panelID);
-        const query = new URLSearchParams({
-          page,
-          updateEligiblePiiRedaction: "true",
-          errors,
-        });
+        const errors = formatErrorsForUI(error.details, "#update-eligible-pii-redaction");
+        const formFlags = getFormFlags("updateEligiblePiiRedaction");
 
         if (reference.startsWith("AHWR")) {
-          return h.redirect(`/view-agreement/${reference}?${query.toString()}`).takeover();
+          return (
+            await buildViewAgreement(request, h, { reference, page, formFlags, errors })
+          ).takeover();
         }
 
-        return h.redirect(`/agreement/${reference}/claims?${query.toString()}`).takeover();
+        return (
+          await buildAgreement(request, h, { reference, page, formFlags, errors })
+        ).takeover();
       },
     },
     handler: async (request, h) => {

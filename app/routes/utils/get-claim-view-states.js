@@ -150,7 +150,26 @@ const getAdminActionsAvailable = ({
   };
 };
 
-export const getClaimViewStates = (request, status, currentStatusEvent) => {
+export const DEFAULT_FORM_FLAGS = {
+  withdraw: false,
+  moveToInCheck: false,
+  recommendToPay: false,
+  recommendToReject: false,
+  approve: false,
+  reject: false,
+  updateStatus: false,
+  updateVetsName: false,
+  updateDateOfVisit: false,
+  updateVetRCVSNumber: false,
+  updateEligiblePiiRedaction: false,
+};
+
+export const getClaimViewStates = (
+  request,
+  status,
+  currentStatusEvent,
+  formFlags = request.query,
+) => {
   const {
     withdraw,
     moveToInCheck,
@@ -163,7 +182,7 @@ export const getClaimViewStates = (request, status, currentStatusEvent) => {
     updateDateOfVisit,
     updateVetRCVSNumber,
     updateEligiblePiiRedaction,
-  } = request.query;
+  } = formFlags;
   const { name } = request.auth.credentials.account;
 
   const { isAdministrator, isRecommender, isAuthoriser, isSuperAdmin } = mapAuth(request);

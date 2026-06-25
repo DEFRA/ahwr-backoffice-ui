@@ -365,6 +365,26 @@ describe("View claim test", () => {
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
     });
 
+    test("ignores an errors query parameter added manually to the URL", async () => {
+      getClaim.mockReturnValue(claims[0]);
+      getClaims.mockReturnValue({ claims });
+      getApplication.mockReturnValue(application);
+      const injected = Buffer.from(
+        JSON.stringify([{ text: "Injected link", href: "#x", key: "y" }]),
+      ).toString("base64");
+
+      const res = await server.inject({
+        method: "GET",
+        url: `${url}/AHWR-0000-4444?errors=${injected}`,
+        auth,
+      });
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect($(".govuk-error-summary").length).toBe(0);
+      expect(res.payload).not.toContain("Injected link");
+    });
+
     test("returns 200 with review claim type and Pigs species", async () => {
       const options = {
         method: "GET",

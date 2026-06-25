@@ -5,18 +5,18 @@ import { permissions } from "../../../../app/auth/permissions.js";
 import { getCrumbs } from "../../../utils/get-crumbs.js";
 import { StatusCodes } from "http-status-codes";
 import { preSubmissionHandler } from "../../../../app/routes/utils/pre-submission-handler.js";
+import { setupViewClaimRender } from "../../../utils/view-claim-render-fixtures.js";
 import boom from "@hapi/boom";
 
 jest.mock("../../../../app/auth");
 jest.mock("../../../../app/api/applications");
 jest.mock("../../../../app/api/claims");
 jest.mock("../../../../app/routes/utils/pre-submission-handler");
+jest.mock("../../../../app/routes/utils/get-claim-view-states");
 
 preSubmissionHandler.mockImplementation((_arg, h) => h.continue);
 
 const reference = "AHWR-555A-FD4C";
-const encodedErrors =
-  "W3sidGV4dCI6IlNlbGVjdCBhbGwgY2hlY2tib3hlcyIsImhyZWYiOiIjcmVqZWN0Iiwia2V5IjoiY29uZmlybSJ9XQ%3D%3D";
 
 const { administrator, authoriser } = permissions;
 
@@ -37,6 +37,7 @@ describe("Reject Application test", () => {
   beforeEach(async () => {
     crumb = await getCrumbs(server);
     jest.clearAllMocks();
+    setupViewClaimRender();
   });
 
   describe(`POST ${url} route`, () => {
@@ -161,9 +162,7 @@ describe("Reject Application test", () => {
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
     });
 
-    test("Reject application invalid reference", async () => {
-      const errors =
-        "W3sidGV4dCI6IlwicmVmZXJlbmNlXCIgbXVzdCBiZSBhIHN0cmluZyIsImhyZWYiOiIjcmVqZWN0Iiwia2V5IjoicmVmZXJlbmNlIn1d";
+    test("re-renders the claim view in place on invalid reference", async () => {
       auth = {
         strategy: "session-auth",
         credentials: {
@@ -187,15 +186,13 @@ describe("Reject Application test", () => {
 
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      expect(res.headers.location).toEqual(
-        `/view-claim/123?page=1&reject=true&errors=${errors}&returnPage=claims`,
-      );
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(res.headers.location).toBeUndefined();
+      expect(res.payload).not.toContain("errors=");
+      expect(res.payload).toContain("govuk-error-summary");
     });
 
-    test("Reject application claim not processed", async () => {
-      const errors =
-        "W3sidGV4dCI6IlwiY29uZmlybVwiIGRvZXMgbm90IGNvbnRhaW4gMSByZXF1aXJlZCB2YWx1ZShzKSIsImhyZWYiOiIjcmVqZWN0Iiwia2V5IjoiY29uZmlybSJ9XQ%3D%3D";
+    test("re-renders the claim view in place when claim not processed", async () => {
       const options = {
         method: "POST",
         url,
@@ -210,14 +207,14 @@ describe("Reject Application test", () => {
         },
       };
       const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      expect(res.headers.location).toEqual(
-        `/view-claim/${reference}?page=1&reject=true&errors=${errors}&returnPage=claims`,
-      );
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(res.headers.location).toBeUndefined();
+      expect(res.payload).not.toContain("errors=");
+      expect(res.payload).toContain("govuk-error-summary");
     });
   });
 
-  test("retuns 400 Bad Request for claim", async () => {
+  test("re-renders the claim view in place on validation failure for claim", async () => {
     const options = {
       method: "POST",
       url,
@@ -231,9 +228,9 @@ describe("Reject Application test", () => {
       },
     };
     const res = await server.inject(options);
-    expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-    expect(res.headers.location).toEqual(
-      `/view-claim/${reference}?page=1&reject=true&errors=${encodedErrors}&returnPage=claims`,
-    );
+    expect(res.statusCode).toBe(StatusCodes.OK);
+    expect(res.headers.location).toBeUndefined();
+    expect(res.payload).not.toContain("errors=");
+    expect(res.payload).toContain("govuk-error-summary");
   });
 });

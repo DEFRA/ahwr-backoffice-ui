@@ -1,8 +1,10 @@
 import { getCrumbs } from "../../../utils/get-crumbs.js";
 import { permissions } from "../../../../app/auth/permissions.js";
-import { claims } from "../../../data/claims.js";
-import { getClaims, updateClaimData } from "../../../../app/api/claims.js";
+import * as cheerio from "cheerio";
+import { axe } from "../../../helpers/axe-helper.js";
+import { updateClaimData } from "../../../../app/api/claims.js";
 import { updateApplicationData } from "../../../../app/api/applications.js";
+import { setupViewClaimRender } from "../../../utils/view-claim-render-fixtures.js";
 import { getPagination, getPagingData } from "../../../../app/pagination.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
@@ -14,6 +16,7 @@ jest.mock("../../../../app/api/claims");
 jest.mock("../../../../app/api/applications");
 jest.mock("../../../../app/pagination");
 jest.mock("../../../../app/routes/models/claim-list");
+jest.mock("../../../../app/routes/utils/get-claim-view-states");
 jest.mock("../../../../app/auth");
 
 getPagination.mockReturnValue({
@@ -27,7 +30,6 @@ getPagingData.mockReturnValue({
   total: 1,
   limit: 10,
 });
-getClaims.mockReturnValue(claims);
 
 describe("Claims data tests", () => {
   const auth = {
@@ -46,6 +48,7 @@ describe("Claims data tests", () => {
     beforeEach(async () => {
       crumb = await getCrumbs(server);
       jest.clearAllMocks();
+      setupViewClaimRender();
     });
 
     test("returns 302 no auth", async () => {
@@ -250,7 +253,7 @@ describe("Claims data tests", () => {
       );
     });
 
-    test("returns 302 with an error message for an invalid rcvs", async () => {
+    test("re-renders the claim view in place with an error for an invalid rcvs", async () => {
       const options = {
         method: "POST",
         url: "/claims/data",
@@ -269,15 +272,19 @@ describe("Claims data tests", () => {
         },
       };
       const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      const $ = cheerio.load(res.payload);
 
-      expect(res.headers.location).toMatch(
-        /view-claim\/AAAA\?page=1&updateVetRCVSNumber=true&errors=.+&returnPage=claims/,
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(res.headers.location).toBeUndefined();
+      expect(res.payload).not.toContain("errors=");
+      expect($(".govuk-error-summary").length).toBe(1);
+      expect($(".govuk-error-summary").text()).toContain(
+        "Vet's RCVS number should be a 7 digit number or 6 digit number ending with a letter",
       );
       expect(updateApplicationData).toHaveBeenCalledTimes(0);
     });
 
-    test("returns 302 with an error message when visitDate moved after payment rate change", async () => {
+    test("re-renders the claim view in place when visitDate moved after payment rate change", async () => {
       const options = {
         method: "POST",
         url: "/claims/data",
@@ -297,15 +304,19 @@ describe("Claims data tests", () => {
         },
       };
       const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      const $ = cheerio.load(res.payload);
 
-      expect(res.headers.location).toMatch(
-        /view-claim\/AAAA\?page=1&updateDateOfVisit=true&errors=.+&returnPage=claims/,
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(res.headers.location).toBeUndefined();
+      expect(res.payload).not.toContain("errors=");
+      expect($(".govuk-error-summary").text()).toContain(
+        "The date of visit cannot be moved after the payment rate change",
       );
+      expect(await axe(res.payload)).toHaveNoViolations();
       expect(updateApplicationData).toHaveBeenCalledTimes(0);
     });
 
-    test("returns 302 with an error message when visitDate moved before payment rate change", async () => {
+    test("re-renders the claim view in place when visitDate moved before payment rate change", async () => {
       const options = {
         method: "POST",
         url: "/claims/data",
@@ -325,10 +336,13 @@ describe("Claims data tests", () => {
         },
       };
       const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+      const $ = cheerio.load(res.payload);
 
-      expect(res.headers.location).toMatch(
-        /view-claim\/AAAA\?page=1&updateDateOfVisit=true&errors=.+&returnPage=claims/,
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(res.headers.location).toBeUndefined();
+      expect(res.payload).not.toContain("errors=");
+      expect($(".govuk-error-summary").text()).toContain(
+        "The date of visit cannot be moved before the payment rate change",
       );
       expect(updateApplicationData).toHaveBeenCalledTimes(0);
     });

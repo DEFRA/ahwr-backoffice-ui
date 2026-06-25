@@ -86,6 +86,26 @@ describe("Claims test", () => {
       expect(res.statusCode).toBe(400);
     });
 
+    test("ignores an errors query parameter added manually to the URL", async () => {
+      getApplication.mockReturnValue(applicationsData.applications[0]);
+      const injected = Buffer.from(
+        JSON.stringify([{ text: "Injected link", href: "#x", key: "y" }]),
+      ).toString("base64");
+
+      const options = {
+        method: "GET",
+        url: `${url}?page=1&errors=${injected}`,
+        auth,
+      };
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect($(".govuk-error-summary").length).toBe(0);
+      expect(res.payload).not.toContain("Injected link");
+    });
+
     test("returns 200", async () => {
       const options = {
         method: "GET",
