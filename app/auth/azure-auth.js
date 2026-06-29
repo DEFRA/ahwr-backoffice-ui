@@ -1,6 +1,7 @@
 import { config } from "../config/index.js";
 import { ConfidentialClientApplication, LogLevel, ResponseMode } from "@azure/msal-node";
 import { getLogger } from "../logging/logger.js";
+import { WebIdentityTokenProvider } from "@defra/hapi-auth-oidc";
 
 export const getMsalLoggingSetup = () => {
   if (config.isProd || config.isTest) {
@@ -28,8 +29,34 @@ const msalLogging = getMsalLoggingSetup();
 let msalApplication;
 
 export const init = () => {
+  let auth;
+
+  if (config.federatedCredentials.enabled) {
+    const logger = getLogger();
+
+    logger.info("Initialising auth provider");
+    const authProvider = new WebIdentityTokenProvider({ audience: "ahwr-backoffice-ui" });
+    logger.info("Initialised auth provider");
+
+    auth = {
+      clientId: config.auth.clientId,
+      authority: config.auth.authority,
+      clientAssertion: async () => {
+        logger.info("Retrieving credentials");
+        const assertion = await authProvider.getCredentials(getLogger());
+
+        logger.info(`type: ${typeof assertion}`);
+        logger.info(`value: ${assertion}`);
+
+        return assertion;
+      },
+    };
+  } else {
+    auth = config.auth;
+  }
+
   msalApplication = new ConfidentialClientApplication({
-    auth: config.auth,
+    auth,
     system: { loggerOptions: msalLogging, customAgentOptions: { keepAlive: false } },
   });
 };
