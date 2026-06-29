@@ -2,7 +2,9 @@ const sharedConfig = {
   transform: {
     "^.+\\.[j]sx?$": "babel-jest",
   },
-  transformIgnorePatterns: ["/node_modules/(?!(ffc-ahwr-common-library|@defra/hapi-tracing|@defra/hapi-auth-oidc)/)"],
+  transformIgnorePatterns: [
+    "/node_modules/(?!(ffc-ahwr-common-library|@defra/hapi-tracing|@defra/hapi-auth-oidc)/)",
+  ],
   modulePathIgnorePatterns: ["node_modules"],
   testPathIgnorePatterns: [],
   watchPathIgnorePatterns: ["\\.#"],
