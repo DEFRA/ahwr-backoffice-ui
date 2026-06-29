@@ -2,10 +2,13 @@ import { permissions } from "../../../../app/auth/permissions.js";
 import { getCrumbs } from "../../../utils/get-crumbs.js";
 import { createServer } from "../../../../app/server.js";
 import { generateNewCrumb } from "../../../../app/routes/utils/crumb-cache.js";
+import { setupViewClaimRender } from "../../../utils/view-claim-render-fixtures.js";
 import { StatusCodes } from "http-status-codes";
 
 jest.mock("../../../../app/api/claims");
+jest.mock("../../../../app/api/applications");
 jest.mock("../../../../app/routes/utils/crumb-cache");
+jest.mock("../../../../app/routes/utils/get-claim-view-states");
 jest.mock("../../../../app/auth");
 
 const reference = "AHWR-555A-FD4C";
@@ -31,6 +34,7 @@ describe("Recommended To Pay test", () => {
   beforeEach(async () => {
     crumb = await getCrumbs(server);
     jest.clearAllMocks();
+    setupViewClaimRender();
   });
 
   describe(`POST ${url} route`, () => {
@@ -43,9 +47,7 @@ describe("Recommended To Pay test", () => {
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
     });
 
-    test("returns 302 when validation fails for claim", async () => {
-      const errors =
-        "W3sidGV4dCI6IlNlbGVjdCBhbGwgY2hlY2tib3hlcyIsImhyZWYiOiIjcmVjb21tZW5kLXRvLXBheSIsImtleSI6ImNvbmZpcm0ifV0%3D";
+    test("re-renders the claim view in place when validation fails for claim", async () => {
       const options = {
         method: "POST",
         url,
@@ -60,10 +62,10 @@ describe("Recommended To Pay test", () => {
         },
       };
       const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      expect(res.headers.location).toEqual(
-        `/view-claim/${reference}?page=1&recommendToPay=true&errors=${errors}&returnPage=claims`,
-      );
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(res.headers.location).toBeUndefined();
+      expect(res.payload).not.toContain("errors=");
+      expect(res.payload).toContain("govuk-error-summary");
     });
 
     test.each([recommender, administrator])(
@@ -120,9 +122,7 @@ describe("Recommended To Pay test", () => {
       expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
     });
 
-    test("Returns 302 on wrong payload", async () => {
-      const errors =
-        "W3sidGV4dCI6IlwiY29uZmlybVwiIGRvZXMgbm90IGNvbnRhaW4gMSByZXF1aXJlZCB2YWx1ZShzKSIsImhyZWYiOiIjcmVjb21tZW5kLXRvLXBheSIsImtleSI6ImNvbmZpcm0ifV0%3D";
+    test("re-renders the claim view in place on wrong payload", async () => {
       auth = {
         strategy: "session-auth",
         credentials: {
@@ -143,15 +143,13 @@ describe("Recommended To Pay test", () => {
         },
       };
       const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      expect(res.headers.location).toEqual(
-        `/view-claim/${reference}?page=1&recommendToPay=true&errors=${errors}&returnPage=undefined`,
-      );
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(res.headers.location).toBeUndefined();
+      expect(res.payload).not.toContain("errors=");
+      expect(res.payload).toContain("govuk-error-summary");
     });
 
-    test("Recommended to pay invalid reference", async () => {
-      const errors =
-        "W3sidGV4dCI6IlwiY29uZmlybVswXVwiIGRvZXMgbm90IG1hdGNoIGFueSBvZiB0aGUgYWxsb3dlZCB0eXBlcyIsImhyZWYiOiIjcmVjb21tZW5kLXRvLXBheSIsImtleSI6MH0seyJ0ZXh0IjoiXCJjb25maXJtXCIgZG9lcyBub3QgY29udGFpbiAxIHJlcXVpcmVkIHZhbHVlKHMpIiwiaHJlZiI6IiNyZWNvbW1lbmQtdG8tcGF5Iiwia2V5IjoiY29uZmlybSJ9LHsidGV4dCI6IlwicmVmZXJlbmNlXCIgbXVzdCBiZSBhIHN0cmluZyIsImhyZWYiOiIjcmVjb21tZW5kLXRvLXBheSIsImtleSI6InJlZmVyZW5jZSJ9XQ%3D%3D";
+    test("re-renders the claim view in place on invalid reference", async () => {
       auth = {
         strategy: "session-auth",
         credentials: {
@@ -174,10 +172,10 @@ describe("Recommended To Pay test", () => {
 
       const res = await server.inject(options);
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      expect(res.headers.location).toEqual(
-        `/view-claim/123?page=1&recommendToPay=true&errors=${errors}&returnPage=undefined`,
-      );
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(res.headers.location).toBeUndefined();
+      expect(res.payload).not.toContain("errors=");
+      expect(res.payload).toContain("govuk-error-summary");
     });
   });
 });

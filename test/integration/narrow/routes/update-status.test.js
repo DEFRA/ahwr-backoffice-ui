@@ -1,6 +1,9 @@
+import * as cheerio from "cheerio";
+import { axe } from "../../../helpers/axe-helper.js";
 import { createServer } from "../../../../app/server.js";
 import { permissions } from "../../../../app/auth/permissions.js";
 import { getCrumbs } from "../../../utils/get-crumbs.js";
+import { setupViewClaimRender } from "../../../utils/view-claim-render-fixtures.js";
 import { STATUS } from "ffc-ahwr-common-library";
 import { StatusCodes } from "http-status-codes";
 
@@ -9,84 +12,70 @@ const { administrator } = permissions;
 jest.mock("../../../../app/api/applications");
 jest.mock("../../../../app/api/claims");
 jest.mock("../../../../app/routes/utils/crumb-cache");
+jest.mock("../../../../app/routes/utils/get-claim-view-states");
 jest.mock("../../../../app/auth");
 
-test("success: update claim", async () => {
-  const server = await createServer();
+describe("update-status", () => {
+  let server;
   const auth = {
     strategy: "session-auth",
-    credentials: {
-      account: {},
-      scope: [administrator],
-    },
+    credentials: { account: {}, scope: [administrator] },
   };
-  const crumb = await getCrumbs(server);
 
-  const reference = "FUSH-1010-2020";
-  const returnPage = "claims";
-  const page = "1";
-
-  const res = await server.inject({
-    method: "post",
-    url: "/update-status",
-    auth,
-    headers: { cookie: `crumb=${crumb}` },
-    payload: {
-      reference,
-      page,
-      status: STATUS.IN_CHECK,
-      note: "test",
-      returnPage,
-      crumb,
-    },
+  beforeAll(async () => {
+    server = await createServer();
   });
 
-  expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-  expect(res.headers.location).toBe(
-    `/view-claim/${reference}?page=${page}&returnPage=${returnPage}`,
-  );
-});
-
-test("failure: update claim, missing note", async () => {
-  const server = await createServer();
-  const auth = {
-    strategy: "session-auth",
-    credentials: {
-      account: {},
-      scope: [administrator],
-    },
-  };
-  const crumb = await getCrumbs(server);
-
-  const reference = "FUSH-1010-2020";
-  const returnPage = "claims";
-  const page = "1";
-
-  const res = await server.inject({
-    method: "post",
-    url: "/update-status",
-    auth,
-    headers: { cookie: `crumb=${crumb}` },
-    payload: {
-      reference,
-      page,
-      status: STATUS.IN_CHECK,
-      returnPage,
-      crumb,
-    },
+  beforeEach(() => {
+    jest.clearAllMocks();
+    setupViewClaimRender();
   });
 
-  const errors = [
-    {
-      text: "Enter note",
-      href: "#update-status",
-      key: "note",
-    },
-  ];
-  const encodedErrors = Buffer.from(JSON.stringify(errors)).toString("base64");
+  test("success: redirects to the claim view (PRG preserved on the success path)", async () => {
+    const crumb = await getCrumbs(server);
 
-  expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-  expect(res.headers.location).toBe(
-    `/view-claim/${reference}?page=${page}&updateStatus=true&errors=${encodedErrors}&returnPage=${returnPage}`,
-  );
+    const res = await server.inject({
+      method: "post",
+      url: "/update-status",
+      auth,
+      headers: { cookie: `crumb=${crumb}` },
+      payload: {
+        reference: "FUSH-1010-2020",
+        page: "1",
+        status: STATUS.IN_CHECK,
+        note: "test",
+        returnPage: "claims",
+        crumb,
+      },
+    });
+
+    expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+    expect(res.headers.location).toBe("/view-claim/FUSH-1010-2020?page=1&returnPage=claims");
+  });
+
+  test("failure: re-renders the claim view in place with the error summary, no redirect, no errors in the URL", async () => {
+    const crumb = await getCrumbs(server);
+
+    const res = await server.inject({
+      method: "post",
+      url: "/update-status",
+      auth,
+      headers: { cookie: `crumb=${crumb}` },
+      payload: {
+        reference: "FUSH-1010-2020",
+        page: "1",
+        status: STATUS.IN_CHECK,
+        returnPage: "claims",
+        crumb,
+      },
+    });
+    const $ = cheerio.load(res.payload);
+
+    expect(res.statusCode).toBe(StatusCodes.OK);
+    expect(res.headers.location).toBeUndefined();
+    expect(res.payload).not.toContain("errors=");
+    expect($(".govuk-error-summary")).toHaveLength(1);
+    expect($(".govuk-error-summary").text()).toContain("Enter note");
+    expect(await axe(res.payload)).toHaveNoViolations();
+  });
 });

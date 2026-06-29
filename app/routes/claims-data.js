@@ -3,7 +3,10 @@ import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { permissions } from "../auth/permissions.js";
 import { updateClaimData } from "../api/claims.js";
 import { updateApplicationData } from "../api/applications.js";
-import { encodeErrorsForUI } from "./utils/encode-errors-for-ui.js";
+import { formatErrorsForUI } from "./utils/format-errors-for-ui.js";
+import { getFormFlags } from "./utils/get-form-flags.js";
+import { buildViewClaim } from "./view-claim.js";
+import { buildViewAgreement } from "./view-agreement.js";
 import { PIGS_AND_PAYMENTS_RELEASE_DATE } from "../constants/index.js";
 
 const { administrator } = permissions;
@@ -28,26 +31,21 @@ const affectsPaymentRate = (originalDateString, newDate) => {
   );
 };
 
-const encodeErrAndRedirectBackToView = (request, h, error) => {
-  const { claimOrAgreement, form, page, reference, returnPage } = request.payload;
+const renderErrAtView = async (request, h, error) => {
+  const { claimOrAgreement, form: formName, page, reference, returnPage } = request.payload;
 
-  request.logger.error({ error, form });
+  request.logger.error({ error, form: formName });
 
-  const panelID = panelIdGivenFormName(form);
-
-  const errors = encodeErrorsForUI(error.details, panelID);
-
-  const query = new URLSearchParams({
-    page,
-    [form]: "true",
-    errors,
-  });
+  const errors = formatErrorsForUI(error.details, panelIdGivenFormName(formName));
+  const formFlags = getFormFlags(formName);
 
   if (claimOrAgreement === "claim") {
-    query.append("returnPage", returnPage);
+    return (
+      await buildViewClaim(request, h, { reference, page, returnPage, formFlags, errors })
+    ).takeover();
   }
 
-  return h.redirect(`/view-${claimOrAgreement}/${reference}?${query.toString()}`).takeover();
+  return (await buildViewAgreement(request, h, { reference, page, formFlags, errors })).takeover();
 };
 
 export const claimsDataRoutes = [
@@ -132,7 +130,7 @@ export const claimsDataRoutes = [
           })
           .required(),
         failAction: async (request, h, error) => {
-          return encodeErrAndRedirectBackToView(request, h, error);
+          return renderErrAtView(request, h, error);
         },
       },
       handler: async (request, h) => {
@@ -176,7 +174,7 @@ export const claimsDataRoutes = [
               },
             ],
           };
-          return encodeErrAndRedirectBackToView(request, h, err);
+          return renderErrAtView(request, h, err);
         }
 
         await generateNewCrumb(request, h);

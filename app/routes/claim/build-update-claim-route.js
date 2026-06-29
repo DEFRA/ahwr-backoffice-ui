@@ -1,23 +1,24 @@
-import { encodeErrorsForUI } from "../utils/encode-errors-for-ui.js";
+import { formatErrorsForUI } from "../utils/format-errors-for-ui.js";
+import { getFormFlags } from "../utils/get-form-flags.js";
+import { buildViewClaim } from "../view-claim.js";
 import { generateNewCrumb } from "../utils/crumb-cache.js";
 import { updateClaimStatus } from "../../api/claims.js";
 import { preSubmissionHandler } from "../utils/pre-submission-handler.js";
 import Joi from "joi";
 
-export const updateClaimFailAction = (request, h, error, errorHref, searchParam) => {
+export const updateClaimFailAction = async (request, h, error, errorHref, searchParam) => {
   const { page, reference, returnPage } = request.payload;
   request.logger.error({ error, reference });
 
-  const errors = encodeErrorsForUI(error.details, errorHref);
-
-  const query = new URLSearchParams({
-    page,
-    [searchParam]: "true",
-    errors,
-  });
-  query.append("returnPage", returnPage);
-
-  return h.redirect(`/view-claim/${reference}?${query.toString()}`).takeover();
+  return (
+    await buildViewClaim(request, h, {
+      reference,
+      page,
+      returnPage,
+      formFlags: getFormFlags(searchParam),
+      errors: formatErrorsForUI(error.details, errorHref),
+    })
+  ).takeover();
 };
 
 export const updateClaimHandler = async (request, h, status) => {

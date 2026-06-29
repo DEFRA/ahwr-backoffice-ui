@@ -1,4 +1,3 @@
-import { Buffer } from "node:buffer";
 import joi from "joi";
 import { getClaim, getClaimHistory, getClaims } from "../api/claims.js";
 import { getHistoryDetails } from "./models/application-history.js";
@@ -24,6 +23,112 @@ const backLink = (applicationReference, returnPage, page) => {
     : `/claims?page=${page}`;
 };
 
+const buildClaimApplicationSummary = (application, applicationReference) => {
+  const { organisation } = application;
+  return [
+    buildKeyValueJson("Agreement number", applicationReference),
+    buildKeyValueJson("Agreement date", formattedDateToUk(application.createdAt)),
+    buildKeyValueJson("Agreement holder", organisation.farmerName),
+    buildKeyValueJson("Agreement holder email", organisation.email),
+    buildKeyValueJson("SBI number", organisation.sbi),
+    buildKeyValueJson("Address", organisation.address.split(",").join(", ")),
+    buildKeyValueJson("Business email", organisation.orgEmail),
+    buildKeyValueJson("Flagged", application.flags.length > 0 ? "Yes" : "No"),
+  ];
+};
+
+const prepareClaimSummaryRows = (scheme, claim, organisation, { page, returnPage }, viewStates) => {
+  const { data, reference: claimReference, type, status: claimStatus, createdAt, herd } = claim;
+  const rowPreparation =
+    scheme === POULTRY_SCHEME ? preparePoultryClaimDisplayRows : prepareLivestockClaimDisplayRows;
+
+  const rows = rowPreparation(
+    data,
+    { type, claimStatus, createdAt, organisation, herd },
+    { claimReference, page, returnPage },
+    {
+      updateStatusAction: viewStates.updateStatusAction,
+      updateDateOfVisitAction: viewStates.updateDateOfVisitAction,
+      updateVetsNameAction: viewStates.updateVetsNameAction,
+      updateVetRCVSNumberAction: viewStates.updateVetRCVSNumberAction,
+    },
+  );
+
+  return rows.filter((row) => row?.value?.html);
+};
+
+const loadClaimsBreakdown = async (scheme, applicationReference, logger) => {
+  const limit = 30;
+  const offset = 0;
+  const { claims } = await getClaims(
+    "appRef",
+    applicationReference,
+    undefined,
+    limit,
+    offset,
+    undefined,
+    logger,
+  );
+  return scheme === POULTRY_SCHEME ? getSiteBreakdown(claims) : getHerdBreakdown(claims);
+};
+
+export const buildViewClaim = async (
+  request,
+  h,
+  { reference, page, returnPage, formFlags, errors = [] },
+) => {
+  const claim = await getClaim(reference, request.logger);
+  const { data, reference: claimReference, applicationReference, status: claimStatus } = claim;
+
+  // TODO - look at removing setBindings here
+  request.logger.setBindings({ applicationReference, claimReference });
+
+  const application = await getApplication(applicationReference, request.logger);
+  const { organisation } = application;
+
+  // TODO - look at removing setBindings here
+  request.logger.setBindings({ sbi: organisation.sbi });
+
+  const { historyRecords } = await getClaimHistory(claimReference, request.logger);
+  const currentStatusEvent = getCurrentStatusEvent(claim, historyRecords);
+
+  const viewStates = application.redacted
+    ? {}
+    : getClaimViewStates(request, claim.status, currentStatusEvent, formFlags);
+
+  const scheme = getScheme(applicationReference);
+
+  return h.view("view-claim", {
+    page,
+    backLink: backLink(applicationReference, returnPage, page),
+    returnPage,
+    isFlagged: application.flags.length > 0,
+    reference: claimReference,
+    applicationReference,
+    claimOrAgreement: "claim",
+    dateOfVisit: data?.dateOfVisit,
+    title: upperFirstLetter(organisation.name),
+    claimSummaryDetails: prepareClaimSummaryRows(
+      scheme,
+      claim,
+      organisation,
+      { page, returnPage },
+      viewStates,
+    ),
+    status: {
+      normalType: upperFirstLetter(claim.status.replaceAll("_", " ").toLowerCase()),
+      tagClass: getStyleClassByStatus(claim.status.replaceAll("_", " ")),
+    },
+    applicationSummaryDetails: buildClaimApplicationSummary(application, applicationReference),
+    historyDetails: getHistoryDetails(historyRecords),
+    statusOptions: getStatusUpdateOptions(claimStatus),
+    errorMessages: getErrorMessagesByKey(errors),
+    errors,
+    ...viewStates,
+    ...(await loadClaimsBreakdown(scheme, applicationReference, request.logger)),
+  });
+};
+
 export const viewClaimRoute = {
   method: "get",
   path: "/view-claim/{reference}",
@@ -36,7 +141,7 @@ export const viewClaimRoute = {
       query: joi.object({
         page: joi.string().default(1).allow(null),
         returnPage: joi.string().optional().allow("").valid("agreement", "claims"),
-        errors: joi.string().allow(null),
+        errors: joi.any().strip(),
         moveToInCheck: joi.bool().default(false),
         recommendToPay: joi.bool().default(false),
         recommendToReject: joi.bool().default(false),
@@ -50,146 +155,12 @@ export const viewClaimRoute = {
     },
     handler: async (request, h) => {
       const { page, returnPage } = request.query;
-      const claim = await getClaim(request.params.reference, request.logger);
-
-      const {
-        data,
-        reference: claimReference,
-        type,
-        applicationReference,
-        status: claimStatus,
-        createdAt,
-        herd,
-      } = claim;
-
-      // TODO - look at removing setBindings here
-      request.logger.setBindings({ applicationReference, claimReference });
-
-      const application = await getApplication(applicationReference, request.logger);
-
-      const { organisation } = application;
-
-      // TODO - look at removing setBindings here
-      request.logger.setBindings({ sbi: organisation.sbi });
-
-      const isFlagged = application.flags.length > 0;
-      const flaggedText = isFlagged ? "Yes" : "No";
-
-      const isRedacted = application.redacted;
-
-      const applicationSummaryDetails = [
-        buildKeyValueJson("Agreement number", applicationReference),
-        buildKeyValueJson("Agreement date", formattedDateToUk(application.createdAt)),
-        buildKeyValueJson("Agreement holder", organisation.farmerName),
-        buildKeyValueJson("Agreement holder email", organisation.email),
-        buildKeyValueJson("SBI number", organisation.sbi),
-        buildKeyValueJson("Address", organisation.address.split(",").join(", ")),
-        buildKeyValueJson("Business email", organisation.orgEmail),
-        buildKeyValueJson("Flagged", flaggedText),
-      ];
-
-      const errors = request.query.errors
-        ? JSON.parse(Buffer.from(request.query.errors, "base64").toString("utf8"))
-        : [];
-
-      const { historyRecords } = await getClaimHistory(claimReference, request.logger);
-      const historyDetails = getHistoryDetails(historyRecords);
-      const currentStatusEvent = getCurrentStatusEvent(claim, historyRecords);
-
-      const {
-        moveToInCheckAction,
-        moveToInCheckForm,
-        recommendAction,
-        recommendToPayForm,
-        recommendToRejectForm,
-        authoriseAction,
-        authoriseForm,
-        rejectAction,
-        rejectForm,
-        updateStatusAction,
-        updateStatusForm,
-        updateVetsNameAction,
-        updateVetsNameForm,
-        updateVetRCVSNumberAction,
-        updateVetRCVSNumberForm,
-        updateDateOfVisitAction,
-        updateDateOfVisitForm,
-      } = isRedacted ? {} : getClaimViewStates(request, claim.status, currentStatusEvent);
-
-      const statusOptions = getStatusUpdateOptions(claimStatus);
-
-      const scheme = getScheme(applicationReference);
-
-      const rowPreparation =
-        scheme === POULTRY_SCHEME
-          ? preparePoultryClaimDisplayRows
-          : prepareLivestockClaimDisplayRows;
-
-      const rows = rowPreparation(
-        data,
-        { type, claimStatus, createdAt, organisation, herd },
-        { claimReference, page, returnPage },
-        {
-          updateStatusAction,
-          updateDateOfVisitAction,
-          updateVetsNameAction,
-          updateVetRCVSNumberAction,
-        },
-      );
-
-      const rowsWithData = rows.filter((row) => row?.value?.html);
-      const errorMessages = getErrorMessagesByKey(errors);
-      const searchText = applicationReference;
-      const searchType = "appRef";
-      const limit = 30;
-      const offset = 0;
-      const { claims } = await getClaims(
-        searchType,
-        searchText,
-        undefined,
-        limit,
-        offset,
-        undefined,
-        request.logger,
-      );
-
-      const claimsBreakdown =
-        scheme === POULTRY_SCHEME ? getSiteBreakdown(claims) : getHerdBreakdown(claims);
-
-      return h.view("view-claim", {
+      return buildViewClaim(request, h, {
+        reference: request.params.reference,
         page,
-        backLink: backLink(applicationReference, returnPage, page),
         returnPage,
-        isFlagged,
-        reference: claimReference,
-        applicationReference,
-        claimOrAgreement: "claim",
-        dateOfVisit: data?.dateOfVisit,
-        title: upperFirstLetter(organisation.name),
-        claimSummaryDetails: rowsWithData,
-        status: {
-          normalType: upperFirstLetter(claim.status.replaceAll("_", " ").toLowerCase()),
-          tagClass: getStyleClassByStatus(claim.status.replaceAll("_", " ")),
-        },
-        applicationSummaryDetails,
-        historyDetails,
-        moveToInCheckAction,
-        moveToInCheckForm,
-        recommendAction,
-        recommendToPayForm,
-        recommendToRejectForm,
-        rejectAction,
-        rejectForm,
-        authoriseAction,
-        authoriseForm,
-        updateStatusForm,
-        updateVetsNameForm,
-        updateVetRCVSNumberForm,
-        updateDateOfVisitForm,
-        statusOptions,
-        errorMessages,
-        errors,
-        ...claimsBreakdown,
+        formFlags: request.query,
+        errors: [],
       });
     },
   },
