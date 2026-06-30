@@ -43,7 +43,7 @@ export const init = () => {
       authority: config.auth.authority,
       clientAssertion: async () => {
         logger.info("Retrieving credentials");
-        const assertion = await authProvider.getCredentials(getLogger());
+        const assertion = await authProvider.getCredentials(logger);
 
         logger.info(`type: ${typeof assertion}`);
         logger.info(`value: ${assertion}`);
