@@ -38,7 +38,7 @@
     "@hapi/cookie": "11.0.2",
     "@hapi/crumb": "8.0.1",
     "@hapi/hapi": "21.4.9",
-    "@hapi/inert": "6.0.5",
+    "@hapi/inert": "7.1.2",
     "@hapi/vision": "6.1.0",
     "@hapi/wreck": "18.1.2",
     "@hapi/yar": "11.0.3",
@@ -57,7 +57,7 @@
     "undici": "7.28.0"
   },
   "devDependencies": {
-    "@babel/core": "7.29.0",
+    "@babel/core": "7.29.7",
     "@babel/plugin-transform-export-namespace-from": "7.27.1",
     "@babel/plugin-transform-modules-commonjs": "7.28.6",
     "babel-jest": "30.2.0",
