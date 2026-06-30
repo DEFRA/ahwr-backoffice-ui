@@ -1,6 +1,6 @@
 const sharedConfig = {
   transform: {
-    "^.+\\.[j]sx?$": "babel-jest",
+    "^.+\\.(mjs|jsx?)$": "babel-jest",
   },
   transformIgnorePatterns: ["/node_modules/@defra/(?!(hapi-tracing)/)"],
   modulePathIgnorePatterns: ["node_modules"],
