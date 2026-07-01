@@ -44,10 +44,7 @@ export const init = () => {
       clientAssertion: async () => {
         logger.info("Retrieving credentials");
         const assertion = await authProvider.getCredentials(logger);
-
-        logger.info(`type: ${typeof assertion}`);
-        logger.info(`value: ${assertion}`);
-
+        logger.info(`Retrieved credentials: ${assertion.slice(0, 4)}`);
         return assertion;
       },
     };
