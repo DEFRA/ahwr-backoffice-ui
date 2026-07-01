@@ -9,10 +9,12 @@ import { sessionPlugin } from "./plugins/session.js";
 import { viewsPlugin } from "./plugins/views.js";
 import { inertPlugin } from "./plugins/inert.js";
 import { loggingContextPlugin } from "./plugins/logging-context.js";
+import { setupProxy } from "./lib/setup-proxy.js";
 import { getCacheEngine } from "./cache/get-cache-engine.js";
 import { requestLogger } from "./logging/request-logger.js";
 
 export async function createServer(options) {
+  setupProxy();
   const { testPort } = options ?? {};
   const server = Hapi.server({
     cache: [getCacheEngine()],
