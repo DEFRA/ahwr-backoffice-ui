@@ -1,6 +1,8 @@
 import { getMsalLoggingSetup, getAuthenticationUrl, init } from "../../../app/auth/azure-auth.js";
 import { getLogger } from "../../../app/logging/logger.js";
 import { ConfidentialClientApplication, LogLevel, ResponseMode } from "@azure/msal-node";
+import { config } from "../../../app/config/index.js";
+import { WebIdentityTokenProvider } from "@defra/hapi-auth-oidc";
 
 jest.mock("../../../app/logging/logger.js");
 jest.mock("@azure/msal-node", () => {
@@ -8,6 +10,27 @@ jest.mock("@azure/msal-node", () => {
   return {
     ...actual,
     ConfidentialClientApplication: jest.fn(),
+  };
+});
+jest.mock("@defra/hapi-auth-oidc", () => ({
+  WebIdentityTokenProvider: jest.fn(),
+}));
+jest.mock("../../../app/config/index.js", () => {
+  const actual = jest.requireActual("../../../app/config/index.js");
+
+  return {
+    ...actual,
+    config: {
+      ...actual.config,
+      federatedCredentials: { enabled: false },
+      auth: {
+        clientId: "test-client-id",
+        authority: "https://test-authority",
+        redirectUrl: "https://test-redirect",
+      },
+      isProd: true,
+      isTest: false,
+    },
   };
 });
 
@@ -53,5 +76,44 @@ describe("Azure auth test", () => {
     expect(getAuthCodeUrl).toHaveBeenCalledWith(
       expect.objectContaining({ responseMode: ResponseMode.FORM_POST }),
     );
+  });
+
+  describe("when federated credentials are enabled", () => {
+    const mockGetCredentials = jest.fn();
+
+    beforeEach(() => {
+      config.federatedCredentials.enabled = true;
+      getLogger.mockReturnValue(mockLogger);
+      WebIdentityTokenProvider.mockImplementation(() => ({ getCredentials: mockGetCredentials }));
+      ConfidentialClientApplication.mockImplementation(() => ({}));
+    });
+
+    afterEach(() => {
+      config.federatedCredentials.enabled = false;
+    });
+
+    test("clientAssertion retrieves and returns credentials from the auth provider", async () => {
+      const expectedAssertion = "test-assertion-token";
+      mockGetCredentials.mockResolvedValue(expectedAssertion);
+
+      init();
+
+      expect(ConfidentialClientApplication).toHaveBeenCalledWith(
+        expect.objectContaining({
+          auth: expect.objectContaining({
+            clientId: config.auth.clientId,
+            authority: config.auth.authority,
+            clientAssertion: expect.any(Function),
+          }),
+        }),
+      );
+      expect(WebIdentityTokenProvider).toHaveBeenCalledWith({ audience: "ahwr-backoffice-ui" });
+
+      const { auth } = ConfidentialClientApplication.mock.calls[0][0];
+      const assertion = await auth.clientAssertion();
+
+      expect(mockGetCredentials).toHaveBeenCalled();
+      expect(assertion).toBe(expectedAssertion);
+    });
   });
 });
