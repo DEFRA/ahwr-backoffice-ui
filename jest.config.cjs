@@ -1,6 +1,6 @@
 const sharedConfig = {
   transform: {
-    "^.+\\.[j]sx?$": "babel-jest",
+    "^.+\\.(mjs|jsx?)$": "babel-jest",
   },
   transformIgnorePatterns: ["/node_modules/@defra/(?!(hapi-tracing|hapi-auth-oidc)/)"],
   modulePathIgnorePatterns: ["node_modules"],
@@ -10,7 +10,7 @@ const sharedConfig = {
 
 module.exports = {
   collectCoverage: true,
-  collectCoverageFrom: ["**/*.js", "!**/*.test.js", "!app/config/**/*.js"],
+  collectCoverageFrom: ["**/*.js", "!**/*.test.js", "!app/config/**/*.js", "!test-output/**"],
   coverageDirectory: "test-output",
   coverageReporters: ["text-summary", "lcov"],
   coveragePathIgnorePatterns: [
