@@ -3,6 +3,27 @@ import { ConfidentialClientApplication, LogLevel, ResponseMode } from "@azure/ms
 import { getLogger } from "../logging/logger.js";
 import { WebIdentityTokenProvider } from "@defra/hapi-auth-oidc";
 
+const wrapLoggerForPino = (logger) => ({
+  info: (...args) => logger.info(...args),
+  warn: (...args) => logger.warn(...args),
+  error: (firstArg, secondArg) => {
+    if (typeof firstArg === "string" && secondArg instanceof Error) {
+      logger.error(
+        {
+          error: {
+            type: secondArg.constructor?.name ?? secondArg.name,
+            message: secondArg.message,
+            stack_trace: secondArg.stack,
+          },
+        },
+        firstArg,
+      );
+    } else {
+      logger.error(firstArg, secondArg);
+    }
+  },
+});
+
 export const getMsalLoggingSetup = () => {
   if (config.isProd || config.isTest) {
     return {
@@ -43,7 +64,7 @@ export const init = () => {
       authority: config.auth.authority,
       clientAssertion: async () => {
         logger.info("Retrieving credentials");
-        const assertion = await authProvider.getCredentials(logger);
+        const assertion = await authProvider.getCredentials(wrapLoggerForPino(logger));
         logger.info(`Retrieved credentials: ${assertion.slice(0, 4)}`);
         return assertion;
       },
