@@ -44,6 +44,7 @@ describe("buildRedisClient", () => {
       host: "test-host",
       db: 0,
       keyPrefix: "test-keyprefix",
+      enableReadyCheck: false,
     });
 
     expect(Cluster).not.toHaveBeenCalled();
@@ -63,6 +64,7 @@ describe("buildRedisClient", () => {
         dnsLookup: expect.any(Function),
         redisOptions: expect.objectContaining({
           db: 0,
+          enableReadyCheck: false,
         }),
       }),
     );
