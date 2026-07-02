@@ -8,16 +8,7 @@ const wrapLoggerForPino = (logger) => ({
   warn: (...args) => logger.warn(...args),
   error: (firstArg, secondArg) => {
     if (typeof firstArg === "string" && secondArg instanceof Error) {
-      logger.error(
-        {
-          error: {
-            type: secondArg.constructor?.name ?? secondArg.name,
-            message: secondArg.message,
-            stack_trace: secondArg.stack,
-          },
-        },
-        firstArg,
-      );
+      logger.error({ error: secondArg }, firstArg);
     } else {
       logger.error(firstArg, secondArg);
     }
