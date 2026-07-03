@@ -6,13 +6,9 @@ import { WebIdentityTokenProvider } from "@defra/hapi-auth-oidc";
 const wrapLoggerForPino = (logger) => ({
   info: (...args) => logger.info(...args),
   warn: (...args) => logger.warn(...args),
-  error: (firstArg, secondArg) => {
-    if (typeof firstArg === "string" && secondArg instanceof Error) {
-      logger.error({ error: secondArg }, firstArg);
-    } else {
-      logger.error(firstArg, secondArg);
-    }
-  },
+  // WebIdentityTokenProvider calls error(message, Error) but pino expects error({ err }, message)
+  error: (msg, err) =>
+    err instanceof Error ? logger.error({ error: err }, msg) : logger.error(msg, err),
 });
 
 export const getMsalLoggingSetup = () => {
@@ -44,21 +40,13 @@ export const init = () => {
   let auth;
 
   if (config.federatedCredentials.enabled) {
-    const logger = getLogger();
-
-    logger.info("Initialising auth provider");
+    // Bug in library where audience should be an array but expected type is string
     const authProvider = new WebIdentityTokenProvider({ audience: ["ahwr-backoffice-ui"] });
-    logger.info("Initialised auth provider");
 
     auth = {
       clientId: config.auth.clientId,
       authority: config.auth.authority,
-      clientAssertion: async () => {
-        logger.info("Retrieving credentials");
-        const assertion = await authProvider.getCredentials(wrapLoggerForPino(logger));
-        logger.info(`Retrieved credentials: ${assertion.slice(0, 4)}`);
-        return assertion;
-      },
+      clientAssertion: async () => authProvider.getCredentials(wrapLoggerForPino(getLogger())),
     };
   } else {
     auth = config.auth;
@@ -95,7 +83,7 @@ export const authenticate = async (redirectCode, auth, cookieAuth) => {
 export const logout = async (account) => {
   try {
     await msalApplication.getTokenCache().removeAccount(account);
-  } catch (err) {
-    console.error("Unable to end session", err);
+  } catch (error) {
+    getLogger().error({ error }, "Unable to end session");
   }
 };
