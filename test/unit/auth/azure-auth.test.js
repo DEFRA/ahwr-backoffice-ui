@@ -107,7 +107,7 @@ describe("Azure auth test", () => {
           }),
         }),
       );
-      expect(WebIdentityTokenProvider).toHaveBeenCalledWith({ audience: "ahwr-backoffice-ui" });
+      expect(WebIdentityTokenProvider).toHaveBeenCalledWith({ audience: ["ahwr-backoffice-ui"] });
 
       const { auth } = ConfidentialClientApplication.mock.calls[0][0];
       const assertion = await auth.clientAssertion();
