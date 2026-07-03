@@ -33,6 +33,7 @@ export const buildRedisClient = () => {
       host,
       db,
       keyPrefix,
+      enableReadyCheck: false,
       ...credentials,
       ...tls,
     });
@@ -45,6 +46,7 @@ export const buildRedisClient = () => {
       dnsLookup: (address, callback) => callback(null, address),
       redisOptions: {
         db,
+        enableReadyCheck: false,
         ...credentials,
         ...tls,
       },
