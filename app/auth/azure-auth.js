@@ -47,7 +47,7 @@ export const init = () => {
     const logger = getLogger();
 
     logger.info("Initialising auth provider");
-    const authProvider = new WebIdentityTokenProvider({ audience: "ahwr-backoffice-ui" });
+    const authProvider = new WebIdentityTokenProvider({ audience: ["ahwr-backoffice-ui"] });
     logger.info("Initialised auth provider");
 
     auth = {
