@@ -40,19 +40,13 @@ export const init = () => {
   let auth;
 
   if (config.federatedCredentials.enabled) {
-    const logger = getLogger();
-
-    logger.info("Initialising auth provider");
     // Bug in library where audience should be an array but expected type is string
     const authProvider = new WebIdentityTokenProvider({ audience: ["ahwr-backoffice-ui"] });
 
     auth = {
       clientId: config.auth.clientId,
       authority: config.auth.authority,
-      clientAssertion: async () => {
-        logger.info("Retrieving federated credentials");
-        return authProvider.getCredentials(wrapLoggerForPino(logger));
-      },
+      clientAssertion: async () => authProvider.getCredentials(wrapLoggerForPino(getLogger())),
     };
   } else {
     auth = config.auth;
