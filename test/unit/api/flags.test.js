@@ -44,7 +44,7 @@ describe("Flags API", () => {
         throw new Error("test error");
       });
 
-      expect(async () => await getAllFlags(mockLogger)).rejects.toThrow("test error");
+      await expect(async () => await getAllFlags(mockLogger)).rejects.toThrow("test error");
       expect(mockLogger.error).toHaveBeenCalled();
     });
   });
@@ -84,7 +84,7 @@ describe("Flags API", () => {
         throw new Error("test error");
       });
 
-      expect(async () => await deleteFlag("", "", mockLogger)).rejects.toThrow("test error");
+      await expect(async () => await deleteFlag("", "", mockLogger)).rejects.toThrow("test error");
       expect(mockLogger.error).toHaveBeenCalled();
       expect(metricsCounter).not.toHaveBeenCalled();
     });
@@ -128,7 +128,7 @@ describe("Flags API", () => {
         throw new Error("test error");
       });
 
-      expect(async () => await createFlag({}, "", mockLogger)).rejects.toThrow("test error");
+      await expect(async () => await createFlag({}, "", mockLogger)).rejects.toThrow("test error");
       expect(mockLogger.error).toHaveBeenCalled();
       expect(metricsCounter).not.toHaveBeenCalled();
     });

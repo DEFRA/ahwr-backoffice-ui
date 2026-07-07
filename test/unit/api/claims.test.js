@@ -56,7 +56,7 @@ describe("Claims API", () => {
       wreck.get = jest.fn().mockRejectedValueOnce(wreckResponse);
 
       const logger = { error: jest.fn() };
-      expect(async () => {
+      await expect(async () => {
         await getClaim("RESH-2222-2222", logger);
       }).rejects.toEqual(wreckResponse);
     });
@@ -91,7 +91,7 @@ describe("Claims API", () => {
 
       const logger = { error: jest.fn() };
       const filter = { field: "updatedAt", op: "lte", value: "2025-01-17" };
-      expect(async () => {
+      await expect(async () => {
         await getClaims("sbi", "1010", filter, 10, 10, "ASC", logger);
       }).rejects.toEqual(wreckResponse);
     });
@@ -127,7 +127,7 @@ describe("Claims API", () => {
       wreck.put = jest.fn().mockRejectedValueOnce(wreckResponse);
       const logger = { error: jest.fn() };
 
-      expect(async () => {
+      await expect(async () => {
         await updateClaimStatus(applicationReference, "Admin", STATUS.IN_CHECK, logger);
       }).rejects.toEqual(wreckResponse);
       expect(metricsCounter).not.toHaveBeenCalled();
@@ -175,7 +175,7 @@ describe("Claims API", () => {
       wreck.put = jest.fn().mockRejectedValueOnce(wreckResponse);
       const logger = { error: jest.fn() };
 
-      expect(async () => {
+      await expect(async () => {
         await updateClaimData(
           applicationReference,
           {
@@ -227,7 +227,7 @@ describe("Claims API", () => {
       wreck.get = jest.fn().mockRejectedValueOnce(wreckResponse);
 
       const logger = { error: jest.fn() };
-      expect(async () => {
+      await expect(async () => {
         await getClaimHistory("RESH-2222-2222", logger);
       }).rejects.toEqual(wreckResponse);
     });
