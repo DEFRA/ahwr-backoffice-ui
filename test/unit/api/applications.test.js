@@ -74,7 +74,7 @@ describe("Application API", () => {
       wreck.post = jest.fn().mockRejectedValueOnce("getApplications boom");
       const logger = { error: jest.fn() };
 
-      expect(async () => {
+      await expect(async () => {
         await getApplications(searchType, searchText, limit, offset, filter, sort, logger);
       }).rejects.toBe("getApplications boom");
       expect(wreck.post).toHaveBeenCalledTimes(1);
@@ -141,7 +141,7 @@ describe("Application API", () => {
       wreck.get = jest.fn().mockRejectedValueOnce("getApplication boom");
       const logger = { error: jest.fn() };
 
-      expect(async () => {
+      await expect(async () => {
         await getApplication(appRef, logger);
       }).rejects.toBe("getApplication boom");
 
@@ -166,7 +166,7 @@ describe("Application API", () => {
       wreck.put = jest.fn().mockRejectedValueOnce("updateApplicationStatus boom");
       const logger = { error: jest.fn() };
 
-      expect(async () => {
+      await expect(async () => {
         await updateApplicationStatus(appRef, "test", 2, logger);
       }).rejects.toBe("updateApplicationStatus boom");
 
@@ -245,7 +245,7 @@ describe("Application API", () => {
       wreck.put = jest.fn().mockRejectedValueOnce(wreckResponse);
       const logger = { error: jest.fn() };
 
-      expect(async () => {
+      await expect(async () => {
         await updateApplicationData(
           appRef,
           {
@@ -386,7 +386,7 @@ describe("Application API", () => {
       wreck.get = jest.fn().mockRejectedValueOnce("getApplication boom");
       const logger = { error: jest.fn() };
 
-      expect(async () => {
+      await expect(async () => {
         await getOldWorldApplicationHistory(appRef, logger);
       }).rejects.toBe("getApplication boom");
 
