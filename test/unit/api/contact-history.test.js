@@ -26,7 +26,7 @@ describe("contact-history", () => {
       expect(result).toEqual(payload);
     });
 
-    test("throws errors", () => {
+    test("throws errors", async () => {
       const logger = { error: jest.fn() };
 
       const response = {
@@ -38,7 +38,7 @@ describe("contact-history", () => {
 
       wreck.get.mockRejectedValueOnce(response);
 
-      expect(async () => {
+      await expect(async () => {
         await getContactHistory("E100", logger);
       }).rejects.toBe(response);
     });
