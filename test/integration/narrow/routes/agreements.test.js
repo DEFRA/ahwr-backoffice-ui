@@ -22,13 +22,6 @@ getPagination.mockReturnValue({
   offset: 0,
 });
 
-getPagingData.mockReturnValue({
-  page: 1,
-  totalPages: 1,
-  total: 1,
-  limit: 10,
-});
-
 getApplications.mockReturnValue(applicationsData);
 
 describe("Applications test", () => {
@@ -196,6 +189,19 @@ describe("Applications test", () => {
       expect(getPagination).toHaveBeenCalled();
       expect(getPagingData).toHaveBeenCalled();
       phaseBannerOk($);
+    });
+
+    test("shows total search results in bold above the table", async () => {
+      const options = {
+        method: "GET",
+        url,
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+      const results = $("p.govuk-body.govuk-\\!-font-weight-bold");
+      expect(results.text()).toEqual("9 search results");
     });
 
     test("returns 200 clear", async () => {

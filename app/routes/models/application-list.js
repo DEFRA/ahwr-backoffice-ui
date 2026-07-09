@@ -144,6 +144,7 @@ export async function createModel(request, page) {
 
     return {
       applications,
+      total: apps.total,
       header: getApplicationTableHeader(getAppSearch(request, sessionKeys.appSearch.sort)),
       ...pagingData,
       searchText,
@@ -152,6 +153,7 @@ export async function createModel(request, page) {
 
   return {
     applications: [],
+    total: 0,
     error: "No agreements found.",
     searchText,
   };
