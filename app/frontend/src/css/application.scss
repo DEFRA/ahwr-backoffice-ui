@@ -157,6 +157,10 @@ $moj-assets-path: "~@ministryofjustice/frontend/moj/assets/";
   background-color: #003078;
 }
 
+.no-results-message {
+  color: $govuk-secondary-text-colour;
+}
+
 .filter-block {
   padding-top: 30px;
   border-top: 1px solid #b1b4b6;

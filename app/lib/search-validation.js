@@ -1,5 +1,7 @@
 import { regexChecker } from "../../app/routes/utils/regex-checker.js";
 
+export const UNSUPPORTED_SEARCH_TYPE = "unsupported";
+
 const refRegEx =
   /^(IAHW|AHWR|REPI|RESH|REBC|REDC|FUPI|FUSH|FUBC|FUDC|POUL|PORE)-[A-Z0-9]{4}-[A-Z0-9]{4}$/i;
 const dateRegEx = /^(0[1-9]|[12]\d|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/; // DD/MM/YYYY
@@ -59,13 +61,13 @@ export const searchValidation = (searchText) => {
       searchType = "ref";
       break;
     case validStatus.indexOf(searchText.toLowerCase()) !== -1:
-      searchType = "status";
+      searchType = UNSUPPORTED_SEARCH_TYPE;
       break;
     case sbiRegEx.test(searchText):
       searchType = "sbi";
       break;
     case regexChecker(dateRegEx, searchText):
-      searchType = "date";
+      searchType = UNSUPPORTED_SEARCH_TYPE;
       break;
     case isValidSpecies:
       searchType = "species";
