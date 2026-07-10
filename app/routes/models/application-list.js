@@ -6,8 +6,16 @@ import { getStyleClassByStatus } from "../../constants/status.js";
 import { upperFirstLetter } from "../../lib/display-helper.js";
 import { FLAG_EMOJI } from "../utils/ui-constants.js";
 import { config } from "../../config/index.js";
+import { UNSUPPORTED_SEARCH_TYPE } from "../../lib/search-validation.js";
 
 const { serviceUri } = config;
+
+const emptyModel = (searchText) => ({
+  applications: [],
+  total: 0,
+  error: "No agreements found.",
+  searchText,
+});
 
 export const viewModel = (request, page) => {
   return (async () => {
@@ -126,6 +134,11 @@ export async function createModel(request, page) {
   const { limit, offset } = getPagination(page);
   const searchText = getAppSearch(request, sessionKeys.appSearch.searchText);
   const searchType = getAppSearch(request, sessionKeys.appSearch.searchType);
+
+  if (searchType === UNSUPPORTED_SEARCH_TYPE) {
+    return emptyModel(searchText);
+  }
+
   const filterStatus = getAppSearch(request, sessionKeys.appSearch.filterStatus) ?? [];
   const sortField = getAppSearch(request, sessionKeys.appSearch.sort) ?? undefined;
   const apps = await getApplications(
@@ -151,10 +164,5 @@ export async function createModel(request, page) {
     };
   }
 
-  return {
-    applications: [],
-    total: 0,
-    error: "No agreements found.",
-    searchText,
-  };
+  return emptyModel(searchText);
 }

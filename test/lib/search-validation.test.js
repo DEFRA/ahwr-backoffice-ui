@@ -11,7 +11,6 @@ describe("searchValidation", () => {
     { type: "organisation", text: "IAHW-1234" },
     { type: "organisation", text: "IAHW-ABCD-1234-EFGH" },
     { type: "sbi", text: "107279003" },
-    { type: "date", text: "01/12/2024" },
     { type: "organisation", text: "a string" },
     { type: "species", text: "sheep" },
     { type: "reset", text: "" },
@@ -20,29 +19,43 @@ describe("searchValidation", () => {
     expect(searchType).toBe(type);
     expect(searchText).toBe(text);
   });
-  test.each([
-    { status: "agreed" },
-    { status: "applied" },
-    { status: "withdrawn" },
-    { status: "inputted" },
-    { status: "claimed" },
-    { status: "in check" },
-    { status: "check" },
-    { status: "recommended" },
-    { status: "pay" },
-    { status: "recommended to pay" },
-    { status: "reject" },
-    { status: "recommended to reject" },
-    { status: "paid" },
-    { status: "rejected" },
-    { status: "not agreed" },
-    { status: "ready" },
-    { status: "ready to pay" },
-    { status: "hold" },
-    { status: "on hold" },
-  ])("A valid status ($status) should return $status and status as type", ({ status }) => {
-    const { searchText, searchType } = searchValidation(status);
-    expect(searchType).toBe("status");
-    expect(searchText).toBe(status);
+
+  describe("retired basic-search terms return 'unsupported'", () => {
+    test.each([
+      { text: "01/12/2024" },
+      { text: "31/12/2025" },
+      { text: "01-12-2024" },
+      { text: "01.12.2024" },
+    ])("a date ($text) is no longer a searchable term", ({ text }) => {
+      const { searchText, searchType } = searchValidation(text);
+      expect(searchType).toBe("unsupported");
+      expect(searchText).toBe(text);
+    });
+
+    test.each([
+      { status: "agreed" },
+      { status: "applied" },
+      { status: "withdrawn" },
+      { status: "inputted" },
+      { status: "claimed" },
+      { status: "in check" },
+      { status: "check" },
+      { status: "recommended" },
+      { status: "pay" },
+      { status: "recommended to pay" },
+      { status: "reject" },
+      { status: "recommended to reject" },
+      { status: "paid" },
+      { status: "rejected" },
+      { status: "not agreed" },
+      { status: "ready" },
+      { status: "ready to pay" },
+      { status: "hold" },
+      { status: "on hold" },
+    ])("a status ($status) is no longer a searchable term", ({ status }) => {
+      const { searchText, searchType } = searchValidation(status);
+      expect(searchType).toBe("unsupported");
+      expect(searchText).toBe(status);
+    });
   });
 });
