@@ -46,6 +46,7 @@ const getViewData = async (request) => {
     next,
     pages,
     error,
+    total,
   };
 };
 

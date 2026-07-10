@@ -71,6 +71,20 @@ describe("Claims tests", () => {
       phaseBannerOk($);
     });
 
+    test("shows total search results in bold above the table", async () => {
+      getClaims.mockReturnValueOnce({ claims, total: 9 });
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      const $ = cheerio.load(res.payload);
+      const results = $("p.govuk-body.govuk-\\!-font-weight-bold");
+      expect(results.text()).toEqual("9 search results");
+    });
+
     test("returns 200 with query parameter", async () => {
       const options = {
         method: "GET",
