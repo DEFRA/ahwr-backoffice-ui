@@ -71,5 +71,36 @@ describe("Application-list createModel", () => {
     };
     const result = await createModel(request, 1);
     expect(result.applications[0][5].html).toContain("Agreed");
+    expect(result.total).toBe(9);
+  });
+
+  test("createModel returns the empty state without querying the backend for an unsupported search type", async () => {
+    getApplications.mockClear();
+    const request = {
+      yar: {
+        get: jest.fn(() => ({
+          searchType: "unsupported",
+          searchText: "01/12/2024",
+        })),
+      },
+      query: {},
+      auth: {
+        isAuthenticated: true,
+        credentials: {
+          scope: [administrator],
+          account: { username: "unit-tester" },
+        },
+      },
+    };
+
+    const result = await createModel(request, 1);
+
+    expect(result).toEqual({
+      applications: [],
+      total: 0,
+      error: "No agreements found.",
+      searchText: "01/12/2024",
+    });
+    expect(getApplications).not.toHaveBeenCalled();
   });
 });

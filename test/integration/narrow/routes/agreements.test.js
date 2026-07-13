@@ -251,43 +251,17 @@ describe("Applications test", () => {
     });
 
     test.each([
-      {
-        searchDetails: { searchText: "AHWR-555A-FD6E", searchType: "ref" },
-        status: ["APPLIED", "CLAIMED"],
-      },
-      {
-        searchDetails: { searchText: "applied", searchType: "status" },
-        status: "APPLIED",
-      },
-      {
-        searchDetails: { searchText: "claimed", searchType: "status" },
-        status: "CLAIMED",
-      },
-      {
-        searchDetails: { searchText: "check", searchType: "status" },
-        status: "CHECK",
-      },
-      {
-        searchDetails: { searchText: "accepted", searchType: "status" },
-        status: "ACCEPTED",
-      },
-      {
-        searchDetails: { searchText: "rejected", searchType: "status" },
-        status: "REJECTED",
-      },
-      {
-        searchDetails: { searchText: "paid", searchType: "status" },
-        status: "PAID",
-      },
-      { searchDetails: { searchText: "withdrawn", searchType: "status" } },
-    ])("returns success when post %p", async ({ searchDetails, status }) => {
+      { searchText: "AHWR-555A-FD6E" }, // agreement number
+      { searchText: "107279003" }, // sbi
+      { searchText: "Foxes Drove Farm" }, // organisation
+    ])("supported search ($searchText) posts and queries the backend", async ({ searchText }) => {
       const options = {
         method,
         url,
         payload: {
           crumb,
-          searchText: searchDetails.searchText,
-          status,
+          searchText,
+          status: [],
           submit: "search",
         },
         auth,
@@ -342,7 +316,9 @@ describe("Applications test", () => {
       expect(getApplications).toHaveBeenCalled();
       expect(getPagination).toHaveBeenCalled();
       const $ = cheerio.load(res.payload);
-      expect($("p.govuk-error-message").text()).toMatch("No agreements found.");
+      expect($("p.no-results-message").text()).toMatch("No agreements found.");
+      expect($("p.govuk-error-message")).toHaveLength(0);
+      expect($("p.govuk-body.govuk-\\!-font-weight-bold").text()).toEqual("0 search results");
     });
   });
 });
