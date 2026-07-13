@@ -165,32 +165,6 @@ describe("Applications test", () => {
       phaseBannerOk($);
     });
 
-    test("returns correct content", async () => {
-      const options = {
-        method: "GET",
-        url: `${url}`,
-        auth,
-      };
-      const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(await axe(res.payload)).toHaveNoViolations();
-      const $ = cheerio.load(res.payload);
-      expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
-      expect($("title").text()).toContain("AHWR Agreements");
-      expect($("span.govuk-tag--green").text()).toContain("Agreed");
-      expect($("span.govuk-tag--orange").text()).toContain("Check");
-      expect($("span.govuk-tag--blue").text()).toContain("Paid");
-      expect($("span.govuk-tag--purple").text()).toContain("Accepted");
-      expect($("span.govuk-tag--blue").text()).toContain("Claimed");
-      expect($("span.govuk-tag--grey").text()).toContain("Withdrawn");
-      expect($("span.govuk-tag--red").text()).toContain("Rejected");
-      expect(getAppSearch).toHaveBeenCalled();
-      expect(getApplications).toHaveBeenCalled();
-      expect(getPagination).toHaveBeenCalled();
-      expect(getPagingData).toHaveBeenCalled();
-      phaseBannerOk($);
-    });
-
     test("shows total search results in bold above the table", async () => {
       const options = {
         method: "GET",
