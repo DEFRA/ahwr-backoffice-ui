@@ -192,6 +192,40 @@ describe("Applications test", () => {
         const $ = cheerio.load(res.payload);
         expect($('th[aria-sort="none"]').text()).toContain("Organisation");
       });
+
+      test("has advanced search option", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($(".govuk-details__summary-text").text()).toContain("Advanced search");
+      });
+
+      test("has an agreement type dropdown", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($('label[for="agreementType"]').text()).toContain("Agreement type");
+        expect($("select#agreementType").length).toEqual(1);
+      });
+
+      test("agreement type dropdown has All types, IAHW and PBR options", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        const optionTexts = $("select#agreementType option")
+          .map((_, el) => $(el).text().trim())
+          .get();
+        expect(optionTexts).toEqual(["All types", "IAHW", "PBR"]);
+      });
+
+      test("has a search button in the advanced search", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($(".advanced-search-actions button.govuk-button").text()).toContain("Search");
+      });
+
+      test("has a clear all filters link", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($(".advanced-search-actions a.govuk-link").text()).toContain("Clear all filters");
+      });
     });
 
     test("should sort in descending order when requested", async () => {
@@ -341,6 +375,12 @@ describe("Applications test", () => {
         const res = await server.inject(options);
         const $ = cheerio.load(res.payload);
         expect($('th[aria-sort="none"]').text()).toContain("Organisation");
+      });
+
+      test("has advanced search option", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($(".govuk-details__summary-text").text()).toContain("Advanced search");
       });
     });
 
