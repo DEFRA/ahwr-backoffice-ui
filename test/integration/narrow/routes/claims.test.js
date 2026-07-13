@@ -170,6 +170,17 @@ describe("Claims tests", () => {
       },
     );
 
+    test("supported search with no match shows the no-results state", async () => {
+      getClaims.mockReturnValueOnce({ claims: [], total: 0 });
+      const res = await search("107279003");
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(getClaims).toHaveBeenCalled();
+      const $ = cheerio.load(res.payload);
+      expect($("p.no-results-message").text()).toMatch("No claims found.");
+      expect($("p.govuk-error-message")).toHaveLength(0);
+      expect($("p.govuk-body.govuk-\\!-font-weight-bold").text()).toEqual("0 search results");
+    });
+
     test.each([
       { searchText: "Beef cattle" }, // species
       { searchText: "Dairy cattle" }, // species
