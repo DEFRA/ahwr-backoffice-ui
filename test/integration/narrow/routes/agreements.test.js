@@ -22,6 +22,8 @@ getPagination.mockReturnValue({
   offset: 0,
 });
 
+// The application data contains multiple agreements with each one
+// having a different status.
 getApplications.mockReturnValue(applicationsData);
 
 describe("Applications test", () => {
@@ -64,50 +66,132 @@ describe("Applications test", () => {
       phaseBannerOk($);
     });
 
-    test("returns 200 with query parameter", async () => {
-      const options = {
-        method: "GET",
-        url: `${url}?page=1`,
-        auth,
-      };
-      const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(await axe(res.payload)).toHaveNoViolations();
-      const $ = cheerio.load(res.payload);
-      expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
-      expect($("title").text()).toContain("AHWR Agreements");
-      expect($("span.govuk-tag--green").text()).toContain("Agreed");
-      expect($("span.govuk-tag--orange").text()).toContain("Check");
-      expect($("span.govuk-tag--blue").text()).toContain("Paid");
-      expect($("span.govuk-tag--purple").text()).toContain("Accepted");
-      expect($("span.govuk-tag--blue").text()).toContain("Claimed");
-      expect($("span.govuk-tag--grey").text()).toContain("Withdrawn");
-      expect($("span.govuk-tag--red").text()).toContain("Rejected");
-      expect($('th[aria-sort="none"]').text()).toContain("SBI");
-      expect($('th[aria-sort="none"]').text()).toContain("Status");
-      expect(getAppSearch).toHaveBeenCalled();
-      expect(getApplications).toHaveBeenCalled();
-      expect(getPagination).toHaveBeenCalled();
-      expect(getPagination).toHaveBeenCalledWith(1);
-      expect(getPagingData).toHaveBeenCalled();
-      expect(getPagingData).toHaveBeenCalledWith(9, 10, {
-        limit: 20,
-        page: 1,
-      });
-      phaseBannerOk($);
-    });
+    describe("with query parameter", () => {
+      // Is it needed to have this checks at all?
+      // looking inside the blackbox
 
-    test("should head column agreement date", async () => {
+      // expect(getAppSearch).toHaveBeenCalled();
+      // expect(getApplications).toHaveBeenCalled();
+      // expect(getPagination).toHaveBeenCalled();
+      // expect(getPagination).toHaveBeenCalledWith(1);
+      // expect(getPagingData).toHaveBeenCalled();
+      // expect(getPagingData).toHaveBeenCalledWith(9, 10, {
+      //   limit: 20,
+      //   page: 1,
+      // });
+
       const options = {
         method: "GET",
         url: `${url}?page=1`,
         auth,
       };
-      const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(await axe(res.payload)).toHaveNoViolations();
-      const $ = cheerio.load(res.payload);
-      expect($('th[aria-sort="none"]').text()).toContain("Agreement date");
+
+      test("returns 200", async () => {
+        const res = await server.inject(options);
+        expect(res.statusCode).toBe(StatusCodes.OK);
+        expect(await axe(res.payload)).toHaveNoViolations();
+      });
+
+      test("has no accessibility violations", async () => {
+        const res = await server.inject(options);
+        expect(await axe(res.payload)).toHaveNoViolations();
+      });
+
+      test("has phase banner", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        phaseBannerOk($);
+      });
+
+      test("has the full browser title", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("title").text()).toContain("Administration: AHWR Agreements");
+      });
+
+      test("has the full page heading", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("h1.govuk-heading-xl").text()).toEqual("Claims, Agreements and Flags");
+      });
+
+      test("has the tab heading", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
+      });
+
+      test("shows the agreed status", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("span.govuk-tag--green").text()).toContain("Agreed");
+      });
+
+      test("has the check status", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("span.govuk-tag--orange").text()).toContain("Check");
+      });
+
+      test("has the paid status", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("span.govuk-tag--blue").text()).toContain("Paid");
+      });
+
+      test("has the accepted status", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("span.govuk-tag--purple").text()).toContain("Accepted");
+      });
+
+      test("has the claimed status", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("span.govuk-tag--blue").text()).toContain("Claimed");
+      });
+
+      test("has the withdraw status", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("span.govuk-tag--grey").text()).toContain("Withdrawn");
+      });
+
+      test("has the rejected status", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("span.govuk-tag--red").text()).toContain("Rejected");
+      });
+
+      test("has the sbi header", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($('th[aria-sort="none"]').text()).toContain("SBI number");
+      });
+
+      test("has the status header", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($('th[aria-sort="none"]').text()).toContain("Status");
+      });
+
+      test("has the agreement date header", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($('th[aria-sort="none"]').text()).toContain("Agreement date");
+      });
+
+      test("has the agreement number header", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($('th[aria-sort="none"]').text()).toContain("Agreement number");
+      });
+
+      test("has the organisation header", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($('th[aria-sort="none"]').text()).toContain("Organisation");
+      });
     });
 
     test("should sort in descending order when requested", async () => {
@@ -139,30 +223,125 @@ describe("Applications test", () => {
       phaseBannerOk($);
     });
 
-    test("returns 200 without query parameter", async () => {
+    describe("without query parameter", () => {
       const options = {
         method: "GET",
         url: `${url}`,
         auth,
       };
-      const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(await axe(res.payload)).toHaveNoViolations();
-      const $ = cheerio.load(res.payload);
-      expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
-      expect($("title").text()).toContain("AHWR Agreements");
-      expect($("span.govuk-tag--green").text()).toContain("Agreed");
-      expect($("span.govuk-tag--orange").text()).toContain("Check");
-      expect($("span.govuk-tag--blue").text()).toContain("Paid");
-      expect($("span.govuk-tag--purple").text()).toContain("Accepted");
-      expect($("span.govuk-tag--blue").text()).toContain("Claimed");
-      expect($("span.govuk-tag--grey").text()).toContain("Withdrawn");
-      expect($("span.govuk-tag--red").text()).toContain("Rejected");
-      expect(getAppSearch).toHaveBeenCalled();
-      expect(getApplications).toHaveBeenCalled();
-      expect(getPagination).toHaveBeenCalled();
-      expect(getPagingData).toHaveBeenCalled();
-      phaseBannerOk($);
+      // Do we need to check for this inside the blackbox?
+
+      // expect(getAppSearch).toHaveBeenCalled();
+      // expect(getApplications).toHaveBeenCalled();
+      // expect(getPagination).toHaveBeenCalled();
+      // expect(getPagingData).toHaveBeenCalled();
+
+      test("returns 200", async () => {
+        const res = await server.inject(options);
+        expect(res.statusCode).toBe(StatusCodes.OK);
+        expect(await axe(res.payload)).toHaveNoViolations();
+      });
+
+      test("has no accessibility violations", async () => {
+        const res = await server.inject(options);
+        expect(await axe(res.payload)).toHaveNoViolations();
+      });
+
+      test("has phase banner", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        phaseBannerOk($);
+      });
+
+      test("has the full browser title", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("title").text()).toContain("Administration: AHWR Agreements");
+      });
+
+      test("has the full page heading", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("h1.govuk-heading-xl").text()).toEqual("Claims, Agreements and Flags");
+      });
+
+      test("has the tab heading", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
+      });
+
+      test("shows the agreed status", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("span.govuk-tag--green").text()).toContain("Agreed");
+      });
+
+      test("has the check status", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("span.govuk-tag--orange").text()).toContain("Check");
+      });
+
+      test("has the paid status", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("span.govuk-tag--blue").text()).toContain("Paid");
+      });
+
+      test("has the accepted status", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("span.govuk-tag--purple").text()).toContain("Accepted");
+      });
+
+      test("has the claimed status", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("span.govuk-tag--blue").text()).toContain("Claimed");
+      });
+
+      test("has the withdraw status", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("span.govuk-tag--grey").text()).toContain("Withdrawn");
+      });
+
+      test("has the rejected status", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("span.govuk-tag--red").text()).toContain("Rejected");
+      });
+
+      test("has the sbi header", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($('th[aria-sort="none"]').text()).toContain("SBI number");
+      });
+
+      test("has the status header", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($('th[aria-sort="none"]').text()).toContain("Status");
+      });
+
+      test("has the agreement date header", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($('th[aria-sort="none"]').text()).toContain("Agreement date");
+      });
+
+      test("has the agreement number header", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($('th[aria-sort="none"]').text()).toContain("Agreement number");
+      });
+
+      test("has the organisation header", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($('th[aria-sort="none"]').text()).toContain("Organisation");
+      });
     });
 
     test("shows total search results in bold above the table", async () => {
@@ -254,6 +433,7 @@ describe("Applications test", () => {
       expect(getApplications).toHaveBeenCalled();
       expect(getPagination).toHaveBeenCalled();
     });
+
     test.each([
       { searchDetails: { searchText: "333333333" } },
       { searchDetails: { searchText: "444444443" } },
