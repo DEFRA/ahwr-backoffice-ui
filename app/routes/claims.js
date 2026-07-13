@@ -16,6 +16,9 @@ const { claimSearch } = sessionKeys;
 const viewTemplate = "claims";
 const currentPath = `/${viewTemplate}`;
 
+// claims basic search supports claim number and SBI only; every other term returns no results
+const SUPPORTED_SEARCH_TYPES = ["ref", "sbi", "reset"];
+
 const getViewData = async (request) => {
   const { page } = request.query;
   const returnPage = viewTemplate;
@@ -23,6 +26,22 @@ const getViewData = async (request) => {
   const searchText = getClaimSearch(request, claimSearch.searchText);
   const sort = getClaimSearch(request, claimSearch.sort);
   const { searchType, searchText: validatedSearchText } = searchValidation(searchText);
+  const header = getClaimTableHeader(sort);
+
+  if (!SUPPORTED_SEARCH_TYPES.includes(searchType)) {
+    const { previous, next, pages } = getPagingData(0, limit, request.query);
+    return {
+      searchText,
+      header,
+      rows: [],
+      previous,
+      next,
+      pages,
+      error: "No claims found.",
+      total: 0,
+    };
+  }
+
   const filter = undefined;
   const { claims, total } = await getClaims(
     searchType,
@@ -33,7 +52,6 @@ const getViewData = async (request) => {
     sort,
     request.logger,
   );
-  const header = getClaimTableHeader(sort);
   const rows = getClaimTableRows(claims, page, returnPage);
   const { previous, next, pages } = getPagingData(total, limit, request.query);
   const error = total === 0 ? "No claims found." : null;
