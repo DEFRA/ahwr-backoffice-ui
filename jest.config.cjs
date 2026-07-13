@@ -6,13 +6,6 @@ const sharedConfig = {
   modulePathIgnorePatterns: ["node_modules"],
   testPathIgnorePatterns: [],
   watchPathIgnorePatterns: ["\\.#"],
-};
-
-module.exports = {
-  collectCoverage: true,
-  collectCoverageFrom: ["**/*.js", "!**/*.test.js", "!app/config/**/*.js", "!test-output/**"],
-  coverageDirectory: "test-output",
-  coverageReporters: ["text-summary", "lcov"],
   coveragePathIgnorePatterns: [
     "<rootDir>/app/frontend/",
     "<rootDir>/node_modules/",
@@ -21,6 +14,13 @@ module.exports = {
     "<rootDir>/jest.config.cjs",
     "<rootDir>/webpack.config.js",
   ],
+};
+
+module.exports = {
+  collectCoverage: true,
+  collectCoverageFrom: ["**/*.js", "!**/*.test.js", "!app/config/**/*.js"],
+  coverageDirectory: "test-output",
+  coverageReporters: ["text-summary", "lcov"],
   reporters: [
     "default",
     [
