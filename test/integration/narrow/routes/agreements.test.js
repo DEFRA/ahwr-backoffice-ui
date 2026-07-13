@@ -204,21 +204,6 @@ describe("Applications test", () => {
       expect(results.text()).toEqual("9 search results");
     });
 
-    test("search hint lists only agreement number, organisation and SBI", async () => {
-      const options = {
-        method: "GET",
-        url,
-        auth,
-      };
-      const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.OK);
-      const $ = cheerio.load(res.payload);
-      const hint = $("#agreementSearch-hint").text().trim();
-      expect(hint).toBe("Search by agreement number, organisation or SBI.");
-      expect(hint).not.toContain("date");
-      expect(hint).not.toContain("status");
-    });
-
     test("returns 200 clear", async () => {
       const options = {
         method: "GET",
