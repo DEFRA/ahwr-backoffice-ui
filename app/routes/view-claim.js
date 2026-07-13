@@ -31,7 +31,7 @@ const buildClaimApplicationSummary = (application, applicationReference) => {
     buildKeyValueJson("Agreement holder", organisation.farmerName),
     buildKeyValueJson("Agreement holder email", organisation.email),
     buildKeyValueJson("SBI number", organisation.sbi),
-    buildKeyValueJson("Address", organisation.address.split(",").join(", ")),
+    buildKeyValueJson("Address", organisation.address.replaceAll(",", ", ")),
     buildKeyValueJson("Business email", organisation.orgEmail),
     buildKeyValueJson("Flagged", application.flags.length > 0 ? "Yes" : "No"),
   ];

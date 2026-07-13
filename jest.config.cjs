@@ -18,7 +18,7 @@ const sharedConfig = {
 
 module.exports = {
   collectCoverage: true,
-  collectCoverageFrom: ["**/*.js", "!**/*.test.js", "!app/config/**/*.js", "!test-output/**"],
+  collectCoverageFrom: ["**/*.js", "!**/*.test.js", "!app/config/**/*.js"],
   coverageDirectory: "test-output",
   coverageReporters: ["text-summary", "lcov"],
   reporters: [

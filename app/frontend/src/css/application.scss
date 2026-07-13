@@ -1,5 +1,8 @@
 $govuk-assets-path: "~govuk-frontend/dist/govuk/assets/";
+$moj-assets-path: "~@ministryofjustice/frontend/moj/assets/";
+
 @import "~govuk-frontend/dist/govuk/index";
+@import "@ministryofjustice/frontend/moj/all";
 @import "./app-task-list";
 @import "./guidance-layout";
 @import "./update-form";
@@ -11,9 +14,6 @@ $govuk-assets-path: "~govuk-frontend/dist/govuk/assets/";
   max-width: 90% !important;
 }
 
-$moj-assets-path: "~@ministryofjustice/frontend/moj/assets/";
-
-@import "@ministryofjustice/frontend/moj/all";
 .nojs-hidden {
   display: none;
 }
