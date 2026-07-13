@@ -66,10 +66,14 @@ describe("Applications test", () => {
       phaseBannerOk($);
     });
 
-    describe("with query parameter", () => {
+    describe.each([
+      { parameters: "with", urlOption: "?page=1" },
+      { parameters: "without", urlOption: "" },
+    ])("$parameters query parameter", ({ urlOption }) => {
       // Is it needed to have this checks at all?
       // looking inside the blackbox
 
+      // with
       // expect(getAppSearch).toHaveBeenCalled();
       // expect(getApplications).toHaveBeenCalled();
       // expect(getPagination).toHaveBeenCalled();
@@ -80,9 +84,15 @@ describe("Applications test", () => {
       //   page: 1,
       // });
 
+      // without
+      // expect(getAppSearch).toHaveBeenCalled();
+      // expect(getApplications).toHaveBeenCalled();
+      // expect(getPagination).toHaveBeenCalled();
+      // expect(getPagingData).toHaveBeenCalled();
+
       const options = {
         method: "GET",
-        url: `${url}?page=1`,
+        url: `${url}${urlOption}`,
         auth,
       };
 
@@ -255,133 +265,6 @@ describe("Applications test", () => {
         page: 1,
       });
       phaseBannerOk($);
-    });
-
-    describe("without query parameter", () => {
-      const options = {
-        method: "GET",
-        url: `${url}`,
-        auth,
-      };
-      // Do we need to check for this inside the blackbox?
-
-      // expect(getAppSearch).toHaveBeenCalled();
-      // expect(getApplications).toHaveBeenCalled();
-      // expect(getPagination).toHaveBeenCalled();
-      // expect(getPagingData).toHaveBeenCalled();
-
-      test("returns 200", async () => {
-        const res = await server.inject(options);
-        expect(res.statusCode).toBe(StatusCodes.OK);
-        expect(await axe(res.payload)).toHaveNoViolations();
-      });
-
-      test("has no accessibility violations", async () => {
-        const res = await server.inject(options);
-        expect(await axe(res.payload)).toHaveNoViolations();
-      });
-
-      test("has phase banner", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        phaseBannerOk($);
-      });
-
-      test("has the full browser title", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("title").text()).toContain("Administration: AHWR Agreements");
-      });
-
-      test("has the full page heading", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("h1.govuk-heading-xl").text()).toEqual("Claims, Agreements and Flags");
-      });
-
-      test("has the tab heading", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
-      });
-
-      test("shows the agreed status", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("span.govuk-tag--green").text()).toContain("Agreed");
-      });
-
-      test("has the check status", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("span.govuk-tag--orange").text()).toContain("Check");
-      });
-
-      test("has the paid status", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("span.govuk-tag--blue").text()).toContain("Paid");
-      });
-
-      test("has the accepted status", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("span.govuk-tag--purple").text()).toContain("Accepted");
-      });
-
-      test("has the claimed status", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("span.govuk-tag--blue").text()).toContain("Claimed");
-      });
-
-      test("has the withdraw status", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("span.govuk-tag--grey").text()).toContain("Withdrawn");
-      });
-
-      test("has the rejected status", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("span.govuk-tag--red").text()).toContain("Rejected");
-      });
-
-      test("has the sbi header", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($('th[aria-sort="none"]').text()).toContain("SBI number");
-      });
-
-      test("has the status header", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($('th[aria-sort="none"]').text()).toContain("Status");
-      });
-
-      test("has the agreement date header", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($('th[aria-sort="none"]').text()).toContain("Agreement date");
-      });
-
-      test("has the agreement number header", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($('th[aria-sort="none"]').text()).toContain("Agreement number");
-      });
-
-      test("has the organisation header", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($('th[aria-sort="none"]').text()).toContain("Organisation");
-      });
-
-      test("has advanced search option", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($(".govuk-details__summary-text").text()).toContain("Advanced search");
-      });
     });
 
     test("shows total search results in bold above the table", async () => {
