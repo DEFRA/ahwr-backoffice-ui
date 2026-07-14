@@ -5,6 +5,7 @@ import { permissions } from "../../../../app/auth/permissions.js";
 import { getPagination, getPagingData } from "../../../../app/pagination.js";
 import { getApplications } from "../../../../app/api/applications.js";
 import { getAppSearch, setAppSearch } from "../../../../app/session/index.js";
+import { AGREEMENT_TYPE_ALL } from "../../../../app/constants/index.js";
 import { applicationsData } from "../../../data/applications.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
@@ -121,7 +122,15 @@ describe("Applications Filter test", () => {
       expect($("title").text()).toContain("AHWR Agreements");
       // Why are these needed?
       expect(getAppSearch).toHaveBeenCalledTimes(6);
-      expect(setAppSearch).toHaveBeenCalledTimes(1);
+      expect(setAppSearch).toHaveBeenCalledTimes(4);
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "status", []);
+      expect(setAppSearch).toHaveBeenCalledWith(
+        expect.anything(),
+        "agreementType",
+        AGREEMENT_TYPE_ALL,
+      );
       phaseBannerOk($);
     });
   });

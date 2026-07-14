@@ -236,7 +236,9 @@ describe("Applications test", () => {
       test("has a clear all filters link", async () => {
         const res = await server.inject(options);
         const $ = cheerio.load(res.payload);
-        expect($(".advanced-search-actions a.govuk-link").text()).toContain("Clear all filters");
+        const clearLink = $(".advanced-search-actions a.govuk-link");
+        expect(clearLink.text()).toContain("Clear all filters");
+        expect(clearLink.attr("href")).toEqual("/agreements/clear");
       });
     });
 

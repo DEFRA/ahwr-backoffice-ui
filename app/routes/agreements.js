@@ -43,7 +43,10 @@ export const agreementsRoutes = [
         scope: [administrator, processor, user, recommender, authoriser],
       },
       handler: async (request, h) => {
+        setAppSearch(request, sessionKeys.appSearch.searchText, "");
+        setAppSearch(request, sessionKeys.appSearch.searchType, "");
         setAppSearch(request, sessionKeys.appSearch.filterStatus, []);
+        setAppSearch(request, sessionKeys.appSearch.agreementType, AGREEMENT_TYPE_ALL);
         const viewModelDetails = await viewModel(request);
         return h.view(viewTemplate, viewModelDetails);
       },
