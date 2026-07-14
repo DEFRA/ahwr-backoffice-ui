@@ -6,17 +6,20 @@ import { getStyleClassByStatus } from "../../constants/status.js";
 import { upperFirstLetter } from "../../lib/display-helper.js";
 import { FLAG_EMOJI } from "../utils/ui-constants.js";
 import { config } from "../../config/index.js";
+import { AGREEMENT_TYPE } from "../../constants/index.js";
+import { getAgreementTypeOptions } from "../utils/get-agreement-type-options.js";
 
 const { serviceUri } = config;
 
 // date and status are retired from agreements basic search; recognise them and return no results
 const RETIRED_SEARCH_TYPES = ["date", "status"];
 
-const emptyModel = (searchText) => ({
+const emptyModel = (searchText, agreementTypeOptions) => ({
   applications: [],
   total: 0,
   error: "No agreements found.",
   searchText,
+  agreementTypeOptions,
 });
 
 export const viewModel = (request, page) => {
@@ -136,19 +139,20 @@ export async function createModel(request, page) {
   const { limit, offset } = getPagination(page);
   const searchText = getAppSearch(request, sessionKeys.appSearch.searchText);
   const searchType = getAppSearch(request, sessionKeys.appSearch.searchType);
+  const agreementType =
+    getAppSearch(request, sessionKeys.appSearch.agreementType) ?? AGREEMENT_TYPE.ALL;
+  const agreementTypeOptions = getAgreementTypeOptions(agreementType);
 
   if (RETIRED_SEARCH_TYPES.includes(searchType)) {
-    return emptyModel(searchText);
+    return emptyModel(searchText, agreementTypeOptions);
   }
 
   const filterStatus = getAppSearch(request, sessionKeys.appSearch.filterStatus) ?? [];
   const sortField = getAppSearch(request, sessionKeys.appSearch.sort) ?? undefined;
   const apps = await getApplications(
-    searchType,
-    searchText,
+    { searchText, searchType, filterStatus, agreementType },
     limit,
     offset,
-    filterStatus,
     sortField,
     request.logger,
   );
@@ -163,8 +167,9 @@ export async function createModel(request, page) {
       header: getApplicationTableHeader(getAppSearch(request, sessionKeys.appSearch.sort)),
       ...pagingData,
       searchText,
+      agreementTypeOptions,
     };
   }
 
-  return emptyModel(searchText);
+  return emptyModel(searchText, agreementTypeOptions);
 }

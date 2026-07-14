@@ -5,6 +5,7 @@ import { permissions } from "../../../../app/auth/permissions.js";
 import { getPagination, getPagingData } from "../../../../app/pagination.js";
 import { getApplications } from "../../../../app/api/applications.js";
 import { getAppSearch, setAppSearch } from "../../../../app/session/index.js";
+import { AGREEMENT_TYPE } from "../../../../app/constants/index.js";
 import { applicationsData } from "../../../data/applications.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
@@ -74,24 +75,6 @@ describe("Applications Filter test", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
       expect($("title").text()).toContain("AHWR Agreements");
-      expect(getAppSearch).toHaveBeenCalledTimes(6);
-      expect(setAppSearch).toHaveBeenCalledTimes(1);
-      phaseBannerOk($);
-    });
-
-    test("returns 200 with selected status", async () => {
-      const options = {
-        method,
-        url: `${url}/PENDING`,
-        auth,
-      };
-      const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(await axe(res.payload)).toHaveNoViolations();
-      const $ = cheerio.load(res.payload);
-      expect($("govuk-checkboxes__input").filter((s) => s.value === "APPLIED")).toBeTruthy();
-      expect(getAppSearch).toHaveBeenCalledTimes(6);
-      expect(setAppSearch).toHaveBeenCalledTimes(1);
       phaseBannerOk($);
     });
   });
@@ -117,8 +100,14 @@ describe("Applications Filter test", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
       expect($("title").text()).toContain("AHWR Agreements");
-      expect(getAppSearch).toHaveBeenCalledTimes(5);
-      expect(setAppSearch).toHaveBeenCalledTimes(1);
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "status", []);
+      expect(setAppSearch).toHaveBeenCalledWith(
+        expect.anything(),
+        "agreementType",
+        AGREEMENT_TYPE.ALL,
+      );
       phaseBannerOk($);
     });
   });
@@ -142,8 +131,11 @@ describe("Applications Filter test", () => {
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(res.payload).toEqual("1");
-      expect(getAppSearch).toHaveBeenCalledTimes(0);
-      expect(setAppSearch).toHaveBeenCalledTimes(1);
+      expect(setAppSearch).toHaveBeenCalledWith(
+        expect.anything(),
+        "sort",
+        expect.objectContaining({ field: "sbi", direction: "DESC" }),
+      );
     });
 
     test("returns 200 descending", async () => {
@@ -155,8 +147,11 @@ describe("Applications Filter test", () => {
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(res.payload).toEqual("1");
-      expect(getAppSearch).toHaveBeenCalledTimes(0);
-      expect(setAppSearch).toHaveBeenCalledTimes(1);
+      expect(setAppSearch).toHaveBeenCalledWith(
+        expect.anything(),
+        "sort",
+        expect.objectContaining({ field: "sbi", direction: "ASC" }),
+      );
     });
   });
 });

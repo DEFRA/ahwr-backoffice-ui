@@ -1,4 +1,5 @@
 {% extends './layouts/layout.njk' %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
 {% block pageTitle %}
   Administration: AHWR Agreements
 {% endblock %}
@@ -45,6 +46,28 @@
                       <p class="govuk-body no-results-message">{{model.error}}{{error}}</p>
                     </div>
                   {% endif %}
+                  <div class="govuk-grid-column-full">
+                    {% call govukDetails({
+                      summaryText: "Advanced search"
+                      }) %}
+                        {{ govukSelect({
+                          id: "agreementType",
+                          name: "agreementType",
+                          label: {
+                            text: "Agreement type"
+                          },
+                          items: model.agreementTypeOptions
+                        }) }}
+                        <div class="govuk-button-group">
+                          {{ govukButton({
+                            text: "Search",
+                            name: "submit",
+                            value: "advancedSearch"
+                          }) }}
+                          <a class="govuk-link" href="/agreements/clear">Clear all filters</a>
+                        </div>
+                    {% endcall %}
+                  </div>
                   <div class="govuk-grid-column-full">
                     <p class="govuk-body govuk-!-font-weight-bold">{{ model.total }} search results</p>
                   </div>

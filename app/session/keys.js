@@ -3,6 +3,7 @@ export const sessionKeys = {
     searchText: "searchText",
     searchType: "searchType",
     filterStatus: "status",
+    agreementType: "agreementType",
     sort: "sort",
   },
   claimSearch: {
