@@ -155,7 +155,7 @@ describe("Applications test", () => {
         const res = await server.inject(options);
         const $ = cheerio.load(res.payload);
         expect($('label[for="agreementType"]').text()).toContain("Agreement type");
-        expect($("select#agreementType").length).toEqual(1);
+        expect($("select#agreementType")).toHaveLength(1);
       });
 
       test("agreement type dropdown has All types, IAHW and PBR options", async () => {
