@@ -103,34 +103,37 @@ describe("Application-list createModel", () => {
     );
   });
 
-  test("createModel returns the empty state without querying the backend for an unsupported search type", async () => {
-    getApplications.mockClear();
-    const request = {
-      yar: {
-        get: jest.fn(() => ({
-          searchType: "unsupported",
-          searchText: "01/12/2024",
-        })),
-      },
-      query: {},
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          scope: [administrator],
-          account: { username: "unit-tester" },
+  test.each([
+    { searchType: "date", searchText: "01/12/2024" },
+    { searchType: "status", searchText: "agreed" },
+  ])(
+    "createModel returns the empty state without querying the backend for a retired '$searchType' search",
+    async ({ searchType, searchText }) => {
+      getApplications.mockClear();
+      const request = {
+        yar: {
+          get: jest.fn(() => ({ searchType, searchText })),
         },
-      },
-    };
+        query: {},
+        auth: {
+          isAuthenticated: true,
+          credentials: {
+            scope: [administrator],
+            account: { username: "unit-tester" },
+          },
+        },
+      };
 
-    const result = await createModel(request, 1);
+      const result = await createModel(request, 1);
 
-    expect(result).toEqual({
-      applications: [],
-      total: 0,
-      error: "No agreements found.",
-      searchText: "01/12/2024",
-      agreementTypeOptions: getAgreementTypeOptions(AGREEMENT_TYPE_ALL),
-    });
-    expect(getApplications).not.toHaveBeenCalled();
-  });
+      expect(result).toEqual({
+        applications: [],
+        total: 0,
+        error: "No agreements found.",
+        searchText,
+        agreementTypeOptions: getAgreementTypeOptions(AGREEMENT_TYPE_ALL),
+      });
+      expect(getApplications).not.toHaveBeenCalled();
+    },
+  );
 });

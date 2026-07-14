@@ -6,11 +6,13 @@ import { getStyleClassByStatus } from "../../constants/status.js";
 import { upperFirstLetter } from "../../lib/display-helper.js";
 import { FLAG_EMOJI } from "../utils/ui-constants.js";
 import { config } from "../../config/index.js";
-import { UNSUPPORTED_SEARCH_TYPE } from "../../lib/search-validation.js";
 import { AGREEMENT_TYPE_ALL } from "../../constants/index.js";
 import { getAgreementTypeOptions } from "../utils/get-agreement-type-options.js";
 
 const { serviceUri } = config;
+
+// date and status are retired from agreements basic search; recognise them and return no results
+const RETIRED_SEARCH_TYPES = ["date", "status"];
 
 const emptyModel = (searchText, agreementTypeOptions) => ({
   applications: [],
@@ -141,7 +143,7 @@ export async function createModel(request, page) {
     getAppSearch(request, sessionKeys.appSearch.agreementType) ?? AGREEMENT_TYPE_ALL;
   const agreementTypeOptions = getAgreementTypeOptions(agreementType);
 
-  if (searchType === UNSUPPORTED_SEARCH_TYPE) {
+  if (RETIRED_SEARCH_TYPES.includes(searchType)) {
     return emptyModel(searchText, agreementTypeOptions);
   }
 
