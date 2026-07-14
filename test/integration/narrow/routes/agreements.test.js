@@ -70,26 +70,6 @@ describe("Applications test", () => {
       { parameters: "with", urlOption: "?page=1" },
       { parameters: "without", urlOption: "" },
     ])("$parameters query parameter", ({ urlOption }) => {
-      // Is it needed to have this checks at all?
-      // looking inside the blackbox
-
-      // with
-      // expect(getAppSearch).toHaveBeenCalled();
-      // expect(getApplications).toHaveBeenCalled();
-      // expect(getPagination).toHaveBeenCalled();
-      // expect(getPagination).toHaveBeenCalledWith(1);
-      // expect(getPagingData).toHaveBeenCalled();
-      // expect(getPagingData).toHaveBeenCalledWith(9, 10, {
-      //   limit: 20,
-      //   page: 1,
-      // });
-
-      // without
-      // expect(getAppSearch).toHaveBeenCalled();
-      // expect(getApplications).toHaveBeenCalled();
-      // expect(getPagination).toHaveBeenCalled();
-      // expect(getPagingData).toHaveBeenCalled();
-
       const options = {
         method: "GET",
         url: `${url}${urlOption}`,
