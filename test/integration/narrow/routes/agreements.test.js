@@ -93,10 +93,50 @@ describe("Applications test", () => {
         phaseBannerOk($);
       });
 
-      test("has the full browser title", async () => {
+      test.each([
+        {
+          title: "has the full browser title",
+          selector: "title",
+          text: "Administration: AHWR Agreements",
+        },
+        { title: "shows the agreed status", selector: "span.govuk-tag--green", text: "Agreed" },
+        { title: "has the check status", selector: "span.govuk-tag--orange", text: "Check" },
+        { title: "has the paid status", selector: "span.govuk-tag--blue", text: "Paid" },
+        { title: "has the accepted status", selector: "span.govuk-tag--purple", text: "Accepted" },
+        { title: "has the claimed status", selector: "span.govuk-tag--blue", text: "Claimed" },
+        { title: "has the withdraw status", selector: "span.govuk-tag--grey", text: "Withdrawn" },
+        { title: "has the rejected status", selector: "span.govuk-tag--red", text: "Rejected" },
+        { title: "has the sbi header", selector: 'th[aria-sort="none"]', text: "SBI number" },
+        { title: "has the status header", selector: 'th[aria-sort="none"]', text: "Status" },
+        {
+          title: "has the agreement date header",
+          selector: 'th[aria-sort="none"]',
+          text: "Agreement date",
+        },
+        {
+          title: "has the agreement number header",
+          selector: 'th[aria-sort="none"]',
+          text: "Agreement number",
+        },
+        {
+          title: "has the organisation header",
+          selector: 'th[aria-sort="none"]',
+          text: "Organisation",
+        },
+        {
+          title: "has advanced search option",
+          selector: ".govuk-details__summary-text",
+          text: "Advanced search",
+        },
+        {
+          title: "has a search button in the advanced search",
+          selector: ".govuk-button-group button.govuk-button",
+          text: "Search",
+        },
+      ])("$title", async ({ selector, text }) => {
         const res = await server.inject(options);
         const $ = cheerio.load(res.payload);
-        expect($("title").text()).toContain("Administration: AHWR Agreements");
+        expect($(selector).text()).toContain(text);
       });
 
       test("has the full page heading", async () => {
@@ -109,84 +149,6 @@ describe("Applications test", () => {
         const res = await server.inject(options);
         const $ = cheerio.load(res.payload);
         expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
-      });
-
-      test("shows the agreed status", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("span.govuk-tag--green").text()).toContain("Agreed");
-      });
-
-      test("has the check status", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("span.govuk-tag--orange").text()).toContain("Check");
-      });
-
-      test("has the paid status", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("span.govuk-tag--blue").text()).toContain("Paid");
-      });
-
-      test("has the accepted status", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("span.govuk-tag--purple").text()).toContain("Accepted");
-      });
-
-      test("has the claimed status", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("span.govuk-tag--blue").text()).toContain("Claimed");
-      });
-
-      test("has the withdraw status", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("span.govuk-tag--grey").text()).toContain("Withdrawn");
-      });
-
-      test("has the rejected status", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($("span.govuk-tag--red").text()).toContain("Rejected");
-      });
-
-      test("has the sbi header", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($('th[aria-sort="none"]').text()).toContain("SBI number");
-      });
-
-      test("has the status header", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($('th[aria-sort="none"]').text()).toContain("Status");
-      });
-
-      test("has the agreement date header", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($('th[aria-sort="none"]').text()).toContain("Agreement date");
-      });
-
-      test("has the agreement number header", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($('th[aria-sort="none"]').text()).toContain("Agreement number");
-      });
-
-      test("has the organisation header", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($('th[aria-sort="none"]').text()).toContain("Organisation");
-      });
-
-      test("has advanced search option", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($(".govuk-details__summary-text").text()).toContain("Advanced search");
       });
 
       test("has an agreement type dropdown", async () => {
@@ -203,12 +165,6 @@ describe("Applications test", () => {
           .map((_, el) => $(el).text().trim())
           .get();
         expect(optionTexts).toEqual(["All types", "IAHW", "PBR"]);
-      });
-
-      test("has a search button in the advanced search", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        expect($(".govuk-button-group button.govuk-button").text()).toContain("Search");
       });
 
       test("has a clear all filters link", async () => {
