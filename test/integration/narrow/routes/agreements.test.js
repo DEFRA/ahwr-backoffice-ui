@@ -6,6 +6,7 @@ import { permissions } from "../../../../app/auth/permissions.js";
 import { getAppSearch, setAppSearch } from "../../../../app/session/index.js";
 import { getPagination, getPagingData } from "../../../../app/pagination.js";
 import { getApplications } from "../../../../app/api/applications.js";
+import { AGREEMENT_TYPE_ALL } from "../../../../app/constants/index.js";
 import { applicationsData } from "../../../data/applications.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
@@ -62,7 +63,8 @@ describe("Applications test", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
       expect($("title").text()).toContain("AHWR Agreements");
-      expect(getAppSearch).toHaveBeenCalledTimes(5);
+      // Is this actually needed?
+      expect(getAppSearch).toHaveBeenCalledTimes(6);
       phaseBannerOk($);
     });
 
@@ -396,6 +398,52 @@ describe("Applications test", () => {
       expect($("p.no-results-message").text()).toMatch("No agreements found.");
       expect($("p.govuk-error-message")).toHaveLength(0);
       expect($("p.govuk-body.govuk-\\!-font-weight-bold").text()).toEqual("0 search results");
+    });
+
+    test("advanced search stores the selected agreement type", async () => {
+      const options = {
+        method,
+        url,
+        payload: {
+          crumb,
+          searchText: "",
+          agreementType: "IAHW",
+          submit: "advancedSearch",
+        },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      getApplications.mockReturnValue({ applications: [], total: 0 });
+
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "agreementType", "IAHW");
+    });
+
+    test("basic search resets the agreement type to all", async () => {
+      const options = {
+        method,
+        url,
+        payload: {
+          crumb,
+          searchText: "107279003",
+          agreementType: "IAHW",
+          submit: "search",
+        },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      getApplications.mockReturnValue({ applications: [], total: 0 });
+
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setAppSearch).toHaveBeenCalledWith(
+        expect.anything(),
+        "agreementType",
+        AGREEMENT_TYPE_ALL,
+      );
     });
   });
 });

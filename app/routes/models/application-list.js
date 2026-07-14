@@ -7,6 +7,7 @@ import { upperFirstLetter } from "../../lib/display-helper.js";
 import { FLAG_EMOJI } from "../utils/ui-constants.js";
 import { config } from "../../config/index.js";
 import { UNSUPPORTED_SEARCH_TYPE } from "../../lib/search-validation.js";
+import { AGREEMENT_TYPE_ALL } from "../../constants/index.js";
 
 const { serviceUri } = config;
 
@@ -140,13 +141,13 @@ export async function createModel(request, page) {
   }
 
   const filterStatus = getAppSearch(request, sessionKeys.appSearch.filterStatus) ?? [];
+  const agreementType =
+    getAppSearch(request, sessionKeys.appSearch.agreementType) ?? AGREEMENT_TYPE_ALL;
   const sortField = getAppSearch(request, sessionKeys.appSearch.sort) ?? undefined;
   const apps = await getApplications(
-    searchType,
-    searchText,
+    { searchText, searchType, filterStatus, agreementType },
     limit,
     offset,
-    filterStatus,
     sortField,
     request.logger,
   );

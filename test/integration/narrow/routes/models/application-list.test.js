@@ -74,6 +74,33 @@ describe("Application-list createModel", () => {
     expect(result.total).toBe(9);
   });
 
+  test("createModel passes the session agreement type to the backend", async () => {
+    getApplications.mockClear();
+    const request = {
+      yar: {
+        get: jest.fn(() => ({
+          searchText: "",
+          searchType: "",
+          agreementType: "IAHW",
+        })),
+      },
+      query: {},
+      auth: {
+        isAuthenticated: true,
+        credentials: {
+          scope: [administrator],
+          account: { username: "unit-tester" },
+        },
+      },
+    };
+
+    await createModel(request, 1);
+
+    expect(getApplications.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ agreementType: "IAHW" }),
+    );
+  });
+
   test("createModel returns the empty state without querying the backend for an unsupported search type", async () => {
     getApplications.mockClear();
     const request = {

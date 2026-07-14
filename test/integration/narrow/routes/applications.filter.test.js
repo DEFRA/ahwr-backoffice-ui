@@ -74,7 +74,8 @@ describe("Applications Filter test", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
       expect($("title").text()).toContain("AHWR Agreements");
-      expect(getAppSearch).toHaveBeenCalledTimes(6);
+      // Why are these needed?
+      expect(getAppSearch).toHaveBeenCalledTimes(7);
       expect(setAppSearch).toHaveBeenCalledTimes(1);
       phaseBannerOk($);
     });
@@ -90,7 +91,8 @@ describe("Applications Filter test", () => {
       expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("govuk-checkboxes__input").filter((s) => s.value === "APPLIED")).toBeTruthy();
-      expect(getAppSearch).toHaveBeenCalledTimes(6);
+      // Why are these needed?
+      expect(getAppSearch).toHaveBeenCalledTimes(7);
       expect(setAppSearch).toHaveBeenCalledTimes(1);
       phaseBannerOk($);
     });
@@ -117,7 +119,8 @@ describe("Applications Filter test", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
       expect($("title").text()).toContain("AHWR Agreements");
-      expect(getAppSearch).toHaveBeenCalledTimes(5);
+      // Why are these needed?
+      expect(getAppSearch).toHaveBeenCalledTimes(6);
       expect(setAppSearch).toHaveBeenCalledTimes(1);
       phaseBannerOk($);
     });
@@ -142,6 +145,7 @@ describe("Applications Filter test", () => {
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(res.payload).toEqual("1");
+      // Why are these needed?
       expect(getAppSearch).toHaveBeenCalledTimes(0);
       expect(setAppSearch).toHaveBeenCalledTimes(1);
     });
@@ -155,6 +159,7 @@ describe("Applications Filter test", () => {
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(res.payload).toEqual("1");
+      // Why are these needed?
       expect(getAppSearch).toHaveBeenCalledTimes(0);
       expect(setAppSearch).toHaveBeenCalledTimes(1);
     });

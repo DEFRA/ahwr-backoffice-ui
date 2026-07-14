@@ -1,5 +1,6 @@
 import wreck from "@hapi/wreck";
 import { config } from "../config/index.js";
+import { AGREEMENT_TYPE_ALL } from "../constants/index.js";
 
 const { applicationApiUri, apiKeys } = config;
 
@@ -17,15 +18,8 @@ export async function getApplication(applicationReference, logger) {
   }
 }
 
-export async function getApplications(
-  searchType,
-  searchText,
-  limit,
-  offset,
-  filterStatus,
-  sort,
-  logger,
-) {
+export async function getApplications(searchParameters, limit, offset, sort, logger) {
+  const { searchText, searchType, filterStatus, agreementType } = searchParameters;
   const endpoint = `${applicationApiUri}/applications/search`;
   const options = {
     payload: {
@@ -33,6 +27,7 @@ export async function getApplications(
       limit,
       offset,
       filter: filterStatus,
+      ...(agreementType && agreementType !== AGREEMENT_TYPE_ALL && { agreementType }),
       sort,
     },
     json: true,
