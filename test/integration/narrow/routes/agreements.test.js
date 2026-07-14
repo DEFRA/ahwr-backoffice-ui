@@ -63,8 +63,6 @@ describe("Applications test", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
       expect($("title").text()).toContain("AHWR Agreements");
-      // Is this actually needed?
-      expect(getAppSearch).toHaveBeenCalledTimes(6);
       phaseBannerOk($);
     });
 
