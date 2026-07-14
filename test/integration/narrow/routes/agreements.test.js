@@ -402,13 +402,13 @@ describe("Applications test", () => {
       expect($("p.govuk-body.govuk-\\!-font-weight-bold").text()).toEqual("0 search results");
     });
 
-    test("advanced search stores the selected agreement type", async () => {
+    test("advanced search stores the agreement type and does not send the text search", async () => {
       const options = {
         method,
         url,
         payload: {
           crumb,
-          searchText: "",
+          searchText: "107279003",
           agreementType: "IAHW",
           submit: "advancedSearch",
         },
@@ -421,9 +421,11 @@ describe("Applications test", () => {
 
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "agreementType", "IAHW");
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
     });
 
-    test("basic search resets the agreement type to all", async () => {
+    test("basic search sends the text search and resets the agreement type", async () => {
       const options = {
         method,
         url,
@@ -446,6 +448,8 @@ describe("Applications test", () => {
         "agreementType",
         AGREEMENT_TYPE_ALL,
       );
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "107279003");
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "sbi");
     });
   });
 });

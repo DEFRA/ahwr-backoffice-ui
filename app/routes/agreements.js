@@ -97,13 +97,18 @@ export const agreementsRoutes = [
 
           setAppSearch(request, sessionKeys.appSearch.filterStatus, filterStatus);
 
-          const agreementType =
-            request.payload.submit === "advancedSearch"
-              ? (request.payload.agreementType ?? AGREEMENT_TYPE_ALL)
-              : AGREEMENT_TYPE_ALL;
+          // Basic search and advanced search are mutually exclusive: a basic
+          // search filters by text only, an advanced search by agreement type only.
+          const isAdvancedSearch = request.payload.submit === "advancedSearch";
+
+          const agreementType = isAdvancedSearch
+            ? (request.payload.agreementType ?? AGREEMENT_TYPE_ALL)
+            : AGREEMENT_TYPE_ALL;
           setAppSearch(request, sessionKeys.appSearch.agreementType, agreementType);
 
-          const { searchText, searchType } = searchValidation(request.payload.searchText);
+          const { searchText, searchType } = isAdvancedSearch
+            ? { searchText: "", searchType: "" }
+            : searchValidation(request.payload.searchText);
           setAppSearch(request, sessionKeys.appSearch.searchText, searchText ?? "");
           setAppSearch(request, sessionKeys.appSearch.searchType, searchType ?? "");
           const viewModelDetails = await viewModel(request, 1);
