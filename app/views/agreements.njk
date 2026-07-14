@@ -56,11 +56,7 @@
                           label: {
                             text: "Agreement type"
                           },
-                          items: [
-                            { value: "ALL", text: "All types", selected: model.agreementType == "ALL" },
-                            { value: "IAHW", text: "IAHW", selected: model.agreementType == "IAHW" },
-                            { value: "PBR", text: "PBR", selected: model.agreementType == "PBR" }
-                          ]
+                          items: model.agreementTypeOptions
                         }) }}
                         <div class="advanced-search-actions">
                           {{ govukButton({

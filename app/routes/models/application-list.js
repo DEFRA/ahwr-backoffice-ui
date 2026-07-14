@@ -8,14 +8,16 @@ import { FLAG_EMOJI } from "../utils/ui-constants.js";
 import { config } from "../../config/index.js";
 import { UNSUPPORTED_SEARCH_TYPE } from "../../lib/search-validation.js";
 import { AGREEMENT_TYPE_ALL } from "../../constants/index.js";
+import { getAgreementTypeOptions } from "../utils/get-agreement-type-options.js";
 
 const { serviceUri } = config;
 
-const emptyModel = (searchText) => ({
+const emptyModel = (searchText, agreementTypeOptions) => ({
   applications: [],
   total: 0,
   error: "No agreements found.",
   searchText,
+  agreementTypeOptions,
 });
 
 export const viewModel = (request, page) => {
@@ -135,14 +137,15 @@ export async function createModel(request, page) {
   const { limit, offset } = getPagination(page);
   const searchText = getAppSearch(request, sessionKeys.appSearch.searchText);
   const searchType = getAppSearch(request, sessionKeys.appSearch.searchType);
+  const agreementType =
+    getAppSearch(request, sessionKeys.appSearch.agreementType) ?? AGREEMENT_TYPE_ALL;
+  const agreementTypeOptions = getAgreementTypeOptions(agreementType);
 
   if (searchType === UNSUPPORTED_SEARCH_TYPE) {
-    return emptyModel(searchText);
+    return emptyModel(searchText, agreementTypeOptions);
   }
 
   const filterStatus = getAppSearch(request, sessionKeys.appSearch.filterStatus) ?? [];
-  const agreementType =
-    getAppSearch(request, sessionKeys.appSearch.agreementType) ?? AGREEMENT_TYPE_ALL;
   const sortField = getAppSearch(request, sessionKeys.appSearch.sort) ?? undefined;
   const apps = await getApplications(
     { searchText, searchType, filterStatus, agreementType },
@@ -162,8 +165,9 @@ export async function createModel(request, page) {
       header: getApplicationTableHeader(getAppSearch(request, sessionKeys.appSearch.sort)),
       ...pagingData,
       searchText,
+      agreementTypeOptions,
     };
   }
 
-  return emptyModel(searchText);
+  return emptyModel(searchText, agreementTypeOptions);
 }

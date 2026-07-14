@@ -4,6 +4,8 @@ import {
 } from "../../../../../app/routes/models/application-list.js";
 import { applicationsData } from "../../../../data/applications.js";
 import { getApplications } from "../../../../../app/api/applications.js";
+import { getAgreementTypeOptions } from "../../../../../app/routes/utils/get-agreement-type-options.js";
+import { AGREEMENT_TYPE_ALL } from "../../../../../app/constants/index.js";
 import { permissions } from "../../../../../app/auth/permissions.js";
 
 jest.mock("../../../../../app/api/applications");
@@ -127,6 +129,7 @@ describe("Application-list createModel", () => {
       total: 0,
       error: "No agreements found.",
       searchText: "01/12/2024",
+      agreementTypeOptions: getAgreementTypeOptions(AGREEMENT_TYPE_ALL),
     });
     expect(getApplications).not.toHaveBeenCalled();
   });
