@@ -5,7 +5,7 @@ import {
 import { applicationsData } from "../../../../data/applications.js";
 import { getApplications } from "../../../../../app/api/applications.js";
 import { getAgreementTypeOptions } from "../../../../../app/routes/utils/get-agreement-type-options.js";
-import { AGREEMENT_TYPE_ALL } from "../../../../../app/constants/index.js";
+import { AGREEMENT_TYPE } from "../../../../../app/constants/index.js";
 import { permissions } from "../../../../../app/auth/permissions.js";
 
 jest.mock("../../../../../app/api/applications");
@@ -131,7 +131,7 @@ describe("Application-list createModel", () => {
         total: 0,
         error: "No agreements found.",
         searchText,
-        agreementTypeOptions: getAgreementTypeOptions(AGREEMENT_TYPE_ALL),
+        agreementTypeOptions: getAgreementTypeOptions(AGREEMENT_TYPE.ALL),
       });
       expect(getApplications).not.toHaveBeenCalled();
     },

@@ -6,7 +6,7 @@ import { permissions } from "../../../../app/auth/permissions.js";
 import { getAppSearch, setAppSearch } from "../../../../app/session/index.js";
 import { getPagination, getPagingData } from "../../../../app/pagination.js";
 import { getApplications } from "../../../../app/api/applications.js";
-import { AGREEMENT_TYPE_ALL } from "../../../../app/constants/index.js";
+import { AGREEMENT_TYPE } from "../../../../app/constants/index.js";
 import { applicationsData } from "../../../data/applications.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
@@ -380,7 +380,7 @@ describe("Applications test", () => {
       expect(setAppSearch).toHaveBeenCalledWith(
         expect.anything(),
         "agreementType",
-        AGREEMENT_TYPE_ALL,
+        AGREEMENT_TYPE.ALL,
       );
       expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "107279003");
       expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "sbi");

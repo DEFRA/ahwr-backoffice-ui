@@ -1,13 +1,9 @@
-import {
-  AGREEMENT_TYPE_ALL,
-  AGREEMENT_TYPE_IAHW,
-  AGREEMENT_TYPE_PBR,
-} from "../../constants/index.js";
+import { AGREEMENT_TYPE } from "../../constants/index.js";
 
 const agreementTypeLabels = {
-  [AGREEMENT_TYPE_ALL]: "All types",
-  [AGREEMENT_TYPE_IAHW]: "IAHW",
-  [AGREEMENT_TYPE_PBR]: "PBR",
+  [AGREEMENT_TYPE.ALL]: "All types",
+  [AGREEMENT_TYPE.IAHW]: "IAHW",
+  [AGREEMENT_TYPE.PBR]: "PBR",
 };
 
 export const getAgreementTypeOptions = (selectedAgreementType) =>

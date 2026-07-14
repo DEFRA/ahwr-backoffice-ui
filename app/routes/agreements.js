@@ -6,7 +6,7 @@ import { sessionKeys } from "../session/keys.js";
 import { viewModel } from "./models/application-list.js";
 import { searchValidation } from "../lib/search-validation.js";
 import { generateNewCrumb } from "./utils/crumb-cache.js";
-import { AGREEMENT_TYPE_ALL } from "../constants/index.js";
+import { AGREEMENT_TYPE } from "../constants/index.js";
 import { StatusCodes } from "http-status-codes";
 
 const { administrator, processor, user, recommender, authoriser } = permissions;
@@ -46,7 +46,7 @@ export const agreementsRoutes = [
         setAppSearch(request, sessionKeys.appSearch.searchText, "");
         setAppSearch(request, sessionKeys.appSearch.searchType, "");
         setAppSearch(request, sessionKeys.appSearch.filterStatus, []);
-        setAppSearch(request, sessionKeys.appSearch.agreementType, AGREEMENT_TYPE_ALL);
+        setAppSearch(request, sessionKeys.appSearch.agreementType, AGREEMENT_TYPE.ALL);
         const viewModelDetails = await viewModel(request);
         return h.view(viewTemplate, viewModelDetails);
       },
@@ -102,8 +102,8 @@ export const agreementsRoutes = [
           const isAdvancedSearch = request.payload.submit === "advancedSearch";
 
           const agreementType = isAdvancedSearch
-            ? (request.payload.agreementType ?? AGREEMENT_TYPE_ALL)
-            : AGREEMENT_TYPE_ALL;
+            ? (request.payload.agreementType ?? AGREEMENT_TYPE.ALL)
+            : AGREEMENT_TYPE.ALL;
           setAppSearch(request, sessionKeys.appSearch.agreementType, agreementType);
 
           const { searchText, searchType } = isAdvancedSearch

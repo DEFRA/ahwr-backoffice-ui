@@ -1,6 +1,6 @@
 import wreck from "@hapi/wreck";
 import { config } from "../../../app/config/index.js";
-import { AGREEMENT_TYPE_ALL } from "../../../app/constants/index.js";
+import { AGREEMENT_TYPE } from "../../../app/constants/index.js";
 import {
   getApplications,
   getApplication,
@@ -106,7 +106,7 @@ describe("Application API", () => {
       wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
 
       await getApplications(
-        { searchType, searchText, filterStatus, agreementType: AGREEMENT_TYPE_ALL },
+        { searchType, searchText, filterStatus, agreementType: AGREEMENT_TYPE.ALL },
         limit,
         offset,
         sort,

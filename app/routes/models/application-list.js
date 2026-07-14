@@ -6,7 +6,7 @@ import { getStyleClassByStatus } from "../../constants/status.js";
 import { upperFirstLetter } from "../../lib/display-helper.js";
 import { FLAG_EMOJI } from "../utils/ui-constants.js";
 import { config } from "../../config/index.js";
-import { AGREEMENT_TYPE_ALL } from "../../constants/index.js";
+import { AGREEMENT_TYPE } from "../../constants/index.js";
 import { getAgreementTypeOptions } from "../utils/get-agreement-type-options.js";
 
 const { serviceUri } = config;
@@ -140,7 +140,7 @@ export async function createModel(request, page) {
   const searchText = getAppSearch(request, sessionKeys.appSearch.searchText);
   const searchType = getAppSearch(request, sessionKeys.appSearch.searchType);
   const agreementType =
-    getAppSearch(request, sessionKeys.appSearch.agreementType) ?? AGREEMENT_TYPE_ALL;
+    getAppSearch(request, sessionKeys.appSearch.agreementType) ?? AGREEMENT_TYPE.ALL;
   const agreementTypeOptions = getAgreementTypeOptions(agreementType);
 
   if (RETIRED_SEARCH_TYPES.includes(searchType)) {
