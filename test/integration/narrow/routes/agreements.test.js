@@ -230,13 +230,13 @@ describe("Applications test", () => {
       test("has a search button in the advanced search", async () => {
         const res = await server.inject(options);
         const $ = cheerio.load(res.payload);
-        expect($(".advanced-search-actions button.govuk-button").text()).toContain("Search");
+        expect($(".govuk-button-group button.govuk-button").text()).toContain("Search");
       });
 
       test("has a clear all filters link", async () => {
         const res = await server.inject(options);
         const $ = cheerio.load(res.payload);
-        const clearLink = $(".advanced-search-actions a.govuk-link");
+        const clearLink = $(".govuk-button-group a.govuk-link");
         expect(clearLink.text()).toContain("Clear all filters");
         expect(clearLink.attr("href")).toEqual("/agreements/clear");
       });
