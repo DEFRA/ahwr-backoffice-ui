@@ -1,8 +1,10 @@
 const emptyParts = { day: "", month: "", year: "" };
 
-// The last hour, minute, second and millisecond of a day, so a "date to" filter
-// includes everything that happened on that day.
-const END_OF_DAY_TIME = [23, 59, 59, 999];
+// JavaScript Date months are zero-based, so a calendar month maps to month - 1.
+const MONTH_INDEX_OFFSET = 1;
+// Steps used to derive the inclusive end of a "date to" day.
+const ONE_DAY = 1;
+const ONE_MILLISECOND = 1;
 
 export const extractDateParts = (payload, prefix) => ({
   day: payload?.[`${prefix}-day`] ?? "",
@@ -11,9 +13,10 @@ export const extractDateParts = (payload, prefix) => ({
 });
 
 const isRealDate = (day, month, year) => {
-  const date = new Date(Date.UTC(year, month - 1, day));
+  const monthIndex = month - MONTH_INDEX_OFFSET;
+  const date = new Date(Date.UTC(year, monthIndex, day));
   return (
-    date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
+    date.getUTCFullYear() === year && date.getUTCMonth() === monthIndex && date.getUTCDate() === day
   );
 };
 
@@ -25,10 +28,16 @@ const toDate = ({ day, month, year }, endOfDay) => {
   if (![d, m, y].every(Number.isInteger) || !isRealDate(d, m, y)) {
     return undefined;
   }
-  // "date to" is inclusive of the whole day, so bound it to the last millisecond.
-  return endOfDay
-    ? new Date(Date.UTC(y, m - 1, d, ...END_OF_DAY_TIME))
-    : new Date(Date.UTC(y, m - 1, d));
+  const monthIndex = m - MONTH_INDEX_OFFSET;
+  const startOfDay = new Date(Date.UTC(y, monthIndex, d));
+  if (!endOfDay) {
+    return startOfDay;
+  }
+
+  // "date to" is inclusive of the whole day: the last millisecond before the next
+  // day begins. Date.UTC rolls the day over month and year ends correctly.
+  const startOfNextDay = new Date(Date.UTC(y, monthIndex, d + ONE_DAY));
+  return new Date(startOfNextDay.getTime() - ONE_MILLISECOND);
 };
 
 export const buildAgreementDateFilter = (parts, { endOfDay = false } = {}) => {

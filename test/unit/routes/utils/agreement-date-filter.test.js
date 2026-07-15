@@ -66,6 +66,20 @@ describe("buildAgreementDateFilter", () => {
     expect(filter.value).toEqual(new Date(Date.UTC(2026, 6, 15, 23, 59, 59, 999)));
   });
 
+  test.each([
+    { day: "31", month: "1", year: "2026", label: "a 31-day month (January)" },
+    { day: "30", month: "4", year: "2026", label: "a 30-day month (April)" },
+    { day: "28", month: "2", year: "2026", label: "the last day of a non-leap February" },
+    { day: "29", month: "2", year: "2024", label: "the last day of a leap February" },
+    { day: "31", month: "12", year: "2026", label: "the last day of the year" },
+  ])("bounds the value to the last millisecond of the day at $label", ({ day, month, year }) => {
+    const filter = buildAgreementDateFilter({ day, month, year }, { endOfDay: true });
+
+    expect(filter.value).toEqual(
+      new Date(Date.UTC(Number(year), Number(month) - 1, Number(day), 23, 59, 59, 999)),
+    );
+  });
+
   test("still returns repopulation items when the date is invalid", () => {
     const filter = buildAgreementDateFilter({ day: "31", month: "2", year: "2026" });
 
