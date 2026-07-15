@@ -58,6 +58,30 @@
                           },
                           items: model.agreementTypeOptions
                         }) }}
+                        <div class="agreement-date-filters">
+                          {{ govukDateInput({
+                            id: "dateFrom",
+                            namePrefix: "dateFrom",
+                            fieldset: {
+                              legend: {
+                                text: "Agreement date from",
+                                classes: "govuk-fieldset__legend--s"
+                              }
+                            },
+                            items: model.agreementDateFrom
+                          }) }}
+                          {{ govukDateInput({
+                            id: "dateTo",
+                            namePrefix: "dateTo",
+                            fieldset: {
+                              legend: {
+                                text: "Agreement date to",
+                                classes: "govuk-fieldset__legend--s"
+                              }
+                            },
+                            items: model.agreementDateTo
+                          }) }}
+                        </div>
                         <div class="govuk-button-group">
                           {{ govukButton({
                             text: "Search",

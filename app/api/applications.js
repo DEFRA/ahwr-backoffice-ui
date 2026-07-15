@@ -19,7 +19,8 @@ export async function getApplication(applicationReference, logger) {
 }
 
 export async function getApplications(searchParameters, limit, offset, sort, logger) {
-  const { searchText, searchType, filterStatus, agreementType } = searchParameters;
+  const { searchText, searchType, filterStatus, agreementType, dateFrom, dateTo } =
+    searchParameters;
   const endpoint = `${applicationApiUri}/applications/search`;
   const options = {
     payload: {
@@ -28,6 +29,8 @@ export async function getApplications(searchParameters, limit, offset, sort, log
       offset,
       filter: filterStatus,
       ...(agreementType && agreementType !== AGREEMENT_TYPE.ALL && { agreementType }),
+      ...(dateFrom && { dateFrom }),
+      ...(dateTo && { dateTo }),
       sort,
     },
     json: true,

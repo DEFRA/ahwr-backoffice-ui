@@ -157,6 +157,15 @@ $moj-assets-path: "~@ministryofjustice/frontend/moj/assets/";
   background-color: #003078;
 }
 
+/**
+ * agreement date range filters
+ */
+.agreement-date-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
 .no-results-message {
   color: $govuk-secondary-text-colour;
 }

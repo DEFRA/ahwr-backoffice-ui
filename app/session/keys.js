@@ -4,6 +4,8 @@ export const sessionKeys = {
     searchType: "searchType",
     filterStatus: "status",
     agreementType: "agreementType",
+    dateFrom: "dateFrom",
+    dateTo: "dateTo",
     sort: "sort",
   },
   claimSearch: {

@@ -8,18 +8,21 @@ import { FLAG_EMOJI } from "../utils/ui-constants.js";
 import { config } from "../../config/index.js";
 import { AGREEMENT_TYPE } from "../../constants/index.js";
 import { getAgreementTypeOptions } from "../utils/get-agreement-type-options.js";
+import { buildAgreementDateFilter } from "../utils/agreement-date-filter.js";
 
 const { serviceUri } = config;
 
 // date and status are retired from agreements basic search; recognise them and return no results
 const RETIRED_SEARCH_TYPES = ["date", "status"];
 
-const emptyModel = (searchText, agreementTypeOptions) => ({
+const emptyModel = (searchText, agreementTypeOptions, agreementDateFrom, agreementDateTo) => ({
   applications: [],
   total: 0,
   error: "No agreements found.",
   searchText,
   agreementTypeOptions,
+  agreementDateFrom,
+  agreementDateTo,
 });
 
 export const viewModel = (request, page) => {
@@ -143,14 +146,29 @@ export async function createModel(request, page) {
     getAppSearch(request, sessionKeys.appSearch.agreementType) ?? AGREEMENT_TYPE.ALL;
   const agreementTypeOptions = getAgreementTypeOptions(agreementType);
 
+  const dateFromFilter = buildAgreementDateFilter(
+    getAppSearch(request, sessionKeys.appSearch.dateFrom),
+  );
+  const dateToFilter = buildAgreementDateFilter(
+    getAppSearch(request, sessionKeys.appSearch.dateTo),
+    { endOfDay: true },
+  );
+
   if (RETIRED_SEARCH_TYPES.includes(searchType)) {
-    return emptyModel(searchText, agreementTypeOptions);
+    return emptyModel(searchText, agreementTypeOptions, dateFromFilter.items, dateToFilter.items);
   }
 
   const filterStatus = getAppSearch(request, sessionKeys.appSearch.filterStatus) ?? [];
   const sortField = getAppSearch(request, sessionKeys.appSearch.sort) ?? undefined;
   const apps = await getApplications(
-    { searchText, searchType, filterStatus, agreementType },
+    {
+      searchText,
+      searchType,
+      filterStatus,
+      agreementType,
+      dateFrom: dateFromFilter.value,
+      dateTo: dateToFilter.value,
+    },
     limit,
     offset,
     sortField,
@@ -168,8 +186,10 @@ export async function createModel(request, page) {
       ...pagingData,
       searchText,
       agreementTypeOptions,
+      agreementDateFrom: dateFromFilter.items,
+      agreementDateTo: dateToFilter.items,
     };
   }
 
-  return emptyModel(searchText, agreementTypeOptions);
+  return emptyModel(searchText, agreementTypeOptions, dateFromFilter.items, dateToFilter.items);
 }

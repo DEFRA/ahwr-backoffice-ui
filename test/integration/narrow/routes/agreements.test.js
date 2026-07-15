@@ -174,6 +174,27 @@ describe("Applications test", () => {
         expect(clearLink.text()).toContain("Clear all filters");
         expect(clearLink.attr("href")).toEqual("/agreements/clear");
       });
+
+      test("has agreement date from and to inputs with day, month and year boxes", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        const legends = $(".govuk-fieldset__legend")
+          .map((_, el) => $(el).text().trim())
+          .get();
+        expect(legends).toEqual(
+          expect.arrayContaining(["Agreement date from", "Agreement date to"]),
+        );
+        for (const name of [
+          "dateFrom-day",
+          "dateFrom-month",
+          "dateFrom-year",
+          "dateTo-day",
+          "dateTo-month",
+          "dateTo-year",
+        ]) {
+          expect($(`input[name='${name}']`)).toHaveLength(1);
+        }
+      });
     });
 
     test("should sort in descending order when requested", async () => {
@@ -357,6 +378,74 @@ describe("Applications test", () => {
       expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "agreementType", "IAHW");
       expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
       expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
+    });
+
+    test("advanced search stores the agreement date range parts", async () => {
+      const options = {
+        method,
+        url,
+        payload: {
+          crumb,
+          searchText: "",
+          agreementType: "ALL",
+          "dateFrom-day": "1",
+          "dateFrom-month": "2",
+          "dateFrom-year": "2026",
+          "dateTo-day": "15",
+          "dateTo-month": "7",
+          "dateTo-year": "2026",
+          submit: "advancedSearch",
+        },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      getApplications.mockReturnValue({ applications: [], total: 0 });
+
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "dateFrom", {
+        day: "1",
+        month: "2",
+        year: "2026",
+      });
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "dateTo", {
+        day: "15",
+        month: "7",
+        year: "2026",
+      });
+    });
+
+    test("basic search resets the agreement date range", async () => {
+      const options = {
+        method,
+        url,
+        payload: {
+          crumb,
+          searchText: "107279003",
+          "dateFrom-day": "1",
+          "dateFrom-month": "2",
+          "dateFrom-year": "2026",
+          submit: "search",
+        },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      getApplications.mockReturnValue({ applications: [], total: 0 });
+
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "dateFrom", {
+        day: "",
+        month: "",
+        year: "",
+      });
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "dateTo", {
+        day: "",
+        month: "",
+        year: "",
+      });
     });
 
     test("basic search sends the text search and resets the agreement type", async () => {
