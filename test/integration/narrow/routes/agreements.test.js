@@ -218,7 +218,7 @@ describe("Applications test", () => {
       expect(results.text()).toEqual("9 search results");
     });
 
-    test("returns 200 clear", async () => {
+    test("returns 200 clear and resets the search and agreement type filters", async () => {
       const options = {
         method: "GET",
         url: `${url}/clear`,
@@ -226,6 +226,18 @@ describe("Applications test", () => {
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "status", []);
+      expect(setAppSearch).toHaveBeenCalledWith(
+        expect.anything(),
+        "agreementType",
+        AGREEMENT_TYPE.ALL,
+      );
+
+      const $ = cheerio.load(res.payload);
+      expect($("select#agreementType option[selected]").text().trim()).toEqual("All types");
+      expect($("p.govuk-body.govuk-\\!-font-weight-bold").text()).toEqual("9 search results");
     });
 
     test("returns 200 remove status", async () => {
