@@ -218,14 +218,41 @@ describe("Applications test", () => {
       expect(results.text()).toEqual("9 search results");
     });
 
-    test("returns 200 clear", async () => {
-      const options = {
-        method: "GET",
-        url: `${url}/clear`,
-        auth,
-      };
-      const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.OK);
+    describe(`GET ${url}/clear route`, () => {
+      const options = { method: "GET", url: `${url}/clear`, auth };
+
+      test("returns 200 clear", async () => {
+        const res = await server.inject(options);
+        expect(res.statusCode).toBe(StatusCodes.OK);
+      });
+
+      test("clear resets the search, search type and status filters", async () => {
+        await server.inject(options);
+        expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
+        expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
+        expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "status", []);
+      });
+
+      test("clear resets the agreement type filter", async () => {
+        await server.inject(options);
+        expect(setAppSearch).toHaveBeenCalledWith(
+          expect.anything(),
+          "agreementType",
+          AGREEMENT_TYPE.ALL,
+        );
+      });
+
+      test("agreement type dropdown resets to All types after clear", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("select#agreementType option[selected]").text().trim()).toEqual("All types");
+      });
+
+      test("shows the full unfiltered total after clear", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($("p.govuk-body.govuk-\\!-font-weight-bold").text()).toEqual("9 search results");
+      });
     });
 
     test("returns 200 remove status", async () => {
