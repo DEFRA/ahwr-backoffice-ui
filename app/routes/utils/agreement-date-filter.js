@@ -40,6 +40,15 @@ const toDate = ({ day, month, year }, endOfDay) => {
   return new Date(startOfNextDay.getTime() - ONE_MILLISECOND);
 };
 
+/**
+ * Builds an agreement date filter from raw day/month/year form parts.
+ *
+ * @param {{ day?: string, month?: string, year?: string }} [parts] - the raw values from the date input.
+ * @param {{ endOfDay?: boolean }} [options] - set `endOfDay` for an inclusive "date to" bound (last millisecond of the day).
+ * @returns {{ value: Date | undefined, items: Array<{ name: string, classes: string, value: string }> }}
+ *   `value` is the parsed UTC date, or undefined when the parts are empty or not a real date;
+ *   `items` are the govukDateInput items used to re-populate the form.
+ */
 export const buildAgreementDateFilter = (parts, { endOfDay = false } = {}) => {
   const { day, month, year } = { ...emptyParts, ...parts };
   return {
@@ -50,4 +59,23 @@ export const buildAgreementDateFilter = (parts, { endOfDay = false } = {}) => {
       { name: "year", classes: "govuk-input--width-4", value: year },
     ],
   };
+};
+
+/**
+ * Resolves the agreement date range to send to the search API.
+ *
+ * An inverted range (to before from) is meaningless, so neither bound is sent.
+ * Either bound may be undefined when its date was empty or invalid.
+ *
+ * @param {{ value: Date | undefined }} fromFilter - the "date from" filter from {@link buildAgreementDateFilter}.
+ * @param {{ value: Date | undefined }} toFilter - the "date to" filter from {@link buildAgreementDateFilter}.
+ * @returns {{ dateFrom: Date | undefined, dateTo: Date | undefined }} the bounds to pass to the API.
+ */
+export const resolveAgreementDateRange = (fromFilter, toFilter) => {
+  const { value: dateFrom } = fromFilter;
+  const { value: dateTo } = toFilter;
+  if (dateFrom && dateTo && dateTo < dateFrom) {
+    return { dateFrom: undefined, dateTo: undefined };
+  }
+  return { dateFrom, dateTo };
 };

@@ -205,4 +205,33 @@ describe("Application-list createModel", () => {
       expect.objectContaining({ dateFrom: undefined, dateTo: undefined }),
     );
   });
+
+  test("skips both agreement date filters when the to date is before the from date", async () => {
+    getApplications.mockClear();
+    const request = {
+      yar: {
+        get: jest.fn(() => ({
+          searchText: "",
+          searchType: "",
+          agreementType: "ALL",
+          dateFrom: { day: "16", month: "7", year: "2026" },
+          dateTo: { day: "15", month: "7", year: "2026" },
+        })),
+      },
+      query: {},
+      auth: {
+        isAuthenticated: true,
+        credentials: {
+          scope: [administrator],
+          account: { username: "unit-tester" },
+        },
+      },
+    };
+
+    await createModel(request, 1);
+
+    expect(getApplications.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ dateFrom: undefined, dateTo: undefined }),
+    );
+  });
 });

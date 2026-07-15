@@ -1,6 +1,7 @@
 import {
   extractDateParts,
   buildAgreementDateFilter,
+  resolveAgreementDateRange,
 } from "../../../../app/routes/utils/agreement-date-filter.js";
 
 describe("extractDateParts", () => {
@@ -88,5 +89,56 @@ describe("buildAgreementDateFilter", () => {
       { name: "month", classes: "govuk-input--width-2", value: "2" },
       { name: "year", classes: "govuk-input--width-4", value: "2026" },
     ]);
+  });
+});
+
+describe("resolveAgreementDateRange", () => {
+  const filterFor = (parts, options) => buildAgreementDateFilter(parts, options);
+  const from = (parts) => filterFor(parts);
+  const to = (parts) => filterFor(parts, { endOfDay: true });
+
+  test("returns both bounds for a valid range", () => {
+    const range = resolveAgreementDateRange(
+      from({ day: "1", month: "2", year: "2026" }),
+      to({ day: "15", month: "7", year: "2026" }),
+    );
+
+    expect(range).toEqual({
+      dateFrom: new Date(Date.UTC(2026, 1, 1)),
+      dateTo: new Date(Date.UTC(2026, 6, 15, 23, 59, 59, 999)),
+    });
+  });
+
+  test("keeps a same-day range (to is the end of that day)", () => {
+    const range = resolveAgreementDateRange(
+      from({ day: "15", month: "7", year: "2026" }),
+      to({ day: "15", month: "7", year: "2026" }),
+    );
+
+    expect(range).toEqual({
+      dateFrom: new Date(Date.UTC(2026, 6, 15)),
+      dateTo: new Date(Date.UTC(2026, 6, 15, 23, 59, 59, 999)),
+    });
+  });
+
+  test("drops both bounds when the to date is earlier than the from date", () => {
+    const range = resolveAgreementDateRange(
+      from({ day: "16", month: "7", year: "2026" }),
+      to({ day: "15", month: "7", year: "2026" }),
+    );
+
+    expect(range).toEqual({ dateFrom: undefined, dateTo: undefined });
+  });
+
+  test("keeps the from bound when only the from date is provided", () => {
+    expect(resolveAgreementDateRange(from({ day: "1", month: "2", year: "2026" }), to({}))).toEqual(
+      { dateFrom: new Date(Date.UTC(2026, 1, 1)), dateTo: undefined },
+    );
+  });
+
+  test("keeps the to bound when only the to date is provided", () => {
+    expect(
+      resolveAgreementDateRange(from({}), to({ day: "15", month: "7", year: "2026" })),
+    ).toEqual({ dateFrom: undefined, dateTo: new Date(Date.UTC(2026, 6, 15, 23, 59, 59, 999)) });
   });
 });
