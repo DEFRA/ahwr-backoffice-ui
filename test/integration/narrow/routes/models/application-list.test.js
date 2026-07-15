@@ -4,8 +4,11 @@ import {
 } from "../../../../../app/routes/models/application-list.js";
 import { applicationsData } from "../../../../data/applications.js";
 import { getApplications } from "../../../../../app/api/applications.js";
-import { getAgreementTypeOptions } from "../../../../../app/routes/utils/get-agreement-type-options.js";
-import { AGREEMENT_TYPE } from "../../../../../app/constants/index.js";
+import {
+  getAgreementTypeOptions,
+  getStatusOptions,
+} from "../../../../../app/routes/utils/get-agreement-type-options.js";
+import { AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../../../../app/constants/index.js";
 import { permissions } from "../../../../../app/auth/permissions.js";
 
 jest.mock("../../../../../app/api/applications");
@@ -82,7 +85,7 @@ describe("Application-list createModel", () => {
     expect(result.total).toBe(9);
   });
 
-  test("createModel passes the session agreement type to the backend", async () => {
+  test("createModel passes the session agreement type and status to the backend", async () => {
     getApplications.mockClear();
     const request = {
       yar: {
@@ -90,6 +93,7 @@ describe("Application-list createModel", () => {
           searchText: "",
           searchType: "",
           agreementType: "IAHW",
+          status: "AGREED",
         })),
       },
       query: {},
@@ -105,7 +109,7 @@ describe("Application-list createModel", () => {
     await createModel(request, 1);
 
     expect(getApplications.mock.calls[0][0]).toEqual(
-      expect.objectContaining({ agreementType: "IAHW" }),
+      expect.objectContaining({ agreementType: "IAHW", status: "AGREED" }),
     );
   });
 
@@ -140,6 +144,7 @@ describe("Application-list createModel", () => {
         agreementTypeOptions: getAgreementTypeOptions(AGREEMENT_TYPE.ALL),
         agreementDateFrom: emptyDateItems,
         agreementDateTo: emptyDateItems,
+        statusOptions: getStatusOptions(AGREEMENT_STATUS.ALL),
       });
       expect(getApplications).not.toHaveBeenCalled();
     },

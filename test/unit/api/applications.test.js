@@ -58,7 +58,7 @@ describe("Application API", () => {
     });
 
     it("includes agreementType in the payload when a specific type is given", async () => {
-      const filterStatus = [];
+      const status = [];
       const sort = "ASC";
       const wreckResponse = { payload: { applications: [], total: 0 } };
       const expectedOptions = {
@@ -66,7 +66,7 @@ describe("Application API", () => {
           search: { text: searchText, type: searchType },
           limit,
           offset,
-          filter: filterStatus,
+          status,
           agreementType: "IAHW",
           sort,
         },
@@ -76,7 +76,7 @@ describe("Application API", () => {
       wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
 
       await getApplications(
-        { searchType, searchText, filterStatus, agreementType: "IAHW" },
+        { searchType, searchText, status, agreementType: "IAHW" },
         limit,
         offset,
         sort,
@@ -89,7 +89,7 @@ describe("Application API", () => {
     });
 
     it("omits agreementType from the payload when the type is all", async () => {
-      const filterStatus = [];
+      const status = [];
       const sort = "ASC";
       const wreckResponse = { payload: { applications: [], total: 0 } };
       const expectedOptions = {
@@ -97,7 +97,7 @@ describe("Application API", () => {
           search: { text: searchText, type: searchType },
           limit,
           offset,
-          filter: filterStatus,
+          status,
           sort,
         },
         json: true,
@@ -106,7 +106,7 @@ describe("Application API", () => {
       wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
 
       await getApplications(
-        { searchType, searchText, filterStatus, agreementType: AGREEMENT_TYPE.ALL },
+        { searchType, searchText, status, agreementType: AGREEMENT_TYPE.ALL },
         limit,
         offset,
         sort,
@@ -119,7 +119,7 @@ describe("Application API", () => {
     });
 
     it("throws error when error raised", async () => {
-      const filterStatus = [];
+      const status = [];
       const sort = "ASC";
 
       const expectedOptions = {
@@ -127,7 +127,7 @@ describe("Application API", () => {
           search: { text: searchText, type: searchType },
           limit,
           offset,
-          filter: filterStatus,
+          status,
           sort,
         },
         json: true,
@@ -137,13 +137,7 @@ describe("Application API", () => {
       const logger = { error: jest.fn() };
 
       await expect(async () => {
-        await getApplications(
-          { searchType, searchText, filterStatus },
-          limit,
-          offset,
-          sort,
-          logger,
-        );
+        await getApplications({ searchType, searchText, status }, limit, offset, sort, logger);
       }).rejects.toBe("getApplications boom");
       expect(wreck.post).toHaveBeenCalledTimes(1);
       expect(wreck.post).toHaveBeenCalledWith(

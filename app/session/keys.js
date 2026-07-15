@@ -2,7 +2,7 @@ export const sessionKeys = {
   appSearch: {
     searchText: "searchText",
     searchType: "searchType",
-    filterStatus: "status",
+    status: "status",
     agreementType: "agreementType",
     dateFrom: "dateFrom",
     dateTo: "dateTo",

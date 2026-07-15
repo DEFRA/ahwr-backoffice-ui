@@ -7,7 +7,7 @@ import { viewModel } from "./models/application-list.js";
 import { searchValidation } from "../lib/search-validation.js";
 import { extractDateParts } from "./utils/agreement-date-filter.js";
 import { generateNewCrumb } from "./utils/crumb-cache.js";
-import { AGREEMENT_TYPE } from "../constants/index.js";
+import { AGREEMENT_STATUS, AGREEMENT_TYPE } from "../constants/index.js";
 import { StatusCodes } from "http-status-codes";
 
 const { administrator, processor, user, recommender, authoriser } = permissions;
@@ -47,7 +47,7 @@ export const agreementsRoutes = [
       handler: async (request, h) => {
         setAppSearch(request, sessionKeys.appSearch.searchText, "");
         setAppSearch(request, sessionKeys.appSearch.searchType, "");
-        setAppSearch(request, sessionKeys.appSearch.filterStatus, []);
+        setAppSearch(request, sessionKeys.appSearch.status, AGREEMENT_STATUS.ALL);
         setAppSearch(request, sessionKeys.appSearch.agreementType, AGREEMENT_TYPE.ALL);
         setAppSearch(request, sessionKeys.appSearch.dateFrom, emptyDateParts);
         setAppSearch(request, sessionKeys.appSearch.dateTo, emptyDateParts);
@@ -69,9 +69,9 @@ export const agreementsRoutes = [
         }),
       },
       handler: async (request, h) => {
-        let filterStatus = getAppSearch(request, sessionKeys.appSearch.filterStatus);
-        filterStatus = filterStatus.filter((s) => s !== request.params.status);
-        setAppSearch(request, sessionKeys.appSearch.filterStatus, filterStatus);
+        let status = getAppSearch(request, sessionKeys.appSearch.status);
+        status = status.filter((s) => s !== request.params.status);
+        setAppSearch(request, sessionKeys.appSearch.status, status);
         const viewModelDetails = await viewModel(request);
         return h.view(viewTemplate, viewModelDetails);
       },
@@ -92,23 +92,24 @@ export const agreementsRoutes = [
       },
       handler: async (request, h) => {
         try {
-          let filterStatus = [];
-          // Is Search Button Clicked
-          if (!request.payload.submit) {
-            filterStatus = request.payload?.status ?? [];
-            filterStatus = Array.isArray(filterStatus) ? filterStatus : [filterStatus];
-          }
-
-          setAppSearch(request, sessionKeys.appSearch.filterStatus, filterStatus);
+          let agreementType;
+          console.log({
+            submit: request.payload.submit,
+            payload: request.payload,
+          });
 
           // Basic search and advanced search are mutually exclusive: a basic
           // search filters by text only, an advanced search by agreement type only.
           const isAdvancedSearch = request.payload.submit === "advancedSearch";
 
-          const agreementType = isAdvancedSearch
-            ? (request.payload.agreementType ?? AGREEMENT_TYPE.ALL)
-            : AGREEMENT_TYPE.ALL;
+          if (isAdvancedSearch) {
+            agreementType = request.payload.agreementType ?? AGREEMENT_TYPE.ALL;
+          } else {
+            agreementType = AGREEMENT_TYPE.ALL;
+          }
+
           setAppSearch(request, sessionKeys.appSearch.agreementType, agreementType);
+          setAppSearch(request, sessionKeys.appSearch.status, request.payload.status);
 
           const dateFrom = isAdvancedSearch
             ? extractDateParts(request.payload, "dateFrom")

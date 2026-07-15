@@ -1,4 +1,4 @@
-import { AGREEMENT_TYPE } from "../../constants/index.js";
+import { AGREEMENT_TYPE, AGREEMENT_STATUS } from "../../constants/index.js";
 
 const agreementTypeLabels = {
   [AGREEMENT_TYPE.ALL]: "All types",
@@ -6,9 +6,22 @@ const agreementTypeLabels = {
   [AGREEMENT_TYPE.PBR]: "PBR",
 };
 
+const statusLabels = {
+  [AGREEMENT_STATUS.ALL]: "All statuses",
+  [AGREEMENT_STATUS.AGREED]: "Agreed",
+  [AGREEMENT_STATUS.NOT_AGREED]: "Not Agreed",
+};
+
 export const getAgreementTypeOptions = (selectedAgreementType) =>
   Object.entries(agreementTypeLabels).map(([value, text]) => ({
     value,
     text,
     selected: value === selectedAgreementType,
+  }));
+
+export const getStatusOptions = (selectedStatus) =>
+  Object.entries(statusLabels).map(([value, text]) => ({
+    value,
+    text,
+    selected: value === selectedStatus,
   }));

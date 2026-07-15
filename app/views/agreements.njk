@@ -82,6 +82,16 @@
                             items: model.agreementDateTo
                           }) }}
                         </div>
+
+                        {{ govukSelect({
+                          id: "status",
+                          name: "status",
+                          label: {
+                            text: "Status"
+                          },
+                          items: model.statusOptions
+                        }) }}
+
                         <div class="govuk-button-group">
                           {{ govukButton({
                             text: "Search",

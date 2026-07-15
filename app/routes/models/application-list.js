@@ -6,19 +6,19 @@ import { getStyleClassByStatus } from "../../constants/status.js";
 import { upperFirstLetter } from "../../lib/display-helper.js";
 import { FLAG_EMOJI } from "../utils/ui-constants.js";
 import { config } from "../../config/index.js";
-import { AGREEMENT_TYPE } from "../../constants/index.js";
-import { getAgreementTypeOptions } from "../utils/get-agreement-type-options.js";
 import {
   buildAgreementDateFilter,
   resolveAgreementDateRange,
 } from "../utils/agreement-date-filter.js";
+import { AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../constants/index.js";
+import { getAgreementTypeOptions, getStatusOptions } from "../utils/get-agreement-type-options.js";
 
 const { serviceUri } = config;
 
 // date and status are retired from agreements basic search; recognise them and return no results
 const RETIRED_SEARCH_TYPES = ["date", "status"];
 
-const emptyModel = ({ searchText, agreementTypeOptions, agreementDateFrom, agreementDateTo }) => ({
+const emptyModel = ({ searchText, agreementTypeOptions, agreementDateFrom, agreementDateTo, statusOptions }) => ({
   applications: [],
   total: 0,
   error: "No agreements found.",
@@ -26,6 +26,7 @@ const emptyModel = ({ searchText, agreementTypeOptions, agreementDateFrom, agree
   agreementTypeOptions,
   agreementDateFrom,
   agreementDateTo,
+  statusOptions,
 });
 
 export const viewModel = (request, page) => {
@@ -147,7 +148,10 @@ export async function createModel(request, page) {
   const searchType = getAppSearch(request, sessionKeys.appSearch.searchType);
   const agreementType =
     getAppSearch(request, sessionKeys.appSearch.agreementType) ?? AGREEMENT_TYPE.ALL;
+  const status = getAppSearch(request, sessionKeys.appSearch.status) ?? AGREEMENT_STATUS.ALL;
+
   const agreementTypeOptions = getAgreementTypeOptions(agreementType);
+  const statusOptions = getStatusOptions(status);
 
   const dateFromFilter = buildAgreementDateFilter(
     getAppSearch(request, sessionKeys.appSearch.dateFrom),
@@ -163,17 +167,17 @@ export async function createModel(request, page) {
       agreementTypeOptions,
       agreementDateFrom: dateFromFilter.items,
       agreementDateTo: dateToFilter.items,
+      statusOptions
     });
   }
 
-  const filterStatus = getAppSearch(request, sessionKeys.appSearch.filterStatus) ?? [];
   const sortField = getAppSearch(request, sessionKeys.appSearch.sort) ?? undefined;
   const { dateFrom, dateTo } = resolveAgreementDateRange(dateFromFilter, dateToFilter);
   const apps = await getApplications(
     {
       searchText,
       searchType,
-      filterStatus,
+      status,
       agreementType,
       dateFrom,
       dateTo,
@@ -197,6 +201,7 @@ export async function createModel(request, page) {
       agreementTypeOptions,
       agreementDateFrom: dateFromFilter.items,
       agreementDateTo: dateToFilter.items,
+      statusOptions,
     };
   }
 
@@ -205,5 +210,6 @@ export async function createModel(request, page) {
     agreementTypeOptions,
     agreementDateFrom: dateFromFilter.items,
     agreementDateTo: dateToFilter.items,
+    statusOptions
   });
 }
