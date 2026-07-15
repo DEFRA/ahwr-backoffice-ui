@@ -208,6 +208,7 @@ describe("Claims tests", () => {
       getClaims.mockReturnValueOnce({ claims, total: 9 });
       const res = await search("");
       expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
       expect(getClaims).toHaveBeenCalledWith(
         "reset",
         "",
