@@ -127,4 +127,100 @@ describe("Claims tests", () => {
       expect(setClaimSearch).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe("Basic search term rationalisation", () => {
+    const search = async (searchText) => {
+      getClaimSearch.mockReturnValueOnce(searchText);
+      return server.inject({ method: "GET", url: `${url}?page=1`, auth });
+    };
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    test("hint tells the user only claim number or SBI are searchable", async () => {
+      const res = await search("");
+      const $ = cheerio.load(res.payload);
+      expect($("#claimSearch-hint").text().replace(/\s+/g, " ").trim()).toEqual(
+        "Search by claim number or SBI.",
+      );
+    });
+
+    test.each([
+      { searchText: "REBC-A1B2-C3D4", type: "ref" }, // claim number
+      { searchText: "107279003", type: "sbi" }, // SBI
+    ])(
+      "supported search ($searchText) queries the backend and shows results",
+      async ({ searchText, type }) => {
+        getClaims.mockReturnValueOnce({ claims, total: 3 });
+        const res = await search(searchText);
+        expect(res.statusCode).toBe(StatusCodes.OK);
+        expect(getClaims).toHaveBeenCalledWith(
+          type,
+          searchText,
+          undefined,
+          10,
+          0,
+          undefined,
+          expect.anything(),
+        );
+        const $ = cheerio.load(res.payload);
+        expect($("p.govuk-body.govuk-\\!-font-weight-bold").text()).toEqual("3 search results");
+        expect($("p.no-results-message")).toHaveLength(0);
+      },
+    );
+
+    test("supported search with no match shows the no-results state", async () => {
+      getClaims.mockReturnValueOnce({ claims: [], total: 0 });
+      const res = await search("107279003");
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(getClaims).toHaveBeenCalled();
+      const $ = cheerio.load(res.payload);
+      expect($("p.no-results-message").text()).toMatch("No claims found.");
+      expect($("p.govuk-error-message")).toHaveLength(0);
+      expect($("p.govuk-body.govuk-\\!-font-weight-bold").text()).toEqual("0 search results");
+    });
+
+    test.each([
+      { searchText: "Beef cattle" }, // species
+      { searchText: "Dairy cattle" }, // species
+      { searchText: "Pigs" }, // species
+      { searchText: "Sheep" }, // species
+      { searchText: "Poultry" }, // species (falls through to organisation)
+      { searchText: "01/12/2024" }, // claim date
+      { searchText: "on hold" }, // claim status
+      { searchText: "Foxes Drove Farm" }, // organisation / free text
+    ])(
+      "retired search ($searchText) returns no claims without querying the backend",
+      async ({ searchText }) => {
+        const res = await search(searchText);
+        expect(res.statusCode).toBe(StatusCodes.OK);
+        expect(await axe(res.payload)).toHaveNoViolations();
+        expect(getClaims).not.toHaveBeenCalled();
+        const $ = cheerio.load(res.payload);
+        expect($("p.no-results-message").text()).toMatch("No claims found.");
+        expect($("p.govuk-error-message")).toHaveLength(0);
+        expect($("p.govuk-body.govuk-\\!-font-weight-bold").text()).toEqual("0 search results");
+      },
+    );
+
+    test("empty search shows all claims (default state)", async () => {
+      getClaims.mockReturnValueOnce({ claims, total: 9 });
+      const res = await search("");
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(await axe(res.payload)).toHaveNoViolations();
+      expect(getClaims).toHaveBeenCalledWith(
+        "reset",
+        "",
+        undefined,
+        10,
+        0,
+        undefined,
+        expect.anything(),
+      );
+      const $ = cheerio.load(res.payload);
+      expect($("p.govuk-body.govuk-\\!-font-weight-bold").text()).toEqual("9 search results");
+      expect($("p.no-results-message")).toHaveLength(0);
+    });
+  });
 });
