@@ -1,5 +1,9 @@
 const emptyParts = { day: "", month: "", year: "" };
 
+// The last hour, minute, second and millisecond of a day, so a "date to" filter
+// includes everything that happened on that day.
+const END_OF_DAY_TIME = [23, 59, 59, 999];
+
 export const extractDateParts = (payload, prefix) => ({
   day: payload?.[`${prefix}-day`] ?? "",
   month: payload?.[`${prefix}-month`] ?? "",
@@ -23,7 +27,7 @@ const toDate = ({ day, month, year }, endOfDay) => {
   }
   // "date to" is inclusive of the whole day, so bound it to the last millisecond.
   return endOfDay
-    ? new Date(Date.UTC(y, m - 1, d, 23, 59, 59, 999))
+    ? new Date(Date.UTC(y, m - 1, d, ...END_OF_DAY_TIME))
     : new Date(Date.UTC(y, m - 1, d));
 };
 
