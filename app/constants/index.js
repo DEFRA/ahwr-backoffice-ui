@@ -5,3 +5,9 @@ export const AGREEMENT_TYPE = {
   IAHW: "IAHW",
   PBR: "PBR",
 };
+
+export const AGREEMENT_STATUS = {
+  ALL: "ALL",
+  AGREED: "AGREED",
+  NOT_AGREED: "NOT_AGREED",
+};

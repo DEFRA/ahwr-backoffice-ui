@@ -1,6 +1,6 @@
 import wreck from "@hapi/wreck";
 import { config } from "../../../app/config/index.js";
-import { AGREEMENT_TYPE } from "../../../app/constants/index.js";
+import { AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../../app/constants/index.js";
 import {
   getApplications,
   getApplication,
@@ -58,7 +58,6 @@ describe("Application API", () => {
     });
 
     it("includes agreementType in the payload when a specific type is given", async () => {
-      const filterStatus = [];
       const sort = "ASC";
       const wreckResponse = { payload: { applications: [], total: 0 } };
       const expectedOptions = {
@@ -66,7 +65,7 @@ describe("Application API", () => {
           search: { text: searchText, type: searchType },
           limit,
           offset,
-          filter: filterStatus,
+          status: "AGREED",
           agreementType: "IAHW",
           sort,
         },
@@ -76,7 +75,7 @@ describe("Application API", () => {
       wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
 
       await getApplications(
-        { searchType, searchText, filterStatus, agreementType: "IAHW" },
+        { searchType, searchText, status: "AGREED", agreementType: "IAHW" },
         limit,
         offset,
         sort,
@@ -89,7 +88,6 @@ describe("Application API", () => {
     });
 
     it("omits agreementType from the payload when the type is all", async () => {
-      const filterStatus = [];
       const sort = "ASC";
       const wreckResponse = { payload: { applications: [], total: 0 } };
       const expectedOptions = {
@@ -97,7 +95,6 @@ describe("Application API", () => {
           search: { text: searchText, type: searchType },
           limit,
           offset,
-          filter: filterStatus,
           sort,
         },
         json: true,
@@ -106,7 +103,35 @@ describe("Application API", () => {
       wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
 
       await getApplications(
-        { searchType, searchText, filterStatus, agreementType: AGREEMENT_TYPE.ALL },
+        { searchType, searchText, agreementType: AGREEMENT_TYPE.ALL },
+        limit,
+        offset,
+        sort,
+      );
+
+      expect(wreck.post).toHaveBeenCalledWith(
+        `${applicationApiUri}/applications/search`,
+        expectedOptions,
+      );
+    });
+
+    it("omits status from the payload when the type is all", async () => {
+      const sort = "ASC";
+      const wreckResponse = { payload: { applications: [], total: 0 } };
+      const expectedOptions = {
+        payload: {
+          search: { text: searchText, type: searchType },
+          limit,
+          offset,
+          sort,
+        },
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      };
+      wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
+
+      await getApplications(
+        { searchType, searchText, status: AGREEMENT_STATUS.ALL },
         limit,
         offset,
         sort,
@@ -119,7 +144,6 @@ describe("Application API", () => {
     });
 
     it("throws error when error raised", async () => {
-      const filterStatus = [];
       const sort = "ASC";
 
       const expectedOptions = {
@@ -127,7 +151,6 @@ describe("Application API", () => {
           search: { text: searchText, type: searchType },
           limit,
           offset,
-          filter: filterStatus,
           sort,
         },
         json: true,
@@ -137,13 +160,7 @@ describe("Application API", () => {
       const logger = { error: jest.fn() };
 
       await expect(async () => {
-        await getApplications(
-          { searchType, searchText, filterStatus },
-          limit,
-          offset,
-          sort,
-          logger,
-        );
+        await getApplications({ searchType, searchText }, limit, offset, sort, logger);
       }).rejects.toBe("getApplications boom");
       expect(wreck.post).toHaveBeenCalledTimes(1);
       expect(wreck.post).toHaveBeenCalledWith(
