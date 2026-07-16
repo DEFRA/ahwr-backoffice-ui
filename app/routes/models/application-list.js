@@ -18,7 +18,13 @@ const { serviceUri } = config;
 // date and status are retired from agreements basic search; recognise them and return no results
 const RETIRED_SEARCH_TYPES = ["date", "status"];
 
-const emptyModel = ({ searchText, agreementTypeOptions, agreementDateFrom, agreementDateTo, statusOptions }) => ({
+const emptyModel = ({
+  searchText,
+  agreementTypeOptions,
+  agreementDateFrom,
+  agreementDateTo,
+  statusOptions,
+}) => ({
   applications: [],
   total: 0,
   error: "No agreements found.",
@@ -167,13 +173,13 @@ export async function createModel(request, page) {
       agreementTypeOptions,
       agreementDateFrom: dateFromFilter.items,
       agreementDateTo: dateToFilter.items,
-      statusOptions
+      statusOptions,
     });
   }
 
   const sortField = getAppSearch(request, sessionKeys.appSearch.sort) ?? undefined;
   const { dateFrom, dateTo } = resolveAgreementDateRange(dateFromFilter, dateToFilter);
- 
+
   const apps = await getApplications(
     {
       searchText,
@@ -211,6 +217,6 @@ export async function createModel(request, page) {
     agreementTypeOptions,
     agreementDateFrom: dateFromFilter.items,
     agreementDateTo: dateToFilter.items,
-    statusOptions
+    statusOptions,
   });
 }

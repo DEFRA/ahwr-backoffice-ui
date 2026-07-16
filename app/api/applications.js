@@ -19,8 +19,7 @@ export async function getApplication(applicationReference, logger) {
 }
 
 export async function getApplications(searchParameters, limit, offset, sort, logger) {
-  const { searchText, searchType, status, agreementType, dateFrom, dateTo } =
-    searchParameters;
+  const { searchText, searchType, status, agreementType, dateFrom, dateTo } = searchParameters;
   const endpoint = `${applicationApiUri}/applications/search`;
   const options = {
     payload: {

@@ -251,7 +251,11 @@ describe("Applications test", () => {
         await server.inject(options);
         expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
         expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
-        expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "status", []);
+        expect(setAppSearch).toHaveBeenCalledWith(
+          expect.anything(),
+          "status",
+          AGREEMENT_STATUS.ALL,
+        );
       });
 
       test("clear resets the agreement type filter", async () => {
