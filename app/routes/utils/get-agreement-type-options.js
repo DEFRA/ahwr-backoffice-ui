@@ -9,7 +9,7 @@ const agreementTypeLabels = {
 const statusLabels = {
   [AGREEMENT_STATUS.ALL]: "All statuses",
   [AGREEMENT_STATUS.AGREED]: "Agreed",
-  [AGREEMENT_STATUS.NOT_AGREED]: "Not Agreed",
+  [AGREEMENT_STATUS.NOT_AGREED]: "Not agreed",
 };
 
 export const getAgreementTypeOptions = (selectedAgreementType) =>

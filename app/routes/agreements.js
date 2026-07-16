@@ -92,11 +92,7 @@ export const agreementsRoutes = [
       },
       handler: async (request, h) => {
         try {
-          let agreementType;
-          console.log({
-            submit: request.payload.submit,
-            payload: request.payload,
-          });
+          let agreementType, status;
 
           // Basic search and advanced search are mutually exclusive: a basic
           // search filters by text only, an advanced search by agreement type only.
@@ -104,12 +100,14 @@ export const agreementsRoutes = [
 
           if (isAdvancedSearch) {
             agreementType = request.payload.agreementType ?? AGREEMENT_TYPE.ALL;
+            status = request.payload.status ?? AGREEMENT_STATUS.ALL;
           } else {
             agreementType = AGREEMENT_TYPE.ALL;
+            status = AGREEMENT_STATUS.ALL;
           }
 
           setAppSearch(request, sessionKeys.appSearch.agreementType, agreementType);
-          setAppSearch(request, sessionKeys.appSearch.status, request.payload.status);
+          setAppSearch(request, sessionKeys.appSearch.status, status);
 
           const dateFrom = isAdvancedSearch
             ? extractDateParts(request.payload, "dateFrom")

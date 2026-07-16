@@ -33,7 +33,7 @@ describe("getStatusOptions", () => {
     expect(options).toEqual([
       { value: AGREEMENT_STATUS.ALL, text: "All statuses", selected: true },
       { value: AGREEMENT_STATUS.AGREED, text: "Agreed", selected: false },
-      { value: AGREEMENT_STATUS.NOT_AGREED, text: "Not Agreed", selected: false },
+      { value: AGREEMENT_STATUS.NOT_AGREED, text: "Not agreed", selected: false },
     ]);
   });
 

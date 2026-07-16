@@ -173,6 +173,7 @@ export async function createModel(request, page) {
 
   const sortField = getAppSearch(request, sessionKeys.appSearch.sort) ?? undefined;
   const { dateFrom, dateTo } = resolveAgreementDateRange(dateFromFilter, dateToFilter);
+ 
   const apps = await getApplications(
     {
       searchText,
