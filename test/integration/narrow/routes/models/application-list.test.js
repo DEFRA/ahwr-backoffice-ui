@@ -85,7 +85,7 @@ describe("Application-list createModel", () => {
     expect(result.total).toBe(9);
   });
 
-  test("createModel passes the session agreement type and status to the backend", async () => {
+  test("createModel passes the session agreement type to the backend", async () => {
     getApplications.mockClear();
     const request = {
       yar: {
@@ -93,7 +93,6 @@ describe("Application-list createModel", () => {
           searchText: "",
           searchType: "",
           agreementType: "IAHW",
-          status: "AGREED",
         })),
       },
       query: {},
@@ -109,8 +108,33 @@ describe("Application-list createModel", () => {
     await createModel(request, 1);
 
     expect(getApplications.mock.calls[0][0]).toEqual(
-      expect.objectContaining({ agreementType: "IAHW", status: "AGREED" }),
+      expect.objectContaining({ agreementType: "IAHW" }),
     );
+  });
+
+  test("createModel passes the session status to the backend", async () => {
+    getApplications.mockClear();
+    const request = {
+      yar: {
+        get: jest.fn(() => ({
+          searchText: "",
+          searchType: "",
+          status: "AGREED",
+        })),
+      },
+      query: {},
+      auth: {
+        isAuthenticated: true,
+        credentials: {
+          scope: [administrator],
+          account: { username: "unit-tester" },
+        },
+      },
+    };
+
+    await createModel(request, 1);
+
+    expect(getApplications.mock.calls[0][0]).toEqual(expect.objectContaining({ status: "AGREED" }));
   });
 
   test.each([
