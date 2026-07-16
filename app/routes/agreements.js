@@ -5,6 +5,7 @@ import { setAppSearch, getAppSearch } from "../session/index.js";
 import { sessionKeys } from "../session/keys.js";
 import { viewModel } from "./models/application-list.js";
 import { searchValidation } from "../lib/search-validation.js";
+import { extractDateParts } from "./utils/agreement-date-filter.js";
 import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { AGREEMENT_TYPE } from "../constants/index.js";
 import { StatusCodes } from "http-status-codes";
@@ -13,6 +14,7 @@ const { administrator, processor, user, recommender, authoriser } = permissions;
 const { displayPageSize } = config;
 const viewTemplate = "agreements";
 const currentPath = `/${viewTemplate}`;
+const emptyDateParts = { day: "", month: "", year: "" };
 
 export const agreementsRoutes = [
   {
@@ -47,6 +49,8 @@ export const agreementsRoutes = [
         setAppSearch(request, sessionKeys.appSearch.searchType, "");
         setAppSearch(request, sessionKeys.appSearch.filterStatus, []);
         setAppSearch(request, sessionKeys.appSearch.agreementType, AGREEMENT_TYPE.ALL);
+        setAppSearch(request, sessionKeys.appSearch.dateFrom, emptyDateParts);
+        setAppSearch(request, sessionKeys.appSearch.dateTo, emptyDateParts);
         const viewModelDetails = await viewModel(request);
         return h.view(viewTemplate, viewModelDetails);
       },
@@ -105,6 +109,15 @@ export const agreementsRoutes = [
             ? (request.payload.agreementType ?? AGREEMENT_TYPE.ALL)
             : AGREEMENT_TYPE.ALL;
           setAppSearch(request, sessionKeys.appSearch.agreementType, agreementType);
+
+          const dateFrom = isAdvancedSearch
+            ? extractDateParts(request.payload, "dateFrom")
+            : emptyDateParts;
+          const dateTo = isAdvancedSearch
+            ? extractDateParts(request.payload, "dateTo")
+            : emptyDateParts;
+          setAppSearch(request, sessionKeys.appSearch.dateFrom, dateFrom);
+          setAppSearch(request, sessionKeys.appSearch.dateTo, dateTo);
 
           const { searchText, searchType } = isAdvancedSearch
             ? { searchText: "", searchType: "" }

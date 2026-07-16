@@ -12,6 +12,12 @@ jest.mock("../../../../../app/api/applications");
 
 const { administrator } = permissions;
 
+const emptyDateItems = [
+  { name: "day", classes: "govuk-input--width-2", value: "" },
+  { name: "month", classes: "govuk-input--width-2", value: "" },
+  { name: "year", classes: "govuk-input--width-4", value: "" },
+];
+
 describe("Application-list model test", () => {
   test.each([
     { n: 0, field: "Reference", direction: "DESC" },
@@ -132,8 +138,100 @@ describe("Application-list createModel", () => {
         error: "No agreements found.",
         searchText,
         agreementTypeOptions: getAgreementTypeOptions(AGREEMENT_TYPE.ALL),
+        agreementDateFrom: emptyDateItems,
+        agreementDateTo: emptyDateItems,
       });
       expect(getApplications).not.toHaveBeenCalled();
     },
   );
+
+  test("passes valid agreement date filters from the session to the backend as dates", async () => {
+    getApplications.mockClear();
+    const request = {
+      yar: {
+        get: jest.fn(() => ({
+          searchText: "",
+          searchType: "",
+          agreementType: "ALL",
+          dateFrom: { day: "1", month: "2", year: "2026" },
+          dateTo: { day: "15", month: "7", year: "2026" },
+        })),
+      },
+      query: {},
+      auth: {
+        isAuthenticated: true,
+        credentials: {
+          scope: [administrator],
+          account: { username: "unit-tester" },
+        },
+      },
+    };
+
+    await createModel(request, 1);
+
+    expect(getApplications.mock.calls[0][0]).toEqual(
+      expect.objectContaining({
+        dateFrom: new Date(Date.UTC(2026, 1, 1)),
+        dateTo: new Date(Date.UTC(2026, 6, 15, 23, 59, 59, 999)),
+      }),
+    );
+  });
+
+  test("skips agreement date filters that are incomplete or invalid", async () => {
+    getApplications.mockClear();
+    const request = {
+      yar: {
+        get: jest.fn(() => ({
+          searchText: "",
+          searchType: "",
+          agreementType: "ALL",
+          dateFrom: { day: "31", month: "2", year: "2026" },
+          dateTo: { day: "", month: "", year: "" },
+        })),
+      },
+      query: {},
+      auth: {
+        isAuthenticated: true,
+        credentials: {
+          scope: [administrator],
+          account: { username: "unit-tester" },
+        },
+      },
+    };
+
+    await createModel(request, 1);
+
+    expect(getApplications.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ dateFrom: undefined, dateTo: undefined }),
+    );
+  });
+
+  test("skips both agreement date filters when the to date is before the from date", async () => {
+    getApplications.mockClear();
+    const request = {
+      yar: {
+        get: jest.fn(() => ({
+          searchText: "",
+          searchType: "",
+          agreementType: "ALL",
+          dateFrom: { day: "16", month: "7", year: "2026" },
+          dateTo: { day: "15", month: "7", year: "2026" },
+        })),
+      },
+      query: {},
+      auth: {
+        isAuthenticated: true,
+        credentials: {
+          scope: [administrator],
+          account: { username: "unit-tester" },
+        },
+      },
+    };
+
+    await createModel(request, 1);
+
+    expect(getApplications.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ dateFrom: undefined, dateTo: undefined }),
+    );
+  });
 });
