@@ -61,9 +61,7 @@ const loadClaimsBreakdown = async (scheme, applicationReference, logger) => {
   const limit = 30;
   const offset = 0;
   const { claims } = await getClaims(
-    "appRef",
-    applicationReference,
-    undefined,
+    { searchType: "appRef", searchText: applicationReference },
     limit,
     offset,
     undefined,

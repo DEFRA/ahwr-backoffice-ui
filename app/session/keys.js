@@ -10,6 +10,8 @@ export const sessionKeys = {
   },
   claimSearch: {
     searchText: "searchText",
+    searchType: "searchType",
+    agreementType: "agreementType",
     sort: "sort",
   },
 };

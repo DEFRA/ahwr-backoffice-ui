@@ -91,9 +91,7 @@ const buildAgreementClaimsTable = async (request, applicationReference, page) =>
   const limit = 30;
   const offset = 0;
   const { claims, total } = await getClaims(
-    "appRef",
-    applicationReference,
-    undefined,
+    { searchType: "appRef", searchText: applicationReference },
     limit,
     offset,
     sortField,

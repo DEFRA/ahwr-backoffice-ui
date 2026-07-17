@@ -8,6 +8,7 @@ import { axe } from "../../../helpers/axe-helper.js";
 import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { claims } from "../../../data/claims.js";
 import { getClaimSearch, setClaimSearch } from "../../../../app/session/index.js";
+import { AGREEMENT_TYPE } from "../../../../app/constants/index.js";
 import { StatusCodes } from "http-status-codes";
 
 jest.mock("../../../../app/session");
@@ -67,7 +68,7 @@ describe("Claims tests", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Claims");
       expect($("title").text()).toContain("AHWR Claims");
-      expect(getClaimSearch).toHaveBeenCalledTimes(2);
+      expect(getClaimSearch).toHaveBeenCalledTimes(4);
       phaseBannerOk($);
     });
 
@@ -94,6 +95,108 @@ describe("Claims tests", () => {
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(setClaimSearch).toHaveBeenCalledTimes(1);
+    });
+
+    test("has an advanced search disclosure", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+      expect($(".govuk-details__summary-text").text()).toContain("Advanced search");
+    });
+
+    test("has a search button in the advanced search group", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+      expect($(".govuk-button-group button.govuk-button").text()).toContain("Search");
+    });
+
+    test("has an agreement type dropdown", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+      expect($('label[for="agreementType"]').text()).toContain("Agreement type");
+      expect($("select#agreementType")).toHaveLength(1);
+    });
+
+    test("agreement type dropdown has All types, IAHW and PBR options in order", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+      const optionTexts = $("select#agreementType option")
+        .map((_, el) => $(el).text().trim())
+        .get();
+      expect(optionTexts).toEqual(["All types", "IAHW", "PBR"]);
+    });
+
+    test("has a clear all filters link with href /claims/clear", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+      const clearLink = $(".govuk-button-group a.govuk-link");
+      expect(clearLink.text()).toContain("Clear all filters");
+      expect(clearLink.attr("href")).toEqual("/claims/clear");
+    });
+
+    test("advanced search rendering has no accessibility violations", async () => {
+      getClaims.mockReturnValueOnce({ claims, total: 0 });
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(await axe(res.payload)).toHaveNoViolations();
+    });
+
+    test("clear route returns 200 and resets the advanced search session", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/clear`,
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setClaimSearch).toHaveBeenCalledWith(
+        expect.anything(),
+        "agreementType",
+        AGREEMENT_TYPE.ALL,
+      );
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
+    });
+
+    test("clear route surfaces an error when building the view fails", async () => {
+      getPagination.mockImplementationOnce(() => {
+        throw new Error("boom");
+      });
+      const options = {
+        method: "GET",
+        url: `${url}/clear`,
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.INTERNAL_SERVER_ERROR);
     });
   });
 
@@ -124,13 +227,110 @@ describe("Claims tests", () => {
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(setClaimSearch).toHaveBeenCalledTimes(1);
+      expect(setClaimSearch).toHaveBeenCalledTimes(3);
     });
+
+    test("advanced search stores the agreement type and clears the text search", async () => {
+      getClaims.mockReturnValue({ claims, total: 0 });
+      const options = {
+        method: "POST",
+        url,
+        payload: { crumb, searchText: "107279003", agreementType: "PBR", submit: "advancedSearch" },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "agreementType", "PBR");
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
+    });
+
+    test("basic search stores the text and type and resets the agreement type", async () => {
+      getClaims.mockReturnValue({ claims, total: 0 });
+      const options = {
+        method: "POST",
+        url,
+        payload: { crumb, searchText: "107279003", agreementType: "PBR", submit: "search" },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setClaimSearch).toHaveBeenCalledWith(
+        expect.anything(),
+        "agreementType",
+        AGREEMENT_TYPE.ALL,
+      );
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "107279003");
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "sbi");
+    });
+
+    test("advanced search without an agreement type falls back to all types", async () => {
+      getClaims.mockReturnValue({ claims, total: 0 });
+      const options = {
+        method: "POST",
+        url,
+        payload: { crumb, submit: "advancedSearch" },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setClaimSearch).toHaveBeenCalledWith(
+        expect.anything(),
+        "agreementType",
+        AGREEMENT_TYPE.ALL,
+      );
+    });
+
+    test("basic search without search text falls back to an empty string", async () => {
+      getClaims.mockReturnValue({ claims, total: 0 });
+      const options = {
+        method: "POST",
+        url,
+        payload: { crumb, submit: "search" },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "reset");
+    });
+
+    test.each([
+      { searchText: "Beef cattle", searchType: "species" },
+      { searchText: "01/12/2024", searchType: "date" },
+      { searchText: "on hold", searchType: "status" },
+      { searchText: "Foxes Drove Farm", searchType: "organisation" },
+    ])(
+      "classifies an unsupported basic-search term ($searchText) and stores its type",
+      async ({ searchText, searchType }) => {
+        getClaims.mockReturnValue({ claims, total: 0 });
+        const options = {
+          method: "POST",
+          url,
+          payload: { crumb, searchText, submit: "search" },
+          headers: { cookie: `crumb=${crumb}` },
+          auth,
+        };
+        const res = await server.inject(options);
+        expect(res.statusCode).toBe(StatusCodes.OK);
+        expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", searchType);
+      },
+    );
   });
 
   describe("Basic search term rationalisation", () => {
-    const search = async (searchText) => {
-      getClaimSearch.mockReturnValueOnce(searchText);
+    // The session is mocked, so a POST's stored searchType does not round-trip to getViewData;
+    // drive the stored type directly to exercise the allow-list on render.
+    const searchByType = async ({ searchText = "", searchType }) => {
+      getClaimSearch.mockImplementation((_request, key) => {
+        if (key === "searchType") return searchType;
+        if (key === "searchText") return searchText;
+        return undefined;
+      });
       return server.inject({ method: "GET", url: `${url}?page=1`, auth });
     };
 
@@ -139,7 +339,7 @@ describe("Claims tests", () => {
     });
 
     test("hint tells the user only claim number or SBI are searchable", async () => {
-      const res = await search("");
+      const res = await searchByType({ searchType: "reset" });
       const $ = cheerio.load(res.payload);
       expect($("#claimSearch-hint").text().replace(/\s+/g, " ").trim()).toEqual(
         "Search by claim number or SBI.",
@@ -147,18 +347,16 @@ describe("Claims tests", () => {
     });
 
     test.each([
-      { searchText: "REBC-A1B2-C3D4", type: "ref" }, // claim number
-      { searchText: "107279003", type: "sbi" }, // SBI
+      { searchText: "REBC-A1B2-C3D4", searchType: "ref" },
+      { searchText: "107279003", searchType: "sbi" },
     ])(
-      "supported search ($searchText) queries the backend and shows results",
-      async ({ searchText, type }) => {
+      "supported search type ($searchType) queries the backend and shows results",
+      async ({ searchText, searchType }) => {
         getClaims.mockReturnValueOnce({ claims, total: 3 });
-        const res = await search(searchText);
+        const res = await searchByType({ searchText, searchType });
         expect(res.statusCode).toBe(StatusCodes.OK);
         expect(getClaims).toHaveBeenCalledWith(
-          type,
-          searchText,
-          undefined,
+          { searchText, searchType, agreementType: AGREEMENT_TYPE.ALL },
           10,
           0,
           undefined,
@@ -172,7 +370,7 @@ describe("Claims tests", () => {
 
     test("supported search with no match shows the no-results state", async () => {
       getClaims.mockReturnValueOnce({ claims: [], total: 0 });
-      const res = await search("107279003");
+      const res = await searchByType({ searchText: "107279003", searchType: "sbi" });
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(getClaims).toHaveBeenCalled();
       const $ = cheerio.load(res.payload);
@@ -182,18 +380,14 @@ describe("Claims tests", () => {
     });
 
     test.each([
-      { searchText: "Beef cattle" }, // species
-      { searchText: "Dairy cattle" }, // species
-      { searchText: "Pigs" }, // species
-      { searchText: "Sheep" }, // species
-      { searchText: "Poultry" }, // species (falls through to organisation)
-      { searchText: "01/12/2024" }, // claim date
-      { searchText: "on hold" }, // claim status
-      { searchText: "Foxes Drove Farm" }, // organisation / free text
+      { searchType: "species" },
+      { searchType: "date" },
+      { searchType: "status" },
+      { searchType: "organisation" },
     ])(
-      "retired search ($searchText) returns no claims without querying the backend",
-      async ({ searchText }) => {
-        const res = await search(searchText);
+      "unsupported search type ($searchType) returns no claims without querying the backend",
+      async ({ searchType }) => {
+        const res = await searchByType({ searchType });
         expect(res.statusCode).toBe(StatusCodes.OK);
         expect(await axe(res.payload)).toHaveNoViolations();
         expect(getClaims).not.toHaveBeenCalled();
@@ -204,15 +398,13 @@ describe("Claims tests", () => {
       },
     );
 
-    test("empty search shows all claims (default state)", async () => {
+    test("empty/absent search type shows all claims (default state)", async () => {
       getClaims.mockReturnValueOnce({ claims, total: 9 });
-      const res = await search("");
+      const res = await searchByType({ searchText: "", searchType: "reset" });
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(await axe(res.payload)).toHaveNoViolations();
       expect(getClaims).toHaveBeenCalledWith(
-        "reset",
-        "",
-        undefined,
+        { searchText: "", searchType: "reset", agreementType: AGREEMENT_TYPE.ALL },
         10,
         0,
         undefined,
