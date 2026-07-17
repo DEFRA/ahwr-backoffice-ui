@@ -26,9 +26,10 @@ const getViewData = async (request) => {
   const returnPage = viewTemplate;
   const { limit, offset } = getPagination(page);
   const searchText = getClaimSearch(request, claimSearch.searchText);
+  // an empty/absent stored type means no basic-search term is active; treat it as the show-all "reset" type
+  const searchType = getClaimSearch(request, claimSearch.searchType) || "reset";
   const sort = getClaimSearch(request, claimSearch.sort);
   const agreementType = getClaimSearch(request, claimSearch.agreementType) ?? AGREEMENT_TYPE.ALL;
-  const { searchType, searchText: validatedSearchText } = searchValidation(searchText);
   const header = getClaimTableHeader(sort);
   const agreementTypeOptions = getAgreementTypeOptions(agreementType);
 
@@ -47,7 +48,7 @@ const getViewData = async (request) => {
   }
 
   const { claims, total } = await getClaims(
-    { searchText: validatedSearchText, searchType, agreementType },
+    { searchText, searchType, agreementType },
     limit,
     offset,
     sort,
@@ -137,6 +138,7 @@ export const claimsRoutes = [
         try {
           await generateNewCrumb(request, h);
           setClaimSearch(request, claimSearch.searchText, "");
+          setClaimSearch(request, claimSearch.searchType, "");
           setClaimSearch(request, claimSearch.agreementType, AGREEMENT_TYPE.ALL);
           const viewData = await getViewData(request);
           return h.view(viewTemplate, viewData);
@@ -167,8 +169,13 @@ export const claimsRoutes = [
             ? (request.payload?.agreementType ?? AGREEMENT_TYPE.ALL)
             : AGREEMENT_TYPE.ALL;
           setClaimSearch(request, claimSearch.agreementType, agreementType);
-          const searchText = isAdvancedSearch ? "" : (request.payload?.searchText ?? "");
-          setClaimSearch(request, claimSearch.searchText, searchText);
+
+          const { searchText, searchType } = isAdvancedSearch
+            ? { searchText: "", searchType: "" }
+            : searchValidation(request.payload?.searchText);
+          setClaimSearch(request, claimSearch.searchText, searchText ?? "");
+          setClaimSearch(request, claimSearch.searchType, searchType ?? "");
+
           const viewData = await getViewData(request);
           return h.view(viewTemplate, viewData);
         } catch (error) {
