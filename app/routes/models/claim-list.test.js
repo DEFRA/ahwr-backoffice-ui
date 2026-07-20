@@ -16,6 +16,33 @@ describe("getClaimTableHeader", () => {
     const header = getClaimTableHeader(null);
     expect(header[4].text).toBe("Herd/Site CPH");
   });
+
+  const sortUrlsOf = (header) =>
+    header
+      .filter((column) => column.attributes?.["data-url"])
+      .map((column) => column.attributes["data-url"]);
+
+  // Relative sort links resolve against whatever path the browser is on, so they break on any
+  // route deeper than /claims (e.g. /claims/clear). Absolute links are immune.
+  test("builds absolute sort links when rendered on the claims tab", () => {
+    expect(sortUrlsOf(getClaimTableHeader(null))).toEqual([
+      "/claims/sort/claim number",
+      "/claims/sort/species",
+      "/claims/sort/SBI",
+      "/claims/sort/claim date",
+      "/claims/sort/status",
+    ]);
+  });
+
+  test("builds prefixed sort links when rendered under an agreement", () => {
+    expect(sortUrlsOf(getClaimTableHeader(null, "/agreement/IAHW-1234-5678/"))).toEqual([
+      "/agreement/IAHW-1234-5678/claims/sort/claim number",
+      "/agreement/IAHW-1234-5678/claims/sort/species",
+      "/agreement/IAHW-1234-5678/claims/sort/SBI",
+      "/agreement/IAHW-1234-5678/claims/sort/claim date",
+      "/agreement/IAHW-1234-5678/claims/sort/status",
+    ]);
+  });
 });
 
 describe("Application-list model test", () => {

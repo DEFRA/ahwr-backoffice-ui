@@ -13,7 +13,7 @@ const { serviceUri } = config;
 const respText = "responsive-text";
 const col6RespText = `col-6 ${respText}`;
 
-export const getClaimTableHeader = (sortField, dataURLPrefix = "", showSBI = true) => {
+export const getClaimTableHeader = (sortField, dataURLPrefix = "/", showSBI = true) => {
   const direction = sortField?.direction === "DESC" ? "descending" : "ascending";
   const sort = sortField ? sortField.field : "";
 
@@ -34,7 +34,7 @@ export const getClaimTableHeader = (sortField, dataURLPrefix = "", showSBI = tru
       text: "Species",
       attributes: {
         "aria-sort": sort === "species" ? direction : "none",
-        "data-url": "claims/sort/species",
+        "data-url": `${dataURLPrefix}claims/sort/species`,
       },
       classes: col6RespText,
     },
@@ -50,7 +50,7 @@ export const getClaimTableHeader = (sortField, dataURLPrefix = "", showSBI = tru
       text: "SBI number",
       attributes: {
         "aria-sort": sort === "SBI" ? direction : "none",
-        "data-url": "/claims/sort/SBI",
+        "data-url": `${dataURLPrefix}claims/sort/SBI`,
       },
       format: "numeric",
       classes: `col-6 align-left ${respText}`,
@@ -59,7 +59,7 @@ export const getClaimTableHeader = (sortField, dataURLPrefix = "", showSBI = tru
       text: "Claim date",
       attributes: {
         "aria-sort": sort === "claim date" ? direction : "none",
-        "data-url": "claims/sort/claim date",
+        "data-url": `${dataURLPrefix}claims/sort/claim date`,
       },
       format: "date",
       classes: `col-6 align-left ${respText}`,
@@ -68,7 +68,7 @@ export const getClaimTableHeader = (sortField, dataURLPrefix = "", showSBI = tru
       text: "Status",
       attributes: {
         "aria-sort": sort === "status" ? direction : "none",
-        "data-url": "claims/sort/status",
+        "data-url": `${dataURLPrefix}claims/sort/status`,
       },
       classes: col6RespText,
     },
