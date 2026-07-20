@@ -158,9 +158,9 @@ $moj-assets-path: "~@ministryofjustice/frontend/moj/assets/";
 }
 
 /**
- * agreement date range filters
+ * options laid out side by side
  */
-.agreement-date-filters {
+.side-by-side-options {
   display: flex;
   flex-wrap: wrap;
   gap: 40px;

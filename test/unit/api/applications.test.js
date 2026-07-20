@@ -1,6 +1,6 @@
 import wreck from "@hapi/wreck";
 import { config } from "../../../app/config/index.js";
-import { AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../../app/constants/index.js";
+import { AGREEMENT_FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../../app/constants/index.js";
 import {
   getApplications,
   getApplication,
@@ -132,6 +132,58 @@ describe("Application API", () => {
 
       await getApplications(
         { searchType, searchText, status: AGREEMENT_STATUS.ALL },
+        limit,
+        offset,
+        sort,
+      );
+
+      expect(wreck.post).toHaveBeenCalledWith(
+        `${applicationApiUri}/applications/search`,
+        expectedOptions,
+      );
+    });
+
+    it("includes flag in the payload when a specific flag is given", async () => {
+      const sort = "ASC";
+      const wreckResponse = { payload: { applications: [], total: 0 } };
+      const expectedOptions = {
+        payload: {
+          search: { text: searchText, type: searchType },
+          limit,
+          offset,
+          flag: "FLAGGED",
+          sort,
+        },
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      };
+      wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
+
+      await getApplications({ searchType, searchText, flag: "FLAGGED" }, limit, offset, sort);
+
+      expect(wreck.post).toHaveBeenCalledWith(
+        `${applicationApiUri}/applications/search`,
+        expectedOptions,
+      );
+    });
+
+    it("omits flag from the payload when the flag is all", async () => {
+      const sort = "ASC";
+      const wreckResponse = { payload: { applications: [], total: 0 } };
+      const expectedOptions = {
+        payload: {
+          search: { text: searchText, type: searchType },
+          limit,
+          offset,
+          sort,
+        },
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      };
+      wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
+
+      await getApplications(
+        { searchType, searchText, flag: AGREEMENT_FLAG.ALL },
         limit,
         offset,
         sort,
