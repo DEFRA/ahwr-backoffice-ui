@@ -10,6 +10,7 @@ import { claims } from "../../../data/claims.js";
 import { getClaimSearch, setClaimSearch } from "../../../../app/session/index.js";
 import { AGREEMENT_TYPE } from "../../../../app/constants/index.js";
 import { StatusCodes } from "http-status-codes";
+import { ALL_STATUS } from "../../../../app/routes/utils/get-claim-status-options.js";
 
 jest.mock("../../../../app/session");
 jest.mock("../../../../app/api/claims");
@@ -68,7 +69,7 @@ describe("Claims tests", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Claims");
       expect($("title").text()).toContain("AHWR Claims");
-      expect(getClaimSearch).toHaveBeenCalledTimes(4);
+      expect(getClaimSearch).toHaveBeenCalledTimes(5);
       phaseBannerOk($);
     });
 
@@ -131,6 +132,18 @@ describe("Claims tests", () => {
       expect($("select#agreementType")).toHaveLength(1);
     });
 
+    test("has an status dropdown", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+      expect($('label[for="status"]').text()).toContain("Status");
+      expect($("select#status")).toHaveLength(1);
+    });
+
     test("agreement type dropdown has All types, IAHW and PBR options in order", async () => {
       const options = {
         method: "GET",
@@ -143,6 +156,36 @@ describe("Claims tests", () => {
         .map((_, el) => $(el).text().trim())
         .get();
       expect(optionTexts).toEqual(["All types", "IAHW", "PBR"]);
+    });
+
+    test("status dropdown has All types, and the status values", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+      const optionTexts = $("select#status option")
+        .map((_, el) => $(el).text().trim())
+        .get();
+      expect(optionTexts).toEqual([
+        "All statuses",
+        "Agreed",
+        "Withdrawn",
+        "In check",
+        "Accepted",
+        "Not agreed",
+        "Paid",
+        "Ready to pay",
+        "Rejected",
+        "On hold",
+        "Recommended to pay",
+        "Recommended to reject",
+        "Authorised",
+        "Sent to finance",
+        "Payment held",
+      ]);
     });
 
     test("has a clear all filters link with href /claims/clear", async () => {
@@ -182,6 +225,7 @@ describe("Claims tests", () => {
         "agreementType",
         AGREEMENT_TYPE.ALL,
       );
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "status", ALL_STATUS);
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
     });
@@ -227,7 +271,7 @@ describe("Claims tests", () => {
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(setClaimSearch).toHaveBeenCalledTimes(3);
+      expect(setClaimSearch).toHaveBeenCalledTimes(4);
     });
 
     test("advanced search stores the agreement type and clears the text search", async () => {
@@ -242,6 +286,22 @@ describe("Claims tests", () => {
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "agreementType", "PBR");
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
+    });
+
+    test("advanced search stores the status and clears the text search", async () => {
+      getClaims.mockReturnValue({ claims, total: 0 });
+      const options = {
+        method: "POST",
+        url,
+        payload: { crumb, searchText: "107279003", status: "AGREED", submit: "advancedSearch" },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "status", "AGREED");
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
     });
@@ -266,6 +326,22 @@ describe("Claims tests", () => {
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "sbi");
     });
 
+    test("basic search stores the text and type and resets the status", async () => {
+      getClaims.mockReturnValue({ claims, total: 0 });
+      const options = {
+        method: "POST",
+        url,
+        payload: { crumb, searchText: "107279003", status: "AGREED", submit: "search" },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "status", ALL_STATUS);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "107279003");
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "sbi");
+    });
+
     test("advanced search without an agreement type falls back to all types", async () => {
       getClaims.mockReturnValue({ claims, total: 0 });
       const options = {
@@ -282,6 +358,20 @@ describe("Claims tests", () => {
         "agreementType",
         AGREEMENT_TYPE.ALL,
       );
+    });
+
+    test("advanced search without an status falls back to all types", async () => {
+      getClaims.mockReturnValue({ claims, total: 0 });
+      const options = {
+        method: "POST",
+        url,
+        payload: { crumb, submit: "advancedSearch" },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "status", ALL_STATUS);
     });
 
     test("basic search without search text falls back to an empty string", async () => {
@@ -356,7 +446,7 @@ describe("Claims tests", () => {
         const res = await searchByType({ searchText, searchType });
         expect(res.statusCode).toBe(StatusCodes.OK);
         expect(getClaims).toHaveBeenCalledWith(
-          { searchText, searchType, agreementType: AGREEMENT_TYPE.ALL },
+          { searchText, searchType, agreementType: AGREEMENT_TYPE.ALL, status: ALL_STATUS },
           10,
           0,
           undefined,
@@ -404,7 +494,12 @@ describe("Claims tests", () => {
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(await axe(res.payload)).toHaveNoViolations();
       expect(getClaims).toHaveBeenCalledWith(
-        { searchText: "", searchType: "reset", agreementType: AGREEMENT_TYPE.ALL },
+        {
+          searchText: "",
+          searchType: "reset",
+          agreementType: AGREEMENT_TYPE.ALL,
+          status: ALL_STATUS,
+        },
         10,
         0,
         undefined,

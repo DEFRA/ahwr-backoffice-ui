@@ -58,6 +58,16 @@
                           },
                           items: agreementTypeOptions
                         }) }}
+
+                        {{ govukSelect({
+                          id: "status",
+                          name: "status",
+                          label: {
+                            text: "Status"
+                          },
+                          items: statusOptions
+                        }) }}
+
                         <div class="govuk-button-group">
                           {{ govukButton({
                             text: "Search",

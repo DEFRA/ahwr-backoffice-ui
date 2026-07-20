@@ -2,6 +2,7 @@ import wreck from "@hapi/wreck";
 import { config } from "../config/index.js";
 import { metricsCounter } from "../lib/metrics.js";
 import { AGREEMENT_TYPE } from "../constants/index.js";
+import { ALL_STATUS } from "../routes/utils/get-claim-status-options.js";
 
 const { applicationApiUri, apiKeys } = config;
 
@@ -20,17 +21,19 @@ export async function getClaim(reference, logger) {
 }
 
 export async function getClaims(searchParameters, limit, offset, sort, logger) {
-  const { searchText, searchType, filter, agreementType } = searchParameters;
+  const { searchText, searchType, status, agreementType } = searchParameters;
   const hasAgreementType = agreementType && agreementType !== AGREEMENT_TYPE.ALL;
+  const hasStatus = status && status !== ALL_STATUS;
+
   const endpoint = `${applicationApiUri}/claims/search`;
   const options = {
     payload: {
       search: { text: searchText, type: searchType },
-      filter,
       limit,
       offset,
       ...(hasAgreementType && { agreementType }),
       sort,
+      ...(hasStatus && { status }),
     },
     json: true,
     headers: { "x-api-key": apiKeys.backofficeUiApiKey },

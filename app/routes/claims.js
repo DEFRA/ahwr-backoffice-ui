@@ -11,6 +11,7 @@ import { getAgreementTypeOptions } from "./utils/get-agreement-type-options.js";
 import { permissions } from "../auth/permissions.js";
 import { AGREEMENT_TYPE } from "../constants/index.js";
 import { StatusCodes } from "http-status-codes";
+import { getClaimStatusOptions, ALL_STATUS } from "./utils/get-claim-status-options.js";
 
 const { administrator, authoriser, processor, recommender, user } = permissions;
 const { displayPageSize } = config;
@@ -25,13 +26,17 @@ const getViewData = async (request) => {
   const { page } = request.query;
   const returnPage = viewTemplate;
   const { limit, offset } = getPagination(page);
+
   const searchText = getClaimSearch(request, claimSearch.searchText);
   // an empty/absent stored type means no basic-search term is active; treat it as the show-all "reset" type
   const searchType = getClaimSearch(request, claimSearch.searchType) || "reset";
   const sort = getClaimSearch(request, claimSearch.sort);
   const agreementType = getClaimSearch(request, claimSearch.agreementType) ?? AGREEMENT_TYPE.ALL;
+  const status = getClaimSearch(request, claimSearch.status) ?? ALL_STATUS;
+
   const header = getClaimTableHeader(sort);
   const agreementTypeOptions = getAgreementTypeOptions(agreementType);
+  const statusOptions = getClaimStatusOptions(status);
 
   const emptyViewData = () => ({
     searchText,
@@ -41,6 +46,7 @@ const getViewData = async (request) => {
     error: "No claims found.",
     total: 0,
     agreementTypeOptions,
+    statusOptions,
   });
 
   if (!SUPPORTED_SEARCH_TYPES.has(searchType)) {
@@ -48,7 +54,7 @@ const getViewData = async (request) => {
   }
 
   const { claims, total } = await getClaims(
-    { searchText, searchType, agreementType },
+    { searchText, searchType, agreementType, status },
     limit,
     offset,
     sort,
@@ -72,6 +78,7 @@ const getViewData = async (request) => {
     error: null,
     total,
     agreementTypeOptions,
+    statusOptions,
   };
 };
 
@@ -140,6 +147,7 @@ export const claimsRoutes = [
           setClaimSearch(request, claimSearch.searchText, "");
           setClaimSearch(request, claimSearch.searchType, "");
           setClaimSearch(request, claimSearch.agreementType, AGREEMENT_TYPE.ALL);
+          setClaimSearch(request, claimSearch.status, ALL_STATUS);
           const viewData = await getViewData(request);
           return h.view(viewTemplate, viewData);
         } catch (err) {
@@ -164,11 +172,19 @@ export const claimsRoutes = [
       },
       handler: async (request, h) => {
         try {
+          let agreementType, status;
+
           const isAdvancedSearch = request.payload?.submit === "advancedSearch";
-          const agreementType = isAdvancedSearch
-            ? (request.payload?.agreementType ?? AGREEMENT_TYPE.ALL)
-            : AGREEMENT_TYPE.ALL;
+          if (isAdvancedSearch) {
+            agreementType = request.payload.agreementType ?? AGREEMENT_TYPE.ALL;
+            status = request.payload.status ?? ALL_STATUS;
+          } else {
+            agreementType = AGREEMENT_TYPE.ALL;
+            status = ALL_STATUS;
+          }
+
           setClaimSearch(request, claimSearch.agreementType, agreementType);
+          setClaimSearch(request, claimSearch.status, status);
 
           const { searchText, searchType } = isAdvancedSearch
             ? { searchText: "", searchType: "" }
