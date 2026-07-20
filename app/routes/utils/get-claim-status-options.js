@@ -5,8 +5,8 @@ export const ALL_STATUS = "ALL";
 const formatText = (str) =>
   str
     .toLowerCase()
-    .replace(/_/g, " ")
-    .replace(/^\w/, (c) => c.toUpperCase());
+    .replaceAll(/_/g, " ")
+    .replaceAll(/^\w/, (c) => c.toUpperCase());
 
 export const getClaimStatusOptions = (selectedStatus) => [
   {
