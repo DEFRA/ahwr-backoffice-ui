@@ -6,10 +6,25 @@ const MONTH_INDEX_OFFSET = 1;
 const ONE_DAY = 1;
 const ONE_MILLISECOND = 1;
 
-export const extractDateParts = (payload, prefix) => ({
+const extractDateParts = (payload, prefix) => ({
   day: payload?.[`${prefix}-day`] ?? "",
   month: payload?.[`${prefix}-month`] ?? "",
   year: payload?.[`${prefix}-year`] ?? "",
+});
+
+/**
+ * Reads the advanced-search date range parts from a search form payload.
+ *
+ * Only an advanced search carries a date range; a basic search clears it, so
+ * both bounds fall back to {@link emptyDateParts}.
+ *
+ * @param {object} payload - the submitted search form payload.
+ * @param {boolean} isAdvancedSearch - whether the advanced search was submitted.
+ * @returns {{ dateFrom: object, dateTo: object }} the raw day/month/year parts for each bound.
+ */
+export const extractDateRangeParts = (payload, isAdvancedSearch) => ({
+  dateFrom: isAdvancedSearch ? extractDateParts(payload, "dateFrom") : emptyDateParts,
+  dateTo: isAdvancedSearch ? extractDateParts(payload, "dateTo") : emptyDateParts,
 });
 
 const isRealDate = (day, month, year) => {

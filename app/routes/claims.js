@@ -13,7 +13,7 @@ import { AGREEMENT_TYPE } from "../constants/index.js";
 import { StatusCodes } from "http-status-codes";
 import { getClaimStatusOptions, SEARCH_STATUS } from "./utils/get-claim-status-options.js";
 import {
-  extractDateParts,
+  extractDateRangeParts,
   buildDateFilter,
   resolveDateRange,
   emptyDateParts,
@@ -205,12 +205,7 @@ export const claimsRoutes = [
           setClaimSearch(request, claimSearch.agreementType, agreementType);
           setClaimSearch(request, claimSearch.status, status);
 
-          const dateFrom = isAdvancedSearch
-            ? extractDateParts(request.payload, "dateFrom")
-            : emptyDateParts;
-          const dateTo = isAdvancedSearch
-            ? extractDateParts(request.payload, "dateTo")
-            : emptyDateParts;
+          const { dateFrom, dateTo } = extractDateRangeParts(request.payload, isAdvancedSearch);
           setClaimSearch(request, claimSearch.dateFrom, dateFrom);
           setClaimSearch(request, claimSearch.dateTo, dateTo);
 

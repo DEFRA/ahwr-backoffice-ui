@@ -1,35 +1,45 @@
 import {
-  extractDateParts,
+  extractDateRangeParts,
   buildDateFilter,
   resolveDateRange,
 } from "../../../../app/routes/utils/date-filter.js";
 
-describe("extractDateParts", () => {
-  test("reads the prefixed day, month and year from the payload", () => {
-    const payload = {
-      "dateFrom-day": "1",
-      "dateFrom-month": "2",
-      "dateFrom-year": "2026",
-      "dateTo-day": "15",
-      "dateTo-month": "7",
-      "dateTo-year": "2026",
-    };
+describe("extractDateRangeParts", () => {
+  const payload = {
+    "dateFrom-day": "1",
+    "dateFrom-month": "2",
+    "dateFrom-year": "2026",
+    "dateTo-day": "15",
+    "dateTo-month": "7",
+    "dateTo-year": "2026",
+  };
 
-    expect(extractDateParts(payload, "dateFrom")).toEqual({
-      day: "1",
-      month: "2",
-      year: "2026",
-    });
-    expect(extractDateParts(payload, "dateTo")).toEqual({
-      day: "15",
-      month: "7",
-      year: "2026",
+  test("reads the prefixed day, month and year of both bounds for an advanced search", () => {
+    expect(extractDateRangeParts(payload, true)).toEqual({
+      dateFrom: { day: "1", month: "2", year: "2026" },
+      dateTo: { day: "15", month: "7", year: "2026" },
     });
   });
 
-  test("defaults missing parts to empty strings", () => {
-    expect(extractDateParts({}, "dateFrom")).toEqual({ day: "", month: "", year: "" });
-    expect(extractDateParts(undefined, "dateFrom")).toEqual({ day: "", month: "", year: "" });
+  test("defaults missing parts to empty strings for an empty advanced-search payload", () => {
+    expect(extractDateRangeParts({}, true)).toEqual({
+      dateFrom: { day: "", month: "", year: "" },
+      dateTo: { day: "", month: "", year: "" },
+    });
+  });
+
+  test("defaults missing parts to empty strings for an absent advanced-search payload", () => {
+    expect(extractDateRangeParts(undefined, true)).toEqual({
+      dateFrom: { day: "", month: "", year: "" },
+      dateTo: { day: "", month: "", year: "" },
+    });
+  });
+
+  test("clears both bounds to empty parts for a basic search", () => {
+    expect(extractDateRangeParts(payload, false)).toEqual({
+      dateFrom: { day: "", month: "", year: "" },
+      dateTo: { day: "", month: "", year: "" },
+    });
   });
 });
 
