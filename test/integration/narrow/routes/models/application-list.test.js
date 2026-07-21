@@ -7,8 +7,13 @@ import { getApplications } from "../../../../../app/api/applications.js";
 import {
   getAgreementTypeOptions,
   getStatusOptions,
+  getFlagOptions,
 } from "../../../../../app/routes/utils/get-agreement-type-options.js";
-import { AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../../../../app/constants/index.js";
+import {
+  AGREEMENT_FLAG,
+  AGREEMENT_STATUS,
+  AGREEMENT_TYPE,
+} from "../../../../../app/constants/index.js";
 import { permissions } from "../../../../../app/auth/permissions.js";
 
 jest.mock("../../../../../app/api/applications");
@@ -137,6 +142,31 @@ describe("Application-list createModel", () => {
     expect(getApplications.mock.calls[0][0]).toEqual(expect.objectContaining({ status: "AGREED" }));
   });
 
+  test("createModel passes the session flag to the backend", async () => {
+    getApplications.mockClear();
+    const request = {
+      yar: {
+        get: jest.fn(() => ({
+          searchText: "",
+          searchType: "",
+          flag: "FLAGGED",
+        })),
+      },
+      query: {},
+      auth: {
+        isAuthenticated: true,
+        credentials: {
+          scope: [administrator],
+          account: { username: "unit-tester" },
+        },
+      },
+    };
+
+    await createModel(request, 1);
+
+    expect(getApplications.mock.calls[0][0]).toEqual(expect.objectContaining({ flag: "FLAGGED" }));
+  });
+
   test.each([
     { searchType: "date", searchText: "01/12/2024" },
     { searchType: "status", searchText: "agreed" },
@@ -169,6 +199,7 @@ describe("Application-list createModel", () => {
         agreementDateFrom: emptyDateItems,
         agreementDateTo: emptyDateItems,
         statusOptions: getStatusOptions(AGREEMENT_STATUS.ALL),
+        flagOptions: getFlagOptions(AGREEMENT_FLAG.ALL),
       });
       expect(getApplications).not.toHaveBeenCalled();
     },

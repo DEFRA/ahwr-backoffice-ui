@@ -3,6 +3,7 @@ export const sessionKeys = {
     searchText: "searchText",
     searchType: "searchType",
     status: "status",
+    flag: "flag",
     agreementType: "agreementType",
     dateFrom: "dateFrom",
     dateTo: "dateTo",

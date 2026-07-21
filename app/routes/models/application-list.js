@@ -10,8 +10,12 @@ import {
   buildAgreementDateFilter,
   resolveAgreementDateRange,
 } from "../utils/agreement-date-filter.js";
-import { AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../constants/index.js";
-import { getAgreementTypeOptions, getStatusOptions } from "../utils/get-agreement-type-options.js";
+import { AGREEMENT_FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../constants/index.js";
+import {
+  getAgreementTypeOptions,
+  getStatusOptions,
+  getFlagOptions,
+} from "../utils/get-agreement-type-options.js";
 
 const { serviceUri } = config;
 
@@ -24,6 +28,7 @@ const emptyModel = ({
   agreementDateFrom,
   agreementDateTo,
   statusOptions,
+  flagOptions,
 }) => ({
   applications: [],
   total: 0,
@@ -33,6 +38,7 @@ const emptyModel = ({
   agreementDateFrom,
   agreementDateTo,
   statusOptions,
+  flagOptions,
 });
 
 export const viewModel = (request, page) => {
@@ -155,9 +161,11 @@ export async function createModel(request, page) {
   const agreementType =
     getAppSearch(request, sessionKeys.appSearch.agreementType) ?? AGREEMENT_TYPE.ALL;
   const status = getAppSearch(request, sessionKeys.appSearch.status) ?? AGREEMENT_STATUS.ALL;
+  const flag = getAppSearch(request, sessionKeys.appSearch.flag) ?? AGREEMENT_FLAG.ALL;
 
   const agreementTypeOptions = getAgreementTypeOptions(agreementType);
   const statusOptions = getStatusOptions(status);
+  const flagOptions = getFlagOptions(flag);
 
   const dateFromFilter = buildAgreementDateFilter(
     getAppSearch(request, sessionKeys.appSearch.dateFrom),
@@ -174,6 +182,7 @@ export async function createModel(request, page) {
       agreementDateFrom: dateFromFilter.items,
       agreementDateTo: dateToFilter.items,
       statusOptions,
+      flagOptions,
     });
   }
 
@@ -185,6 +194,7 @@ export async function createModel(request, page) {
       searchText,
       searchType,
       status,
+      flag,
       agreementType,
       dateFrom,
       dateTo,
@@ -209,6 +219,7 @@ export async function createModel(request, page) {
       agreementDateFrom: dateFromFilter.items,
       agreementDateTo: dateToFilter.items,
       statusOptions,
+      flagOptions,
     };
   }
 
@@ -218,5 +229,6 @@ export async function createModel(request, page) {
     agreementDateFrom: dateFromFilter.items,
     agreementDateTo: dateToFilter.items,
     statusOptions,
+    flagOptions,
   });
 }

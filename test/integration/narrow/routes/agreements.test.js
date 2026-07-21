@@ -6,7 +6,11 @@ import { permissions } from "../../../../app/auth/permissions.js";
 import { getAppSearch, setAppSearch } from "../../../../app/session/index.js";
 import { getPagination, getPagingData } from "../../../../app/pagination.js";
 import { getApplications } from "../../../../app/api/applications.js";
-import { AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../../../app/constants/index.js";
+import {
+  AGREEMENT_FLAG,
+  AGREEMENT_STATUS,
+  AGREEMENT_TYPE,
+} from "../../../../app/constants/index.js";
 import { applicationsData } from "../../../data/applications.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
@@ -167,6 +171,31 @@ describe("Applications test", () => {
         expect(optionTexts).toEqual(["All types", "IAHW", "PBR"]);
       });
 
+      test("has a flag dropdown", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        expect($('label[for="flag"]').text()).toContain("Flag");
+        expect($("select#flag")).toHaveLength(1);
+      });
+
+      test("flag dropdown has All flags, Flagged and Not flagged options", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        const optionTexts = $("select#flag option")
+          .map((_, el) => $(el).text().trim())
+          .get();
+        expect(optionTexts).toEqual(["All flags", "Flagged", "Not flagged"]);
+      });
+
+      test("flag dropdown appears to the left of the status dropdown", async () => {
+        const res = await server.inject(options);
+        const $ = cheerio.load(res.payload);
+        const selectIds = $("select")
+          .map((_, el) => $(el).attr("id"))
+          .get();
+        expect(selectIds.indexOf("flag")).toBeLessThan(selectIds.indexOf("status"));
+      });
+
       test("has a clear all filters link", async () => {
         const res = await server.inject(options);
         const $ = cheerio.load(res.payload);
@@ -256,6 +285,11 @@ describe("Applications test", () => {
           "status",
           AGREEMENT_STATUS.ALL,
         );
+      });
+
+      test("clear resets the flag filter", async () => {
+        await server.inject(options);
+        expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "flag", AGREEMENT_FLAG.ALL);
       });
 
       test("clear resets the agreement type filter", async () => {
@@ -409,6 +443,48 @@ describe("Applications test", () => {
       expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "agreementType", "IAHW");
       expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
       expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
+    });
+
+    test("advanced search stores the flag filter", async () => {
+      const options = {
+        method,
+        url,
+        payload: {
+          crumb,
+          searchText: "",
+          flag: "FLAGGED",
+          submit: "advancedSearch",
+        },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      getApplications.mockReturnValue({ applications: [], total: 0 });
+
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "flag", "FLAGGED");
+    });
+
+    test("basic search resets the flag filter", async () => {
+      const options = {
+        method,
+        url,
+        payload: {
+          crumb,
+          searchText: "107279003",
+          flag: "FLAGGED",
+          submit: "search",
+        },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      getApplications.mockReturnValue({ applications: [], total: 0 });
+
+      const res = await server.inject(options);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "flag", AGREEMENT_FLAG.ALL);
     });
 
     test("advanced search stores the agreement date range parts", async () => {

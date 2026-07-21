@@ -1,13 +1,19 @@
 export const PIGS_AND_PAYMENTS_RELEASE_DATE = new Date("2026-01-22T00:00:00");
 
-export const AGREEMENT_TYPE = {
+export const AGREEMENT_TYPE = Object.freeze({
   ALL: "ALL",
   IAHW: "IAHW",
   PBR: "PBR",
-};
+});
 
-export const AGREEMENT_STATUS = {
+export const AGREEMENT_STATUS = Object.freeze({
   ALL: "ALL",
   AGREED: "AGREED",
   NOT_AGREED: "NOT_AGREED",
-};
+});
+
+export const AGREEMENT_FLAG = Object.freeze({
+  ALL: "ALL",
+  FLAGGED: "FLAGGED",
+  NOT_FLAGGED: "NOT_FLAGGED",
+});
