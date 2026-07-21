@@ -12,6 +12,7 @@ export const sessionKeys = {
     searchText: "searchText",
     searchType: "searchType",
     agreementType: "agreementType",
+    status: "status",
     sort: "sort",
   },
 };

@@ -11,6 +11,7 @@ import {
 import { metricsCounter } from "../../../app/lib/metrics.js";
 import { config } from "../../../app/config/index.js";
 import { AGREEMENT_TYPE } from "../../../app/constants/index.js";
+import { SEARCH_STATUS } from "../../../app/routes/utils/get-claim-status-options.js";
 
 jest.mock("@hapi/wreck");
 jest.mock("../../../app/config");
@@ -87,7 +88,6 @@ describe("Claims API", () => {
       expect(wreck.post).toHaveBeenCalledWith(endpoint, {
         payload: {
           search: { text: searchText, type: searchType },
-          filter: undefined,
           limit,
           offset,
           sort: undefined,
@@ -106,7 +106,6 @@ describe("Claims API", () => {
       expect(wreck.post).toHaveBeenCalledWith(endpoint, {
         payload: {
           search: { text: searchText, type: searchType },
-          filter: undefined,
           limit,
           offset,
           agreementType: "PBR",
@@ -131,7 +130,43 @@ describe("Claims API", () => {
       expect(wreck.post).toHaveBeenCalledWith(endpoint, {
         payload: {
           search: { text: searchText, type: searchType },
-          filter: undefined,
+          limit,
+          offset,
+          sort,
+        },
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      });
+    });
+
+    test("includes status in the payload when a specific type is given", async () => {
+      const sort = "ASC";
+      wreck.post = jest.fn().mockResolvedValueOnce({ payload: { claims: [], total: 0 } });
+
+      await getClaims({ searchType, searchText, status: "AGREED" }, limit, offset, sort);
+
+      expect(wreck.post).toHaveBeenCalledWith(endpoint, {
+        payload: {
+          search: { text: searchText, type: searchType },
+          limit,
+          offset,
+          status: "AGREED",
+          sort,
+        },
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      });
+    });
+
+    test("omits status from the payload when the type is all", async () => {
+      const sort = "ASC";
+      wreck.post = jest.fn().mockResolvedValueOnce({ payload: { claims: [], total: 0 } });
+
+      await getClaims({ searchType, searchText, status: SEARCH_STATUS.ALL }, limit, offset, sort);
+
+      expect(wreck.post).toHaveBeenCalledWith(endpoint, {
+        payload: {
+          search: { text: searchText, type: searchType },
           limit,
           offset,
           sort,
@@ -152,9 +187,8 @@ describe("Claims API", () => {
       wreck.post = jest.fn().mockRejectedValueOnce(wreckResponse);
 
       const logger = { error: jest.fn() };
-      const filter = { field: "updatedAt", op: "lte", value: "2025-01-17" };
       await expect(async () => {
-        await getClaims({ searchType: "sbi", searchText: "1010", filter }, 10, 10, "ASC", logger);
+        await getClaims({ searchType: "sbi", searchText: "1010" }, 10, 10, "ASC", logger);
       }).rejects.toEqual(wreckResponse);
     });
   });
