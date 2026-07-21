@@ -12,14 +12,18 @@ import { permissions } from "../auth/permissions.js";
 import { AGREEMENT_TYPE } from "../constants/index.js";
 import { StatusCodes } from "http-status-codes";
 import { getClaimStatusOptions, SEARCH_STATUS } from "./utils/get-claim-status-options.js";
-import { extractDateParts, buildDateFilter, resolveDateRange } from "./utils/date-filter.js";
+import {
+  extractDateParts,
+  buildDateFilter,
+  resolveDateRange,
+  emptyDateParts,
+} from "./utils/date-filter.js";
 
 const { administrator, authoriser, processor, recommender, user } = permissions;
 const { displayPageSize } = config;
 const { claimSearch } = sessionKeys;
 const viewTemplate = "claims";
 const currentPath = `/${viewTemplate}`;
-const emptyDateParts = { day: "", month: "", year: "" };
 
 // claims basic search supports claim number and SBI only; every other term returns no results
 const SUPPORTED_SEARCH_TYPES = new Set(["ref", "sbi", "reset"]);

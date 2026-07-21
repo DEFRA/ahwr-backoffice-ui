@@ -1,4 +1,4 @@
-const emptyParts = { day: "", month: "", year: "" };
+export const emptyDateParts = { day: "", month: "", year: "" };
 
 // JavaScript Date months are zero-based, so a calendar month maps to month - 1.
 const MONTH_INDEX_OFFSET = 1;
@@ -50,7 +50,7 @@ const toDate = ({ day, month, year }, endOfDay) => {
  *   `items` are the govukDateInput items used to re-populate the form.
  */
 export const buildDateFilter = (parts, { endOfDay = false } = {}) => {
-  const { day, month, year } = { ...emptyParts, ...parts };
+  const { day, month, year } = { ...emptyDateParts, ...parts };
   return {
     value: toDate({ day, month, year }, endOfDay),
     items: [
