@@ -18,7 +18,7 @@
     "test:watch": "jest --coverage=false --onlyChanged --watch --runInBand",
     "test:watch:all": "npm run test:watch & npm run build:watch",
     "lint": "eslint",
-    "lint:deps": "knip --production --include dependencies,unlisted,unresolved",
+    "lint:knip": "knip --production --exclude exports",
     "lint:fix": "eslint --fix",
     "test:debug": "node --inspect-brk=0.0.0.0 ./node_modules/jest/bin/jest.js --coverage=false --onlyChanged --watch --runInBand --no-cache",
     "setup:husky": "node -e \"try { (await import('husky')).default() } catch (e) { if (e.code !== 'ERR_MODULE_NOT_FOUND') throw e }\" --input-type module",
