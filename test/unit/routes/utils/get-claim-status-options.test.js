@@ -1,15 +1,15 @@
 import { STATUS } from "ffc-ahwr-common-library";
 import {
-  ALL_STATUS,
+  SEARCH_STATUS,
   getClaimStatusOptions,
 } from "../../../../app/routes/utils/get-claim-status-options.js";
 
 describe("getStatusOptions", () => {
   test("returns the claim status options in order", () => {
-    const options = getClaimStatusOptions(ALL_STATUS);
+    const options = getClaimStatusOptions(SEARCH_STATUS.ALL);
 
     expect(options).toEqual([
-      { value: ALL_STATUS, text: "All statuses", selected: true },
+      { value: SEARCH_STATUS.ALL, text: "All statuses", selected: true },
       { value: STATUS.AGREED, text: "Agreed", selected: false },
       { value: STATUS.WITHDRAWN, text: "Withdrawn", selected: false },
       { value: STATUS.IN_CHECK, text: "In check", selected: false },

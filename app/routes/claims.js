@@ -11,7 +11,7 @@ import { getAgreementTypeOptions } from "./utils/get-agreement-type-options.js";
 import { permissions } from "../auth/permissions.js";
 import { AGREEMENT_TYPE } from "../constants/index.js";
 import { StatusCodes } from "http-status-codes";
-import { getClaimStatusOptions, ALL_STATUS } from "./utils/get-claim-status-options.js";
+import { getClaimStatusOptions, SEARCH_STATUS } from "./utils/get-claim-status-options.js";
 
 const { administrator, authoriser, processor, recommender, user } = permissions;
 const { displayPageSize } = config;
@@ -32,7 +32,7 @@ const getViewData = async (request) => {
   const searchType = getClaimSearch(request, claimSearch.searchType) || "reset";
   const sort = getClaimSearch(request, claimSearch.sort);
   const agreementType = getClaimSearch(request, claimSearch.agreementType) ?? AGREEMENT_TYPE.ALL;
-  const status = getClaimSearch(request, claimSearch.status) ?? ALL_STATUS;
+  const status = getClaimSearch(request, claimSearch.status) ?? SEARCH_STATUS.ALL;
 
   const header = getClaimTableHeader(sort);
   const agreementTypeOptions = getAgreementTypeOptions(agreementType);
@@ -147,7 +147,7 @@ export const claimsRoutes = [
           setClaimSearch(request, claimSearch.searchText, "");
           setClaimSearch(request, claimSearch.searchType, "");
           setClaimSearch(request, claimSearch.agreementType, AGREEMENT_TYPE.ALL);
-          setClaimSearch(request, claimSearch.status, ALL_STATUS);
+          setClaimSearch(request, claimSearch.status, SEARCH_STATUS.ALL);
           const viewData = await getViewData(request);
           return h.view(viewTemplate, viewData);
         } catch (err) {
@@ -177,10 +177,10 @@ export const claimsRoutes = [
           const isAdvancedSearch = request.payload?.submit === "advancedSearch";
           if (isAdvancedSearch) {
             agreementType = request.payload.agreementType ?? AGREEMENT_TYPE.ALL;
-            status = request.payload.status ?? ALL_STATUS;
+            status = request.payload.status ?? SEARCH_STATUS.ALL;
           } else {
             agreementType = AGREEMENT_TYPE.ALL;
-            status = ALL_STATUS;
+            status = SEARCH_STATUS.ALL;
           }
 
           setClaimSearch(request, claimSearch.agreementType, agreementType);

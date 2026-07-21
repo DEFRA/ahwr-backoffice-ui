@@ -1,22 +1,16 @@
 import { STATUS } from "ffc-ahwr-common-library";
+import { upperFirstLetter } from "../../lib/display-helper.js";
 
-export const ALL_STATUS = "ALL";
+export const SEARCH_STATUS = Object.freeze({
+  ALL: "ALL",
+  ...STATUS,
+});
 
-const formatText = (str) =>
-  str
-    .toLowerCase()
-    .replaceAll("_", " ")
-    .replace(/^\w/, (c) => c.toUpperCase());
+const formatStatusText = (status) => upperFirstLetter(status.toLowerCase()).replaceAll("_", " ");
 
-export const getClaimStatusOptions = (selectedStatus) => [
-  {
-    value: ALL_STATUS,
-    text: "All statuses",
-    selected: selectedStatus === ALL_STATUS,
-  },
-  ...Object.values(STATUS).map((value) => ({
-    value,
-    text: formatText(value),
-    selected: value === selectedStatus,
-  })),
-];
+export const getClaimStatusOptions = (selectedStatus) =>
+  Object.values(SEARCH_STATUS).map((status) => ({
+    value: status,
+    text: status === SEARCH_STATUS.ALL ? "All statuses" : formatStatusText(status),
+    selected: status === selectedStatus,
+  }));

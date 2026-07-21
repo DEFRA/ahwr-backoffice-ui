@@ -10,7 +10,7 @@ import { claims } from "../../../data/claims.js";
 import { getClaimSearch, setClaimSearch } from "../../../../app/session/index.js";
 import { AGREEMENT_TYPE } from "../../../../app/constants/index.js";
 import { StatusCodes } from "http-status-codes";
-import { ALL_STATUS } from "../../../../app/routes/utils/get-claim-status-options.js";
+import { SEARCH_STATUS } from "../../../../app/routes/utils/get-claim-status-options.js";
 
 jest.mock("../../../../app/session");
 jest.mock("../../../../app/api/claims");
@@ -225,7 +225,7 @@ describe("Claims tests", () => {
         "agreementType",
         AGREEMENT_TYPE.ALL,
       );
-      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "status", ALL_STATUS);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "status", SEARCH_STATUS.ALL);
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
     });
@@ -337,7 +337,7 @@ describe("Claims tests", () => {
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "status", ALL_STATUS);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "status", SEARCH_STATUS.ALL);
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "107279003");
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "sbi");
     });
@@ -371,7 +371,7 @@ describe("Claims tests", () => {
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "status", ALL_STATUS);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "status", SEARCH_STATUS.ALL);
     });
 
     test("basic search without search text falls back to an empty string", async () => {
@@ -446,7 +446,7 @@ describe("Claims tests", () => {
         const res = await searchByType({ searchText, searchType });
         expect(res.statusCode).toBe(StatusCodes.OK);
         expect(getClaims).toHaveBeenCalledWith(
-          { searchText, searchType, agreementType: AGREEMENT_TYPE.ALL, status: ALL_STATUS },
+          { searchText, searchType, agreementType: AGREEMENT_TYPE.ALL, status: SEARCH_STATUS.ALL },
           10,
           0,
           undefined,
@@ -498,7 +498,7 @@ describe("Claims tests", () => {
           searchText: "",
           searchType: "reset",
           agreementType: AGREEMENT_TYPE.ALL,
-          status: ALL_STATUS,
+          status: SEARCH_STATUS.ALL,
         },
         10,
         0,

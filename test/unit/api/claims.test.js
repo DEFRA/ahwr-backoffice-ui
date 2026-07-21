@@ -11,7 +11,7 @@ import {
 import { metricsCounter } from "../../../app/lib/metrics.js";
 import { config } from "../../../app/config/index.js";
 import { AGREEMENT_TYPE } from "../../../app/constants/index.js";
-import { ALL_STATUS } from "../../../app/routes/utils/get-claim-status-options.js";
+import { SEARCH_STATUS } from "../../../app/routes/utils/get-claim-status-options.js";
 
 jest.mock("@hapi/wreck");
 jest.mock("../../../app/config");
@@ -162,7 +162,7 @@ describe("Claims API", () => {
       const sort = "ASC";
       wreck.post = jest.fn().mockResolvedValueOnce({ payload: { claims: [], total: 0 } });
 
-      await getClaims({ searchType, searchText, status: ALL_STATUS }, limit, offset, sort);
+      await getClaims({ searchType, searchText, status: SEARCH_STATUS.ALL }, limit, offset, sort);
 
       expect(wreck.post).toHaveBeenCalledWith(endpoint, {
         payload: {
