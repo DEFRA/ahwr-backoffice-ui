@@ -200,7 +200,10 @@ describe("Claims tests", () => {
       expect(clearLink.attr("href")).toEqual("/claims/clear");
     });
 
-    test("has claim date from and to inputs with day, month and year boxes", async () => {
+    test.each([
+      { legend: "Claim date from", field: "dateFrom" },
+      { legend: "Claim date to", field: "dateTo" },
+    ])("has a $legend input with day, month and year boxes", async ({ legend, field }) => {
       const options = {
         method: "GET",
         url: `${url}?page=1`,
@@ -211,16 +214,9 @@ describe("Claims tests", () => {
       const legends = $(".govuk-fieldset__legend")
         .map((_, el) => $(el).text().trim())
         .get();
-      expect(legends).toEqual(expect.arrayContaining(["Claim date from", "Claim date to"]));
-      for (const name of [
-        "dateFrom-day",
-        "dateFrom-month",
-        "dateFrom-year",
-        "dateTo-day",
-        "dateTo-month",
-        "dateTo-year",
-      ]) {
-        expect($(`input[name='${name}']`)).toHaveLength(1);
+      expect(legends).toContain(legend);
+      for (const part of ["day", "month", "year"]) {
+        expect($(`input[name='${field}-${part}']`)).toHaveLength(1);
       }
     });
 
@@ -338,66 +334,92 @@ describe("Claims tests", () => {
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
     });
 
-    test("advanced search stores the claim date range parts", async () => {
-      getClaims.mockReturnValue({ claims, total: 0 });
-      const options = {
-        method: "POST",
-        url,
-        payload: {
-          crumb,
-          searchText: "",
-          "dateFrom-day": "1",
-          "dateFrom-month": "2",
-          "dateFrom-year": "2026",
-          "dateTo-day": "15",
-          "dateTo-month": "7",
-          "dateTo-year": "2026",
-          submit: "advancedSearch",
-        },
-        headers: { cookie: `crumb=${crumb}` },
-        auth,
-      };
-      const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "dateFrom", {
-        day: "1",
-        month: "2",
-        year: "2026",
+    describe("advanced search stores the claim date range parts", () => {
+      let res;
+
+      beforeEach(async () => {
+        getClaims.mockReturnValue({ claims, total: 0 });
+        const options = {
+          method: "POST",
+          url,
+          payload: {
+            crumb,
+            searchText: "",
+            "dateFrom-day": "1",
+            "dateFrom-month": "2",
+            "dateFrom-year": "2026",
+            "dateTo-day": "15",
+            "dateTo-month": "7",
+            "dateTo-year": "2026",
+            submit: "advancedSearch",
+          },
+          headers: { cookie: `crumb=${crumb}` },
+          auth,
+        };
+        res = await server.inject(options);
       });
-      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "dateTo", {
-        day: "15",
-        month: "7",
-        year: "2026",
+
+      test("returns 200", () => {
+        expect(res.statusCode).toBe(StatusCodes.OK);
+      });
+
+      test("stores the dateFrom parts", () => {
+        expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "dateFrom", {
+          day: "1",
+          month: "2",
+          year: "2026",
+        });
+      });
+
+      test("stores the dateTo parts", () => {
+        expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "dateTo", {
+          day: "15",
+          month: "7",
+          year: "2026",
+        });
       });
     });
 
-    test("basic search resets the claim date range", async () => {
-      getClaims.mockReturnValue({ claims, total: 0 });
-      const options = {
-        method: "POST",
-        url,
-        payload: {
-          crumb,
-          searchText: "107279003",
-          "dateFrom-day": "1",
-          "dateFrom-month": "2",
-          "dateFrom-year": "2026",
-          submit: "search",
-        },
-        headers: { cookie: `crumb=${crumb}` },
-        auth,
-      };
-      const res = await server.inject(options);
-      expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "dateFrom", {
-        day: "",
-        month: "",
-        year: "",
+    describe("basic search resets the claim date range", () => {
+      let res;
+
+      beforeEach(async () => {
+        getClaims.mockReturnValue({ claims, total: 0 });
+        const options = {
+          method: "POST",
+          url,
+          payload: {
+            crumb,
+            searchText: "107279003",
+            "dateFrom-day": "1",
+            "dateFrom-month": "2",
+            "dateFrom-year": "2026",
+            submit: "search",
+          },
+          headers: { cookie: `crumb=${crumb}` },
+          auth,
+        };
+        res = await server.inject(options);
       });
-      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "dateTo", {
-        day: "",
-        month: "",
-        year: "",
+
+      test("returns 200", () => {
+        expect(res.statusCode).toBe(StatusCodes.OK);
+      });
+
+      test("resets the dateFrom parts", () => {
+        expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "dateFrom", {
+          day: "",
+          month: "",
+          year: "",
+        });
+      });
+
+      test("resets the dateTo parts", () => {
+        expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "dateTo", {
+          day: "",
+          month: "",
+          year: "",
+        });
       });
     });
 
