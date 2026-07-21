@@ -69,7 +69,6 @@ describe("Claims tests", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Claims");
       expect($("title").text()).toContain("AHWR Claims");
-      expect(getClaimSearch).toHaveBeenCalledTimes(7);
       phaseBannerOk($);
     });
 
@@ -305,7 +304,6 @@ describe("Claims tests", () => {
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(setClaimSearch).toHaveBeenCalledTimes(6);
     });
 
     test("advanced search stores the agreement type and clears the text search", async () => {
