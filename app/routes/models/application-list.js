@@ -6,10 +6,7 @@ import { getStyleClassByStatus } from "../../constants/status.js";
 import { upperFirstLetter } from "../../lib/display-helper.js";
 import { FLAG_EMOJI } from "../utils/ui-constants.js";
 import { config } from "../../config/index.js";
-import {
-  buildAgreementDateFilter,
-  resolveAgreementDateRange,
-} from "../utils/agreement-date-filter.js";
+import { buildDateFilter, resolveDateRange } from "../utils/date-filter.js";
 import { AGREEMENT_FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../constants/index.js";
 import {
   getAgreementTypeOptions,
@@ -167,13 +164,10 @@ export async function createModel(request, page) {
   const statusOptions = getStatusOptions(status);
   const flagOptions = getFlagOptions(flag);
 
-  const dateFromFilter = buildAgreementDateFilter(
-    getAppSearch(request, sessionKeys.appSearch.dateFrom),
-  );
-  const dateToFilter = buildAgreementDateFilter(
-    getAppSearch(request, sessionKeys.appSearch.dateTo),
-    { endOfDay: true },
-  );
+  const dateFromFilter = buildDateFilter(getAppSearch(request, sessionKeys.appSearch.dateFrom));
+  const dateToFilter = buildDateFilter(getAppSearch(request, sessionKeys.appSearch.dateTo), {
+    endOfDay: true,
+  });
 
   if (RETIRED_SEARCH_TYPES.includes(searchType)) {
     return emptyModel({
@@ -187,7 +181,7 @@ export async function createModel(request, page) {
   }
 
   const sortField = getAppSearch(request, sessionKeys.appSearch.sort) ?? undefined;
-  const { dateFrom, dateTo } = resolveAgreementDateRange(dateFromFilter, dateToFilter);
+  const { dateFrom, dateTo } = resolveDateRange(dateFromFilter, dateToFilter);
 
   const apps = await getApplications(
     {

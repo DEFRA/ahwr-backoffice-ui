@@ -12,11 +12,7 @@ import { permissions } from "../auth/permissions.js";
 import { AGREEMENT_TYPE } from "../constants/index.js";
 import { StatusCodes } from "http-status-codes";
 import { getClaimStatusOptions, SEARCH_STATUS } from "./utils/get-claim-status-options.js";
-import {
-  extractDateParts,
-  buildAgreementDateFilter,
-  resolveAgreementDateRange,
-} from "./utils/agreement-date-filter.js";
+import { extractDateParts, buildDateFilter, resolveDateRange } from "./utils/date-filter.js";
 
 const { administrator, authoriser, processor, recommender, user } = permissions;
 const { displayPageSize } = config;
@@ -44,8 +40,8 @@ const getViewData = async (request) => {
   const agreementTypeOptions = getAgreementTypeOptions(agreementType);
   const statusOptions = getClaimStatusOptions(status);
 
-  const dateFromFilter = buildAgreementDateFilter(getClaimSearch(request, claimSearch.dateFrom));
-  const dateToFilter = buildAgreementDateFilter(getClaimSearch(request, claimSearch.dateTo), {
+  const dateFromFilter = buildDateFilter(getClaimSearch(request, claimSearch.dateFrom));
+  const dateToFilter = buildDateFilter(getClaimSearch(request, claimSearch.dateTo), {
     endOfDay: true,
   });
 
@@ -66,7 +62,7 @@ const getViewData = async (request) => {
     return emptyViewData();
   }
 
-  const { dateFrom, dateTo } = resolveAgreementDateRange(dateFromFilter, dateToFilter);
+  const { dateFrom, dateTo } = resolveDateRange(dateFromFilter, dateToFilter);
 
   const { claims, total } = await getClaims(
     { searchText, searchType, agreementType, status, dateFrom, dateTo },

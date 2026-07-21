@@ -41,7 +41,7 @@ const toDate = ({ day, month, year }, endOfDay) => {
 };
 
 /**
- * Builds an agreement date filter from raw day/month/year form parts.
+ * Builds a date filter from raw day/month/year form parts.
  *
  * @param {{ day?: string, month?: string, year?: string }} [parts] - the raw values from the date input.
  * @param {{ endOfDay?: boolean }} [options] - set `endOfDay` for an inclusive "date to" bound (last millisecond of the day).
@@ -49,7 +49,7 @@ const toDate = ({ day, month, year }, endOfDay) => {
  *   `value` is the parsed UTC date, or undefined when the parts are empty or not a real date;
  *   `items` are the govukDateInput items used to re-populate the form.
  */
-export const buildAgreementDateFilter = (parts, { endOfDay = false } = {}) => {
+export const buildDateFilter = (parts, { endOfDay = false } = {}) => {
   const { day, month, year } = { ...emptyParts, ...parts };
   return {
     value: toDate({ day, month, year }, endOfDay),
@@ -62,16 +62,16 @@ export const buildAgreementDateFilter = (parts, { endOfDay = false } = {}) => {
 };
 
 /**
- * Resolves the agreement date range to send to the search API.
+ * Resolves the date range to send to the search API.
  *
  * An inverted range (to before from) is meaningless, so neither bound is sent.
  * Either bound may be undefined when its date was empty or invalid.
  *
- * @param {{ value: Date | undefined }} fromFilter - the "date from" filter from {@link buildAgreementDateFilter}.
- * @param {{ value: Date | undefined }} toFilter - the "date to" filter from {@link buildAgreementDateFilter}.
+ * @param {{ value: Date | undefined }} fromFilter - the "date from" filter from {@link buildDateFilter}.
+ * @param {{ value: Date | undefined }} toFilter - the "date to" filter from {@link buildDateFilter}.
  * @returns {{ dateFrom: Date | undefined, dateTo: Date | undefined }} the bounds to pass to the API.
  */
-export const resolveAgreementDateRange = (fromFilter, toFilter) => {
+export const resolveDateRange = (fromFilter, toFilter) => {
   const { value: dateFrom } = fromFilter;
   const { value: dateTo } = toFilter;
   if (dateFrom && dateTo && dateTo < dateFrom) {
