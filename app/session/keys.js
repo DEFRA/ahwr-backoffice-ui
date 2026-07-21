@@ -14,6 +14,8 @@ export const sessionKeys = {
     searchType: "searchType",
     agreementType: "agreementType",
     status: "status",
+    dateFrom: "dateFrom",
+    dateTo: "dateTo",
     sort: "sort",
   },
 };

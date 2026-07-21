@@ -21,7 +21,7 @@ export async function getClaim(reference, logger) {
 }
 
 export async function getClaims(searchParameters, limit, offset, sort, logger) {
-  const { searchText, searchType, status, agreementType } = searchParameters;
+  const { searchText, searchType, status, agreementType, dateFrom, dateTo } = searchParameters;
   const hasAgreementType = agreementType && agreementType !== AGREEMENT_TYPE.ALL;
   const hasStatus = status && status !== SEARCH_STATUS.ALL;
 
@@ -32,6 +32,8 @@ export async function getClaims(searchParameters, limit, offset, sort, logger) {
       limit,
       offset,
       ...(hasAgreementType && { agreementType }),
+      ...(dateFrom && { dateFrom }),
+      ...(dateTo && { dateTo }),
       sort,
       ...(hasStatus && { status }),
     },

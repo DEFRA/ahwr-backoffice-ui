@@ -12,12 +12,18 @@ import { permissions } from "../auth/permissions.js";
 import { AGREEMENT_TYPE } from "../constants/index.js";
 import { StatusCodes } from "http-status-codes";
 import { getClaimStatusOptions, SEARCH_STATUS } from "./utils/get-claim-status-options.js";
+import {
+  extractDateParts,
+  buildAgreementDateFilter,
+  resolveAgreementDateRange,
+} from "./utils/agreement-date-filter.js";
 
 const { administrator, authoriser, processor, recommender, user } = permissions;
 const { displayPageSize } = config;
 const { claimSearch } = sessionKeys;
 const viewTemplate = "claims";
 const currentPath = `/${viewTemplate}`;
+const emptyDateParts = { day: "", month: "", year: "" };
 
 // claims basic search supports claim number and SBI only; every other term returns no results
 const SUPPORTED_SEARCH_TYPES = new Set(["ref", "sbi", "reset"]);
@@ -38,6 +44,11 @@ const getViewData = async (request) => {
   const agreementTypeOptions = getAgreementTypeOptions(agreementType);
   const statusOptions = getClaimStatusOptions(status);
 
+  const dateFromFilter = buildAgreementDateFilter(getClaimSearch(request, claimSearch.dateFrom));
+  const dateToFilter = buildAgreementDateFilter(getClaimSearch(request, claimSearch.dateTo), {
+    endOfDay: true,
+  });
+
   const emptyViewData = () => ({
     searchText,
     header,
@@ -47,14 +58,18 @@ const getViewData = async (request) => {
     total: 0,
     agreementTypeOptions,
     statusOptions,
+    claimDateFrom: dateFromFilter.items,
+    claimDateTo: dateToFilter.items,
   });
 
   if (!SUPPORTED_SEARCH_TYPES.has(searchType)) {
     return emptyViewData();
   }
 
+  const { dateFrom, dateTo } = resolveAgreementDateRange(dateFromFilter, dateToFilter);
+
   const { claims, total } = await getClaims(
-    { searchText, searchType, agreementType, status },
+    { searchText, searchType, agreementType, status, dateFrom, dateTo },
     limit,
     offset,
     sort,
@@ -79,6 +94,8 @@ const getViewData = async (request) => {
     total,
     agreementTypeOptions,
     statusOptions,
+    claimDateFrom: dateFromFilter.items,
+    claimDateTo: dateToFilter.items,
   };
 };
 
@@ -148,6 +165,8 @@ export const claimsRoutes = [
           setClaimSearch(request, claimSearch.searchType, "");
           setClaimSearch(request, claimSearch.agreementType, AGREEMENT_TYPE.ALL);
           setClaimSearch(request, claimSearch.status, SEARCH_STATUS.ALL);
+          setClaimSearch(request, claimSearch.dateFrom, emptyDateParts);
+          setClaimSearch(request, claimSearch.dateTo, emptyDateParts);
           const viewData = await getViewData(request);
           return h.view(viewTemplate, viewData);
         } catch (err) {
@@ -185,6 +204,15 @@ export const claimsRoutes = [
 
           setClaimSearch(request, claimSearch.agreementType, agreementType);
           setClaimSearch(request, claimSearch.status, status);
+
+          const dateFrom = isAdvancedSearch
+            ? extractDateParts(request.payload, "dateFrom")
+            : emptyDateParts;
+          const dateTo = isAdvancedSearch
+            ? extractDateParts(request.payload, "dateTo")
+            : emptyDateParts;
+          setClaimSearch(request, claimSearch.dateFrom, dateFrom);
+          setClaimSearch(request, claimSearch.dateTo, dateTo);
 
           const { searchText, searchType } = isAdvancedSearch
             ? { searchText: "", searchType: "" }

@@ -69,7 +69,7 @@ describe("Claims tests", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Claims");
       expect($("title").text()).toContain("AHWR Claims");
-      expect(getClaimSearch).toHaveBeenCalledTimes(5);
+      expect(getClaimSearch).toHaveBeenCalledTimes(7);
       phaseBannerOk($);
     });
 
@@ -201,6 +201,30 @@ describe("Claims tests", () => {
       expect(clearLink.attr("href")).toEqual("/claims/clear");
     });
 
+    test("has claim date from and to inputs with day, month and year boxes", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+      const legends = $(".govuk-fieldset__legend")
+        .map((_, el) => $(el).text().trim())
+        .get();
+      expect(legends).toEqual(expect.arrayContaining(["Claim date from", "Claim date to"]));
+      for (const name of [
+        "dateFrom-day",
+        "dateFrom-month",
+        "dateFrom-year",
+        "dateTo-day",
+        "dateTo-month",
+        "dateTo-year",
+      ]) {
+        expect($(`input[name='${name}']`)).toHaveLength(1);
+      }
+    });
+
     test("advanced search rendering has no accessibility violations", async () => {
       getClaims.mockReturnValueOnce({ claims, total: 0 });
       const options = {
@@ -228,6 +252,16 @@ describe("Claims tests", () => {
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "status", SEARCH_STATUS.ALL);
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "dateFrom", {
+        day: "",
+        month: "",
+        year: "",
+      });
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "dateTo", {
+        day: "",
+        month: "",
+        year: "",
+      });
     });
 
     test("clear route surfaces an error when building the view fails", async () => {
@@ -271,7 +305,7 @@ describe("Claims tests", () => {
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(setClaimSearch).toHaveBeenCalledTimes(4);
+      expect(setClaimSearch).toHaveBeenCalledTimes(6);
     });
 
     test("advanced search stores the agreement type and clears the text search", async () => {
@@ -304,6 +338,69 @@ describe("Claims tests", () => {
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "status", "AGREED");
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
+    });
+
+    test("advanced search stores the claim date range parts", async () => {
+      getClaims.mockReturnValue({ claims, total: 0 });
+      const options = {
+        method: "POST",
+        url,
+        payload: {
+          crumb,
+          searchText: "",
+          "dateFrom-day": "1",
+          "dateFrom-month": "2",
+          "dateFrom-year": "2026",
+          "dateTo-day": "15",
+          "dateTo-month": "7",
+          "dateTo-year": "2026",
+          submit: "advancedSearch",
+        },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "dateFrom", {
+        day: "1",
+        month: "2",
+        year: "2026",
+      });
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "dateTo", {
+        day: "15",
+        month: "7",
+        year: "2026",
+      });
+    });
+
+    test("basic search resets the claim date range", async () => {
+      getClaims.mockReturnValue({ claims, total: 0 });
+      const options = {
+        method: "POST",
+        url,
+        payload: {
+          crumb,
+          searchText: "107279003",
+          "dateFrom-day": "1",
+          "dateFrom-month": "2",
+          "dateFrom-year": "2026",
+          submit: "search",
+        },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "dateFrom", {
+        day: "",
+        month: "",
+        year: "",
+      });
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "dateTo", {
+        day: "",
+        month: "",
+        year: "",
+      });
     });
 
     test("basic search stores the text and type and resets the agreement type", async () => {
@@ -446,7 +543,14 @@ describe("Claims tests", () => {
         const res = await searchByType({ searchText, searchType });
         expect(res.statusCode).toBe(StatusCodes.OK);
         expect(getClaims).toHaveBeenCalledWith(
-          { searchText, searchType, agreementType: AGREEMENT_TYPE.ALL, status: SEARCH_STATUS.ALL },
+          {
+            searchText,
+            searchType,
+            agreementType: AGREEMENT_TYPE.ALL,
+            status: SEARCH_STATUS.ALL,
+            dateFrom: undefined,
+            dateTo: undefined,
+          },
           10,
           0,
           undefined,
@@ -488,6 +592,31 @@ describe("Claims tests", () => {
       },
     );
 
+    test("sends the resolved claim date range to the backend", async () => {
+      getClaimSearch.mockImplementation((_request, key) => {
+        if (key === "searchType") return "reset";
+        if (key === "searchText") return "";
+        if (key === "dateFrom") return { day: "1", month: "2", year: "2026" };
+        if (key === "dateTo") return { day: "15", month: "7", year: "2026" };
+        return undefined;
+      });
+      getClaims.mockReturnValueOnce({ claims, total: 3 });
+
+      const res = await server.inject({ method: "GET", url: `${url}?page=1`, auth });
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(getClaims).toHaveBeenCalledWith(
+        expect.objectContaining({
+          dateFrom: new Date(Date.UTC(2026, 1, 1)),
+          dateTo: new Date(Date.UTC(2026, 6, 15, 23, 59, 59, 999)),
+        }),
+        10,
+        0,
+        undefined,
+        expect.anything(),
+      );
+    });
+
     test("empty/absent search type shows all claims (default state)", async () => {
       getClaims.mockReturnValueOnce({ claims, total: 9 });
       const res = await searchByType({ searchText: "", searchType: "reset" });
@@ -499,6 +628,8 @@ describe("Claims tests", () => {
           searchType: "reset",
           agreementType: AGREEMENT_TYPE.ALL,
           status: SEARCH_STATUS.ALL,
+          dateFrom: undefined,
+          dateTo: undefined,
         },
         10,
         0,
