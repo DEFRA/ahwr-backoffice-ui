@@ -60,6 +60,31 @@
                         }) }}
 
                         <div class="side-by-side-options">
+                          {{ govukDateInput({
+                            id: "dateFrom",
+                            namePrefix: "dateFrom",
+                            fieldset: {
+                              legend: {
+                                text: "Claim date from",
+                                classes: "govuk-fieldset__legend--s"
+                              }
+                            },
+                            items: claimDateFrom
+                          }) }}
+                          {{ govukDateInput({
+                            id: "dateTo",
+                            namePrefix: "dateTo",
+                            fieldset: {
+                              legend: {
+                                text: "Claim date to",
+                                classes: "govuk-fieldset__legend--s"
+                              }
+                            },
+                            items: claimDateTo
+                          }) }}
+                        </div>
+
+                        <div class="side-by-side-options">
                           {{ govukSelect({
                             id: "species",
                             name: "species",

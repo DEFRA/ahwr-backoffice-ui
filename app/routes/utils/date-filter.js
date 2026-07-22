@@ -1,4 +1,4 @@
-const emptyParts = { day: "", month: "", year: "" };
+export const emptyDateParts = { day: "", month: "", year: "" };
 
 // JavaScript Date months are zero-based, so a calendar month maps to month - 1.
 const MONTH_INDEX_OFFSET = 1;
@@ -6,10 +6,25 @@ const MONTH_INDEX_OFFSET = 1;
 const ONE_DAY = 1;
 const ONE_MILLISECOND = 1;
 
-export const extractDateParts = (payload, prefix) => ({
+const extractDateParts = (payload, prefix) => ({
   day: payload?.[`${prefix}-day`] ?? "",
   month: payload?.[`${prefix}-month`] ?? "",
   year: payload?.[`${prefix}-year`] ?? "",
+});
+
+/**
+ * Reads the advanced-search date range parts from a search form payload.
+ *
+ * Only an advanced search carries a date range; a basic search clears it, so
+ * both bounds fall back to {@link emptyDateParts}.
+ *
+ * @param {object} payload - the submitted search form payload.
+ * @param {boolean} isAdvancedSearch - whether the advanced search was submitted.
+ * @returns {{ dateFrom: object, dateTo: object }} the raw day/month/year parts for each bound.
+ */
+export const extractDateRangeParts = (payload, isAdvancedSearch) => ({
+  dateFrom: isAdvancedSearch ? extractDateParts(payload, "dateFrom") : emptyDateParts,
+  dateTo: isAdvancedSearch ? extractDateParts(payload, "dateTo") : emptyDateParts,
 });
 
 const isRealDate = (day, month, year) => {
@@ -41,7 +56,7 @@ const toDate = ({ day, month, year }, endOfDay) => {
 };
 
 /**
- * Builds an agreement date filter from raw day/month/year form parts.
+ * Builds a date filter from raw day/month/year form parts.
  *
  * @param {{ day?: string, month?: string, year?: string }} [parts] - the raw values from the date input.
  * @param {{ endOfDay?: boolean }} [options] - set `endOfDay` for an inclusive "date to" bound (last millisecond of the day).
@@ -49,8 +64,8 @@ const toDate = ({ day, month, year }, endOfDay) => {
  *   `value` is the parsed UTC date, or undefined when the parts are empty or not a real date;
  *   `items` are the govukDateInput items used to re-populate the form.
  */
-export const buildAgreementDateFilter = (parts, { endOfDay = false } = {}) => {
-  const { day, month, year } = { ...emptyParts, ...parts };
+export const buildDateFilter = (parts, { endOfDay = false } = {}) => {
+  const { day, month, year } = { ...emptyDateParts, ...parts };
   return {
     value: toDate({ day, month, year }, endOfDay),
     items: [
@@ -62,16 +77,16 @@ export const buildAgreementDateFilter = (parts, { endOfDay = false } = {}) => {
 };
 
 /**
- * Resolves the agreement date range to send to the search API.
+ * Resolves the date range to send to the search API.
  *
  * An inverted range (to before from) is meaningless, so neither bound is sent.
  * Either bound may be undefined when its date was empty or invalid.
  *
- * @param {{ value: Date | undefined }} fromFilter - the "date from" filter from {@link buildAgreementDateFilter}.
- * @param {{ value: Date | undefined }} toFilter - the "date to" filter from {@link buildAgreementDateFilter}.
+ * @param {{ value: Date | undefined }} fromFilter - the "date from" filter from {@link buildDateFilter}.
+ * @param {{ value: Date | undefined }} toFilter - the "date to" filter from {@link buildDateFilter}.
  * @returns {{ dateFrom: Date | undefined, dateTo: Date | undefined }} the bounds to pass to the API.
  */
-export const resolveAgreementDateRange = (fromFilter, toFilter) => {
+export const resolveDateRange = (fromFilter, toFilter) => {
   const { value: dateFrom } = fromFilter;
   const { value: dateTo } = toFilter;
   if (dateFrom && dateTo && dateTo < dateFrom) {

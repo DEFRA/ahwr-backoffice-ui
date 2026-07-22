@@ -213,6 +213,46 @@ describe("Claims API", () => {
       });
     });
 
+    test("includes the date range in the payload when dateFrom and dateTo are given", async () => {
+      const sort = "ASC";
+      const dateFrom = new Date(Date.UTC(2026, 1, 1));
+      const dateTo = new Date(Date.UTC(2026, 6, 15));
+      wreck.post = jest.fn().mockResolvedValueOnce({ payload: { claims: [], total: 0 } });
+
+      await getClaims({ searchType, searchText, dateFrom, dateTo }, limit, offset, sort);
+
+      expect(wreck.post).toHaveBeenCalledWith(endpoint, {
+        payload: {
+          search: { text: searchText, type: searchType },
+          limit,
+          offset,
+          dateFrom,
+          dateTo,
+          sort,
+        },
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      });
+    });
+
+    test("omits the date range from the payload when dateFrom and dateTo are absent", async () => {
+      const sort = "ASC";
+      wreck.post = jest.fn().mockResolvedValueOnce({ payload: { claims: [], total: 0 } });
+
+      await getClaims({ searchType, searchText }, limit, offset, sort);
+
+      expect(wreck.post).toHaveBeenCalledWith(endpoint, {
+        payload: {
+          search: { text: searchText, type: searchType },
+          limit,
+          offset,
+          sort,
+        },
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      });
+    });
+
     test("throws error if error returned", async () => {
       const wreckResponse = {
         res: {
