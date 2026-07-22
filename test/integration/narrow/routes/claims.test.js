@@ -171,7 +171,7 @@ describe("Claims tests", () => {
       ]);
     });
 
-    test("flag dropdown has All Types, Flagged and Not Flagged options in order", async () => {
+    test("flag dropdown has All flags, Flagged and Not flagged options in order", async () => {
       const options = {
         method: "GET",
         url: `${url}?page=1`,
@@ -182,7 +182,7 @@ describe("Claims tests", () => {
       const optionTexts = $("select#flag option")
         .map((_, el) => $(el).text().trim())
         .get();
-      expect(optionTexts).toEqual(["All Types", "Flagged", "Not Flagged"]);
+      expect(optionTexts).toEqual(["All flags", "Flagged", "Not flagged"]);
     });
 
     test("status dropdown has All types, and the status values", async () => {

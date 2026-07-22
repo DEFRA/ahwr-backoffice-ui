@@ -1,9 +1,9 @@
 import { FLAG } from "../../constants/index.js";
 
 export const claimFlagLabels = Object.freeze({
-  [FLAG.ALL]: "All Types",
+  [FLAG.ALL]: "All flags",
   [FLAG.FLAGGED]: "Flagged",
-  [FLAG.NOT_FLAGGED]: "Not Flagged",
+  [FLAG.NOT_FLAGGED]: "Not flagged",
 });
 
 export const getClaimFlagOptions = (selectedFlag) =>
