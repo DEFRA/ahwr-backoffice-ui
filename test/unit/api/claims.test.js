@@ -10,7 +10,7 @@ import {
 } from "../../../app/api/claims.js";
 import { metricsCounter } from "../../../app/lib/metrics.js";
 import { config } from "../../../app/config/index.js";
-import { AGREEMENT_TYPE, FLAG, SPECIES } from "../../../app/constants/index.js";
+import { AGREEMENT_TYPE, CLAIM_TYPE, FLAG, SPECIES } from "../../../app/constants/index.js";
 import { SEARCH_STATUS } from "../../../app/routes/utils/get-claim-status-options.js";
 
 jest.mock("@hapi/wreck");
@@ -126,6 +126,48 @@ describe("Claims API", () => {
         offset,
         sort,
       );
+
+      expect(wreck.post).toHaveBeenCalledWith(endpoint, {
+        payload: {
+          search: { text: searchText, type: searchType },
+          limit,
+          offset,
+          sort,
+        },
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      });
+    });
+
+    test("includes claimType in the payload when a specific claim type is given", async () => {
+      const sort = "ASC";
+      wreck.post = jest.fn().mockResolvedValueOnce({ payload: { claims: [], total: 0 } });
+
+      await getClaims(
+        { searchType, searchText, claimType: CLAIM_TYPE.REVIEW },
+        limit,
+        offset,
+        sort,
+      );
+
+      expect(wreck.post).toHaveBeenCalledWith(endpoint, {
+        payload: {
+          search: { text: searchText, type: searchType },
+          limit,
+          offset,
+          claimType: CLAIM_TYPE.REVIEW,
+          sort,
+        },
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      });
+    });
+
+    test("omits claimType from the payload when the claim type is all", async () => {
+      const sort = "ASC";
+      wreck.post = jest.fn().mockResolvedValueOnce({ payload: { claims: [], total: 0 } });
+
+      await getClaims({ searchType, searchText, claimType: CLAIM_TYPE.ALL }, limit, offset, sort);
 
       expect(wreck.post).toHaveBeenCalledWith(endpoint, {
         payload: {
