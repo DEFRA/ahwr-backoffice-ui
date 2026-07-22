@@ -17,3 +17,12 @@ export const AGREEMENT_FLAG = Object.freeze({
   FLAGGED: "FLAGGED",
   NOT_FLAGGED: "NOT_FLAGGED",
 });
+
+export const SPECIES = Object.freeze({
+  ALL: "ALL",
+  BEEF: "beef",
+  DAIRY: "dairy",
+  SHEEP: "sheep",
+  PIGS: "pigs",
+  POULTRY: "poultry",
+});

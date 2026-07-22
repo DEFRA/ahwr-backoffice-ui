@@ -84,14 +84,25 @@
                           }) }}
                         </div>
 
-                        {{ govukSelect({
-                          id: "status",
-                          name: "status",
-                          label: {
-                            text: "Status"
-                          },
-                          items: statusOptions
-                        }) }}
+                        <div class="side-by-side-options">
+                          {{ govukSelect({
+                            id: "species",
+                            name: "species",
+                            label: {
+                              text: "Species"
+                            },
+                            items: speciesOptions
+                          }) }}
+
+                          {{ govukSelect({
+                            id: "status",
+                            name: "status",
+                            label: {
+                              text: "Status"
+                            },
+                            items: statusOptions
+                          }) }}
+                        </div>
 
                         <div class="govuk-button-group">
                           {{ govukButton({
