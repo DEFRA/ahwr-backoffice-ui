@@ -1,6 +1,6 @@
 import wreck from "@hapi/wreck";
 import { config } from "../../../app/config/index.js";
-import { AGREEMENT_FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../../app/constants/index.js";
+import { FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../../app/constants/index.js";
 import {
   getApplications,
   getApplication,
@@ -182,12 +182,7 @@ describe("Application API", () => {
       };
       wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
 
-      await getApplications(
-        { searchType, searchText, flag: AGREEMENT_FLAG.ALL },
-        limit,
-        offset,
-        sort,
-      );
+      await getApplications({ searchType, searchText, flag: FLAG.ALL }, limit, offset, sort);
 
       expect(wreck.post).toHaveBeenCalledWith(
         `${applicationApiUri}/applications/search`,

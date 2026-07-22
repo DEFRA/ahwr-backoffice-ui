@@ -14,6 +14,7 @@ export const sessionKeys = {
     searchType: "searchType",
     agreementType: "agreementType",
     species: "species",
+    flag: "flag",
     status: "status",
     dateFrom: "dateFrom",
     dateTo: "dateTo",

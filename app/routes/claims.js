@@ -9,7 +9,7 @@ import { searchValidation } from "../lib/search-validation.js";
 import { getClaimTableHeader, getClaimTableRows } from "./models/claim-list.js";
 import { getAgreementTypeOptions } from "./utils/get-agreement-type-options.js";
 import { permissions } from "../auth/permissions.js";
-import { AGREEMENT_TYPE, SPECIES } from "../constants/index.js";
+import { AGREEMENT_TYPE, FLAG, SPECIES } from "../constants/index.js";
 import { StatusCodes } from "http-status-codes";
 import { getClaimStatusOptions, SEARCH_STATUS } from "./utils/get-claim-status-options.js";
 import {
@@ -19,6 +19,7 @@ import {
   emptyDateParts,
 } from "./utils/date-filter.js";
 import { getSpeciesOptions } from "./utils/get-species-options.js";
+import { getClaimFlagOptions } from "./utils/get-claim-flag-options.js";
 
 const { administrator, authoriser, processor, recommender, user } = permissions;
 const { displayPageSize } = config;
@@ -40,11 +41,13 @@ const getViewData = async (request) => {
   const sort = getClaimSearch(request, claimSearch.sort);
   const agreementType = getClaimSearch(request, claimSearch.agreementType) ?? AGREEMENT_TYPE.ALL;
   const species = getClaimSearch(request, claimSearch.species) ?? SPECIES.ALL;
+  const flag = getClaimSearch(request, claimSearch.flag) ?? FLAG.ALL;
   const status = getClaimSearch(request, claimSearch.status) ?? SEARCH_STATUS.ALL;
 
   const header = getClaimTableHeader(sort);
   const agreementTypeOptions = getAgreementTypeOptions(agreementType);
   const speciesOptions = getSpeciesOptions(species);
+  const flagOptions = getClaimFlagOptions(flag);
   const statusOptions = getClaimStatusOptions(status);
 
   const dateFromFilter = buildDateFilter(getClaimSearch(request, claimSearch.dateFrom));
@@ -61,6 +64,7 @@ const getViewData = async (request) => {
     total: 0,
     agreementTypeOptions,
     speciesOptions,
+    flagOptions,
     statusOptions,
     claimDateFrom: dateFromFilter.items,
     claimDateTo: dateToFilter.items,
@@ -73,7 +77,7 @@ const getViewData = async (request) => {
   const { dateFrom, dateTo } = resolveDateRange(dateFromFilter, dateToFilter);
 
   const { claims, total } = await getClaims(
-    { searchText, searchType, agreementType, status, dateFrom, dateTo, species },
+    { searchText, searchType, agreementType, status, dateFrom, dateTo, species, flag },
     limit,
     offset,
     sort,
@@ -98,6 +102,7 @@ const getViewData = async (request) => {
     total,
     agreementTypeOptions,
     speciesOptions,
+    flagOptions,
     statusOptions,
     claimDateFrom: dateFromFilter.items,
     claimDateTo: dateToFilter.items,
@@ -170,6 +175,7 @@ export const claimsRoutes = [
           setClaimSearch(request, claimSearch.searchType, "");
           setClaimSearch(request, claimSearch.agreementType, AGREEMENT_TYPE.ALL);
           setClaimSearch(request, claimSearch.species, SPECIES.ALL);
+          setClaimSearch(request, claimSearch.flag, FLAG.ALL);
           setClaimSearch(request, claimSearch.status, SEARCH_STATUS.ALL);
           setClaimSearch(request, claimSearch.dateFrom, emptyDateParts);
           setClaimSearch(request, claimSearch.dateTo, emptyDateParts);
@@ -197,21 +203,24 @@ export const claimsRoutes = [
       },
       handler: async (request, h) => {
         try {
-          let agreementType, status, species;
+          let agreementType, status, species, flag;
 
           const isAdvancedSearch = request.payload?.submit === "advancedSearch";
           if (isAdvancedSearch) {
             agreementType = request.payload.agreementType ?? AGREEMENT_TYPE.ALL;
             species = request.payload.species ?? SPECIES.ALL;
+            flag = request.payload.flag ?? FLAG.ALL;
             status = request.payload.status ?? SEARCH_STATUS.ALL;
           } else {
             agreementType = AGREEMENT_TYPE.ALL;
             species = SPECIES.ALL;
+            flag = FLAG.ALL;
             status = SEARCH_STATUS.ALL;
           }
 
           setClaimSearch(request, claimSearch.agreementType, agreementType);
           setClaimSearch(request, claimSearch.species, species);
+          setClaimSearch(request, claimSearch.flag, flag);
           setClaimSearch(request, claimSearch.status, status);
 
           const { dateFrom, dateTo } = extractDateRangeParts(request.payload, isAdvancedSearch);

@@ -9,11 +9,7 @@ import {
   getStatusOptions,
   getFlagOptions,
 } from "../../../../../app/routes/utils/get-agreement-type-options.js";
-import {
-  AGREEMENT_FLAG,
-  AGREEMENT_STATUS,
-  AGREEMENT_TYPE,
-} from "../../../../../app/constants/index.js";
+import { FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../../../../app/constants/index.js";
 import { permissions } from "../../../../../app/auth/permissions.js";
 
 jest.mock("../../../../../app/api/applications");
@@ -199,7 +195,7 @@ describe("Application-list createModel", () => {
         agreementDateFrom: emptyDateItems,
         agreementDateTo: emptyDateItems,
         statusOptions: getStatusOptions(AGREEMENT_STATUS.ALL),
-        flagOptions: getFlagOptions(AGREEMENT_FLAG.ALL),
+        flagOptions: getFlagOptions(FLAG.ALL),
       });
       expect(getApplications).not.toHaveBeenCalled();
     },

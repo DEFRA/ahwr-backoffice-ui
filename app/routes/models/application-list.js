@@ -7,7 +7,7 @@ import { upperFirstLetter } from "../../lib/display-helper.js";
 import { FLAG_EMOJI } from "../utils/ui-constants.js";
 import { config } from "../../config/index.js";
 import { buildDateFilter, resolveDateRange } from "../utils/date-filter.js";
-import { AGREEMENT_FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../constants/index.js";
+import { FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../constants/index.js";
 import {
   getAgreementTypeOptions,
   getStatusOptions,
@@ -158,7 +158,7 @@ export async function createModel(request, page) {
   const agreementType =
     getAppSearch(request, sessionKeys.appSearch.agreementType) ?? AGREEMENT_TYPE.ALL;
   const status = getAppSearch(request, sessionKeys.appSearch.status) ?? AGREEMENT_STATUS.ALL;
-  const flag = getAppSearch(request, sessionKeys.appSearch.flag) ?? AGREEMENT_FLAG.ALL;
+  const flag = getAppSearch(request, sessionKeys.appSearch.flag) ?? FLAG.ALL;
 
   const agreementTypeOptions = getAgreementTypeOptions(agreementType);
   const statusOptions = getStatusOptions(status);
