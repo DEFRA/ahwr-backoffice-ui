@@ -120,7 +120,11 @@ describe("Claims tests", () => {
       expect($(".govuk-button-group button.govuk-button").text()).toContain("Search");
     });
 
-    test("has an agreement type dropdown", async () => {
+    test.each([
+      ["agreementType", "Agreement type"],
+      ["status", "Status"],
+      ["species", "Species"],
+    ])("has a %s dropdown", async (id, label) => {
       const options = {
         method: "GET",
         url: `${url}?page=1`,
@@ -128,32 +132,8 @@ describe("Claims tests", () => {
       };
       const res = await server.inject(options);
       const $ = cheerio.load(res.payload);
-      expect($('label[for="agreementType"]').text()).toContain("Agreement type");
-      expect($("select#agreementType")).toHaveLength(1);
-    });
-
-    test("has an status dropdown", async () => {
-      const options = {
-        method: "GET",
-        url: `${url}?page=1`,
-        auth,
-      };
-      const res = await server.inject(options);
-      const $ = cheerio.load(res.payload);
-      expect($('label[for="status"]').text()).toContain("Status");
-      expect($("select#status")).toHaveLength(1);
-    });
-
-    test("has a species dropdown", async () => {
-      const options = {
-        method: "GET",
-        url: `${url}?page=1`,
-        auth,
-      };
-      const res = await server.inject(options);
-      const $ = cheerio.load(res.payload);
-      expect($('label[for="species"]').text()).toContain("Species");
-      expect($("select#species")).toHaveLength(1);
+      expect($(`label[for="${id}"]`).text()).toContain(label);
+      expect($(`select#${id}`)).toHaveLength(1);
     });
 
     test("agreement type dropdown has All types, IAHW and PBR options in order", async () => {
