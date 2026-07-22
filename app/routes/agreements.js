@@ -7,7 +7,7 @@ import { viewModel } from "./models/application-list.js";
 import { searchValidation } from "../lib/search-validation.js";
 import { extractDateRangeParts, emptyDateParts } from "./utils/date-filter.js";
 import { generateNewCrumb } from "./utils/crumb-cache.js";
-import { AGREEMENT_FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../constants/index.js";
+import { FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../constants/index.js";
 import { StatusCodes } from "http-status-codes";
 
 const { administrator, processor, user, recommender, authoriser } = permissions;
@@ -47,7 +47,7 @@ export const agreementsRoutes = [
         setAppSearch(request, sessionKeys.appSearch.searchText, "");
         setAppSearch(request, sessionKeys.appSearch.searchType, "");
         setAppSearch(request, sessionKeys.appSearch.status, AGREEMENT_STATUS.ALL);
-        setAppSearch(request, sessionKeys.appSearch.flag, AGREEMENT_FLAG.ALL);
+        setAppSearch(request, sessionKeys.appSearch.flag, FLAG.ALL);
         setAppSearch(request, sessionKeys.appSearch.agreementType, AGREEMENT_TYPE.ALL);
         setAppSearch(request, sessionKeys.appSearch.dateFrom, emptyDateParts);
         setAppSearch(request, sessionKeys.appSearch.dateTo, emptyDateParts);
@@ -101,11 +101,11 @@ export const agreementsRoutes = [
           if (isAdvancedSearch) {
             agreementType = request.payload.agreementType ?? AGREEMENT_TYPE.ALL;
             status = request.payload.status ?? AGREEMENT_STATUS.ALL;
-            flag = request.payload.flag ?? AGREEMENT_FLAG.ALL;
+            flag = request.payload.flag ?? FLAG.ALL;
           } else {
             agreementType = AGREEMENT_TYPE.ALL;
             status = AGREEMENT_STATUS.ALL;
-            flag = AGREEMENT_FLAG.ALL;
+            flag = FLAG.ALL;
           }
 
           setAppSearch(request, sessionKeys.appSearch.agreementType, agreementType);

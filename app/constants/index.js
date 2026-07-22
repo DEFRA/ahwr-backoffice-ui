@@ -12,7 +12,7 @@ export const AGREEMENT_STATUS = Object.freeze({
   NOT_AGREED: "NOT_AGREED",
 });
 
-export const AGREEMENT_FLAG = Object.freeze({
+export const FLAG = Object.freeze({
   ALL: "ALL",
   FLAGGED: "FLAGGED",
   NOT_FLAGGED: "NOT_FLAGGED",

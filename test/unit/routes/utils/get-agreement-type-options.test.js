@@ -3,11 +3,7 @@ import {
   getStatusOptions,
   getFlagOptions,
 } from "../../../../app/routes/utils/get-agreement-type-options.js";
-import {
-  AGREEMENT_FLAG,
-  AGREEMENT_STATUS,
-  AGREEMENT_TYPE,
-} from "../../../../app/constants/index.js";
+import { FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../../../app/constants/index.js";
 
 describe("getAgreementTypeOptions", () => {
   test("returns the all, IAHW and PBR options in order", () => {
@@ -55,20 +51,20 @@ describe("getStatusOptions", () => {
 
 describe("getFlagOptions", () => {
   test("returns the all, flagged and not flagged options in order", () => {
-    const options = getFlagOptions(AGREEMENT_FLAG.ALL);
+    const options = getFlagOptions(FLAG.ALL);
 
     expect(options).toEqual([
-      { value: AGREEMENT_FLAG.ALL, text: "All flags", selected: true },
-      { value: AGREEMENT_FLAG.FLAGGED, text: "Flagged", selected: false },
-      { value: AGREEMENT_FLAG.NOT_FLAGGED, text: "Not flagged", selected: false },
+      { value: FLAG.ALL, text: "All flags", selected: true },
+      { value: FLAG.FLAGGED, text: "Flagged", selected: false },
+      { value: FLAG.NOT_FLAGGED, text: "Not flagged", selected: false },
     ]);
   });
 
   test("marks the given flag as selected", () => {
-    const options = getFlagOptions(AGREEMENT_FLAG.FLAGGED);
+    const options = getFlagOptions(FLAG.FLAGGED);
 
     expect(options.find((option) => option.selected)).toEqual({
-      value: AGREEMENT_FLAG.FLAGGED,
+      value: FLAG.FLAGGED,
       text: "Flagged",
       selected: true,
     });

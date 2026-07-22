@@ -95,6 +95,15 @@
                           }) }}
 
                           {{ govukSelect({
+                            id: "flag",
+                            name: "flag",
+                            label: {
+                              text: "Flag"
+                            },
+                            items: flagOptions
+                          }) }}
+
+                          {{ govukSelect({
                             id: "status",
                             name: "status",
                             label: {

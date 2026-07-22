@@ -1,4 +1,4 @@
-import { AGREEMENT_TYPE, AGREEMENT_STATUS, AGREEMENT_FLAG } from "../../constants/index.js";
+import { AGREEMENT_TYPE, AGREEMENT_STATUS, FLAG } from "../../constants/index.js";
 
 const agreementTypeLabels = {
   [AGREEMENT_TYPE.ALL]: "All types",
@@ -13,9 +13,9 @@ const statusLabels = {
 };
 
 const flagLabels = {
-  [AGREEMENT_FLAG.ALL]: "All flags",
-  [AGREEMENT_FLAG.FLAGGED]: "Flagged",
-  [AGREEMENT_FLAG.NOT_FLAGGED]: "Not flagged",
+  [FLAG.ALL]: "All flags",
+  [FLAG.FLAGGED]: "Flagged",
+  [FLAG.NOT_FLAGGED]: "Not flagged",
 };
 
 export const getAgreementTypeOptions = (selectedAgreementType) =>

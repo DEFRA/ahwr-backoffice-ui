@@ -6,11 +6,7 @@ import { permissions } from "../../../../app/auth/permissions.js";
 import { getAppSearch, setAppSearch } from "../../../../app/session/index.js";
 import { getPagination, getPagingData } from "../../../../app/pagination.js";
 import { getApplications } from "../../../../app/api/applications.js";
-import {
-  AGREEMENT_FLAG,
-  AGREEMENT_STATUS,
-  AGREEMENT_TYPE,
-} from "../../../../app/constants/index.js";
+import { FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../../../app/constants/index.js";
 import { applicationsData } from "../../../data/applications.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
@@ -289,7 +285,7 @@ describe("Applications test", () => {
 
       test("clear resets the flag filter", async () => {
         await server.inject(options);
-        expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "flag", AGREEMENT_FLAG.ALL);
+        expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "flag", FLAG.ALL);
       });
 
       test("clear resets the agreement type filter", async () => {
@@ -484,7 +480,7 @@ describe("Applications test", () => {
       const res = await server.inject(options);
 
       expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "flag", AGREEMENT_FLAG.ALL);
+      expect(setAppSearch).toHaveBeenCalledWith(expect.anything(), "flag", FLAG.ALL);
     });
 
     test("advanced search stores the agreement date range parts", async () => {
