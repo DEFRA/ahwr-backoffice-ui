@@ -10,7 +10,7 @@ import {
 } from "../../../app/api/claims.js";
 import { metricsCounter } from "../../../app/lib/metrics.js";
 import { config } from "../../../app/config/index.js";
-import { AGREEMENT_TYPE } from "../../../app/constants/index.js";
+import { AGREEMENT_TYPE, SPECIES } from "../../../app/constants/index.js";
 import { SEARCH_STATUS } from "../../../app/routes/utils/get-claim-status-options.js";
 
 jest.mock("@hapi/wreck");
@@ -126,6 +126,43 @@ describe("Claims API", () => {
         offset,
         sort,
       );
+
+      expect(wreck.post).toHaveBeenCalledWith(endpoint, {
+        payload: {
+          search: { text: searchText, type: searchType },
+          limit,
+          offset,
+          sort,
+        },
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      });
+    });
+
+    test("includes species in the payload when a specific species is given", async () => {
+      const sort = "ASC";
+      wreck.post = jest.fn().mockResolvedValueOnce({ payload: { claims: [], total: 0 } });
+
+      await getClaims({ searchType, searchText, species: "sheep" }, limit, offset, sort);
+
+      expect(wreck.post).toHaveBeenCalledWith(endpoint, {
+        payload: {
+          search: { text: searchText, type: searchType },
+          limit,
+          offset,
+          species: "sheep",
+          sort,
+        },
+        json: true,
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      });
+    });
+
+    test("omits species from the payload when the species is all", async () => {
+      const sort = "ASC";
+      wreck.post = jest.fn().mockResolvedValueOnce({ payload: { claims: [], total: 0 } });
+
+      await getClaims({ searchType, searchText, species: SPECIES.ALL }, limit, offset, sort);
 
       expect(wreck.post).toHaveBeenCalledWith(endpoint, {
         payload: {

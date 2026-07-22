@@ -8,7 +8,7 @@ import { axe } from "../../../helpers/axe-helper.js";
 import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { claims } from "../../../data/claims.js";
 import { getClaimSearch, setClaimSearch } from "../../../../app/session/index.js";
-import { AGREEMENT_TYPE } from "../../../../app/constants/index.js";
+import { AGREEMENT_TYPE, SPECIES } from "../../../../app/constants/index.js";
 import { StatusCodes } from "http-status-codes";
 import { SEARCH_STATUS } from "../../../../app/routes/utils/get-claim-status-options.js";
 
@@ -69,7 +69,7 @@ describe("Claims tests", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Claims");
       expect($("title").text()).toContain("AHWR Claims");
-      expect(getClaimSearch).toHaveBeenCalledTimes(5);
+      expect(getClaimSearch).toHaveBeenCalledTimes(6);
       phaseBannerOk($);
     });
 
@@ -120,7 +120,11 @@ describe("Claims tests", () => {
       expect($(".govuk-button-group button.govuk-button").text()).toContain("Search");
     });
 
-    test("has an agreement type dropdown", async () => {
+    test.each([
+      ["agreementType", "Agreement type"],
+      ["status", "Status"],
+      ["species", "Species"],
+    ])("has a %s dropdown", async (id, label) => {
       const options = {
         method: "GET",
         url: `${url}?page=1`,
@@ -128,20 +132,8 @@ describe("Claims tests", () => {
       };
       const res = await server.inject(options);
       const $ = cheerio.load(res.payload);
-      expect($('label[for="agreementType"]').text()).toContain("Agreement type");
-      expect($("select#agreementType")).toHaveLength(1);
-    });
-
-    test("has an status dropdown", async () => {
-      const options = {
-        method: "GET",
-        url: `${url}?page=1`,
-        auth,
-      };
-      const res = await server.inject(options);
-      const $ = cheerio.load(res.payload);
-      expect($('label[for="status"]').text()).toContain("Status");
-      expect($("select#status")).toHaveLength(1);
+      expect($(`label[for="${id}"]`).text()).toContain(label);
+      expect($(`select#${id}`)).toHaveLength(1);
     });
 
     test("agreement type dropdown has All types, IAHW and PBR options in order", async () => {
@@ -156,6 +148,27 @@ describe("Claims tests", () => {
         .map((_, el) => $(el).text().trim())
         .get();
       expect(optionTexts).toEqual(["All types", "IAHW", "PBR"]);
+    });
+
+    test("species dropdown has All species and the species values in order", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+      const optionTexts = $("select#species option")
+        .map((_, el) => $(el).text().trim())
+        .get();
+      expect(optionTexts).toEqual([
+        "All species",
+        "Beef cattle",
+        "Dairy cattle",
+        "Sheep",
+        "Pigs",
+        "Poultry",
+      ]);
     });
 
     test("status dropdown has All types, and the status values", async () => {
@@ -225,6 +238,7 @@ describe("Claims tests", () => {
         "agreementType",
         AGREEMENT_TYPE.ALL,
       );
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "species", SPECIES.ALL);
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "status", SEARCH_STATUS.ALL);
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
@@ -271,7 +285,7 @@ describe("Claims tests", () => {
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
-      expect(setClaimSearch).toHaveBeenCalledTimes(4);
+      expect(setClaimSearch).toHaveBeenCalledTimes(5);
     });
 
     test("advanced search stores the agreement type and clears the text search", async () => {
@@ -286,6 +300,22 @@ describe("Claims tests", () => {
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "agreementType", "PBR");
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
+    });
+
+    test("advanced search stores the species and clears the text search", async () => {
+      getClaims.mockReturnValue({ claims, total: 0 });
+      const options = {
+        method: "POST",
+        url,
+        payload: { crumb, searchText: "107279003", species: "sheep", submit: "advancedSearch" },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "species", "sheep");
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "");
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "");
     });
@@ -326,6 +356,22 @@ describe("Claims tests", () => {
       expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "sbi");
     });
 
+    test("basic search stores the text and type and resets the species", async () => {
+      getClaims.mockReturnValue({ claims, total: 0 });
+      const options = {
+        method: "POST",
+        url,
+        payload: { crumb, searchText: "107279003", species: "sheep", submit: "search" },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "species", SPECIES.ALL);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchText", "107279003");
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "searchType", "sbi");
+    });
+
     test("basic search stores the text and type and resets the status", async () => {
       getClaims.mockReturnValue({ claims, total: 0 });
       const options = {
@@ -358,6 +404,20 @@ describe("Claims tests", () => {
         "agreementType",
         AGREEMENT_TYPE.ALL,
       );
+    });
+
+    test("advanced search without a species falls back to all species", async () => {
+      getClaims.mockReturnValue({ claims, total: 0 });
+      const options = {
+        method: "POST",
+        url,
+        payload: { crumb, submit: "advancedSearch" },
+        headers: { cookie: `crumb=${crumb}` },
+        auth,
+      };
+      const res = await server.inject(options);
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(setClaimSearch).toHaveBeenCalledWith(expect.anything(), "species", SPECIES.ALL);
     });
 
     test("advanced search without an status falls back to all types", async () => {
@@ -446,7 +506,13 @@ describe("Claims tests", () => {
         const res = await searchByType({ searchText, searchType });
         expect(res.statusCode).toBe(StatusCodes.OK);
         expect(getClaims).toHaveBeenCalledWith(
-          { searchText, searchType, agreementType: AGREEMENT_TYPE.ALL, status: SEARCH_STATUS.ALL },
+          {
+            searchText,
+            searchType,
+            agreementType: AGREEMENT_TYPE.ALL,
+            status: SEARCH_STATUS.ALL,
+            species: SPECIES.ALL,
+          },
           10,
           0,
           undefined,
@@ -499,6 +565,7 @@ describe("Claims tests", () => {
           searchType: "reset",
           agreementType: AGREEMENT_TYPE.ALL,
           status: SEARCH_STATUS.ALL,
+          species: SPECIES.ALL,
         },
         10,
         0,
