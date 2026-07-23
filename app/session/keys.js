@@ -13,6 +13,7 @@ export const sessionKeys = {
     searchText: "searchText",
     searchType: "searchType",
     agreementType: "agreementType",
+    claimType: "claimType",
     species: "species",
     flag: "flag",
     status: "status",

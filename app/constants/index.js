@@ -18,6 +18,12 @@ export const FLAG = Object.freeze({
   NOT_FLAGGED: "NOT_FLAGGED",
 });
 
+export const CLAIM_TYPE = Object.freeze({
+  ALL: "ALL",
+  REVIEW: "REVIEW",
+  FOLLOW_UP: "FOLLOW_UP",
+});
+
 export const SPECIES = Object.freeze({
   ALL: "ALL",
   BEEF: "beef",
