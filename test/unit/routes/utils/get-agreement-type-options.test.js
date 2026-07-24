@@ -11,8 +11,16 @@ describe("getAgreementTypeOptions", () => {
 
     expect(options).toEqual([
       { value: AGREEMENT_TYPE.ALL, text: "All types", selected: true },
-      { value: AGREEMENT_TYPE.IAHW, text: "IAHW", selected: false },
-      { value: AGREEMENT_TYPE.PBR, text: "PBR", selected: false },
+      {
+        value: AGREEMENT_TYPE.IAHW,
+        text: "Improve Animal Health and Welfare (IAHW)",
+        selected: false,
+      },
+      {
+        value: AGREEMENT_TYPE.PBR,
+        text: "Poultry Biosecurity Review (PBR)",
+        selected: false,
+      },
     ]);
   });
 
@@ -21,7 +29,7 @@ describe("getAgreementTypeOptions", () => {
 
     expect(options.find((option) => option.selected)).toEqual({
       value: AGREEMENT_TYPE.IAHW,
-      text: "IAHW",
+      text: "Improve Animal Health and Welfare (IAHW)",
       selected: true,
     });
   });

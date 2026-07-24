@@ -148,7 +148,11 @@ describe("Claims tests", () => {
       const optionTexts = $("select#agreementType option")
         .map((_, el) => $(el).text().trim())
         .get();
-      expect(optionTexts).toEqual(["All types", "IAHW", "PBR"]);
+      expect(optionTexts).toEqual([
+        "All types",
+        "Improve Animal Health and Welfare (IAHW)",
+        "Poultry Biosecurity Review (PBR)",
+      ]);
     });
 
     test("claim type dropdown has All types, Review and Endemics options in order", async () => {

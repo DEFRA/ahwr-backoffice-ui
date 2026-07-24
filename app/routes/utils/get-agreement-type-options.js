@@ -2,8 +2,8 @@ import { AGREEMENT_TYPE, AGREEMENT_STATUS, FLAG } from "../../constants/index.js
 
 const agreementTypeLabels = {
   [AGREEMENT_TYPE.ALL]: "All types",
-  [AGREEMENT_TYPE.IAHW]: "IAHW",
-  [AGREEMENT_TYPE.PBR]: "PBR",
+  [AGREEMENT_TYPE.IAHW]: "Improve Animal Health and Welfare (IAHW)",
+  [AGREEMENT_TYPE.PBR]: "Poultry Biosecurity Review (PBR)",
 };
 
 const statusLabels = {
