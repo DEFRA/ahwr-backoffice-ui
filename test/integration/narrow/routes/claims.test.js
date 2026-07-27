@@ -217,20 +217,14 @@ describe("Claims tests", () => {
         .get();
       expect(optionTexts).toEqual([
         "All statuses",
-        "Agreed",
-        "Withdrawn",
-        "In check",
-        "Accepted",
-        "Not agreed",
-        "Paid",
-        "Ready to pay",
-        "Rejected",
         "On hold",
+        "In check",
         "Recommended to pay",
         "Recommended to reject",
-        "Authorised",
-        "Sent to finance",
-        "Payment held",
+        "Ready to pay",
+        "Rejected",
+        "Paid",
+        "Withdrawn",
       ]);
     });
 

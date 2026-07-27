@@ -1,9 +1,15 @@
-import { STATUS } from "ffc-ahwr-common-library";
 import { upperFirstLetter } from "../../lib/display-helper.js";
 
 export const SEARCH_STATUS = Object.freeze({
   ALL: "ALL",
-  ...STATUS,
+  ON_HOLD: "ON_HOLD",
+  IN_CHECK: "IN_CHECK",
+  RECOMMENDED_TO_PAY: "RECOMMENDED_TO_PAY",
+  RECOMMENDED_TO_REJECT: "RECOMMENDED_TO_REJECT",
+  READY_TO_PAY: "READY_TO_PAY",
+  REJECTED: "REJECTED",
+  PAID: "PAID",
+  WITHDRAWN: "WITHDRAWN",
 });
 
 const formatStatusText = (status) => upperFirstLetter(status.toLowerCase()).replaceAll("_", " ");
