@@ -173,7 +173,7 @@ export const getClaimViewStates = (
 
   const { isAdministrator, isRecommender, isAuthoriser, isSuperAdmin } = mapAuth(request);
 
-  const admActions = getAdminActionsAvailable({
+  const adminActions = getAdminActionsAvailable({
     isAdministrator,
     isAuthoriser,
     status,
@@ -187,20 +187,17 @@ export const getClaimViewStates = (
     name,
   });
 
-  const superAdmActions = superAdminActions(
-    isSuperAdmin,
-    status,
+  const superAdminActions = superAdminActionsAvailable(isSuperAdmin, status, isFlagged, {
     updateStatus,
     updateVetsName,
     updateVetRCVSNumber,
     updateDateOfVisit,
     updateEligiblePiiRedaction,
-    isFlagged,
-  );
+  });
 
   return {
-    ...admActions,
-    ...superAdmActions,
+    ...adminActions,
+    ...superAdminActions,
   };
 };
 
@@ -208,16 +205,15 @@ const statusWasSetByAnotherUser = (currentStatusEvent, name) => {
   return currentStatusEvent && name !== currentStatusEvent.updatedBy;
 };
 
-const superAdminActions = (
-  isSuperAdmin,
-  status,
-  updateStatus,
-  updateVetsName,
-  updateVetRCVSNumber,
-  updateDateOfVisit,
-  updateEligiblePiiRedaction,
-  isFlagged,
-) => {
+const superAdminActionsAvailable = (isSuperAdmin, status, isFlagged, updateFlags) => {
+  const {
+    updateStatus,
+    updateVetsName,
+    updateVetRCVSNumber,
+    updateDateOfVisit,
+    updateEligiblePiiRedaction,
+  } = updateFlags;
+
   const claimIsntPaidOrReadyToPay = ![STATUS.READY_TO_PAY, STATUS.PAID].includes(status);
   const claimIsInCheck = status === STATUS.IN_CHECK;
 
