@@ -1,11 +1,13 @@
 import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states.js";
 import { STATUS as status } from "ffc-ahwr-common-library";
 import { permissions } from "../../../../app/auth/permissions.js";
+import { config } from "../../../../app/config/index.js";
 const { administrator, recommender, authoriser, user } = permissions;
 
 jest.mock("../../../../app/config", () => ({
   config: {
     superAdmins: ["currentuser@test"],
+    withdrawClaimEnabled: true,
   },
 }));
 
@@ -27,8 +29,7 @@ test("status: agreed, user: admin", () => {
   const state = getClaimViewStates(request, status.AGREED);
 
   expect(state).toEqual({
-    withdrawAction: true,
-    withdrawForm: false,
+    withdrawAction: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -68,7 +69,6 @@ test("status: agreed, user: recommender", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -107,128 +107,7 @@ test("status: agreed, user: authoriser", () => {
   const state = getClaimViewStates(request, status.AGREED);
 
   expect(state).toEqual({
-    withdrawAction: true,
-    withdrawForm: false,
-    moveToInCheckAction: false,
-    moveToInCheckForm: false,
-    recommendAction: false,
-    recommendToPayForm: false,
-    recommendToRejectForm: false,
-    authoriseAction: false,
-    authoriseForm: false,
-    rejectAction: false,
-    rejectForm: false,
-    updateStatusAction: false,
-    updateStatusForm: false,
-    updateDateOfVisitAction: false,
-    updateDateOfVisitForm: false,
-    updateEligiblePiiRedactionAction: false,
-    updateEligiblePiiRedactionForm: false,
-    updateVetRCVSNumberAction: false,
-    updateVetRCVSNumberForm: false,
-    updateVetsNameAction: false,
-    updateVetsNameForm: false,
-  });
-});
-
-test("status: agreed, query: withdraw, user: admin", () => {
-  const request = {
-    query: {
-      withdraw: true,
-    },
-    auth: {
-      isAuthenticated: true,
-      credentials: {
-        account: { name: currentUser, username: "" },
-        scope: [administrator],
-      },
-    },
-  };
-  const state = getClaimViewStates(request, status.AGREED);
-
-  expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: true,
-    moveToInCheckAction: false,
-    moveToInCheckForm: false,
-    recommendAction: false,
-    recommendToPayForm: false,
-    recommendToRejectForm: false,
-    authoriseAction: false,
-    authoriseForm: false,
-    rejectAction: false,
-    rejectForm: false,
-    updateStatusAction: false,
-    updateStatusForm: false,
-    updateDateOfVisitAction: false,
-    updateDateOfVisitForm: false,
-    updateEligiblePiiRedactionAction: false,
-    updateEligiblePiiRedactionForm: false,
-    updateVetRCVSNumberAction: false,
-    updateVetRCVSNumberForm: false,
-    updateVetsNameAction: false,
-    updateVetsNameForm: false,
-  });
-});
-
-test("status: agreed, query: withdraw, user: recommender", () => {
-  const request = {
-    query: {
-      withdraw: true,
-    },
-    auth: {
-      isAuthenticated: true,
-      credentials: {
-        account: { name: currentUser, username: "" },
-        scope: [recommender],
-      },
-    },
-  };
-  const state = getClaimViewStates(request, status.AGREED);
-
-  expect(state).toEqual({
-    withdrawAction: false,
-    withdrawForm: false,
-    moveToInCheckAction: false,
-    moveToInCheckForm: false,
-    recommendAction: false,
-    recommendToPayForm: false,
-    recommendToRejectForm: false,
-    authoriseAction: false,
-    authoriseForm: false,
-    rejectAction: false,
-    rejectForm: false,
-    updateStatusAction: false,
-    updateStatusForm: false,
-    updateDateOfVisitAction: false,
-    updateDateOfVisitForm: false,
-    updateEligiblePiiRedactionAction: false,
-    updateEligiblePiiRedactionForm: false,
-    updateVetRCVSNumberAction: false,
-    updateVetRCVSNumberForm: false,
-    updateVetsNameAction: false,
-    updateVetsNameForm: false,
-  });
-});
-
-test("status: agreed, query: withdraw, user: authoriser", () => {
-  const request = {
-    query: {
-      withdraw: true,
-    },
-    auth: {
-      isAuthenticated: true,
-      credentials: {
-        account: { name: currentUser, username: "" },
-        scope: [authoriser],
-      },
-    },
-  };
-  const state = getClaimViewStates(request, status.AGREED);
-
-  expect(state).toEqual({
-    withdrawAction: false,
-    withdrawForm: true,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -268,7 +147,6 @@ test("status: on hold, user: admin", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: true,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -308,7 +186,6 @@ test("status: on hold, user: recommender", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: true,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -348,7 +225,6 @@ test("status: on hold, user: authoriser", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: true,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -388,7 +264,6 @@ test("status: on hold, user: user", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -428,7 +303,6 @@ test("status: on hold, query: moveToInCheck, user: admin", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: true,
     recommendAction: false,
@@ -468,7 +342,6 @@ test("status: on hold, query: moveToInCheck, user: recommender", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: true,
     recommendAction: false,
@@ -508,7 +381,6 @@ test("status: on hold, query: moveToInCheck, user: authoriser", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: true,
     recommendAction: false,
@@ -549,7 +421,6 @@ test("status: in check, user: admin", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: true,
@@ -590,7 +461,6 @@ test("status: in check, user: recommender", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: true,
@@ -631,7 +501,6 @@ test("status: in check, user: authoriser", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -671,7 +540,6 @@ test("status: in check, query: recommendToPay, user: admin", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -711,7 +579,6 @@ test("status: in check, query: recommendToPay, user: recommender", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -751,7 +618,6 @@ test("status: in check, query: recommendToPay, user: authoriser", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -791,7 +657,6 @@ test("status: in check, query: recommendToReject, user: admin", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -831,7 +696,6 @@ test("status: in check, query: recommendToReject, user: recommender", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -871,7 +735,6 @@ test("status: in check, query: recommendToReject, user: authoriser", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -914,7 +777,6 @@ test("status: in recommended to pay, user: admin, recommender: different person"
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -957,7 +819,6 @@ test("status: in recommended to pay, user: admin, recommender: same person", () 
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1000,7 +861,6 @@ test("status: in recommended to pay, user: recommender, recommender: different p
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1043,7 +903,6 @@ test("status: in recommended to pay, user: authoriser, recommender: different pe
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1086,7 +945,6 @@ test("status: in recommended to pay, query: approve, user: admin, recommender: d
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1129,7 +987,6 @@ test("status: in recommended to pay, query: approve, user: recommender, recommen
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1172,7 +1029,6 @@ test("status: in recommended to pay, query: approve, user: authoriser, recommend
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1215,7 +1071,6 @@ test("status: in recommended to reject, user: admin, recommender: different pers
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1258,7 +1113,6 @@ test("status: in recommended to reject, user: admin, recommender: same person", 
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1301,7 +1155,6 @@ test("status: in recommended to reject, user: recommender, recommender: differen
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1344,7 +1197,6 @@ test("status: in recommended to reject, user: authoriser, recommender: different
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1387,7 +1239,6 @@ test("status: in recommended to reject, query: reject, user: admin, recommender:
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1430,7 +1281,6 @@ test("status: in recommended to reject, query: reject, user: admin, recommender:
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1473,7 +1323,6 @@ test("status: in recommended to reject, query: reject, user: recommender, recomm
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1516,7 +1365,6 @@ test("status: in recommended to reject, query: reject, user: authoriser, recomme
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1557,7 +1405,6 @@ test("statusUpdateAction, status: any, user: admin", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1598,7 +1445,6 @@ test("statusUpdateAction, status: any, user: admin & super admin", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1639,7 +1485,6 @@ test("statusUpdateForm, status: any, query: update, user: admin", () => {
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1680,7 +1525,6 @@ test("statusUpdateForm, status: any, query: updateStatus, user: admin & super ad
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1721,7 +1565,6 @@ test("statusUpdateForm, status: ready to pay, query: updateStatus, user: admin &
 
   expect(state).toEqual({
     withdrawAction: false,
-    withdrawForm: false,
     moveToInCheckAction: false,
     moveToInCheckForm: false,
     recommendAction: false,
@@ -1741,5 +1584,65 @@ test("statusUpdateForm, status: ready to pay, query: updateStatus, user: admin &
     updateVetRCVSNumberForm: false,
     updateVetsNameAction: true,
     updateVetsNameForm: false,
+  });
+});
+
+describe("withdraw button", () => {
+  const inCheckSuperAdminRequest = {
+    query: {
+      recommendToPay: false,
+      recommendToReject: false,
+    },
+    auth: {
+      isAuthenticated: true,
+      credentials: {
+        account: { name: currentUser, username: "currentUser@test" },
+        scope: [administrator],
+      },
+    },
+  };
+
+  afterEach(() => {
+    config.withdrawClaimEnabled = true;
+  });
+
+  test("withdrawAction: true when super admin, status in check and toggle enabled", () => {
+    const state = getClaimViewStates(inCheckSuperAdminRequest, status.IN_CHECK);
+
+    expect(state.withdrawAction).toBe(true);
+  });
+
+  test("withdrawAction: false when toggle disabled", () => {
+    config.withdrawClaimEnabled = false;
+
+    const state = getClaimViewStates(inCheckSuperAdminRequest, status.IN_CHECK);
+
+    expect(state.withdrawAction).toBe(false);
+  });
+
+  test("withdrawAction: false when super admin but status is not in check", () => {
+    const state = getClaimViewStates(inCheckSuperAdminRequest, status.READY_TO_PAY);
+
+    expect(state.withdrawAction).toBe(false);
+  });
+
+  test("withdrawAction: false when status in check but user is not a super admin", () => {
+    const request = {
+      query: {
+        recommendToPay: false,
+        recommendToReject: false,
+      },
+      auth: {
+        isAuthenticated: true,
+        credentials: {
+          account: { name: currentUser, username: "notSuperAdmin@test" },
+          scope: [administrator],
+        },
+      },
+    };
+
+    const state = getClaimViewStates(request, status.IN_CHECK);
+
+    expect(state.withdrawAction).toBe(false);
   });
 });
