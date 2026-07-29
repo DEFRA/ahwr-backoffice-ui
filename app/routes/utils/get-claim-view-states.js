@@ -155,6 +155,7 @@ export const getClaimViewStates = (
   status,
   currentStatusEvent,
   formFlags = request.query,
+  isFlagged = false,
 ) => {
   const {
     moveToInCheck,
@@ -194,6 +195,7 @@ export const getClaimViewStates = (
     updateVetRCVSNumber,
     updateDateOfVisit,
     updateEligiblePiiRedaction,
+    isFlagged,
   );
 
   return {
@@ -214,11 +216,13 @@ const superAdminActions = (
   updateVetRCVSNumber,
   updateDateOfVisit,
   updateEligiblePiiRedaction,
+  isFlagged,
 ) => {
   const claimIsntPaidOrReadyToPay = ![STATUS.READY_TO_PAY, STATUS.PAID].includes(status);
   const claimIsInCheck = status === STATUS.IN_CHECK;
 
-  const withdrawAction = isSuperAdmin && claimIsInCheck && config.withdrawClaimEnabled;
+  const withdrawAction =
+    isSuperAdmin && claimIsInCheck && config.withdrawClaimEnabled && !isFlagged;
 
   const updateStatusAction = isSuperAdmin && claimIsntPaidOrReadyToPay;
   const updateStatusForm = isSuperAdmin && updateStatus === true && claimIsntPaidOrReadyToPay;

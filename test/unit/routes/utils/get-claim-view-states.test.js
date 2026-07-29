@@ -1626,6 +1626,20 @@ describe("withdraw button", () => {
     expect(state.withdrawAction).toBe(false);
   });
 
+  test("withdrawAction: false when the application is flagged", () => {
+    const isFlagged = true;
+
+    const state = getClaimViewStates(
+      inCheckSuperAdminRequest,
+      status.IN_CHECK,
+      undefined,
+      inCheckSuperAdminRequest.query,
+      isFlagged,
+    );
+
+    expect(state.withdrawAction).toBe(false);
+  });
+
   test("withdrawAction: false when status in check but user is not a super admin", () => {
     const request = {
       query: {

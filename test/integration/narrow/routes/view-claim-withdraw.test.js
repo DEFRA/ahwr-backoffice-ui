@@ -135,4 +135,13 @@ describe("Withdraw claim button", () => {
     expect(res.statusCode).toBe(StatusCodes.OK);
     expect(res.payload).not.toContain("Withdraw claim");
   });
+
+  test("hides the button when the application is flagged", async () => {
+    getApplication.mockReturnValue({ ...application, flags: [{ id: "flag-1" }] });
+
+    const res = await injectViewClaim(server, superAdminAuth);
+
+    expect(res.statusCode).toBe(StatusCodes.OK);
+    expect(res.payload).not.toContain("Withdraw claim");
+  });
 });

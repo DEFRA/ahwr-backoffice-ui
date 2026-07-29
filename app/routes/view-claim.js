@@ -90,9 +90,11 @@ export const buildViewClaim = async (
   const { historyRecords } = await getClaimHistory(claimReference, request.logger);
   const currentStatusEvent = getCurrentStatusEvent(claim, historyRecords);
 
+  const isFlagged = application.flags.length > 0;
+
   const viewStates = application.redacted
     ? {}
-    : getClaimViewStates(request, claim.status, currentStatusEvent, formFlags);
+    : getClaimViewStates(request, claim.status, currentStatusEvent, formFlags, isFlagged);
 
   const scheme = getScheme(applicationReference);
 
@@ -100,7 +102,7 @@ export const buildViewClaim = async (
     page,
     backLink: backLink(applicationReference, returnPage, page),
     returnPage,
-    isFlagged: application.flags.length > 0,
+    isFlagged,
     reference: claimReference,
     applicationReference,
     claimOrAgreement: "claim",
