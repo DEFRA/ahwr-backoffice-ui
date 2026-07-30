@@ -1,5 +1,6 @@
 {% extends './layouts/layout.njk' %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% block pageTitle %}
   Administration - Withdraw Claim
@@ -14,6 +15,12 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <form method="post" action="/withdraw-claim/{{ reference }}" class="ahwr-update-form">
+        {% if errors.length %}
+          {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors
+          }) }}
+        {% endif %}
         <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Confirm withdrawal of this claim</h1>
         <p class="govuk-body"><strong>Claim number:</strong> {{ reference }}</p>
 
@@ -24,6 +31,8 @@
 
         {{ govukRadios({
           name: "reasonForWithdrawal",
+          value: reasonForWithdrawal,
+          errorMessage: errorMessages.reasonForWithdrawal,
           fieldset: {
             legend: {
               text: "Reason for withdrawal",
@@ -61,6 +70,8 @@
 
         {{ govukRadios({
           name: "issueDiscovery",
+          value: issueDiscovery,
+          errorMessage: errorMessages.issueDiscovery,
           fieldset: {
             legend: {
               text: "How the issue was discovered",
@@ -82,6 +93,8 @@
         {{ govukTextarea({
           name: "withdrawalDetails",
           id: "withdrawalDetails",
+          value: withdrawalDetails,
+          errorMessage: errorMessages.withdrawalDetails,
           label: {
             text: "Enter details on why this claim should be withdrawn",
             classes: "govuk-label--m"

@@ -76,25 +76,76 @@ describe("Withdrawal claim page", () => {
   });
 
   describe(`POST /withdraw-claim/${reference}`, () => {
-    test("redirects back to the view-claim page we came from", async () => {
+    const postWithdrawal = async (payload) => {
       const crumb = await getCrumbs(server);
-      const res = await server.inject({
+      return server.inject({
         method: "POST",
         url: `/withdraw-claim/${reference}`,
         auth: adminAuth,
-        payload: {
-          page: "2",
-          returnPage: "claims",
-          reasonForWithdrawal: "unintentionalTypingError",
-          issueDiscovery: "customerContactedRPA",
-          withdrawalDetails: "Wrong date entered",
-          crumb,
-        },
+        payload: { page: "2", returnPage: "claims", ...payload, crumb },
         headers: { cookie: `crumb=${crumb}` },
       });
+    };
+
+    const validPayload = {
+      reasonForWithdrawal: "unintentionalTypingError",
+      issueDiscovery: "customerContactedRPA",
+      withdrawalDetails: "Wrong date entered",
+    };
+
+    test("redirects back to the view-claim page we came from", async () => {
+      const res = await postWithdrawal(validPayload);
 
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
       expect(res.headers.location).toBe(`/view-claim/${reference}?page=2&returnPage=claims`);
+    });
+
+    test("fails validation and lists every missing field when nothing is filled in", async () => {
+      const res = await postWithdrawal({});
+      const $ = cheerio.load(res.payload);
+      const summaryErrors = $(".govuk-error-summary__list a")
+        .map((_, el) => $(el).text().trim())
+        .get();
+
+      expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
+      expect(summaryErrors).toEqual([
+        "Select a reason for withdrawal",
+        "Select how the issue was discovered",
+        "Enter details on why this claim should be withdrawn",
+      ]);
+    });
+
+    test.each([
+      ["reasonForWithdrawal", "Select a reason for withdrawal", "#reasonForWithdrawal"],
+      ["issueDiscovery", "Select how the issue was discovered", "#issueDiscovery"],
+      [
+        "withdrawalDetails",
+        "Enter details on why this claim should be withdrawn",
+        "#withdrawalDetails",
+      ],
+    ])("fails validation when %s is missing", async (missingField, message, href) => {
+      const { [missingField]: _removed, ...payload } = validPayload;
+      const res = await postWithdrawal(payload);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
+      expect($(`.govuk-error-summary__list a[href="${href}"]`).text().trim()).toBe(message);
+    });
+
+    test("re-renders the page keeping the values that were entered", async () => {
+      const res = await postWithdrawal({
+        reasonForWithdrawal: "unintentionalTypingError",
+        issueDiscovery: "customerContactedRPA",
+      });
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
+      expect(
+        $("input[name='reasonForWithdrawal'][value='unintentionalTypingError']").is(":checked"),
+      ).toBe(true);
+      expect($("input[name='issueDiscovery'][value='customerContactedRPA']").is(":checked")).toBe(
+        true,
+      );
     });
   });
 });
