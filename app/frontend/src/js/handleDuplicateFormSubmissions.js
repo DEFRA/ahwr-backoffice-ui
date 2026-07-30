@@ -1,5 +1,5 @@
 window.onload = function () {
-  ["#approveClaimForm", "#rejectClaimForm", "#withdrawForm"].forEach((form) =>
+  ["#approveClaimForm", "#rejectClaimForm"].forEach((form) =>
     preventDuplicateFormSubmission(document.querySelector(form)),
   );
 };

@@ -57,6 +57,7 @@ const getConfigSchema = () =>
     federatedCredentials: {
       enabled: joi.bool().required(),
     },
+    withdrawClaimEnabled: joi.bool().optional().default(false),
   });
 
 const buildConfig = () => {
@@ -114,6 +115,7 @@ const buildConfig = () => {
     federatedCredentials: {
       enabled: process.env.FEDERATED_CREDENTIALS_ENABLED === "true",
     },
+    withdrawClaimEnabled: process.env.WITHDRAW_CLAIM_ENABLED === "true",
   };
 
   if (process.env.NODE_ENV === "test") {

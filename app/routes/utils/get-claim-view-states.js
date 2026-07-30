@@ -1,5 +1,6 @@
 import { STATUS } from "ffc-ahwr-common-library";
 import { mapAuth } from "../../auth/map-auth.js";
+import { config } from "../../config/index.js";
 
 const getAdminAndRecommenderActions = ({
   isAdminOrRecommender,
@@ -22,8 +23,6 @@ const getAdminAndRecommenderActions = ({
 
 const getAdminAndAuthoriserActions = ({
   isAdminOrAuthorisor,
-  claimIsAgreed,
-  withdraw,
   claimIsRecommendedToPay,
   approve,
   currentStatusEvent,
@@ -33,8 +32,6 @@ const getAdminAndAuthoriserActions = ({
 }) => {
   if (!isAdminOrAuthorisor) {
     return {
-      withdrawAction: false,
-      withdrawForm: false,
       authoriseAction: false,
       authoriseForm: false,
       rejectAction: false,
@@ -44,13 +41,8 @@ const getAdminAndAuthoriserActions = ({
 
   const setByAnotherUser = statusWasSetByAnotherUser(currentStatusEvent, name);
 
-  const withdrawAction = claimIsAgreed && withdraw === false;
-  const withdrawForm = claimIsAgreed && withdraw === true;
-
   if (!setByAnotherUser) {
     return {
-      withdrawAction,
-      withdrawForm,
       authoriseAction: false,
       authoriseForm: false,
       rejectAction: false,
@@ -66,7 +58,7 @@ const getAdminAndAuthoriserActions = ({
 
   const rejectForm = claimIsRecommendedToReject && reject === true;
 
-  return { withdrawAction, withdrawForm, authoriseAction, authoriseForm, rejectAction, rejectForm };
+  return { authoriseAction, authoriseForm, rejectAction, rejectForm };
 };
 
 const getAdminAndAuthoriserAndRecommenderActions = ({
@@ -89,7 +81,6 @@ const getAdminActionsAvailable = ({
   isAdministrator,
   isAuthoriser,
   status,
-  withdraw,
   isRecommender,
   moveToInCheck,
   recommendToPay,
@@ -103,23 +94,21 @@ const getAdminActionsAvailable = ({
   const isAdminOrRecommender = isAdministrator || isRecommender;
   const isAdminOrAuthorisorOrRecommender = isAdministrator || isAuthoriser || isRecommender;
   const claimIsInCheck = status === STATUS.IN_CHECK;
-  const claimIsAgreed = status === STATUS.AGREED;
   const claimIsOnHold = status === STATUS.ON_HOLD;
   const claimIsRecommendedToPay = status === STATUS.RECOMMENDED_TO_PAY;
   const claimIsRecommendedToReject = status === STATUS.RECOMMENDED_TO_REJECT;
 
-  const { withdrawAction, withdrawForm, authoriseAction, authoriseForm, rejectAction, rejectForm } =
-    getAdminAndAuthoriserActions({
+  const { authoriseAction, authoriseForm, rejectAction, rejectForm } = getAdminAndAuthoriserActions(
+    {
       isAdminOrAuthorisor,
-      claimIsAgreed,
-      withdraw,
       claimIsRecommendedToPay,
       approve,
       currentStatusEvent,
       claimIsRecommendedToReject,
       reject,
       name,
-    });
+    },
+  );
 
   const { recommendAction, recommendToPayForm, recommendToRejectForm } =
     getAdminAndRecommenderActions({
@@ -136,8 +125,6 @@ const getAdminActionsAvailable = ({
   });
 
   return {
-    withdrawAction,
-    withdrawForm,
     moveToInCheckAction,
     moveToInCheckForm,
     recommendAction,
@@ -151,7 +138,6 @@ const getAdminActionsAvailable = ({
 };
 
 export const DEFAULT_FORM_FLAGS = {
-  withdraw: false,
   moveToInCheck: false,
   recommendToPay: false,
   recommendToReject: false,
@@ -169,9 +155,9 @@ export const getClaimViewStates = (
   status,
   currentStatusEvent,
   formFlags = request.query,
+  isFlagged = false,
 ) => {
   const {
-    withdraw,
     moveToInCheck,
     recommendToPay,
     recommendToReject,
@@ -187,11 +173,10 @@ export const getClaimViewStates = (
 
   const { isAdministrator, isRecommender, isAuthoriser, isSuperAdmin } = mapAuth(request);
 
-  const admActions = getAdminActionsAvailable({
+  const adminActions = getAdminActionsAvailable({
     isAdministrator,
     isAuthoriser,
     status,
-    withdraw,
     isRecommender,
     moveToInCheck,
     recommendToPay,
@@ -202,19 +187,17 @@ export const getClaimViewStates = (
     name,
   });
 
-  const superAdmActions = superAdminActions(
-    isSuperAdmin,
-    status,
+  const superAdminActions = superAdminActionsAvailable(isSuperAdmin, status, isFlagged, {
     updateStatus,
     updateVetsName,
     updateVetRCVSNumber,
     updateDateOfVisit,
     updateEligiblePiiRedaction,
-  );
+  });
 
   return {
-    ...admActions,
-    ...superAdmActions,
+    ...adminActions,
+    ...superAdminActions,
   };
 };
 
@@ -222,16 +205,20 @@ const statusWasSetByAnotherUser = (currentStatusEvent, name) => {
   return currentStatusEvent && name !== currentStatusEvent.updatedBy;
 };
 
-const superAdminActions = (
-  isSuperAdmin,
-  status,
-  updateStatus,
-  updateVetsName,
-  updateVetRCVSNumber,
-  updateDateOfVisit,
-  updateEligiblePiiRedaction,
-) => {
+const superAdminActionsAvailable = (isSuperAdmin, status, isFlagged, updateFlags) => {
+  const {
+    updateStatus,
+    updateVetsName,
+    updateVetRCVSNumber,
+    updateDateOfVisit,
+    updateEligiblePiiRedaction,
+  } = updateFlags;
+
   const claimIsntPaidOrReadyToPay = ![STATUS.READY_TO_PAY, STATUS.PAID].includes(status);
+  const claimIsInCheck = status === STATUS.IN_CHECK;
+
+  const withdrawAction =
+    isSuperAdmin && claimIsInCheck && config.withdrawClaimEnabled && !isFlagged;
 
   const updateStatusAction = isSuperAdmin && claimIsntPaidOrReadyToPay;
   const updateStatusForm = isSuperAdmin && updateStatus === true && claimIsntPaidOrReadyToPay;
@@ -249,6 +236,7 @@ const superAdminActions = (
   const updateEligiblePiiRedactionForm = isSuperAdmin && updateEligiblePiiRedaction === true;
 
   return {
+    withdrawAction,
     updateStatusAction,
     updateStatusForm,
     updateVetsNameAction,

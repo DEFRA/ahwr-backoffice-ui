@@ -20,7 +20,6 @@ test("opens none of the known forms when the key matches nothing", () => {
 test("covers every form flag getClaimViewStates reads", () => {
   expect(Object.keys(getFormFlags("updateStatus"))).toEqual(
     expect.arrayContaining([
-      "withdraw",
       "moveToInCheck",
       "recommendToPay",
       "recommendToReject",
