@@ -45,7 +45,7 @@ describe("Withdrawal claim page", () => {
       expect(res.payload).toContain("Once approved, a withdrawn claim cannot be undone.");
       expect(res.payload).toContain("Reason for withdrawal");
       expect(res.payload).toContain("How the issue was discovered");
-      expect($("textarea#withdrawalDetails").length).toBe(1);
+      expect($("textarea#withdrawalDetails")).toHaveLength(1);
       expect($(".govuk-button--warning").text()).toContain("Withdraw claim");
       expect($(".govuk-button--secondary").text()).toContain("Do not withdraw claim");
     });
