@@ -103,6 +103,13 @@ describe("Withdraw claim button", () => {
     expect($(".govuk-button--warning").text()).toMatch("Withdraw claim");
   });
 
+  test("the button links to the withdrawal page for the claim", async () => {
+    const res = await injectViewClaim(server, superAdminAuth);
+    const $ = cheerio.load(res.payload);
+
+    expect($(".govuk-button--warning").attr("href")).toBe("/withdraw-claim/REPI-1111-6666?page=1");
+  });
+
   test("hides the button when the toggle is disabled", async () => {
     config.withdrawClaimEnabled = false;
 
