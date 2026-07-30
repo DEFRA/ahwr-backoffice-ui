@@ -57,7 +57,7 @@ const getConfigSchema = () =>
     federatedCredentials: {
       enabled: joi.bool().required(),
     },
-    withdrawClaimEnabled: joi.bool().required(),
+    withdrawClaimEnabled: joi.bool().optional().default(false),
   });
 
 const buildConfig = () => {
