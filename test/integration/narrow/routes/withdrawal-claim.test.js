@@ -213,7 +213,7 @@ describe("Withdrawal claim page", () => {
       expect(summaryErrors).toEqual([
         "Select a reason for withdrawal",
         "Select how the issue was discovered",
-        "Enter details on why this claim should be withdrawn",
+        "Enter details for why this claim should be withdrawn",
       ]);
     });
 
@@ -222,7 +222,7 @@ describe("Withdrawal claim page", () => {
       ["issueDiscovery", "Select how the issue was discovered", "#issueDiscovery"],
       [
         "withdrawalDetails",
-        "Enter details on why this claim should be withdrawn",
+        "Enter details for why this claim should be withdrawn",
         "#withdrawalDetails",
       ],
     ])("fails validation when %s is missing", async (missingField, message, href) => {

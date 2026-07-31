@@ -99,7 +99,9 @@ export const withdrawalClaimPostRoute = {
         ...returnParams,
         reasonForWithdrawal: requiredSelection("Select a reason for withdrawal"),
         issueDiscovery: requiredSelection("Select how the issue was discovered"),
-        withdrawalDetails: requiredSelection("Enter details on why this claim should be withdrawn"),
+        withdrawalDetails: requiredSelection(
+          "Enter details for why this claim should be withdrawn",
+        ),
         crumb: joi.string().optional(),
       }),
       failAction: (request, h, error) => {
