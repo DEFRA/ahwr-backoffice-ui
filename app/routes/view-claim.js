@@ -23,6 +23,14 @@ const backLink = (applicationReference, returnPage, page) => {
     : `/claims?page=${page}`;
 };
 
+const withdrawClaimLink = (reference, page, returnPage) => {
+  const query = new URLSearchParams({ page });
+  if (returnPage) {
+    query.append("returnPage", returnPage);
+  }
+  return `/withdraw-claim/${reference}?${query.toString()}`;
+};
+
 const buildClaimApplicationSummary = (application, applicationReference) => {
   const { organisation } = application;
   return [
@@ -101,6 +109,7 @@ export const buildViewClaim = async (
   return h.view("view-claim", {
     page,
     backLink: backLink(applicationReference, returnPage, page),
+    withdrawLink: withdrawClaimLink(claimReference, page, returnPage),
     returnPage,
     isFlagged,
     reference: claimReference,

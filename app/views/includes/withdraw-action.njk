@@ -3,7 +3,7 @@
     {{ govukButton({
       text: "Withdraw claim",
       classes: "govuk-button--warning",
-      href: "/withdraw-claim/" + reference + "?page=" + page + ("&returnPage=" + returnPage if returnPage else "")
+      href: withdrawLink
     }) }}
   </div>
 </div>
