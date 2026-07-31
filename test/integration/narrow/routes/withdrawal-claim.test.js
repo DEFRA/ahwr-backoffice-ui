@@ -4,7 +4,7 @@ import { getCrumbs } from "../../../utils/get-crumbs.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
 import { config } from "../../../../app/config/index.js";
-import { getClaim } from "../../../../app/api/claims.js";
+import { getClaim, withdrawClaim } from "../../../../app/api/claims.js";
 import { getApplication } from "../../../../app/api/applications.js";
 
 const SUPER_ADMIN_USERNAME = "superadmin@test";
@@ -195,11 +195,36 @@ describe("Withdrawal claim page", () => {
       withdrawalDetails: "Wrong date entered",
     };
 
-    test("redirects back to the view-claim page we came from", async () => {
-      const res = await postWithdrawal(validPayload);
+    describe("with a valid submission", () => {
+      let res;
 
-      expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      expect(res.headers.location).toBe(`/view-claim/${reference}?page=2&returnPage=claims`);
+      beforeEach(async () => {
+        res = await postWithdrawal(validPayload);
+      });
+
+      test("withdraws the claim via the backend", () => {
+        expect(withdrawClaim).toHaveBeenCalledWith(
+          reference,
+          "Super Admin",
+          {
+            reasonForWithdrawal: "unintentionalTypingError",
+            issueDiscovery: "customerContactedRPA",
+            withdrawalDetails: "Wrong date entered",
+          },
+          expect.anything(),
+        );
+      });
+
+      test("redirects back to the view-claim page we came from", () => {
+        expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
+        expect(res.headers.location).toBe(`/view-claim/${reference}?page=2&returnPage=claims`);
+      });
+    });
+
+    test("does not withdraw the claim when validation fails", async () => {
+      await postWithdrawal({});
+
+      expect(withdrawClaim).not.toHaveBeenCalled();
     });
 
     test("fails validation and lists every missing field when nothing is filled in", async () => {
