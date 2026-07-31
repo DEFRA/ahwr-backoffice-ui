@@ -1,10 +1,37 @@
 import joi from "joi";
+import boom from "@hapi/boom";
 import { StatusCodes } from "http-status-codes";
 import { permissions } from "../auth/permissions.js";
 import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { getErrorMessagesByKey } from "./utils/get-error-messages-by-key.js";
+import { canWithdrawClaim } from "./utils/can-withdraw-claim.js";
+import { mapAuth } from "../auth/map-auth.js";
+import { getClaim } from "../api/claims.js";
+import { getApplication } from "../api/applications.js";
 
 const { administrator } = permissions;
+
+// Gate both routes with the same rules that reveal the withdraw button on view-claim
+const ensureClaimIsWithdrawable = async (request, h) => {
+  const { reference } = request.params;
+  const claim = await getClaim(reference, request.logger);
+  const application = await getApplication(claim.applicationReference, request.logger);
+  const { isSuperAdmin } = mapAuth(request);
+  const isFlagged = application.flags.length > 0;
+
+  if (!canWithdrawClaim({ isSuperAdmin, status: claim.status, isFlagged })) {
+    return boom.forbidden("This claim cannot be withdrawn");
+  }
+
+  return h.continue;
+};
+
+const withdrawalRouteGuards = {
+  auth: { scope: [administrator] },
+  ext: {
+    onPostAuth: { method: ensureClaimIsWithdrawable },
+  },
+};
 
 const viewClaimLink = (reference, page, returnPage) => {
   const query = new URLSearchParams({ page });
@@ -44,7 +71,7 @@ export const withdrawalClaimGetRoute = {
   method: "GET",
   path: "/withdraw-claim/{reference}",
   options: {
-    auth: { scope: [administrator] },
+    ...withdrawalRouteGuards,
     validate: {
       params: joi.object({ reference: joi.string() }),
       query: joi.object(returnParams),
@@ -64,7 +91,7 @@ export const withdrawalClaimPostRoute = {
   method: "POST",
   path: "/withdraw-claim/{reference}",
   options: {
-    auth: { scope: [administrator] },
+    ...withdrawalRouteGuards,
     validate: {
       options: { abortEarly: false },
       params: joi.object({ reference: joi.string() }),

@@ -3,18 +3,47 @@ import { permissions } from "../../../../app/auth/permissions.js";
 import { getCrumbs } from "../../../utils/get-crumbs.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
+import { config } from "../../../../app/config/index.js";
+import { getClaim } from "../../../../app/api/claims.js";
+import { getApplication } from "../../../../app/api/applications.js";
 
+const SUPER_ADMIN_USERNAME = "superadmin@test";
+
+jest.mock("../../../../app/config/index.js", () => {
+  const actual = jest.requireActual("../../../../app/config/index.js");
+  return {
+    ...actual,
+    config: {
+      ...actual.config,
+      superAdmins: ["superadmin@test"],
+      withdrawClaimEnabled: true,
+    },
+  };
+});
 jest.mock("../../../../app/auth");
+jest.mock("../../../../app/api/claims");
+jest.mock("../../../../app/api/applications");
 
 const { administrator, user } = permissions;
 
 const reference = "REBC-D9H7-BJGX";
 
+const claim = {
+  reference,
+  applicationReference: "IAHW-1234-APP1",
+  status: "IN_CHECK",
+};
+
+const application = {
+  reference: "IAHW-1234-APP1",
+  flags: [],
+};
+
 const adminAuth = {
   strategy: "session-auth",
   credentials: {
     scope: [administrator],
-    account: { name: "Super Admin", username: "superadmin@test" },
+    account: { name: "Super Admin", username: SUPER_ADMIN_USERNAME },
   },
 };
 
@@ -27,6 +56,16 @@ describe("Withdrawal claim page", () => {
 
   afterAll(async () => {
     await server.stop();
+  });
+
+  beforeEach(() => {
+    config.withdrawClaimEnabled = true;
+    getClaim.mockResolvedValue(claim);
+    getApplication.mockResolvedValue(application);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe(`GET /withdraw-claim/${reference}`, () => {
@@ -69,6 +108,69 @@ describe("Withdrawal claim page", () => {
         method: "GET",
         url: `/withdraw-claim/${reference}`,
         auth: { strategy: "session-auth", credentials: { scope: [user] } },
+      });
+
+      expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
+    });
+  });
+
+  describe("withdrawal eligibility (same rules as the view-claim button)", () => {
+    const getWithdrawalPage = (auth = adminAuth) =>
+      server.inject({ method: "GET", url: `/withdraw-claim/${reference}`, auth });
+
+    test("forbids an administrator who is not a super admin", async () => {
+      const res = await getWithdrawalPage({
+        strategy: "session-auth",
+        credentials: {
+          scope: [administrator],
+          account: { name: "Plain Admin", username: "notsuperadmin@test" },
+        },
+      });
+
+      expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
+    });
+
+    test("forbids when the claim is not in check", async () => {
+      getClaim.mockResolvedValue({ ...claim, status: "PAID" });
+
+      const res = await getWithdrawalPage();
+
+      expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
+    });
+
+    test("forbids when the application is flagged", async () => {
+      getApplication.mockResolvedValue({ ...application, flags: [{ id: "flag-1" }] });
+
+      const res = await getWithdrawalPage();
+
+      expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
+    });
+
+    test("forbids when the withdraw claim toggle is disabled", async () => {
+      config.withdrawClaimEnabled = false;
+
+      const res = await getWithdrawalPage();
+
+      expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
+    });
+
+    test("forbids submitting when the claim is not in check", async () => {
+      getClaim.mockResolvedValue({ ...claim, status: "PAID" });
+      const crumb = await getCrumbs(server);
+
+      const res = await server.inject({
+        method: "POST",
+        url: `/withdraw-claim/${reference}`,
+        auth: adminAuth,
+        payload: {
+          page: "2",
+          returnPage: "claims",
+          reasonForWithdrawal: "unintentionalTypingError",
+          issueDiscovery: "customerContactedRPA",
+          withdrawalDetails: "Wrong date entered",
+          crumb,
+        },
+        headers: { cookie: `crumb=${crumb}` },
       });
 
       expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
