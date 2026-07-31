@@ -32,6 +32,16 @@ jobs:
           npm install -g npm@11.10.0
           ./scripts/test
 
+      - name: Publish Pact contract
+        if: success()
+        run: |
+          gh release delete pact-contracts --yes || true
+          gh release create pact-contracts pacts/*.json \
+            --title "Pact contracts (latest)" \
+            --notes "Auto-published from ${{ github.sha }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and Publish
         uses: DEFRA/cdp-build-action/build@main
         with:

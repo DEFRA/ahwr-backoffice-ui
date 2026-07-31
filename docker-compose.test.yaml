@@ -15,3 +15,4 @@ services:
     command: npm run test
     volumes:
       - ./test-output:/home/node/test-output
+      - ./pacts:/home/node/pacts

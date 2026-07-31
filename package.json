@@ -61,6 +61,7 @@
     "@babel/core": "7.29.7",
     "@babel/plugin-transform-export-namespace-from": "7.27.1",
     "@babel/plugin-transform-modules-commonjs": "7.28.6",
+    "@pact-foundation/pact": "17.0.1",
     "babel-jest": "30.2.0",
     "cheerio": "1.0.0",
     "clean-webpack-plugin": "4.0.0",

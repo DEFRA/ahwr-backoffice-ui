@@ -51,6 +51,13 @@ module.exports = {
       testMatch: ["<rootDir>/test/integration/**/*.test.js"],
       setupFilesAfterEnv: ["<rootDir>/test/setup.js", "<rootDir>/test/integration-setup.js"],
     },
+    {
+      ...sharedConfig,
+      displayName: "contract",
+      testEnvironment: "node",
+      testMatch: ["<rootDir>/test/contract/**/*.test.js"],
+      setupFilesAfterEnv: ["<rootDir>/test/setup.js"],
+    },
   ],
   verbose: true,
   setupFilesAfterEnv: ["<rootDir>/test/setup.js"],

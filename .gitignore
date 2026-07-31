@@ -1,6 +1,7 @@
 # Test output
 html-reports
 test-output
+pacts
 
 # npm stuff
 .npm/
