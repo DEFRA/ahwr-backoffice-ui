@@ -1,0 +1,123 @@
+{% extends './layouts/layout.njk' %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}
+  Administration - Withdraw Claim
+{% endblock %}
+{% block containerStart %}
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+{% endblock %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <form method="post" action="/withdraw-claim/{{ reference }}" class="ahwr-update-form">
+        {% if errors.length %}
+          {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errors
+          }) }}
+        {% endif %}
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Confirm withdrawal of this claim</h1>
+        <p class="govuk-body"><strong>Claim number:</strong> {{ reference }}</p>
+
+        {{ govukWarningText({
+          text: "Once approved, a withdrawn claim cannot be undone.",
+          iconFallbackText: "Warning"
+        }) }}
+
+        {{ govukRadios({
+          name: "reasonForWithdrawal",
+          value: reasonForWithdrawal,
+          errorMessage: errorMessages.reasonForWithdrawal,
+          fieldset: {
+            legend: {
+              text: "Reason for withdrawal",
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          items: [
+            {
+              value: "vetSummaryEnteredIncorrectly",
+              text: "Data from the vet summary was entered incorrectly",
+              hint: { text: "For example, date of sample instead of date of visit" }
+            },
+            {
+              value: "differentClaimEntered",
+              text: "Data from a different claim was entered",
+              hint: { text: "For example, information from a follow-up instead of a review" }
+            },
+            {
+              value: "unintentionalTypingError",
+              text: "Data contained an unintentional typing error",
+              hint: { text: "For example, a spelling mistake or incorrect number" }
+            },
+            {
+              value: "incorrectSelectionInService",
+              text: "Incorrect selection was made in the digital service",
+              hint: { text: "For example, yes instead of no" }
+            },
+            {
+              value: "confusingInformationFromVet",
+              text: "Incorrect or confusing information was given by vet",
+              hint: { text: "For example, the wrong box completed in the summary template" }
+            }
+          ]
+        }) }}
+
+        {{ govukRadios({
+          name: "issueDiscovery",
+          value: issueDiscovery,
+          errorMessage: errorMessages.issueDiscovery,
+          fieldset: {
+            legend: {
+              text: "How the issue was discovered",
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          items: [
+            {
+              value: "customerContactedRPA",
+              text: "Customer contacted the RPA"
+            },
+            {
+              value: "evidenceDidNotMatch",
+              text: "Evidence did not match customer's data"
+            }
+          ]
+        }) }}
+
+        {{ govukTextarea({
+          name: "withdrawalDetails",
+          id: "withdrawalDetails",
+          value: withdrawalDetails,
+          errorMessage: errorMessages.withdrawalDetails,
+          label: {
+            text: "Enter details for why this claim should be withdrawn",
+            classes: "govuk-label--m"
+          },
+          hint: { text: "Describe all issues with this claim" }
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({
+            text: "Withdraw claim",
+            classes: "govuk-button--warning"
+          }) }}
+          {{ govukButton({
+            text: "Do not withdraw claim",
+            href: backLink,
+            classes: "govuk-button--secondary"
+          }) }}
+        </div>
+
+        <input type="hidden" name="page" value="{{ page }}" />
+        <input type="hidden" name="returnPage" value="{{ returnPage }}" />
+        <input type="hidden" name="crumb" value="{{ crumb }}" />
+      </form>
+    </div>
+  </div>
+{% endblock %}

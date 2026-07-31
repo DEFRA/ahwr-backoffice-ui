@@ -1,6 +1,6 @@
 import { STATUS } from "ffc-ahwr-common-library";
 import { mapAuth } from "../../auth/map-auth.js";
-import { config } from "../../config/index.js";
+import { canWithdrawClaim } from "./can-withdraw-claim.js";
 
 const getAdminAndRecommenderActions = ({
   isAdminOrRecommender,
@@ -215,10 +215,8 @@ const superAdminActionsAvailable = (isSuperAdmin, status, isFlagged, updateFlags
   } = updateFlags;
 
   const claimIsntPaidOrReadyToPay = ![STATUS.READY_TO_PAY, STATUS.PAID].includes(status);
-  const claimIsInCheck = status === STATUS.IN_CHECK;
 
-  const withdrawAction =
-    isSuperAdmin && claimIsInCheck && config.withdrawClaimEnabled && !isFlagged;
+  const withdrawAction = canWithdrawClaim({ isSuperAdmin, status, isFlagged });
 
   const updateStatusAction = isSuperAdmin && claimIsntPaidOrReadyToPay;
   const updateStatusForm = isSuperAdmin && updateStatus === true && claimIsntPaidOrReadyToPay;
