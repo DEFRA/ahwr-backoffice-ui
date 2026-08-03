@@ -7,6 +7,7 @@ import {
   updateClaimStatus,
   updateClaimData,
   getClaimHistory,
+  withdrawClaim,
 } from "../../../app/api/claims.js";
 import { metricsCounter } from "../../../app/lib/metrics.js";
 import { config } from "../../../app/config/index.js";
@@ -383,6 +384,62 @@ describe("Claims API", () => {
         await updateClaimStatus(applicationReference, "Admin", STATUS.IN_CHECK, logger);
       }).rejects.toEqual(wreckResponse);
       expect(metricsCounter).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("POST withdrawClaim", () => {
+    const withdrawal = {
+      reasonForWithdrawal: "unintentionalTypingError",
+      issueDiscovery: "customerContactedRPA",
+      withdrawalDetails: "Wrong date entered",
+    };
+
+    describe("when the request succeeds", () => {
+      const wreckResponse = {
+        payload: claims[0],
+        res: { statusCode: 200 },
+        json: true,
+      };
+      let response;
+
+      beforeEach(async () => {
+        wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
+        response = await withdrawClaim(applicationReference, "Admin", withdrawal);
+      });
+
+      test("posts the withdrawal to the backend", () => {
+        expect(wreck.post).toHaveBeenCalledWith(`${applicationApiUri}/claims/withdraw`, {
+          payload: { reference: applicationReference, user: "Admin", ...withdrawal },
+          json: true,
+          headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+        });
+        expect(metricsCounter).toHaveBeenCalledWith("claim_withdraw");
+      });
+
+      test("returns the payload", () => {
+        expect(response).toEqual(wreckResponse.payload);
+      });
+    });
+
+    describe("when the request fails", () => {
+      const wreckResponse = { payload: claims[0], res: { statusCode: 400 }, json: true };
+      const logger = { error: jest.fn() };
+
+      beforeEach(() => {
+        wreck.post = jest.fn().mockRejectedValueOnce(wreckResponse);
+      });
+
+      test("throws", async () => {
+        await expect(
+          withdrawClaim(applicationReference, "Admin", withdrawal, logger),
+        ).rejects.toEqual(wreckResponse);
+      });
+
+      test("does not count the metric", async () => {
+        await withdrawClaim(applicationReference, "Admin", withdrawal, logger).catch(() => {});
+
+        expect(metricsCounter).not.toHaveBeenCalled();
+      });
     });
   });
 

@@ -88,6 +88,27 @@ export async function updateClaimStatus(reference, user, status, logger, note) {
   }
 }
 
+export async function withdrawClaim(reference, user, withdrawal, logger) {
+  const endpoint = `${applicationApiUri}/claims/withdraw`;
+  const options = {
+    payload: {
+      reference,
+      user,
+      ...withdrawal,
+    },
+    json: true,
+    headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+  };
+  try {
+    const { payload } = await wreck.post(endpoint, options);
+    await metricsCounter("claim_withdraw");
+    return payload;
+  } catch (error) {
+    logger.error({ error, endpoint });
+    throw error;
+  }
+}
+
 export async function updateClaimData(reference, data, note, name, logger) {
   const endpoint = `${applicationApiUri}/claims/${reference}/data`;
 

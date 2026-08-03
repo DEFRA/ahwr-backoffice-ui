@@ -6,7 +6,7 @@ import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { getErrorMessagesByKey } from "./utils/get-error-messages-by-key.js";
 import { canWithdrawClaim } from "./utils/can-withdraw-claim.js";
 import { mapAuth } from "../auth/map-auth.js";
-import { getClaim } from "../api/claims.js";
+import { getClaim, withdrawClaim } from "../api/claims.js";
 import { getApplication } from "../api/applications.js";
 
 const { administrator } = permissions;
@@ -124,7 +124,16 @@ export const withdrawalClaimPostRoute = {
     },
     handler: async (request, h) => {
       const { reference } = request.params;
-      const { page, returnPage } = request.payload;
+      const { page, returnPage, reasonForWithdrawal, issueDiscovery, withdrawalDetails } =
+        request.payload;
+      const { name } = request.auth.credentials.account;
+
+      await withdrawClaim(
+        reference,
+        name,
+        { reasonForWithdrawal, issueDiscovery, withdrawalDetails },
+        request.logger,
+      );
       await generateNewCrumb(request, h);
       return h.redirect(viewClaimLink(reference, page, returnPage));
     },
