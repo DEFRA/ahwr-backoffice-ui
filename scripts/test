@@ -75,6 +75,12 @@ compose() {
   mkdir -p test-output
   chmod -R 777 test-output
 
+  # Create pacts folder - Docker would otherwise auto-create this as root on first
+  # bind-mount (since it's gitignored and won't exist on a fresh checkout), leaving
+  # the container's non-root user unable to write the generated pact file
+  mkdir -p pacts
+  chmod -R 777 pacts
+
   # Guarantee clean environment
   compose down -v
 
