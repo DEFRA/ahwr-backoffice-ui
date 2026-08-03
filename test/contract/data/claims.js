@@ -14,7 +14,10 @@ export const claim = {
   data: like({ typeOfLivestock: string("beef") }),
   herd: like({ name: string("Beef Herd"), cph: string("11/222/3333") }),
   application: like({
-    flags: eachLike({ id: string("278872ee-ecfa-4d5e-8087-0c0fd7c16ed8"), deleted: like(false) }, 0),
+    flags: eachLike(
+      { id: string("278872ee-ecfa-4d5e-8087-0c0fd7c16ed8"), deleted: like(false) },
+      0,
+    ),
     organisation: like({ sbi: string("106821850") }),
   }),
 };
@@ -29,6 +32,9 @@ export const claimWithNoLinkedApplication = {
   // No "organisation" key - this is what the backend returns for a claim whose
   // applicationReference doesn't resolve to a real application (AHWR-2059).
   application: like({
-    flags: eachLike({ id: string("278872ee-ecfa-4d5e-8087-0c0fd7c16ed8"), deleted: like(false) }, 0),
+    flags: eachLike(
+      { id: string("278872ee-ecfa-4d5e-8087-0c0fd7c16ed8"), deleted: like(false) },
+      0,
+    ),
   }),
 };
