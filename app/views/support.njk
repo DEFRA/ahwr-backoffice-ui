@@ -8,14 +8,7 @@
 {% endblock %}
 {% block content %}
 {% if scrollTo %}
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var element = document.getElementById('{{ scrollTo }}');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  });
-</script>
+<div id="js-scroll-to" data-target="{{ scrollTo }}" hidden></div>
 {% endif %}
 <h1 class="govuk-heading-xl govuk-!-margin-bottom-7">Support</h1>
 

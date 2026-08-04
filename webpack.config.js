@@ -31,7 +31,7 @@ export default {
           {
             loader: "sass-loader",
             options: {
-              sourceMap: isDev,
+              sourceMap: true,
               sassOptions: {
                 outputStyle: isDev ? "expanded" : "compressed",
               },
