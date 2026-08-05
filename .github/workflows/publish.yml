@@ -33,12 +33,21 @@ jobs:
           ./scripts/test
 
       - name: Publish Pact contract
+        id: publish-pact
         if: success()
+        continue-on-error: true
         run: |
-          gh release delete pact-contracts --yes || true
-          gh release create pact-contracts pacts/*.json \
-            --title "Pact contracts (latest)" \
-            --notes "Auto-published from ${{ github.sha }}"
+          gh release download pact-contracts --pattern "*.json" --dir /tmp/existing-pact --clobber 2>/dev/null || true
+
+          if [ -f /tmp/existing-pact/*.json ] && diff -q <(jq -S . /tmp/existing-pact/*.json) <(jq -S . pacts/*.json) > /dev/null 2>&1; then
+            echo "Contract unchanged since last publish - nothing to do"
+          else
+            echo "Contract changed (or no previous release exists) - publishing"
+            gh release delete pact-contracts --yes || true
+            gh release create pact-contracts pacts/*.json \
+              --title "Pact contracts (latest)" \
+              --notes "Auto-published from ${{ github.sha }}"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -61,3 +70,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Fail if Pact contract publish failed
+        if: steps.publish-pact.outcome == 'failure'
+        run: |
+          echo "::error::Pact contract publish failed - ahwr-application-backend may verify against a stale contract until this is fixed."
+          exit 1
