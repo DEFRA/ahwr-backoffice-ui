@@ -38,8 +38,9 @@ jobs:
         continue-on-error: true
         run: |
           gh release download pact-contracts --pattern "*.json" --dir /tmp/existing-pact --clobber 2>/dev/null || true
+          existing_file=$(ls /tmp/existing-pact/*.json 2>/dev/null | head -1)
 
-          if [ -f /tmp/existing-pact/*.json ] && diff -q <(jq -S . /tmp/existing-pact/*.json) <(jq -S . pacts/*.json) > /dev/null 2>&1; then
+          if [ -n "$existing_file" ] && diff -q <(jq -S . "$existing_file") <(jq -S . pacts/*.json) > /dev/null 2>&1; then
             echo "Contract unchanged since last publish - nothing to do"
           else
             echo "Contract changed (or no previous release exists) - publishing"
