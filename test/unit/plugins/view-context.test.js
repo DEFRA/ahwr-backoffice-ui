@@ -33,6 +33,23 @@ describe("View Context Plugin", () => {
     expect(result).toBe(mockH.continue);
   });
 
+  it("prefers Blankie's own context.nonce over the request-scoped nonce", () => {
+    const mockRequest = {
+      plugins: {},
+      response: {
+        variety: "view",
+        source: {
+          template: "view-claim",
+          context: { nonce: "blankie-fallback-nonce" },
+        },
+      },
+    };
+
+    onPreResponseHandler(mockRequest, mockH);
+
+    expect(mockRequest.response.source.context.cspNonce).toBe("blankie-fallback-nonce");
+  });
+
   it("creates a context object when the view has none", () => {
     const mockRequest = {
       plugins: { blankie: { nonces: { script: "another-nonce" } } },
