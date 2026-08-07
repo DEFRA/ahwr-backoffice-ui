@@ -314,6 +314,8 @@ describe("Claims tests", () => {
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.INTERNAL_SERVER_ERROR);
+      expect(res.headers["content-security-policy"]).toContain("'nonce-");
+      expect(res.headers["cache-control"]).toBe("no-store");
     });
   });
 

@@ -15,7 +15,7 @@ EXPOSE ${PORT} ${PORT_DEBUG}
 COPY --chown=node:node package*.json ./
 RUN npm ci
 COPY --chown=node:node . .
-RUN npm run build
+RUN NODE_ENV=production npm run build
 CMD [ "npm", "run", "start:watch" ]
 
 # Production

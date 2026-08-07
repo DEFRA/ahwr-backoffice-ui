@@ -1,5 +1,6 @@
 import { config } from "./config/index.js";
 import Hapi from "@hapi/hapi";
+import Scooter from "@hapi/scooter";
 import { authPlugin } from "./plugins/auth.js";
 import { cookiePlugin } from "./plugins/cookies.js";
 import { crumbPlugin } from "./plugins/crumb.js";
@@ -11,6 +12,9 @@ import { inertPlugin } from "./plugins/inert.js";
 import { loggingContextPlugin } from "./plugins/logging-context.js";
 import { getCacheEngine } from "./cache/get-cache-engine.js";
 import { requestLogger } from "./logging/request-logger.js";
+import { contentSecurityPolicyPlugin } from "./plugins/content-security-policy.js";
+import { viewContextPlugin } from "./plugins/view-context.js";
+import { headerPlugin } from "./plugins/header.js";
 
 export async function createServer(options) {
   const { testPort } = options ?? {};
@@ -40,11 +44,15 @@ export async function createServer(options) {
   await server.register(crumbPlugin);
   await server.register(inertPlugin.plugin);
   await server.register(routerPlugin);
-  await server.register(viewsPlugin);
   await server.register(sessionPlugin);
   await server.register(requestLogger);
   await server.register(cookiePlugin);
   await server.register(errorPagesPlugin);
+  await server.register(Scooter);
+  await server.register(contentSecurityPolicyPlugin);
+  await server.register(viewContextPlugin);
+  await server.register(viewsPlugin);
+  await server.register(headerPlugin);
   await server.register(loggingContextPlugin);
 
   return server;

@@ -1,33 +1,44 @@
 import { createServer } from "../../../app/server.js";
+import { config } from "../../../app/config/index.js";
 
-describe("headers plugin tests", () => {
-  let server;
+let server;
 
-  beforeAll(async () => {
-    server = await createServer();
+beforeAll(async () => {
+  server = await createServer();
+});
+
+const getHeaders = async (url = "/accessibility") => {
+  const { headers } = await server.inject({
+    method: "GET",
+    url,
   });
 
+  return headers;
+};
+
+describe("security headers", () => {
   test.each([
-    // { key: "X-Frame-Options", value: "deny" },
-    // { key: "X-Content-Type-Options", value: "nosniff" },
-    // { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
-    // { key: "X-Robots-Tag", value: "noindex, nofollow" },
-    // { key: "X-XSS-Protection", value: "1; mode=block" },
-    // { key: "Strict-Transport-Security", value: "max-age=31536000;" },
-    { key: "Cache-Control", value: "no-cache" },
-    // { key: "Referrer-Policy", value: "no-referrer" },
-    // {
-    //   key: "Content-Security-Policy",
-    //   value:
-    //     "default-src 'self';object-src 'none';script-src 'self' www.google-analytics.com *.googletagmanager.com ajax.googleapis.com *.googletagmanager.com/gtm.js 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes';form-action 'self';base-uri 'self';connect-src 'self' *.google-analytics.com *.analytics.google.com *.googletagmanager.comstyle-src 'self' 'unsafe-inline' tagmanager.google.com *.googleapis.com;img-src 'self' *.google-analytics.com *.googletagmanager.com;",
-    // },
-  ])("header key '$key' contains value '$value'", async ({ key, value }) => {
-    const url = "/";
-    const options = {
-      method: "GET",
-      url,
-    };
-    const res = await server.inject(options);
-    expect(res.headers[key.toLowerCase()]).toEqual(value);
+    ["x-frame-options", "deny"],
+    ["x-content-type-options", "nosniff"],
+    ["access-control-allow-origin", config.serviceUri],
+    ["cross-origin-opener-policy", "same-origin"],
+    ["cross-origin-embedder-policy", "require-corp"],
+    ["x-robots-tag", "noindex, nofollow"],
+    ["strict-transport-security", "max-age=31536000;"],
+    ["cache-control", "no-store"],
+    ["referrer-policy", "no-referrer"],
+  ])("sets %s to the expected value", async (header, value) => {
+    const headers = await getHeaders();
+
+    expect(headers[header]).toBe(value);
+  });
+
+  test("skips the headers when the response has no header element", async () => {
+    const { headers } = await server.inject({
+      method: "POST",
+      url: "/nonsense",
+    });
+
+    expect(headers["x-frame-options"]).toBeUndefined();
   });
 });

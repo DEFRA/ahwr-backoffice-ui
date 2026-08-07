@@ -14,6 +14,7 @@ console.log(`Running webpack in ${isDev ? "development" : "production"} mode`);
 export default {
   entry: "./app/frontend/src/entry.js",
   mode: isDev ? "development" : "production",
+  devtool: isDev ? "cheap-module-source-map" : false,
   module: {
     rules: [
       {
@@ -31,7 +32,7 @@ export default {
           {
             loader: "sass-loader",
             options: {
-              sourceMap: isDev,
+              sourceMap: true,
               sassOptions: {
                 outputStyle: isDev ? "expanded" : "compressed",
               },

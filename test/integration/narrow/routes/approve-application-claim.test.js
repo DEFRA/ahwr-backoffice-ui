@@ -185,6 +185,13 @@ describe("/approve-application-claim", () => {
       expect(res.headers.location).toBeUndefined();
       expect(res.payload).not.toContain("errors=");
       expect(res.payload).toContain("govuk-error-summary");
+
+      const headerNonce = /'nonce-([a-f0-9]+)'/.exec(res.headers["content-security-policy"])?.[1];
+      const $ = cheerio.load(res.payload);
+      const markupNonce = $("script[nonce]").first().attr("nonce");
+
+      expect(headerNonce).toBeDefined();
+      expect(markupNonce).toBe(headerNonce);
     });
 
     test("If user is not administrator or authoriser", async () => {

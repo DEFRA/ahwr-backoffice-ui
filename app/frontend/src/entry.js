@@ -23,6 +23,14 @@ document.querySelectorAll("th.govuk-table__header > button").forEach((button) =>
   }),
 );
 
+const scrollToTarget = document.getElementById("js-scroll-to")?.dataset.target;
+if (scrollToTarget) {
+  const scrollToElement = document.getElementById(scrollToTarget);
+  if (scrollToElement) {
+    scrollToElement.scrollIntoView({ behavior: "smooth" });
+  }
+}
+
 [
   { buttonId: "copyApplicationDocument", inputId: "applicationDocument" },
   { buttonId: "copyClaimDocument", inputId: "claimDocument" },
