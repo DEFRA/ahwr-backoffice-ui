@@ -47,8 +47,6 @@ export async function createServer(options) {
   await server.register(sessionPlugin);
   await server.register(requestLogger);
   await server.register(cookiePlugin);
-  // errorPagesPlugin must precede Scooter/Blankie/viewContextPlugin/headerPlugin so that the
-  // view it renders for error responses still gets a CSP nonce and the security headers
   await server.register(errorPagesPlugin);
   await server.register(Scooter);
   await server.register(contentSecurityPolicyPlugin);
