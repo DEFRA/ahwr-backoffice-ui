@@ -37,23 +37,15 @@ const msalLogging = getMsalLoggingSetup();
 let msalApplication;
 
 export const init = () => {
-  let auth;
+  // Bug in library where audience should be an array but expected type is string
+  const authProvider = new WebIdentityTokenProvider({ audience: ["ahwr-backoffice-ui"] });
 
-  if (config.federatedCredentials.enabled) {
-    // Bug in library where audience should be an array but expected type is string
-    const authProvider = new WebIdentityTokenProvider({ audience: ["ahwr-backoffice-ui"] });
-
-    auth = {
+  msalApplication = new ConfidentialClientApplication({
+    auth: {
       clientId: config.auth.clientId,
       authority: config.auth.authority,
       clientAssertion: async () => authProvider.getCredentials(wrapLoggerForPino(getLogger())),
-    };
-  } else {
-    auth = config.auth;
-  }
-
-  msalApplication = new ConfidentialClientApplication({
-    auth,
+    },
     system: { loggerOptions: msalLogging, customAgentOptions: { keepAlive: false } },
   });
 };

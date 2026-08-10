@@ -14,4 +14,8 @@ describe("cache Config Test", () => {
   test("Should pass validation for all fields populated", async () => {
     expect(authConfig).toBeDefined();
   });
+
+  test("Should not expose a client secret", async () => {
+    expect(authConfig).not.toHaveProperty("clientSecret");
+  });
 });

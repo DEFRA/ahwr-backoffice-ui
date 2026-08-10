@@ -22,7 +22,6 @@ jest.mock("../../../app/config/index.js", () => {
     ...actual,
     config: {
       ...actual.config,
-      federatedCredentials: { enabled: false },
       auth: {
         clientId: "test-client-id",
         authority: "https://test-authority",
@@ -41,9 +40,18 @@ const mockLogger = {
 };
 
 describe("Azure auth test", () => {
+  const mockGetCredentials = jest.fn();
+
   beforeAll(() => {
     process.env.NODE_ENV = "production";
   });
+
+  beforeEach(() => {
+    getLogger.mockReturnValue(mockLogger);
+    WebIdentityTokenProvider.mockImplementation(() => ({ getCredentials: mockGetCredentials }));
+    ConfidentialClientApplication.mockImplementation(() => ({}));
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -78,79 +86,72 @@ describe("Azure auth test", () => {
     );
   });
 
-  describe("when federated credentials are enabled", () => {
-    const mockGetCredentials = jest.fn();
+  test("the msal application is built with no client secret", () => {
+    init();
 
-    beforeEach(() => {
-      config.federatedCredentials.enabled = true;
-      getLogger.mockReturnValue(mockLogger);
-      WebIdentityTokenProvider.mockImplementation(() => ({ getCredentials: mockGetCredentials }));
-      ConfidentialClientApplication.mockImplementation(() => ({}));
-    });
+    const { auth } = ConfidentialClientApplication.mock.calls[0][0];
 
-    afterEach(() => {
-      config.federatedCredentials.enabled = false;
-    });
+    expect(auth).not.toHaveProperty("clientSecret");
+  });
 
-    test("clientAssertion retrieves and returns credentials from the auth provider", async () => {
-      const expectedAssertion = "test-assertion-token";
-      mockGetCredentials.mockResolvedValue(expectedAssertion);
+  test("clientAssertion retrieves and returns credentials from the auth provider", async () => {
+    const expectedAssertion = "test-assertion-token";
+    mockGetCredentials.mockResolvedValue(expectedAssertion);
 
-      init();
+    init();
 
-      expect(ConfidentialClientApplication).toHaveBeenCalledWith(
-        expect.objectContaining({
-          auth: expect.objectContaining({
-            clientId: config.auth.clientId,
-            authority: config.auth.authority,
-            clientAssertion: expect.any(Function),
-          }),
+    expect(ConfidentialClientApplication).toHaveBeenCalledWith(
+      expect.objectContaining({
+        auth: expect.objectContaining({
+          clientId: config.auth.clientId,
+          authority: config.auth.authority,
+          clientAssertion: expect.any(Function),
         }),
-      );
-      expect(WebIdentityTokenProvider).toHaveBeenCalledWith({ audience: ["ahwr-backoffice-ui"] });
+      }),
+    );
+    expect(WebIdentityTokenProvider).toHaveBeenCalledWith({ audience: ["ahwr-backoffice-ui"] });
 
+    const { auth } = ConfidentialClientApplication.mock.calls[0][0];
+    const assertion = await auth.clientAssertion();
+
+    expect(mockGetCredentials).toHaveBeenCalled();
+    expect(assertion).toBe(expectedAssertion);
+  });
+
+  describe("wrapped logger passed to getCredentials", () => {
+    let wrappedLogger;
+
+    beforeEach(async () => {
+      mockGetCredentials.mockResolvedValue("token");
+      init();
       const { auth } = ConfidentialClientApplication.mock.calls[0][0];
-      const assertion = await auth.clientAssertion();
-
-      expect(mockGetCredentials).toHaveBeenCalled();
-      expect(assertion).toBe(expectedAssertion);
+      await auth.clientAssertion();
+      wrappedLogger = mockGetCredentials.mock.calls[0][0];
     });
 
-    describe("wrapped logger passed to getCredentials", () => {
-      let wrappedLogger;
+    test("does not pass the raw logger directly", () => {
+      expect(wrappedLogger).not.toBe(mockLogger);
+    });
 
-      beforeEach(async () => {
-        mockGetCredentials.mockResolvedValue("token");
-        init();
-        const { auth } = ConfidentialClientApplication.mock.calls[0][0];
-        await auth.clientAssertion();
-        wrappedLogger = mockGetCredentials.mock.calls[0][0];
-      });
+    test("passes info calls through to the underlying logger", () => {
+      wrappedLogger.info("test info");
+      expect(mockLogger.info).toHaveBeenCalledWith("test info");
+    });
 
-      test("does not pass the raw logger directly", () => {
-        expect(wrappedLogger).not.toBe(mockLogger);
-      });
+    test("passes warn calls through to the underlying logger", () => {
+      wrappedLogger.warn("test warning");
+      expect(mockLogger.warn).toHaveBeenCalledWith("test warning");
+    });
 
-      test("passes info calls through to the underlying logger", () => {
-        wrappedLogger.info("test info");
-        expect(mockLogger.info).toHaveBeenCalledWith("test info");
-      });
+    test("reorders (string, Error) error calls to pino format ({ error }, string)", () => {
+      const err = new Error("something failed");
+      wrappedLogger.error("refresh failed", err);
+      expect(mockLogger.error).toHaveBeenCalledWith({ error: err }, "refresh failed");
+    });
 
-      test("passes warn calls through to the underlying logger", () => {
-        wrappedLogger.warn("test warning");
-        expect(mockLogger.warn).toHaveBeenCalledWith("test warning");
-      });
-
-      test("reorders (string, Error) error calls to pino format ({ error }, string)", () => {
-        const err = new Error("something failed");
-        wrappedLogger.error("refresh failed", err);
-        expect(mockLogger.error).toHaveBeenCalledWith({ error: err }, "refresh failed");
-      });
-
-      test("passes through error calls that are not (string, Error) unchanged", () => {
-        wrappedLogger.error("plain error message");
-        expect(mockLogger.error).toHaveBeenCalledWith("plain error message", undefined);
-      });
+    test("passes through error calls that are not (string, Error) unchanged", () => {
+      wrappedLogger.error("plain error message");
+      expect(mockLogger.error).toHaveBeenCalledWith("plain error message", undefined);
     });
   });
 });

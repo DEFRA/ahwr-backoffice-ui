@@ -160,6 +160,10 @@ up the data for the frontend.
 When running locally there is a dev auth mode, which will allow you inside without needing to authenticate with Azure AD.
 To disable this, set the environment variable `AADAR_ENABLED` to `true` in your local `.env` file.
 
+Note that real Azure AD authentication only works when the service is running on CDP. The client assertion is an AWS
+STS Web Identity token obtained from the ECS task role, which is not available outside that environment, so dev auth
+is the only way to sign in locally.
+
 The dev auth will pick a random username by default, but this can be overridden by
 navigating to `service/login?userId=<yourchosenuser>`.
 You can choose to login as a user with a specific role by setting the userId to the name of the role,

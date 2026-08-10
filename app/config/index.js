@@ -54,9 +54,6 @@ const getConfigSchema = () =>
     logLevel: joi.string().required(),
     logFormat: joi.string().required(),
     logRedact: joi.array().items(joi.string()),
-    federatedCredentials: {
-      enabled: joi.bool().required(),
-    },
     withdrawClaimEnabled: joi.bool().optional().default(false),
   });
 
@@ -112,9 +109,6 @@ const buildConfig = () => {
     logRedact: process.env.LOG_REDACT
       ? process.env.LOG_REDACT.split(",")
       : ["req.headers", "res.headers"],
-    federatedCredentials: {
-      enabled: process.env.FEDERATED_CREDENTIALS_ENABLED === "true",
-    },
     withdrawClaimEnabled: process.env.WITHDRAW_CLAIM_ENABLED === "true",
   };
 

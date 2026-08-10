@@ -7,7 +7,6 @@ services:
     container_name: ahwr-backoffice-ui
     environment:
       AADAR_ENABLED: ${AADAR_ENABLED:-false}
-      AADAR_CLIENT_SECRET: ${AADAR_CLIENT_SECRET:-notset}
       AADAR_CLIENT_ID: ${AADAR_CLIENT_ID:-notset}
       AADAR_REDIRECT_URL: ${AADAR_REDIRECT_URL:-http://localhost:3002/authenticate}
       AADAR_AUTHORITY_URL: ${AADAR_AUTHORITY_URL:-http://notset}
