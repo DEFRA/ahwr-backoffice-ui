@@ -8,10 +8,8 @@ services:
     environment:
       NODE_ENV: test
       AADAR_ENABLED: "true"
-      AADAR_CLIENT_SECRET: itsasecretshhhhhhhh
       AADAR_CLIENT_ID: NCC-1701-D
       AADAR_REDIRECT_URL: http://thesearenotthedroidsyouarelookingfor
-      AADAR_TENANT_ID: C3PO-R2D2
     image: ahwr-backoffice-ui-development
     container_name: ahwr-backoffice-ui-test
     command: npm run test
