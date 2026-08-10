@@ -77,6 +77,9 @@ describe("getClaims contract with ahwr-application-backend", () => {
       expect(result.claims[1].application.organisation.sbi).toEqual(
         reify(livestockClaimWithApplicationFlagged).application.organisation.sbi,
       );
+      expect(result.claims[2].application.organisation.sbi).toEqual(
+        reify(livestockClaimWithApplicationNoHerd).application.organisation.sbi,
+      );
       expect(result.claims[2].herd).toEqual({});
       expect(result.claims[3].application.organisation.sbi).toEqual(
         reify(poultryClaimWithApplicationNotFlagged).application.organisation.sbi,
