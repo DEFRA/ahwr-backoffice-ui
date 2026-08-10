@@ -1,22 +1,15 @@
 # Contract tests (Pact)
 
-Pilot for AHWR-2144. Consumer-driven contract tests between `ahwr-backoffice-ui` (consumer)
+Consumer-driven contract tests between `ahwr-backoffice-ui` (consumer)
 and `ahwr-application-backend` (provider), using [Pact](https://docs.pact.io/).
 
 ## Why this exists
 
-AHWR-2059 changed the shape of the `/claims/search` response (a claim with no linked
-application could come back as `application: { flags: [] }` instead of being dropped). Nothing
-in `ahwr-backoffice-ui` expected that shape, and it crashed `claim-list.js` in Test. Neither
-existing test tier would have caught this:
-
-- Narrow integration tests (`test/integration/narrow/`) mock the API client entirely, so they
-  only verify the frontend against its own assumptions, never the real backend response.
-- E2E tests only catch this once both sides are already deployed together in the same
-  environment - which is what happened.
-
-Contract tests verify request/response shape agreement between the two services independently,
-in CI, before either side is deployed.
+E2E tests that exercise both services together (real backend, real database - see
+`ahwr-ui-tests`) only run after `ahwr-backoffice-ui` merges to `main` -
+`ahwr-application-backend` has no E2E trigger of its own at all. So a breaking interface change
+between the two services can merge, and even deploy, before anything actually catches it - by
+the time E2E or a shared environment surfaces the problem, the bad change is already out.
 
 ## Running
 
@@ -74,16 +67,27 @@ convention, not by import.
 generated inside the test container actually lands on the runner's filesystem, not just
 inside the ephemeral container - without this mount, CI would have nothing to publish.
 
-**CI publish (AC03) is wired up, no Pact Broker for the pilot.** `.github/workflows/publish.yml`
+**CI publish is wired up, no Pact Broker for the pilot.** `.github/workflows/publish.yml`
 has a "Publish Pact contract" step, right after `./scripts/test`, that publishes `pacts/*.json`
 as the asset on a single rolling GitHub Release tagged `pact-contracts` - deleting and
 recreating it on every successful push to `main`, so there's always exactly one "latest"
 contract to fetch, not a version to track. Uses the existing `GITHUB_TOKEN`, no new secret.
 
+## What's built and verified
+
+Provider verification exists in `ahwr-application-backend` (`tests/contract/provider.pact.test.js`,
+`npm run test:contract`) and passes against this contract - confirmed by actually running it
+against a real server and real MongoDB, not just asserted. Its seed data
+(`tests/contract/data/`) must be kept in sync with this repo's `test/contract/data/claims.js`,
+including `createdAt` values - the backend sorts by `createdAt DESC` by default, so the seed
+data's timestamps have to produce the same ordering this contract's response array assumes, or
+verification fails on array-position mismatches that have nothing to do with the actual data
+being wrong.
+
 ## What's not built yet
 
-- Provider verification in `ahwr-application-backend` (AC02)
 - The backend-side fetch-and-verify CI step, pulling the `pact-contracts` release asset from
-  this repo before running provider verification (AC04)
+  this repo automatically before running provider verification (AC04) - today the pact file has
+  to be copied into `ahwr-application-backend/pacts/` manually
 - Any endpoint beyond `POST /claims/search`, and only its no-filters scenario at that -
   add more `provider/`+`consumer/` exports and test cases as real need arises, not ahead of it

@@ -1,9 +1,18 @@
 import { MatchersV3 } from "@pact-foundation/pact";
-import { claim, claimWithNoLinkedApplication } from "../../data/claims.js";
-import { newProvider, advancedSearchWithNoFilters } from "./provider/claims-search-endpoint.js";
-import { triggerClaimsAdvancedSearchWithNoFilters } from "./consumer/claims-search-trigger.js";
+import {
+  livestockClaimWithApplicationNotFlagged,
+  livestockClaimWithApplicationFlagged,
+  livestockClaimWithApplicationNoHerd,
+  poultryClaimWithApplicationNotFlagged,
+  poultryClaimWithApplicationFlagged,
+} from "../../data/claims.js";
+import {
+  provider as newProvider,
+  advancedSearchForClaimsWithNoFilters,
+} from "./provider/claims-search-endpoint.js";
+import { triggerAdvancedSearchForClaimsWithNoFilters } from "./consumer/claims-search-trigger.js";
 
-const { like, eachLike } = MatchersV3;
+const { like, reify } = MatchersV3;
 
 // jest.mock factories can't reference values imported from elsewhere in this file -
 // Babel hoists this call above all imports, so the port must be a literal here, kept
@@ -20,49 +29,62 @@ jest.mock("../../../../app/config/index.js", () => {
 });
 
 describe("getClaims contract with ahwr-application-backend", () => {
-  test("returns a claim with its linked application data", async () => {
+  test("total counts every claim, but only claims with a resolving application are returned", async () => {
     const provider = newProvider();
 
     provider
-      .uponReceiving("an advanced search with no filters applied")
-      .withRequest(advancedSearchWithNoFilters)
-      .willRespondWith({
-        status: 200,
-        headers: { "Content-Type": like("application/json") },
-        body: {
-          claims: eachLike(claim),
-          total: like(1),
+      .given(
+        "7 claims exist: livestock and poultry each with a not-flagged application, a " +
+          "flagged application, and no matching application, plus a livestock claim with a " +
+          "resolving application but no herd",
+        {
+          livestockOrphanedClaim: {
+            reference: "REBC-9999-ORPH",
+            applicationReference: "IAHW-9999-NOPE",
+          },
+          poultryOrphanedClaim: {
+            reference: "PORE-9999-ORPH",
+            applicationReference: "POUL-9999-NOPE",
+          },
         },
-      });
-
-    await provider.executeTest(async () => {
-      const result = await triggerClaimsAdvancedSearchWithNoFilters();
-      expect(result.claims[0].application.organisation.sbi).toEqual("106821850");
-      expect(result.total).toEqual(1);
-    });
-  });
-
-  test("returns a claim with no application data when its application reference is broken", async () => {
-    const provider = newProvider();
-
-    provider
-      .uponReceiving(
-        "an advanced search with no filters applied, where a claim's application reference is broken",
       )
-      .withRequest(advancedSearchWithNoFilters)
+      .uponReceiving("a request for advanced search for claims with no filters applied")
+      .withRequest(advancedSearchForClaimsWithNoFilters)
       .willRespondWith({
         status: 200,
         headers: { "Content-Type": like("application/json") },
         body: {
-          claims: eachLike(claimWithNoLinkedApplication),
-          total: like(1),
+          claims: [
+            livestockClaimWithApplicationNotFlagged,
+            livestockClaimWithApplicationFlagged,
+            livestockClaimWithApplicationNoHerd,
+            poultryClaimWithApplicationNotFlagged,
+            poultryClaimWithApplicationFlagged,
+          ],
+          total: like(7),
         },
       });
 
     await provider.executeTest(async () => {
-      const result = await triggerClaimsAdvancedSearchWithNoFilters();
-      expect(result.claims[0].application.organisation).toBeUndefined();
-      expect(result.total).toEqual(1);
+      const result = await triggerAdvancedSearchForClaimsWithNoFilters();
+
+      // The 2 claims with no matching application aren't included here - they're dropped by
+      // the backend's join, even though they're still counted in total.
+      expect(result.claims).toHaveLength(5);
+      expect(result.claims[0].application.organisation.sbi).toEqual(
+        reify(livestockClaimWithApplicationNotFlagged).application.organisation.sbi,
+      );
+      expect(result.claims[1].application.organisation.sbi).toEqual(
+        reify(livestockClaimWithApplicationFlagged).application.organisation.sbi,
+      );
+      expect(result.claims[2].herd).toEqual({});
+      expect(result.claims[3].application.organisation.sbi).toEqual(
+        reify(poultryClaimWithApplicationNotFlagged).application.organisation.sbi,
+      );
+      expect(result.claims[4].application.organisation.sbi).toEqual(
+        reify(poultryClaimWithApplicationFlagged).application.organisation.sbi,
+      );
+      expect(result.total).toEqual(7);
     });
   });
 });
