@@ -150,13 +150,13 @@ export const DEFAULT_FORM_FLAGS = {
   updateEligiblePiiRedaction: false,
 };
 
-export const getClaimViewStates = (
+export const getClaimViewStates = ({
   request,
   status,
   currentStatusEvent,
   formFlags = request.query,
   isFlagged = false,
-) => {
+}) => {
   const {
     moveToInCheck,
     recommendToPay,
@@ -216,19 +216,22 @@ const superAdminActionsAvailable = (isSuperAdmin, status, isFlagged, updateFlags
 
   const claimIsntPaidOrReadyToPay = ![STATUS.READY_TO_PAY, STATUS.PAID].includes(status);
 
+  const canChangeClaimData = ![STATUS.WITHDRAWN].includes(status) && isSuperAdmin;
+
   const withdrawAction = canWithdrawClaim({ isSuperAdmin, status, isFlagged });
 
-  const updateStatusAction = isSuperAdmin && claimIsntPaidOrReadyToPay;
-  const updateStatusForm = isSuperAdmin && updateStatus === true && claimIsntPaidOrReadyToPay;
+  const updateStatusAction = canChangeClaimData && claimIsntPaidOrReadyToPay;
+  const updateStatusForm =
+    isSuperAdmin && updateStatus === true && claimIsntPaidOrReadyToPay && canChangeClaimData;
 
-  const updateVetsNameAction = isSuperAdmin;
-  const updateVetsNameForm = isSuperAdmin && updateVetsName === true;
+  const updateVetsNameAction = canChangeClaimData;
+  const updateVetsNameForm = canChangeClaimData && updateVetsName === true;
 
-  const updateVetRCVSNumberAction = isSuperAdmin;
-  const updateVetRCVSNumberForm = isSuperAdmin && updateVetRCVSNumber === true;
+  const updateVetRCVSNumberAction = canChangeClaimData;
+  const updateVetRCVSNumberForm = canChangeClaimData && updateVetRCVSNumber === true;
 
-  const updateDateOfVisitAction = isSuperAdmin;
-  const updateDateOfVisitForm = isSuperAdmin && updateDateOfVisit === true;
+  const updateDateOfVisitAction = canChangeClaimData;
+  const updateDateOfVisitForm = canChangeClaimData && updateDateOfVisit === true;
 
   const updateEligiblePiiRedactionAction = isSuperAdmin;
   const updateEligiblePiiRedactionForm = isSuperAdmin && updateEligiblePiiRedaction === true;

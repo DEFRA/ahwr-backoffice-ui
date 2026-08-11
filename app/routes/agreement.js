@@ -125,7 +125,12 @@ export const buildAgreement = async (
 
   const { updateEligiblePiiRedactionAction, updateEligiblePiiRedactionForm } = isRedacted
     ? {}
-    : getClaimViewStates(request, application.status, null, formFlags);
+    : getClaimViewStates({
+        request,
+        status: application.status,
+        currentStatusEvent: null,
+        formFlags,
+      });
 
   const applicationSummaryDetails = buildAgreementSummaryDetails(application, {
     applicationReference,

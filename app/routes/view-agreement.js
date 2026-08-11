@@ -65,7 +65,7 @@ export const buildViewAgreement = async (
 
   const viewStates = application.redacted
     ? {}
-    : getClaimViewStates(request, status, currentStatusEvent, formFlags);
+    : getClaimViewStates({ request, status, currentStatusEvent, formFlags });
   const { updateVetsNameForm, updateVetRCVSNumberForm, updateDateOfVisitForm } = viewStates;
   const { updateEligiblePiiRedactionAction, updateEligiblePiiRedactionForm } = viewStates;
 
