@@ -1,10 +1,10 @@
-import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states.js";
+import { getClaimViewStates } from "./get-claim-view-states.js";
 import { STATUS as status } from "ffc-ahwr-common-library";
-import { permissions } from "../../../../app/auth/permissions.js";
-import { config } from "../../../../app/config/index.js";
+import { permissions } from "../../auth/permissions.js";
+import { config } from "../../config/index.js";
 const { administrator, recommender, authoriser, user } = permissions;
 
-jest.mock("../../../../app/config", () => ({
+jest.mock("../../config", () => ({
   config: {
     superAdmins: ["currentuser@test"],
     withdrawClaimEnabled: true,
