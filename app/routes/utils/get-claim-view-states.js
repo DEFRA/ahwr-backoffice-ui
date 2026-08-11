@@ -80,7 +80,7 @@ const getAdminAndAuthoriserAndRecommenderActions = ({
 const getAdminActionsAvailable = ({
   isAdministrator,
   isAuthoriser,
-  status,
+  claimStatus,
   isRecommender,
   moveToInCheck,
   recommendToPay,
@@ -93,10 +93,10 @@ const getAdminActionsAvailable = ({
   const isAdminOrAuthorisor = isAdministrator || isAuthoriser;
   const isAdminOrRecommender = isAdministrator || isRecommender;
   const isAdminOrAuthorisorOrRecommender = isAdministrator || isAuthoriser || isRecommender;
-  const claimIsInCheck = status === STATUS.IN_CHECK;
-  const claimIsOnHold = status === STATUS.ON_HOLD;
-  const claimIsRecommendedToPay = status === STATUS.RECOMMENDED_TO_PAY;
-  const claimIsRecommendedToReject = status === STATUS.RECOMMENDED_TO_REJECT;
+  const claimIsInCheck = claimStatus === STATUS.IN_CHECK;
+  const claimIsOnHold = claimStatus === STATUS.ON_HOLD;
+  const claimIsRecommendedToPay = claimStatus === STATUS.RECOMMENDED_TO_PAY;
+  const claimIsRecommendedToReject = claimStatus === STATUS.RECOMMENDED_TO_REJECT;
 
   const { authoriseAction, authoriseForm, rejectAction, rejectForm } = getAdminAndAuthoriserActions(
     {
@@ -152,7 +152,7 @@ export const DEFAULT_FORM_FLAGS = {
 
 export const getClaimViewStates = ({
   request,
-  status,
+  claimStatus,
   currentStatusEvent,
   formFlags = request.query,
   isFlagged = false,
@@ -176,7 +176,7 @@ export const getClaimViewStates = ({
   const adminActions = getAdminActionsAvailable({
     isAdministrator,
     isAuthoriser,
-    status,
+    claimStatus,
     isRecommender,
     moveToInCheck,
     recommendToPay,
@@ -187,7 +187,7 @@ export const getClaimViewStates = ({
     name,
   });
 
-  const superAdminActions = superAdminActionsAvailable(isSuperAdmin, status, isFlagged, {
+  const superAdminActions = superAdminActionsAvailable(isSuperAdmin, claimStatus, isFlagged, {
     updateStatus,
     updateVetsName,
     updateVetRCVSNumber,
@@ -205,7 +205,7 @@ const statusWasSetByAnotherUser = (currentStatusEvent, name) => {
   return currentStatusEvent && name !== currentStatusEvent.updatedBy;
 };
 
-const superAdminActionsAvailable = (isSuperAdmin, status, isFlagged, updateFlags) => {
+const superAdminActionsAvailable = (isSuperAdmin, claimStatus, isFlagged, updateFlags) => {
   const {
     updateStatus,
     updateVetsName,
@@ -214,11 +214,11 @@ const superAdminActionsAvailable = (isSuperAdmin, status, isFlagged, updateFlags
     updateEligiblePiiRedaction,
   } = updateFlags;
 
-  const claimIsntPaidOrReadyToPay = ![STATUS.READY_TO_PAY, STATUS.PAID].includes(status);
+  const claimIsntPaidOrReadyToPay = ![STATUS.READY_TO_PAY, STATUS.PAID].includes(claimStatus);
 
-  const canChangeClaimData = ![STATUS.WITHDRAWN].includes(status) && isSuperAdmin;
+  const canChangeClaimData = ![STATUS.WITHDRAWN].includes(claimStatus) && isSuperAdmin;
 
-  const withdrawAction = canWithdrawClaim({ isSuperAdmin, status, isFlagged });
+  const withdrawAction = canWithdrawClaim({ isSuperAdmin, status: claimStatus, isFlagged });
 
   const updateStatusAction = canChangeClaimData && claimIsntPaidOrReadyToPay;
   const updateStatusForm =

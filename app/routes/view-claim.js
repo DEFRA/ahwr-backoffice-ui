@@ -104,7 +104,7 @@ export const buildViewClaim = async (
     ? {}
     : getClaimViewStates({
         request,
-        status: claim.status,
+        claimStatus: claim.status,
         currentStatusEvent,
         formFlags,
         isFlagged,

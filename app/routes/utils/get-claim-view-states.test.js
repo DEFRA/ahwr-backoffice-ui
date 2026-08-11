@@ -27,7 +27,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.AGREED });
+    const state = getClaimViewStates({ request });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -66,7 +66,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.AGREED });
+    const state = getClaimViewStates({ request });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -105,7 +105,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.AGREED });
+    const state = getClaimViewStates({ request });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -144,7 +144,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.ON_HOLD });
+    const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -183,7 +183,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.ON_HOLD });
+    const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -222,7 +222,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.ON_HOLD });
+    const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -261,7 +261,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.ON_HOLD });
+    const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -300,7 +300,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.ON_HOLD });
+    const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -339,7 +339,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.ON_HOLD });
+    const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -378,7 +378,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.ON_HOLD });
+    const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -418,7 +418,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.IN_CHECK });
+    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -458,7 +458,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.IN_CHECK });
+    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -498,7 +498,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.IN_CHECK });
+    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -537,7 +537,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.IN_CHECK });
+    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -576,7 +576,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.IN_CHECK });
+    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -615,7 +615,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.IN_CHECK });
+    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -654,7 +654,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.IN_CHECK });
+    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -693,7 +693,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.IN_CHECK });
+    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -732,7 +732,7 @@ describe("getClaimViewStates", () => {
         },
       },
     };
-    const state = getClaimViewStates({ request, status: status.IN_CHECK });
+    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -776,7 +776,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_PAY,
+      claimStatus: status.RECOMMENDED_TO_PAY,
       currentStatusEvent,
     });
 
@@ -822,7 +822,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_PAY,
+      claimStatus: status.RECOMMENDED_TO_PAY,
       currentStatusEvent,
     });
 
@@ -868,7 +868,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_PAY,
+      claimStatus: status.RECOMMENDED_TO_PAY,
       currentStatusEvent,
     });
 
@@ -914,7 +914,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_PAY,
+      claimStatus: status.RECOMMENDED_TO_PAY,
       currentStatusEvent,
     });
 
@@ -960,7 +960,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_PAY,
+      claimStatus: status.RECOMMENDED_TO_PAY,
       currentStatusEvent,
     });
 
@@ -1006,7 +1006,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_PAY,
+      claimStatus: status.RECOMMENDED_TO_PAY,
       currentStatusEvent,
     });
 
@@ -1052,7 +1052,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_PAY,
+      claimStatus: status.RECOMMENDED_TO_PAY,
       currentStatusEvent,
     });
 
@@ -1098,7 +1098,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_REJECT,
+      claimStatus: status.RECOMMENDED_TO_REJECT,
       currentStatusEvent,
     });
 
@@ -1144,7 +1144,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_REJECT,
+      claimStatus: status.RECOMMENDED_TO_REJECT,
       currentStatusEvent,
     });
 
@@ -1190,7 +1190,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_REJECT,
+      claimStatus: status.RECOMMENDED_TO_REJECT,
       currentStatusEvent,
     });
 
@@ -1236,7 +1236,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_REJECT,
+      claimStatus: status.RECOMMENDED_TO_REJECT,
       currentStatusEvent,
     });
 
@@ -1282,7 +1282,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_REJECT,
+      claimStatus: status.RECOMMENDED_TO_REJECT,
       currentStatusEvent,
     });
 
@@ -1328,7 +1328,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_REJECT,
+      claimStatus: status.RECOMMENDED_TO_REJECT,
       currentStatusEvent,
     });
 
@@ -1374,7 +1374,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_REJECT,
+      claimStatus: status.RECOMMENDED_TO_REJECT,
       currentStatusEvent,
     });
 
@@ -1420,7 +1420,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({
       request,
-      status: status.RECOMMENDED_TO_REJECT,
+      claimStatus: status.RECOMMENDED_TO_REJECT,
       currentStatusEvent,
     });
 
@@ -1448,7 +1448,7 @@ describe("getClaimViewStates", () => {
     });
   });
 
-  test("statusUpdateAction, status: any, user: admin", () => {
+  test("statusUpdateAction, claimStatus: any, user: admin", () => {
     const request = {
       query: {
         updateStatus: false,
@@ -1462,7 +1462,7 @@ describe("getClaimViewStates", () => {
       },
     };
 
-    const state = getClaimViewStates({ request, status: status.REJECTED });
+    const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -1488,7 +1488,7 @@ describe("getClaimViewStates", () => {
     });
   });
 
-  test("statusUpdateAction, status: any, user: admin & super admin", () => {
+  test("statusUpdateAction, claimStatus: any, user: admin & super admin", () => {
     const request = {
       query: {
         updateStatus: false,
@@ -1502,7 +1502,7 @@ describe("getClaimViewStates", () => {
       },
     };
 
-    const state = getClaimViewStates({ request, status: status.REJECTED });
+    const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -1528,7 +1528,7 @@ describe("getClaimViewStates", () => {
     });
   });
 
-  test("statusUpdateForm, status: any, query: update, user: admin", () => {
+  test("statusUpdateForm, claimStatus: any, query: update, user: admin", () => {
     const request = {
       query: {
         update: true,
@@ -1542,7 +1542,7 @@ describe("getClaimViewStates", () => {
       },
     };
 
-    const state = getClaimViewStates({ request, status: status.REJECTED });
+    const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -1568,7 +1568,7 @@ describe("getClaimViewStates", () => {
     });
   });
 
-  test("statusUpdateForm, status: any, query: updateStatus, user: admin & super admin", () => {
+  test("statusUpdateForm, claimStatus: any, query: updateStatus, user: admin & super admin", () => {
     const request = {
       query: {
         updateStatus: true,
@@ -1582,7 +1582,7 @@ describe("getClaimViewStates", () => {
       },
     };
 
-    const state = getClaimViewStates({ request, status: status.REJECTED });
+    const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -1608,7 +1608,7 @@ describe("getClaimViewStates", () => {
     });
   });
 
-  test("statusUpdateForm, status: ready to pay, query: updateStatus, user: admin & super admin", () => {
+  test("statusUpdateForm, claimStatus: ready to pay, query: updateStatus, user: admin & super admin", () => {
     const request = {
       query: {
         updateStatus: true,
@@ -1622,7 +1622,7 @@ describe("getClaimViewStates", () => {
       },
     };
 
-    const state = getClaimViewStates({ request, status: status.READY_TO_PAY });
+    const state = getClaimViewStates({ request, claimStatus: status.READY_TO_PAY });
 
     expect(state).toEqual({
       withdrawAction: false,
@@ -1671,7 +1671,7 @@ describe("withdraw button", () => {
   test("withdrawAction: true when super admin, status in check and toggle enabled", () => {
     const state = getClaimViewStates({
       request: inCheckSuperAdminRequest,
-      status: status.IN_CHECK,
+      claimStatus: status.IN_CHECK,
     });
 
     expect(state.withdrawAction).toBe(true);
@@ -1682,7 +1682,7 @@ describe("withdraw button", () => {
 
     const state = getClaimViewStates({
       request: inCheckSuperAdminRequest,
-      status: status.IN_CHECK,
+      claimStatus: status.IN_CHECK,
     });
 
     expect(state.withdrawAction).toBe(false);
@@ -1691,7 +1691,7 @@ describe("withdraw button", () => {
   test("withdrawAction: false when super admin but status is not in check", () => {
     const state = getClaimViewStates({
       request: inCheckSuperAdminRequest,
-      status: status.READY_TO_PAY,
+      claimStatus: status.READY_TO_PAY,
     });
 
     expect(state.withdrawAction).toBe(false);
@@ -1702,7 +1702,7 @@ describe("withdraw button", () => {
 
     const state = getClaimViewStates({
       request: inCheckSuperAdminRequest,
-      status: status.IN_CHECK,
+      claimStatus: status.IN_CHECK,
       currentStatusEvent: undefined,
       formFlags: inCheckSuperAdminRequest.query,
       isFlagged,
@@ -1726,7 +1726,7 @@ describe("withdraw button", () => {
       },
     };
 
-    const state = getClaimViewStates({ request, status: status.IN_CHECK });
+    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state.withdrawAction).toBe(false);
   });

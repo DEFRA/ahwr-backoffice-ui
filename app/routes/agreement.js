@@ -127,7 +127,6 @@ export const buildAgreement = async (
     ? {}
     : getClaimViewStates({
         request,
-        status: application.status,
         currentStatusEvent: null,
         formFlags,
       });
