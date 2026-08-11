@@ -137,6 +137,9 @@ const getAdminActionsAvailable = ({
   };
 };
 
+/**
+ * This represents the default flags for actions allowed
+ */
 export const DEFAULT_FORM_FLAGS = {
   moveToInCheck: false,
   recommendToPay: false,
@@ -150,6 +153,25 @@ export const DEFAULT_FORM_FLAGS = {
   updateEligiblePiiRedaction: false,
 };
 
+/**
+ * Determines which action buttons and inline forms a caseworker sees on a claim or
+ * agreement view, from their role, the claim status, and which form they have opened.
+ *
+ * Application/agreement views omit `claimStatus`: no claim-status-driven action applies
+ * there, and the super-admin data-edit actions key off role alone.
+ *
+ * @param {object} params
+ * @param {object} params.request - the Hapi request; supplies the authenticated account
+ *   (`request.auth.credentials.account`) and the default form flags (`request.query`).
+ * @param {string} [params.claimStatus] - the claim's current status (a `STATUS` value).
+ * @param {{ updatedBy: string } | null} [params.currentStatusEvent] - the most recent
+ *   status-change event; stops a user authorising or rejecting a claim they last updated.
+ * @param {object} [params.formFlags=request.query] - booleans for which inline form is
+ *   open; see {@link DEFAULT_FORM_FLAGS}.
+ * @param {boolean} [params.isFlagged=false] - whether the application is flagged; blocks withdrawal.
+ * @returns {Object<string, boolean>} the view-state flags (e.g. `moveToInCheckAction`,
+ *   `authoriseForm`, `withdrawAction`, `updateVetsNameForm`) consumed by the templates.
+ */
 export const getClaimViewStates = ({
   request,
   claimStatus,
