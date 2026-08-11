@@ -49,8 +49,8 @@ const noPermissions = {
 
 describe("getClaimViewStates", () => {
   describe("user: admin", () => {
-    test("status: agreed", () => {
-      const request = buildRequest({ scope: administrator, query: { withdraw: false } });
+    test("no claim status", () => {
+      const request = buildRequest({ scope: administrator });
       const state = getClaimViewStates({ request });
 
       expect(state).toEqual(noPermissions);
@@ -239,8 +239,8 @@ describe("getClaimViewStates", () => {
   });
 
   describe("user: recommender", () => {
-    test("status: agreed", () => {
-      const request = buildRequest({ scope: recommender, query: { withdraw: false } });
+    test("no claim status", () => {
+      const request = buildRequest({ scope: recommender });
       const state = getClaimViewStates({ request });
 
       expect(state).toEqual(noPermissions);
@@ -354,8 +354,8 @@ describe("getClaimViewStates", () => {
   });
 
   describe("user: authoriser", () => {
-    test("status: agreed", () => {
-      const request = buildRequest({ scope: authoriser, query: { withdraw: false } });
+    test("no claim status", () => {
+      const request = buildRequest({ scope: authoriser });
       const state = getClaimViewStates({ request });
 
       expect(state).toEqual(noPermissions);
@@ -484,6 +484,24 @@ describe("getClaimViewStates", () => {
   });
 
   describe("user: super admin", () => {
+    test("no claim status", () => {
+      const request = buildRequest({
+        scope: administrator,
+        username: "currentUser@test",
+      });
+
+      const state = getClaimViewStates({ request });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        updateStatusAction: true,
+        updateDateOfVisitAction: true,
+        updateEligiblePiiRedactionAction: true,
+        updateVetRCVSNumberAction: true,
+        updateVetsNameAction: true,
+      });
+    });
+
     test("statusUpdateAction, claimStatus: any", () => {
       const request = buildRequest({
         scope: administrator,
