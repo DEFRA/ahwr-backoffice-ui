@@ -13,6 +13,17 @@ jest.mock("../../config", () => ({
 
 const currentUser = "testUser";
 
+const buildRequest = ({ scope, query = {}, username = "" }) => ({
+  query,
+  auth: {
+    isAuthenticated: true,
+    credentials: {
+      account: { name: currentUser, username },
+      scope: [scope],
+    },
+  },
+});
+
 const noPermissions = {
   withdrawAction: false,
   moveToInCheckAction: false,
@@ -37,947 +48,507 @@ const noPermissions = {
 };
 
 describe("getClaimViewStates", () => {
-  test("status: agreed, user: admin", () => {
-    const request = {
-      query: {
-        withdraw: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [administrator],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request });
+  describe("user: admin", () => {
+    test("status: agreed", () => {
+      const request = buildRequest({ scope: administrator, query: { withdraw: false } });
+      const state = getClaimViewStates({ request });
 
-    expect(state).toEqual(noPermissions);
-  });
+      expect(state).toEqual(noPermissions);
+    });
 
-  test("status: agreed, user: recommender", () => {
-    const request = {
-      query: {
-        withdraw: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [recommender],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request });
+    test("status: on hold", () => {
+      const request = buildRequest({ scope: administrator, query: { moveToInCheck: false } });
+      const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
-    expect(state).toEqual(noPermissions);
-  });
+      expect(state).toEqual({
+        ...noPermissions,
+        moveToInCheckAction: true,
+      });
+    });
 
-  test("status: agreed, user: authoriser", () => {
-    const request = {
-      query: {
-        withdraw: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [authoriser],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request });
+    test("status: on hold, query: moveToInCheck", () => {
+      const request = buildRequest({ scope: administrator, query: { moveToInCheck: true } });
+      const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
-    expect(state).toEqual(noPermissions);
-  });
+      expect(state).toEqual({
+        ...noPermissions,
+        moveToInCheckForm: true,
+      });
+    });
 
-  test("status: on hold, user: admin", () => {
-    const request = {
-      query: {
-        moveToInCheck: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [administrator],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
+    test("status: in check", () => {
+      const request = buildRequest({
+        scope: administrator,
+        query: { recommendToPay: false, recommendToReject: false },
+      });
+      const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
-    expect(state).toEqual({
-      ...noPermissions,
-      moveToInCheckAction: true,
+      expect(state).toEqual({
+        ...noPermissions,
+        recommendAction: true,
+      });
+    });
+
+    test("status: in check, query: recommendToPay", () => {
+      const request = buildRequest({ scope: administrator, query: { recommendToPay: true } });
+      const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        recommendToPayForm: true,
+      });
+    });
+
+    test("status: in check, query: recommendToReject", () => {
+      const request = buildRequest({ scope: administrator, query: { recommendToReject: true } });
+      const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
+
+      expect(state).toEqual({ ...noPermissions, recommendToRejectForm: true });
+    });
+
+    test("status: in recommended to pay, recommender: different person", () => {
+      const request = buildRequest({ scope: administrator, query: { approve: false } });
+      const currentStatusEvent = {
+        updatedBy: "someone else",
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_PAY,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual({ ...noPermissions, authoriseAction: true });
+    });
+
+    test("status: in recommended to pay, recommender: same person", () => {
+      const request = buildRequest({ scope: administrator, query: { approve: false } });
+      const currentStatusEvent = {
+        updatedBy: currentUser,
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_PAY,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual(noPermissions);
+    });
+
+    test("status: in recommended to pay, query: approve, recommender: different person", () => {
+      const request = buildRequest({ scope: administrator, query: { approve: true } });
+      const currentStatusEvent = {
+        updatedBy: "someone else",
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_PAY,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        authoriseForm: true,
+      });
+    });
+
+    test("status: in recommended to reject, recommender: different person", () => {
+      const request = buildRequest({ scope: administrator, query: { reject: false } });
+      const currentStatusEvent = {
+        updatedBy: "someone else",
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_REJECT,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        rejectAction: true,
+      });
+    });
+
+    test("status: in recommended to reject, recommender: same person", () => {
+      const request = buildRequest({ scope: administrator, query: { reject: false } });
+      const currentStatusEvent = {
+        updatedBy: currentUser,
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_REJECT,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual(noPermissions);
+    });
+
+    test("status: in recommended to reject, query: reject, recommender: different person", () => {
+      const request = buildRequest({ scope: administrator, query: { reject: true } });
+      const currentStatusEvent = {
+        updatedBy: "someone else",
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_REJECT,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        rejectForm: true,
+      });
+    });
+
+    test("status: in recommended to reject, query: reject, recommender: same person", () => {
+      const request = buildRequest({ scope: administrator, query: { reject: true } });
+      const currentStatusEvent = {
+        updatedBy: currentUser,
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_REJECT,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual(noPermissions);
+    });
+
+    test("statusUpdateAction, claimStatus: any", () => {
+      const request = buildRequest({
+        scope: administrator,
+        query: { updateStatus: false },
+        username: "notSuperAdmin@test",
+      });
+
+      const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
+
+      expect(state).toEqual(noPermissions);
+    });
+
+    test("statusUpdateForm, claimStatus: any, query: update", () => {
+      const request = buildRequest({
+        scope: administrator,
+        query: { update: true },
+        username: "notSuperAdmin@test",
+      });
+
+      const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
+
+      expect(state).toEqual(noPermissions);
     });
   });
 
-  test("status: on hold, user: recommender", () => {
-    const request = {
-      query: {
-        moveToInCheck: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [recommender],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
+  describe("user: recommender", () => {
+    test("status: agreed", () => {
+      const request = buildRequest({ scope: recommender, query: { withdraw: false } });
+      const state = getClaimViewStates({ request });
 
-    expect(state).toEqual({
-      ...noPermissions,
-      moveToInCheckAction: true,
+      expect(state).toEqual(noPermissions);
+    });
+
+    test("status: on hold", () => {
+      const request = buildRequest({ scope: recommender, query: { moveToInCheck: false } });
+      const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        moveToInCheckAction: true,
+      });
+    });
+
+    test("status: on hold, query: moveToInCheck", () => {
+      const request = buildRequest({ scope: recommender, query: { moveToInCheck: true } });
+      const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        moveToInCheckForm: true,
+      });
+    });
+
+    test("status: in check", () => {
+      const request = buildRequest({
+        scope: recommender,
+        query: { recommendToPay: false, recommendToReject: false },
+      });
+      const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        recommendAction: true,
+      });
+    });
+
+    test("status: in check, query: recommendToPay", () => {
+      const request = buildRequest({ scope: recommender, query: { recommendToPay: true } });
+      const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
+
+      expect(state).toEqual({ ...noPermissions, recommendToPayForm: true });
+    });
+
+    test("status: in check, query: recommendToReject", () => {
+      const request = buildRequest({ scope: recommender, query: { recommendToReject: true } });
+      const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        recommendToRejectForm: true,
+      });
+    });
+
+    test("status: in recommended to pay, recommender: different person", () => {
+      const request = buildRequest({ scope: recommender, query: { approve: false } });
+      const currentStatusEvent = {
+        updatedBy: "someone else",
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_PAY,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual(noPermissions);
+    });
+
+    test("status: in recommended to pay, query: approve, recommender: different person", () => {
+      const request = buildRequest({ scope: recommender, query: { approve: true } });
+      const currentStatusEvent = {
+        updatedBy: "someone else",
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_PAY,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual(noPermissions);
+    });
+
+    test("status: in recommended to reject, recommender: different person", () => {
+      const request = buildRequest({ scope: recommender, query: { reject: false } });
+      const currentStatusEvent = {
+        updatedBy: "someone else",
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_REJECT,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual(noPermissions);
+    });
+
+    test("status: in recommended to reject, query: reject, recommender: different person", () => {
+      const request = buildRequest({ scope: recommender, query: { reject: true } });
+      const currentStatusEvent = {
+        updatedBy: "someone else",
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_REJECT,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual(noPermissions);
     });
   });
 
-  test("status: on hold, user: authoriser", () => {
-    const request = {
-      query: {
-        moveToInCheck: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [authoriser],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
+  describe("user: authoriser", () => {
+    test("status: agreed", () => {
+      const request = buildRequest({ scope: authoriser, query: { withdraw: false } });
+      const state = getClaimViewStates({ request });
 
-    expect(state).toEqual({
-      ...noPermissions,
-      moveToInCheckAction: true,
+      expect(state).toEqual(noPermissions);
+    });
+
+    test("status: on hold", () => {
+      const request = buildRequest({ scope: authoriser, query: { moveToInCheck: false } });
+      const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        moveToInCheckAction: true,
+      });
+    });
+
+    test("status: on hold, query: moveToInCheck", () => {
+      const request = buildRequest({ scope: authoriser, query: { moveToInCheck: true } });
+      const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        moveToInCheckForm: true,
+      });
+    });
+
+    test("status: in check", () => {
+      const request = buildRequest({
+        scope: authoriser,
+        query: { recommendToPay: false, recommendToReject: false },
+      });
+      const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
+
+      expect(state).toEqual(noPermissions);
+    });
+
+    test("status: in check, query: recommendToPay", () => {
+      const request = buildRequest({ scope: authoriser, query: { recommendToPay: true } });
+      const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
+
+      expect(state).toEqual(noPermissions);
+    });
+
+    test("status: in check, query: recommendToReject", () => {
+      const request = buildRequest({ scope: authoriser, query: { recommendToReject: true } });
+      const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
+
+      expect(state).toEqual(noPermissions);
+    });
+
+    test("status: in recommended to pay, recommender: different person", () => {
+      const request = buildRequest({ scope: authoriser, query: { approve: false } });
+      const currentStatusEvent = {
+        updatedBy: "someone else",
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_PAY,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        authoriseAction: true,
+      });
+    });
+
+    test("status: in recommended to pay, query: approve, recommender: different person", () => {
+      const request = buildRequest({ scope: authoriser, query: { approve: true } });
+      const currentStatusEvent = {
+        updatedBy: "someone else",
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_PAY,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        authoriseForm: true,
+      });
+    });
+
+    test("status: in recommended to reject, recommender: different person", () => {
+      const request = buildRequest({ scope: authoriser, query: { reject: false } });
+      const currentStatusEvent = {
+        updatedBy: "someone else",
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_REJECT,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        rejectAction: true,
+      });
+    });
+
+    test("status: in recommended to reject, query: reject, recommender: different person", () => {
+      const request = buildRequest({ scope: authoriser, query: { reject: true } });
+      const currentStatusEvent = {
+        updatedBy: "someone else",
+      };
+      const state = getClaimViewStates({
+        request,
+        claimStatus: status.RECOMMENDED_TO_REJECT,
+        currentStatusEvent,
+      });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        rejectForm: true,
+      });
     });
   });
 
-  test("status: on hold, user: user", () => {
-    const request = {
-      query: {
-        moveToInCheck: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [user],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
+  describe("user: user", () => {
+    test("status: on hold", () => {
+      const request = buildRequest({ scope: user, query: { moveToInCheck: false } });
+      const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
-    expect(state).toEqual(noPermissions);
-  });
-
-  test("status: on hold, query: moveToInCheck, user: admin", () => {
-    const request = {
-      query: {
-        moveToInCheck: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [administrator],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      moveToInCheckForm: true,
+      expect(state).toEqual(noPermissions);
     });
   });
 
-  test("status: on hold, query: moveToInCheck, user: recommender", () => {
-    const request = {
-      query: {
-        moveToInCheck: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [recommender],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
+  describe("user: super admin", () => {
+    test("statusUpdateAction, claimStatus: any", () => {
+      const request = buildRequest({
+        scope: administrator,
+        query: { updateStatus: false },
+        username: "currentUser@test",
+      });
 
-    expect(state).toEqual({
-      ...noPermissions,
-      moveToInCheckForm: true,
-    });
-  });
+      const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
 
-  test("status: on hold, query: moveToInCheck, user: authoriser", () => {
-    const request = {
-      query: {
-        moveToInCheck: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [authoriser],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      moveToInCheckForm: true,
-    });
-  });
-
-  test("status: in check, user: admin", () => {
-    const request = {
-      query: {
-        recommendToPay: false,
-        recommendToReject: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [administrator],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      recommendAction: true,
-    });
-  });
-
-  test("status: in check, user: recommender", () => {
-    const request = {
-      query: {
-        recommendToPay: false,
-        recommendToReject: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [recommender],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      recommendAction: true,
-    });
-  });
-
-  test("status: in check, user: authoriser", () => {
-    const request = {
-      query: {
-        recommendToPay: false,
-        recommendToReject: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [authoriser],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
-
-    expect(state).toEqual(noPermissions);
-  });
-
-  test("status: in check, query: recommendToPay, user: admin", () => {
-    const request = {
-      query: {
-        recommendToPay: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [administrator],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      recommendToPayForm: true,
-    });
-  });
-
-  test("status: in check, query: recommendToPay, user: recommender", () => {
-    const request = {
-      query: {
-        recommendToPay: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [recommender],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
-
-    expect(state).toEqual({ ...noPermissions, recommendToPayForm: true });
-  });
-
-  test("status: in check, query: recommendToPay, user: authoriser", () => {
-    const request = {
-      query: {
-        recommendToPay: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [authoriser],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
-
-    expect(state).toEqual(noPermissions);
-  });
-
-  test("status: in check, query: recommendToReject, user: admin", () => {
-    const request = {
-      query: {
-        recommendToReject: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [administrator],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
-
-    expect(state).toEqual({ ...noPermissions, recommendToRejectForm: true });
-  });
-
-  test("status: in check, query: recommendToReject, user: recommender", () => {
-    const request = {
-      query: {
-        recommendToReject: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [recommender],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      recommendToRejectForm: true,
-    });
-  });
-
-  test("status: in check, query: recommendToReject, user: authoriser", () => {
-    const request = {
-      query: {
-        recommendToReject: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [authoriser],
-        },
-      },
-    };
-    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
-
-    expect(state).toEqual(noPermissions);
-  });
-
-  test("status: in recommended to pay, user: admin, recommender: different person", () => {
-    const request = {
-      query: {
-        approve: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [administrator],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: "someone else",
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_PAY,
-      currentStatusEvent,
+      expect(state).toEqual({
+        ...noPermissions,
+        updateStatusAction: true,
+        updateDateOfVisitAction: true,
+        updateEligiblePiiRedactionAction: true,
+        updateVetRCVSNumberAction: true,
+        updateVetsNameAction: true,
+      });
     });
 
-    expect(state).toEqual({ ...noPermissions, authoriseAction: true });
-  });
+    test("statusUpdateForm, claimStatus: any, query: updateStatus", () => {
+      const request = buildRequest({
+        scope: administrator,
+        query: { updateStatus: true },
+        username: "currentUser@test",
+      });
 
-  test("status: in recommended to pay, user: admin, recommender: same person", () => {
-    const request = {
-      query: {
-        approve: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [administrator],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: currentUser,
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_PAY,
-      currentStatusEvent,
+      const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        updateStatusAction: true,
+        updateStatusForm: true,
+        updateDateOfVisitAction: true,
+        updateEligiblePiiRedactionAction: true,
+        updateVetRCVSNumberAction: true,
+        updateVetsNameAction: true,
+      });
     });
 
-    expect(state).toEqual(noPermissions);
-  });
+    test("statusUpdateForm, claimStatus: ready to pay, query: updateStatus", () => {
+      const request = buildRequest({
+        scope: administrator,
+        query: { updateStatus: true },
+        username: "currentUser@test",
+      });
 
-  test("status: in recommended to pay, user: recommender, recommender: different person", () => {
-    const request = {
-      query: {
-        approve: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [recommender],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: "someone else",
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_PAY,
-      currentStatusEvent,
-    });
+      const state = getClaimViewStates({ request, claimStatus: status.READY_TO_PAY });
 
-    expect(state).toEqual(noPermissions);
-  });
-
-  test("status: in recommended to pay, user: authoriser, recommender: different person", () => {
-    const request = {
-      query: {
-        approve: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [authoriser],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: "someone else",
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_PAY,
-      currentStatusEvent,
-    });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      authoriseAction: true,
-    });
-  });
-
-  test("status: in recommended to pay, query: approve, user: admin, recommender: different person", () => {
-    const request = {
-      query: {
-        approve: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [administrator],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: "someone else",
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_PAY,
-      currentStatusEvent,
-    });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      authoriseForm: true,
-    });
-  });
-
-  test("status: in recommended to pay, query: approve, user: recommender, recommender: different person", () => {
-    const request = {
-      query: {
-        approve: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [recommender],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: "someone else",
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_PAY,
-      currentStatusEvent,
-    });
-
-    expect(state).toEqual(noPermissions);
-  });
-
-  test("status: in recommended to pay, query: approve, user: authoriser, recommender: different person", () => {
-    const request = {
-      query: {
-        approve: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [authoriser],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: "someone else",
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_PAY,
-      currentStatusEvent,
-    });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      authoriseForm: true,
-    });
-  });
-
-  test("status: in recommended to reject, user: admin, recommender: different person", () => {
-    const request = {
-      query: {
-        reject: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [administrator],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: "someone else",
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_REJECT,
-      currentStatusEvent,
-    });
-
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: true,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
-  });
-
-  test("status: in recommended to reject, user: admin, recommender: same person", () => {
-    const request = {
-      query: {
-        reject: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [administrator],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: currentUser,
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_REJECT,
-      currentStatusEvent,
-    });
-
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
-  });
-
-  test("status: in recommended to reject, user: recommender, recommender: different person", () => {
-    const request = {
-      query: {
-        reject: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [recommender],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: "someone else",
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_REJECT,
-      currentStatusEvent,
-    });
-
-    expect(state).toEqual(noPermissions);
-  });
-
-  test("status: in recommended to reject, user: authoriser, recommender: different person", () => {
-    const request = {
-      query: {
-        reject: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [authoriser],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: "someone else",
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_REJECT,
-      currentStatusEvent,
-    });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      rejectAction: true,
-    });
-  });
-
-  test("status: in recommended to reject, query: reject, user: admin, recommender: different person", () => {
-    const request = {
-      query: {
-        reject: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [administrator],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: "someone else",
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_REJECT,
-      currentStatusEvent,
-    });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      rejectForm: true,
-    });
-  });
-
-  test("status: in recommended to reject, query: reject, user: admin, recommender: same person", () => {
-    const request = {
-      query: {
-        reject: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [administrator],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: currentUser,
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_REJECT,
-      currentStatusEvent,
-    });
-
-    expect(state).toEqual(noPermissions);
-  });
-
-  test("status: in recommended to reject, query: reject, user: recommender, recommender: different person", () => {
-    const request = {
-      query: {
-        reject: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [recommender],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: "someone else",
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_REJECT,
-      currentStatusEvent,
-    });
-
-    expect(state).toEqual(noPermissions);
-  });
-
-  test("status: in recommended to reject, query: reject, user: authoriser, recommender: different person", () => {
-    const request = {
-      query: {
-        reject: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "" },
-          scope: [authoriser],
-        },
-      },
-    };
-    const currentStatusEvent = {
-      updatedBy: "someone else",
-    };
-    const state = getClaimViewStates({
-      request,
-      claimStatus: status.RECOMMENDED_TO_REJECT,
-      currentStatusEvent,
-    });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      rejectForm: true,
-    });
-  });
-
-  test("statusUpdateAction, claimStatus: any, user: admin", () => {
-    const request = {
-      query: {
-        updateStatus: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "notSuperAdmin@test" },
-          scope: [administrator],
-        },
-      },
-    };
-
-    const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
-
-    expect(state).toEqual(noPermissions);
-  });
-
-  test("statusUpdateAction, claimStatus: any, user: admin & super admin", () => {
-    const request = {
-      query: {
-        updateStatus: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "currentUser@test" },
-          scope: [administrator],
-        },
-      },
-    };
-
-    const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      updateStatusAction: true,
-      updateDateOfVisitAction: true,
-      updateEligiblePiiRedactionAction: true,
-      updateVetRCVSNumberAction: true,
-      updateVetsNameAction: true,
-    });
-  });
-
-  test("statusUpdateForm, claimStatus: any, query: update, user: admin", () => {
-    const request = {
-      query: {
-        update: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "notSuperAdmin@test" },
-          scope: [administrator],
-        },
-      },
-    };
-
-    const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
-
-    expect(state).toEqual(noPermissions);
-  });
-
-  test("statusUpdateForm, claimStatus: any, query: updateStatus, user: admin & super admin", () => {
-    const request = {
-      query: {
-        updateStatus: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "currentUser@test" },
-          scope: [administrator],
-        },
-      },
-    };
-
-    const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      updateStatusAction: true,
-      updateStatusForm: true,
-      updateDateOfVisitAction: true,
-      updateEligiblePiiRedactionAction: true,
-      updateVetRCVSNumberAction: true,
-      updateVetsNameAction: true,
-    });
-  });
-
-  test("statusUpdateForm, claimStatus: ready to pay, query: updateStatus, user: admin & super admin", () => {
-    const request = {
-      query: {
-        updateStatus: true,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "currentUser@test" },
-          scope: [administrator],
-        },
-      },
-    };
-
-    const state = getClaimViewStates({ request, claimStatus: status.READY_TO_PAY });
-
-    expect(state).toEqual({
-      ...noPermissions,
-      updateDateOfVisitAction: true,
-      updateEligiblePiiRedactionAction: true,
-      updateVetRCVSNumberAction: true,
-      updateVetsNameAction: true,
+      expect(state).toEqual({
+        ...noPermissions,
+        updateDateOfVisitAction: true,
+        updateEligiblePiiRedactionAction: true,
+        updateVetRCVSNumberAction: true,
+        updateVetsNameAction: true,
+      });
     });
   });
 });
 
 describe("withdraw button", () => {
-  const inCheckSuperAdminRequest = {
-    query: {
-      recommendToPay: false,
-      recommendToReject: false,
-    },
-    auth: {
-      isAuthenticated: true,
-      credentials: {
-        account: { name: currentUser, username: "currentUser@test" },
-        scope: [administrator],
-      },
-    },
-  };
+  const inCheckSuperAdminRequest = buildRequest({
+    scope: administrator,
+    query: { recommendToPay: false, recommendToReject: false },
+    username: "currentUser@test",
+  });
 
   afterEach(() => {
     config.withdrawClaimEnabled = true;
@@ -1027,19 +598,11 @@ describe("withdraw button", () => {
   });
 
   test("withdrawAction: false when status in check but user is not a super admin", () => {
-    const request = {
-      query: {
-        recommendToPay: false,
-        recommendToReject: false,
-      },
-      auth: {
-        isAuthenticated: true,
-        credentials: {
-          account: { name: currentUser, username: "notSuperAdmin@test" },
-          scope: [administrator],
-        },
-      },
-    };
+    const request = buildRequest({
+      scope: administrator,
+      query: { recommendToPay: false, recommendToReject: false },
+      username: "notSuperAdmin@test",
+    });
 
     const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
