@@ -47,6 +47,12 @@ const noPermissions = {
   updateVetsNameForm: false,
 };
 
+const changeDataActions = {
+  updateDateOfVisitAction: true,
+  updateVetRCVSNumberAction: true,
+  updateVetsNameAction: true,
+};
+
 describe("getClaimViewStates", () => {
   describe("user: admin", () => {
     test("no claim status", () => {
@@ -494,11 +500,9 @@ describe("getClaimViewStates", () => {
 
       expect(state).toEqual({
         ...noPermissions,
+        ...changeDataActions,
         updateStatusAction: true,
-        updateDateOfVisitAction: true,
         updateEligiblePiiRedactionAction: true,
-        updateVetRCVSNumberAction: true,
-        updateVetsNameAction: true,
       });
     });
 
@@ -513,11 +517,9 @@ describe("getClaimViewStates", () => {
 
       expect(state).toEqual({
         ...noPermissions,
+        ...changeDataActions,
         updateStatusAction: true,
-        updateDateOfVisitAction: true,
         updateEligiblePiiRedactionAction: true,
-        updateVetRCVSNumberAction: true,
-        updateVetsNameAction: true,
       });
     });
 
@@ -532,12 +534,10 @@ describe("getClaimViewStates", () => {
 
       expect(state).toEqual({
         ...noPermissions,
+        ...changeDataActions,
         updateStatusAction: true,
         updateStatusForm: true,
-        updateDateOfVisitAction: true,
         updateEligiblePiiRedactionAction: true,
-        updateVetRCVSNumberAction: true,
-        updateVetsNameAction: true,
       });
     });
 
@@ -552,10 +552,8 @@ describe("getClaimViewStates", () => {
 
       expect(state).toEqual({
         ...noPermissions,
-        updateDateOfVisitAction: true,
+        ...changeDataActions,
         updateEligiblePiiRedactionAction: true,
-        updateVetRCVSNumberAction: true,
-        updateVetsNameAction: true,
       });
     });
   });

@@ -243,8 +243,7 @@ const superAdminActionsAvailable = (isSuperAdmin, claimStatus, isFlagged, update
   const withdrawAction = canWithdrawClaim({ isSuperAdmin, status: claimStatus, isFlagged });
 
   const updateStatusAction = canChangeClaimData && claimIsntPaidOrReadyToPay;
-  const updateStatusForm =
-    isSuperAdmin && updateStatus === true && claimIsntPaidOrReadyToPay && canChangeClaimData;
+  const updateStatusForm = canChangeClaimData && updateStatus === true && claimIsntPaidOrReadyToPay;
 
   const updateVetsNameAction = canChangeClaimData;
   const updateVetsNameForm = canChangeClaimData && updateVetsName === true;
