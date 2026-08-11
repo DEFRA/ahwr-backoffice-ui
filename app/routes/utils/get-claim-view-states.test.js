@@ -490,6 +490,20 @@ describe("getClaimViewStates", () => {
   });
 
   describe("user: super admin", () => {
+    test("claimStatus: withdrawn, cannot change claim data", () => {
+      const request = buildRequest({
+        scope: administrator,
+        username: "currentUser@test",
+      });
+
+      const state = getClaimViewStates({ request, claimStatus: status.WITHDRAWN });
+
+      expect(state).toEqual({
+        ...noPermissions,
+        updateEligiblePiiRedactionAction: true,
+      });
+    });
+
     test("no claim status", () => {
       const request = buildRequest({
         scope: administrator,
