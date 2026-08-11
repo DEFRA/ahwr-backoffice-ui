@@ -13,6 +13,29 @@ jest.mock("../../config", () => ({
 
 const currentUser = "testUser";
 
+const noPermissions = {
+  withdrawAction: false,
+  moveToInCheckAction: false,
+  moveToInCheckForm: false,
+  recommendAction: false,
+  recommendToPayForm: false,
+  recommendToRejectForm: false,
+  authoriseAction: false,
+  authoriseForm: false,
+  rejectAction: false,
+  rejectForm: false,
+  updateStatusAction: false,
+  updateStatusForm: false,
+  updateDateOfVisitAction: false,
+  updateDateOfVisitForm: false,
+  updateEligiblePiiRedactionAction: false,
+  updateEligiblePiiRedactionForm: false,
+  updateVetRCVSNumberAction: false,
+  updateVetRCVSNumberForm: false,
+  updateVetsNameAction: false,
+  updateVetsNameForm: false,
+};
+
 describe("getClaimViewStates", () => {
   test("status: agreed, user: admin", () => {
     const request = {
@@ -29,28 +52,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({ request });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("status: agreed, user: recommender", () => {
@@ -68,28 +70,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({ request });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("status: agreed, user: authoriser", () => {
@@ -107,28 +88,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({ request });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("status: on hold, user: admin", () => {
@@ -147,26 +107,8 @@ describe("getClaimViewStates", () => {
     const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
     expect(state).toEqual({
-      withdrawAction: false,
+      ...noPermissions,
       moveToInCheckAction: true,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -186,26 +128,8 @@ describe("getClaimViewStates", () => {
     const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
     expect(state).toEqual({
-      withdrawAction: false,
+      ...noPermissions,
       moveToInCheckAction: true,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -225,26 +149,8 @@ describe("getClaimViewStates", () => {
     const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
     expect(state).toEqual({
-      withdrawAction: false,
+      ...noPermissions,
       moveToInCheckAction: true,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -263,28 +169,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("status: on hold, query: moveToInCheck, user: admin", () => {
@@ -303,26 +188,8 @@ describe("getClaimViewStates", () => {
     const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
+      ...noPermissions,
       moveToInCheckForm: true,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -342,26 +209,8 @@ describe("getClaimViewStates", () => {
     const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
+      ...noPermissions,
       moveToInCheckForm: true,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -381,26 +230,8 @@ describe("getClaimViewStates", () => {
     const state = getClaimViewStates({ request, claimStatus: status.ON_HOLD });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
+      ...noPermissions,
       moveToInCheckForm: true,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -421,26 +252,8 @@ describe("getClaimViewStates", () => {
     const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
+      ...noPermissions,
       recommendAction: true,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -461,26 +274,8 @@ describe("getClaimViewStates", () => {
     const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
+      ...noPermissions,
       recommendAction: true,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -500,28 +295,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("status: in check, query: recommendToPay, user: admin", () => {
@@ -540,26 +314,8 @@ describe("getClaimViewStates", () => {
     const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
+      ...noPermissions,
       recommendToPayForm: true,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -578,28 +334,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: true,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual({ ...noPermissions, recommendToPayForm: true });
   });
 
   test("status: in check, query: recommendToPay, user: authoriser", () => {
@@ -617,28 +352,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("status: in check, query: recommendToReject, user: admin", () => {
@@ -656,28 +370,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: true,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual({ ...noPermissions, recommendToRejectForm: true });
   });
 
   test("status: in check, query: recommendToReject, user: recommender", () => {
@@ -696,26 +389,8 @@ describe("getClaimViewStates", () => {
     const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
+      ...noPermissions,
       recommendToRejectForm: true,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -734,28 +409,7 @@ describe("getClaimViewStates", () => {
     };
     const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("status: in recommended to pay, user: admin, recommender: different person", () => {
@@ -780,28 +434,7 @@ describe("getClaimViewStates", () => {
       currentStatusEvent,
     });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: true,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual({ ...noPermissions, authoriseAction: true });
   });
 
   test("status: in recommended to pay, user: admin, recommender: same person", () => {
@@ -826,28 +459,7 @@ describe("getClaimViewStates", () => {
       currentStatusEvent,
     });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("status: in recommended to pay, user: recommender, recommender: different person", () => {
@@ -872,28 +484,7 @@ describe("getClaimViewStates", () => {
       currentStatusEvent,
     });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("status: in recommended to pay, user: authoriser, recommender: different person", () => {
@@ -919,26 +510,8 @@ describe("getClaimViewStates", () => {
     });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
+      ...noPermissions,
       authoriseAction: true,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -965,26 +538,8 @@ describe("getClaimViewStates", () => {
     });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
+      ...noPermissions,
       authoriseForm: true,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -1010,28 +565,7 @@ describe("getClaimViewStates", () => {
       currentStatusEvent,
     });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("status: in recommended to pay, query: approve, user: authoriser, recommender: different person", () => {
@@ -1057,26 +591,8 @@ describe("getClaimViewStates", () => {
     });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
+      ...noPermissions,
       authoriseForm: true,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -1194,28 +710,7 @@ describe("getClaimViewStates", () => {
       currentStatusEvent,
     });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("status: in recommended to reject, user: authoriser, recommender: different person", () => {
@@ -1241,26 +736,8 @@ describe("getClaimViewStates", () => {
     });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
+      ...noPermissions,
       rejectAction: true,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -1287,26 +764,8 @@ describe("getClaimViewStates", () => {
     });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
+      ...noPermissions,
       rejectForm: true,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -1332,28 +791,7 @@ describe("getClaimViewStates", () => {
       currentStatusEvent,
     });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("status: in recommended to reject, query: reject, user: recommender, recommender: different person", () => {
@@ -1378,28 +816,7 @@ describe("getClaimViewStates", () => {
       currentStatusEvent,
     });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("status: in recommended to reject, query: reject, user: authoriser, recommender: different person", () => {
@@ -1425,26 +842,8 @@ describe("getClaimViewStates", () => {
     });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
+      ...noPermissions,
       rejectForm: true,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
     });
   });
 
@@ -1464,28 +863,7 @@ describe("getClaimViewStates", () => {
 
     const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("statusUpdateAction, claimStatus: any, user: admin & super admin", () => {
@@ -1505,26 +883,12 @@ describe("getClaimViewStates", () => {
     const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
+      ...noPermissions,
       updateStatusAction: true,
-      updateStatusForm: false,
       updateDateOfVisitAction: true,
-      updateDateOfVisitForm: false,
       updateEligiblePiiRedactionAction: true,
-      updateEligiblePiiRedactionForm: false,
       updateVetRCVSNumberAction: true,
-      updateVetRCVSNumberForm: false,
       updateVetsNameAction: true,
-      updateVetsNameForm: false,
     });
   });
 
@@ -1544,28 +908,7 @@ describe("getClaimViewStates", () => {
 
     const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
 
-    expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
-      updateDateOfVisitAction: false,
-      updateDateOfVisitForm: false,
-      updateEligiblePiiRedactionAction: false,
-      updateEligiblePiiRedactionForm: false,
-      updateVetRCVSNumberAction: false,
-      updateVetRCVSNumberForm: false,
-      updateVetsNameAction: false,
-      updateVetsNameForm: false,
-    });
+    expect(state).toEqual(noPermissions);
   });
 
   test("statusUpdateForm, claimStatus: any, query: updateStatus, user: admin & super admin", () => {
@@ -1585,26 +928,13 @@ describe("getClaimViewStates", () => {
     const state = getClaimViewStates({ request, claimStatus: status.REJECTED });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
+      ...noPermissions,
       updateStatusAction: true,
       updateStatusForm: true,
       updateDateOfVisitAction: true,
-      updateDateOfVisitForm: false,
       updateEligiblePiiRedactionAction: true,
-      updateEligiblePiiRedactionForm: false,
       updateVetRCVSNumberAction: true,
-      updateVetRCVSNumberForm: false,
       updateVetsNameAction: true,
-      updateVetsNameForm: false,
     });
   });
 
@@ -1625,26 +955,11 @@ describe("getClaimViewStates", () => {
     const state = getClaimViewStates({ request, claimStatus: status.READY_TO_PAY });
 
     expect(state).toEqual({
-      withdrawAction: false,
-      moveToInCheckAction: false,
-      moveToInCheckForm: false,
-      recommendAction: false,
-      recommendToPayForm: false,
-      recommendToRejectForm: false,
-      authoriseAction: false,
-      authoriseForm: false,
-      rejectAction: false,
-      rejectForm: false,
-      updateStatusAction: false,
-      updateStatusForm: false,
+      ...noPermissions,
       updateDateOfVisitAction: true,
-      updateDateOfVisitForm: false,
       updateEligiblePiiRedactionAction: true,
-      updateEligiblePiiRedactionForm: false,
       updateVetRCVSNumberAction: true,
-      updateVetRCVSNumberForm: false,
       updateVetsNameAction: true,
-      updateVetsNameForm: false,
     });
   });
 });
