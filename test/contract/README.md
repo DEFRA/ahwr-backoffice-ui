@@ -6,7 +6,7 @@ and `ahwr-application-backend` (provider), using [Pact](https://docs.pact.io/).
 ## Why this exists
 
 E2E tests that exercise both services together (real backend, real database - see
-`ahwr-ui-tests`) only run after `ahwr-backoffice-ui` merges and 
+`ahwr-ui-tests`) only run after `ahwr-backoffice-ui` merges and
 `ahwr-application-backend` merges to main. So a breaking interface change
 between the two services can merge, and even deploy, before anything actually catches it - by
 the time E2E or a shared environment surfaces the problem, the bad change is already out.
