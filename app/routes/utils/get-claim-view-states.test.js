@@ -39,8 +39,6 @@ const noPermissions = {
   updateStatusForm: false,
   updateDateOfVisitAction: false,
   updateDateOfVisitForm: false,
-  updateEligiblePiiRedactionAction: false,
-  updateEligiblePiiRedactionForm: false,
   updateVetRCVSNumberAction: false,
   updateVetRCVSNumberForm: false,
   updateVetsNameAction: false,
@@ -498,10 +496,7 @@ describe("getClaimViewStates", () => {
 
       const state = getClaimViewStates({ request, claimStatus: status.WITHDRAWN });
 
-      expect(state).toEqual({
-        ...noPermissions,
-        updateEligiblePiiRedactionAction: true,
-      });
+      expect(state).toEqual(noPermissions);
     });
 
     test("no claim status", () => {
@@ -516,7 +511,6 @@ describe("getClaimViewStates", () => {
         ...noPermissions,
         ...changeDataActions,
         updateStatusAction: true,
-        updateEligiblePiiRedactionAction: true,
       });
     });
 
@@ -533,7 +527,6 @@ describe("getClaimViewStates", () => {
         ...noPermissions,
         ...changeDataActions,
         updateStatusAction: true,
-        updateEligiblePiiRedactionAction: true,
       });
     });
 
@@ -551,7 +544,6 @@ describe("getClaimViewStates", () => {
         ...changeDataActions,
         updateStatusAction: true,
         updateStatusForm: true,
-        updateEligiblePiiRedactionAction: true,
       });
     });
 
@@ -567,7 +559,6 @@ describe("getClaimViewStates", () => {
       expect(state).toEqual({
         ...noPermissions,
         ...changeDataActions,
-        updateEligiblePiiRedactionAction: true,
       });
     });
   });

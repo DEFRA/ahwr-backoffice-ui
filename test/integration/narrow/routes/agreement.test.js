@@ -12,7 +12,7 @@ import { getPagination, getPagingData } from "../../../../app/pagination.js";
 import { getClaimSearch } from "../../../../app/session/index.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
-import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states.js";
+import { getApplicationStates } from "../../../../app/routes/utils/get-application-states.js";
 
 const { administrator } = permissions;
 
@@ -24,7 +24,7 @@ jest.mock("../../../../app/api/claims.js");
 jest.mock("../../../../app/api/contact-history.js");
 jest.mock("../../../../app/auth");
 jest.mock("../../../../app/session");
-jest.mock("../../../../app/routes/utils/get-claim-view-states");
+jest.mock("../../../../app/routes/utils/get-application-states");
 
 getApplication.mockReturnValue(applicationsData.applications[0]);
 getContactHistory.mockReturnValue(contactHistory);
@@ -45,7 +45,7 @@ displayContactHistory.mockReturnValue({
   farmerName: "NA",
   address: "NA",
 });
-getClaimViewStates.mockReturnValue({
+getApplicationStates.mockReturnValue({
   updateEligiblePiiRedactionAction: true,
   updateEligiblePiiRedactionForm: false,
 });
@@ -165,7 +165,7 @@ describe("Claims test", () => {
     });
 
     test("returns 200 and hides actions when user not super admin", async () => {
-      getClaimViewStates.mockReturnValue({
+      getApplicationStates.mockReturnValue({
         updateEligiblePiiRedactionAction: false, // driven by isSuperAdmin
         updateEligiblePiiRedactionForm: false,
       });

@@ -9,7 +9,7 @@ import {
   updateEligiblePiiRedaction,
 } from "../../../../app/api/applications.js";
 import { getContactHistory, displayContactHistory } from "../../../../app/api/contact-history.js";
-import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states.js";
+import { getApplicationStates } from "../../../../app/routes/utils/get-application-states.js";
 import { getPagination, getPagingData } from "../../../../app/pagination.js";
 import { createServer } from "../../../../app/server.js";
 import { applicationsData } from "../../../data/applications.js";
@@ -22,7 +22,7 @@ jest.mock("../../../../app/api/applications");
 jest.mock("../../../../app/api/contact-history");
 jest.mock("../../../../app/pagination");
 jest.mock("../../../../app/routes/models/claim-list");
-jest.mock("../../../../app/routes/utils/get-claim-view-states");
+jest.mock("../../../../app/routes/utils/get-application-states");
 jest.mock("../../../../app/auth");
 
 getPagination.mockReturnValue({ limit: 10, offset: 0 });
@@ -57,7 +57,7 @@ describe("get-applications-to-redact", () => {
         farmerName: "NA",
         address: "NA",
       });
-      getClaimViewStates.mockReturnValue({});
+      getApplicationStates.mockReturnValue({});
     });
 
     test("returns 302 no auth", async () => {

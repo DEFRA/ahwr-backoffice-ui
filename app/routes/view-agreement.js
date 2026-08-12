@@ -3,6 +3,7 @@ import { getApplication, getOldWorldApplicationHistory } from "../api/applicatio
 import { permissions } from "../auth/permissions.js";
 import { getStyleClassByStatus } from "../constants/status.js";
 import { getClaimViewStates } from "./utils/get-claim-view-states.js";
+import { getApplicationStates } from "./utils/get-application-states.js";
 import { getCurrentStatusEvent } from "./utils/get-current-status-event.js";
 import { getErrorMessagesByKey } from "./utils/get-error-messages-by-key.js";
 import { getContactHistory, displayContactHistory } from "../api/contact-history.js";
@@ -65,7 +66,10 @@ export const buildViewAgreement = async (
 
   const viewStates = application.redacted
     ? {}
-    : getClaimViewStates({ request, currentStatusEvent, formFlags });
+    : {
+        ...getClaimViewStates({ request, currentStatusEvent, formFlags }),
+        ...getApplicationStates({ request, formFlags }),
+      };
   const { updateVetsNameForm, updateVetRCVSNumberForm, updateDateOfVisitForm } = viewStates;
   const { updateEligiblePiiRedactionAction, updateEligiblePiiRedactionForm } = viewStates;
 

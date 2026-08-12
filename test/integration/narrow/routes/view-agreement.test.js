@@ -5,6 +5,7 @@ import { oldWorldApplication } from "../../../data/ow-application.js";
 import { getApplication, getOldWorldApplicationHistory } from "../../../../app/api/applications.js";
 import { getContactHistory, displayContactHistory } from "../../../../app/api/contact-history.js";
 import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states.js";
+import { getApplicationStates } from "../../../../app/routes/utils/get-application-states.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
 
@@ -13,6 +14,7 @@ const { administrator } = permissions;
 jest.mock("../../../../app/api/applications");
 jest.mock("../../../../app/api/contact-history");
 jest.mock("../../../../app/routes/utils/get-claim-view-states");
+jest.mock("../../../../app/routes/utils/get-application-states");
 jest.mock("../../../../app/auth");
 
 describe("View agreement (old world) test", () => {
@@ -40,6 +42,7 @@ describe("View agreement (old world) test", () => {
       address: "NA",
     });
     getClaimViewStates.mockReturnValue({});
+    getApplicationStates.mockReturnValue({});
   });
 
   test("returns 302 no auth", async () => {
@@ -61,6 +64,8 @@ describe("View agreement (old world) test", () => {
       updateVetsNameAction: true,
       updateVetRCVSNumberAction: true,
       updateDateOfVisitAction: true,
+    });
+    getApplicationStates.mockReturnValue({
       updateEligiblePiiRedactionAction: true,
     });
 

@@ -189,7 +189,6 @@ export const getClaimViewStates = ({
     updateVetsName,
     updateDateOfVisit,
     updateVetRCVSNumber,
-    updateEligiblePiiRedaction,
   } = formFlags;
   const { name } = request.auth.credentials.account;
 
@@ -214,7 +213,6 @@ export const getClaimViewStates = ({
     updateVetsName,
     updateVetRCVSNumber,
     updateDateOfVisit,
-    updateEligiblePiiRedaction,
   });
 
   return {
@@ -228,13 +226,7 @@ const statusWasSetByAnotherUser = (currentStatusEvent, name) => {
 };
 
 const superAdminActionsAvailable = (isSuperAdmin, claimStatus, isFlagged, updateFlags) => {
-  const {
-    updateStatus,
-    updateVetsName,
-    updateVetRCVSNumber,
-    updateDateOfVisit,
-    updateEligiblePiiRedaction,
-  } = updateFlags;
+  const { updateStatus, updateVetsName, updateVetRCVSNumber, updateDateOfVisit } = updateFlags;
 
   const claimIsntPaidOrReadyToPay = ![STATUS.READY_TO_PAY, STATUS.PAID].includes(claimStatus);
 
@@ -254,9 +246,6 @@ const superAdminActionsAvailable = (isSuperAdmin, claimStatus, isFlagged, update
   const updateDateOfVisitAction = canChangeClaimData;
   const updateDateOfVisitForm = canChangeClaimData && updateDateOfVisit === true;
 
-  const updateEligiblePiiRedactionAction = isSuperAdmin;
-  const updateEligiblePiiRedactionForm = isSuperAdmin && updateEligiblePiiRedaction === true;
-
   return {
     withdrawAction,
     updateStatusAction,
@@ -267,7 +256,5 @@ const superAdminActionsAvailable = (isSuperAdmin, claimStatus, isFlagged, update
     updateVetRCVSNumberForm,
     updateDateOfVisitAction,
     updateDateOfVisitForm,
-    updateEligiblePiiRedactionAction,
-    updateEligiblePiiRedactionForm,
   };
 };
