@@ -14,7 +14,8 @@ the time E2E or a shared environment surfaces the problem, the bad change is alr
 ## Running
 
 ```
-npx jest --selectProjects contract          # all contract tests
+npm run test:contract                       # all contract tests
+npx jest --selectProjects contract          # same thing, without the npm script
 npx jest test/contract/api/claims-search    # just this endpoint
 ```
 

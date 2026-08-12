@@ -15,6 +15,7 @@
     "format:check": "prettier --check \"**/*.{cjs,js,json,md}\"",
     "postinstall": "npm run setup:husky",
     "test": "jest --runInBand",
+    "test:contract": "jest --selectProjects contract",
     "test:watch": "jest --coverage=false --onlyChanged --watch --runInBand",
     "test:watch:all": "npm run test:watch & npm run build:watch",
     "lint": "eslint",
