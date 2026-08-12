@@ -179,3 +179,56 @@ test("renders table", () => {
 
   expect(historyData).toEqual(expected);
 });
+
+test("renders withdrawal details as bold-titled lines in the action cell", () => {
+  const historyRecords = [
+    {
+      eventType: "status-updated",
+      updatedProperty: "status",
+      newValue: "WITHDRAWN",
+      note: "Withdrawal requested",
+      updatedBy: "Tester, A",
+      updatedAt: "2025-03-11T15:07:08.488Z",
+      withdrawal: {
+        reasonForWithdrawal: "vetSummaryEnteredIncorrectly",
+        issueDiscovery: "customerContactedRPA",
+        withdrawalDetails: "Date of sample was entered as the date of visit",
+      },
+    },
+  ];
+
+  const historyData = getHistoryDetails(historyRecords);
+
+  expect(historyData.rows[0][2]).toEqual({
+    html:
+      "Withdrawn<br>" +
+      "<strong>Reason for withdrawal:</strong> Data from the vet summary was entered incorrectly<br>" +
+      "<strong>How the issue was discovered:</strong> Customer contacted the RPA<br>" +
+      "<strong>Enter details for why this claim should be withdrawn:</strong> Date of sample was entered as the date of visit",
+  });
+});
+
+test("escapes html in the withdrawal details free text", () => {
+  const historyRecords = [
+    {
+      eventType: "status-updated",
+      updatedProperty: "status",
+      newValue: "WITHDRAWN",
+      note: "Withdrawal requested",
+      updatedBy: "Tester, A",
+      updatedAt: "2025-03-11T15:07:08.488Z",
+      withdrawal: {
+        reasonForWithdrawal: "unintentionalTypingError",
+        issueDiscovery: "evidenceDidNotMatch",
+        withdrawalDetails: "<script>alert('x')</script> & more",
+      },
+    },
+  ];
+
+  const historyData = getHistoryDetails(historyRecords);
+
+  expect(historyData.rows[0][2].html).toContain(
+    "<strong>Enter details for why this claim should be withdrawn:</strong> " +
+      "&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; &amp; more",
+  );
+});

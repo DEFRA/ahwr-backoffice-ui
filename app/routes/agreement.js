@@ -11,7 +11,7 @@ import { getClaims } from "../api/claims.js";
 import { getClaimTableHeader, getClaimTableRows } from "./models/claim-list.js";
 import { FLAG_EMOJI } from "./utils/ui-constants.js";
 import { getHerdBreakdown, getSiteBreakdown } from "../lib/get-claim-breakdown.js";
-import { getClaimViewStates } from "./utils/get-claim-view-states.js";
+import { getApplicationStates } from "./utils/get-application-states.js";
 import { getErrorMessagesByKey } from "./utils/get-error-messages-by-key.js";
 import { getStyleClassByStatus } from "../constants/status.js";
 import { getScheme, POULTRY_SCHEME } from "ffc-ahwr-common-library";
@@ -125,7 +125,7 @@ export const buildAgreement = async (
 
   const { updateEligiblePiiRedactionAction, updateEligiblePiiRedactionForm } = isRedacted
     ? {}
-    : getClaimViewStates(request, application.status, null, formFlags);
+    : getApplicationStates({ request, formFlags });
 
   const applicationSummaryDetails = buildAgreementSummaryDetails(application, {
     applicationReference,

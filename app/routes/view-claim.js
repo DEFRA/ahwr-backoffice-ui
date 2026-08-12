@@ -102,7 +102,13 @@ export const buildViewClaim = async (
 
   const viewStates = application.redacted
     ? {}
-    : getClaimViewStates(request, claim.status, currentStatusEvent, formFlags, isFlagged);
+    : getClaimViewStates({
+        request,
+        claimStatus: claim.status,
+        currentStatusEvent,
+        formFlags,
+        isFlagged,
+      });
 
   const scheme = getScheme(applicationReference);
 

@@ -8,6 +8,7 @@ import { canWithdrawClaim } from "./utils/can-withdraw-claim.js";
 import { mapAuth } from "../auth/map-auth.js";
 import { getClaim, withdrawClaim } from "../api/claims.js";
 import { getApplication } from "../api/applications.js";
+import { WITHDRAWAL_REASONS, WITHDRAWAL_ISSUE_DISCOVERIES } from "../constants/withdrawal.js";
 
 const { administrator } = permissions;
 
@@ -57,6 +58,8 @@ const renderWithdrawalPage = (h, { reference, page, returnPage, values = {}, err
     backLink: viewClaimLink(reference, page, returnPage),
     errors,
     errorMessages: getErrorMessagesByKey(errors),
+    reasonForWithdrawalItems: WITHDRAWAL_REASONS,
+    issueDiscoveryItems: WITHDRAWAL_ISSUE_DISCOVERIES,
     ...values,
   });
 
