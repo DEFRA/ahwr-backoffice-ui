@@ -5,14 +5,14 @@ import {
   livestockClaimWithApplicationNoHerd,
   poultryClaimWithApplicationNotFlagged,
   poultryClaimWithApplicationFlagged,
-} from "../../data/claims.js";
+} from "../../data/claims-response.js";
 import {
   provider as newProvider,
   advancedSearchForClaimsWithNoFilters,
 } from "./provider/claims-search-endpoint.js";
 import { triggerAdvancedSearchForClaimsWithNoFilters } from "./consumer/claims-search-trigger.js";
 
-const { like, reify } = MatchersV3;
+const { like, equal, reify } = MatchersV3;
 
 // jest.mock factories can't reference values imported from elsewhere in this file -
 // Babel hoists this call above all imports, so the port must be a literal here, kept
@@ -32,21 +32,21 @@ describe("getClaims contract with ahwr-application-backend", () => {
   test("total counts every claim, but only claims with a resolving application are returned", async () => {
     const provider = newProvider();
 
+    const livestockOrphanedClaim = {
+      reference: "REBC-9999-ORPH",
+      applicationReference: "IAHW-9999-NOPE",
+    };
+    const poultryOrphanedClaim = {
+      reference: "PORE-9999-ORPH",
+      applicationReference: "POUL-9999-NOPE",
+    };
+
     provider
       .given(
         "7 claims exist: livestock and poultry each with a not-flagged application, a " +
           "flagged application, and no matching application, plus a livestock claim with a " +
           "resolving application but no herd",
-        {
-          livestockOrphanedClaim: {
-            reference: "REBC-9999-ORPH",
-            applicationReference: "IAHW-9999-NOPE",
-          },
-          poultryOrphanedClaim: {
-            reference: "PORE-9999-ORPH",
-            applicationReference: "POUL-9999-NOPE",
-          },
-        },
+        { livestockOrphanedClaim, poultryOrphanedClaim },
       )
       .uponReceiving("a request for advanced search for claims with no filters applied")
       .withRequest(advancedSearchForClaimsWithNoFilters)
@@ -61,16 +61,17 @@ describe("getClaims contract with ahwr-application-backend", () => {
             poultryClaimWithApplicationNotFlagged,
             poultryClaimWithApplicationFlagged,
           ],
-          total: like(7),
+          total: equal(7),
         },
       });
 
     await provider.executeTest(async () => {
       const result = await triggerAdvancedSearchForClaimsWithNoFilters();
 
-      // The 2 claims with no matching application aren't included here - they're dropped by
-      // the backend's join, even though they're still counted in total.
       expect(result.claims).toHaveLength(5);
+      const claimReferences = result.claims.map((claim) => claim.reference);
+      expect(claimReferences).not.toContain(livestockOrphanedClaim.reference);
+      expect(claimReferences).not.toContain(poultryOrphanedClaim.reference);
       expect(result.claims[0].application.organisation.sbi).toEqual(
         reify(livestockClaimWithApplicationNotFlagged).application.organisation.sbi,
       );

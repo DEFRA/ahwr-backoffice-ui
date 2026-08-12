@@ -6,8 +6,8 @@ and `ahwr-application-backend` (provider), using [Pact](https://docs.pact.io/).
 ## Why this exists
 
 E2E tests that exercise both services together (real backend, real database - see
-`ahwr-ui-tests`) only run after `ahwr-backoffice-ui` merges to `main` -
-`ahwr-application-backend` has no E2E trigger of its own at all. So a breaking interface change
+`ahwr-ui-tests`) only run after `ahwr-backoffice-ui` merges and 
+`ahwr-application-backend` merges to main. So a breaking interface change
 between the two services can merge, and even deploy, before anything actually catches it - by
 the time E2E or a shared environment surfaces the problem, the bad change is already out.
 
@@ -61,24 +61,33 @@ factory runs, depending on the specific circular-require path). Keep the port as
 the `.pact.test.js` file, matching `MOCK_PACT_PORT` in the corresponding `provider/` file by
 convention, not by import.
 
-**`pacts/` is generated, not committed.** Regenerated on every passing test run
-(`PactV3.executeTest`'s `cleanup()` writes it). `docker-compose.test.yaml` mounts
+**`pacts/` is generated, then committed.** Regenerated on every passing test run
+(`PactV3.executeTest`'s `cleanup()` writes it), same as `package-lock.json` - a build output
+that's still tracked in git so it can be reviewed like any other change and fetched by the
+backend without a separate publish step. `docker-compose.test.yaml` mounts
 `./pacts:/home/node/pacts` (same pattern as the existing `test-output` mount) so the file
-generated inside the test container actually lands on the runner's filesystem, not just
-inside the ephemeral container - without this mount, CI would have nothing to publish.
+generated inside the test container lands on the host filesystem where it can be committed.
 
-**CI publish is wired up, no Pact Broker for the pilot.** `.github/workflows/publish.yml`
-has a "Publish Pact contract" step, right after `./scripts/test`, that publishes `pacts/*.json`
-as the asset on a single rolling GitHub Release tagged `pact-contracts` - deleting and
-recreating it on every successful push to `main`, so there's always exactly one "latest"
-contract to fetch, not a version to track. Uses the existing `GITHUB_TOKEN`, no new secret.
+**Nothing auto-commits the regenerated file - a verify check catches drift instead.**
+`.husky/pre-push`, `.github/workflows/check-pull-request.yml`, and `.github/workflows/publish.yml`
+all run the same check right after the test suite: `git status --porcelain pacts/` - if the
+freshly-regenerated file doesn't match what's committed, it fails loudly and tells you to
+regenerate and commit again. This is deliberate: a bot silently patching the contract back onto
+the branch would hide the exact thing this pilot exists to make visible - what the contract
+actually changed to, in a normal reviewable diff.
+
+**No Pact Broker for the pilot.** The backend fetches the committed file directly via `curl`
+against `raw.githubusercontent.com` on `main`, authenticated with the same PAT it already used
+for the previous GitHub Release approach. Fine for a single consumer-provider pair with no
+deployment-gating needs; a real Pact Broker would be the answer if version-aware resolution
+(which consumer version is compatible with which provider version) is ever actually needed.
 
 ## What's built and verified
 
 Provider verification exists in `ahwr-application-backend` (`tests/contract/provider.pact.test.js`,
 `npm run test:contract`) and passes against this contract - confirmed by actually running it
 against a real server and real MongoDB, not just asserted. Its seed data
-(`tests/contract/data/`) must be kept in sync with this repo's `test/contract/data/claims.js`,
+(`tests/contract/data/`) must be kept in sync with this repo's `test/contract/data/claims-response.js`,
 including `createdAt` values - the backend sorts by `createdAt DESC` by default, so the seed
 data's timestamps have to produce the same ordering this contract's response array assumes, or
 verification fails on array-position mismatches that have nothing to do with the actual data
@@ -86,8 +95,5 @@ being wrong.
 
 ## What's not built yet
 
-- The backend-side fetch-and-verify CI step, pulling the `pact-contracts` release asset from
-  this repo automatically before running provider verification (AC04) - today the pact file has
-  to be copied into `ahwr-application-backend/pacts/` manually
 - Any endpoint beyond `POST /claims/search`, and only its no-filters scenario at that -
   add more `provider/`+`consumer/` exports and test cases as real need arises, not ahead of it

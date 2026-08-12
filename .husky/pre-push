@@ -1,4 +1,8 @@
 npm run format:check
 npm run lint
 npm test
+if [ -n "$(git status --porcelain pacts/)" ]; then
+  echo "Committed pact is stale - rerun the contract test and commit the regenerated pacts/*.json"
+  exit 1
+fi
 npm run lint:knip
