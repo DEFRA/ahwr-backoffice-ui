@@ -1,5 +1,11 @@
+import nunjucks from "nunjucks";
 import { STATUS } from "ffc-ahwr-common-library";
 import { formattedDateToUk } from "../../lib/display-helper.js";
+import {
+  WITHDRAWAL_REASONS,
+  WITHDRAWAL_ISSUE_DISCOVERIES,
+  labelsByValue,
+} from "../../constants/withdrawal.js";
 const {
   AGREED,
   WITHDRAWN,
@@ -49,6 +55,25 @@ const getAction = (updatedProperty, newValue, oldValue) => {
   return dataProperties[updatedProperty];
 };
 
+const reasonForWithdrawalLabels = labelsByValue(WITHDRAWAL_REASONS);
+const issueDiscoveryLabels = labelsByValue(WITHDRAWAL_ISSUE_DISCOVERIES);
+
+const buildWithdrawalActionHtml = (
+  action,
+  { reasonForWithdrawal, issueDiscovery, withdrawalDetails },
+) =>
+  [
+    action,
+    `<strong>Reason for withdrawal:</strong> ${reasonForWithdrawalLabels[reasonForWithdrawal] ?? ""}`,
+    `<strong>How the issue was discovered:</strong> ${issueDiscoveryLabels[issueDiscovery] ?? ""}`,
+    `<strong>Enter details for why this claim should be withdrawn:</strong> ${nunjucks.lib.escape(withdrawalDetails ?? "")}`,
+  ].join("<br>");
+
+const getActionCell = ({ updatedProperty, newValue, oldValue, withdrawal }) => {
+  const action = getAction(updatedProperty, newValue, oldValue);
+  return withdrawal ? { html: buildWithdrawalActionHtml(action, withdrawal) } : { text: action };
+};
+
 const getHistoryTableHeader = () => [
   { text: "Date" },
   { text: "Time" },
@@ -58,9 +83,8 @@ const getHistoryTableHeader = () => [
 ];
 
 const getHistoryTableRows = (historyRecords) =>
-  historyRecords.map(({ updatedProperty, newValue, oldValue, updatedAt, updatedBy, note }) => {
-    const action = getAction(updatedProperty, newValue, oldValue);
-
+  historyRecords.map((record) => {
+    const { updatedAt, updatedBy, note } = record;
     const updatedDate = new Date(updatedAt);
     return [
       {
@@ -77,7 +101,7 @@ const getHistoryTableRows = (historyRecords) =>
           second: "numeric",
         }),
       },
-      { text: action },
+      getActionCell(record),
       { text: updatedBy },
       { text: note },
     ];

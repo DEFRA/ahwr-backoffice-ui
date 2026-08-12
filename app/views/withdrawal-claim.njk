@@ -39,33 +39,7 @@
               classes: "govuk-fieldset__legend--m"
             }
           },
-          items: [
-            {
-              value: "vetSummaryEnteredIncorrectly",
-              text: "Data from the vet summary was entered incorrectly",
-              hint: { text: "For example, date of sample instead of date of visit" }
-            },
-            {
-              value: "differentClaimEntered",
-              text: "Data from a different claim was entered",
-              hint: { text: "For example, information from a follow-up instead of a review" }
-            },
-            {
-              value: "unintentionalTypingError",
-              text: "Data contained an unintentional typing error",
-              hint: { text: "For example, a spelling mistake or incorrect number" }
-            },
-            {
-              value: "incorrectSelectionInService",
-              text: "Incorrect selection was made in the digital service",
-              hint: { text: "For example, yes instead of no" }
-            },
-            {
-              value: "confusingInformationFromVet",
-              text: "Incorrect or confusing information was given by vet",
-              hint: { text: "For example, the wrong box completed in the summary template" }
-            }
-          ]
+          items: reasonForWithdrawalItems
         }) }}
 
         {{ govukRadios({
@@ -78,16 +52,7 @@
               classes: "govuk-fieldset__legend--m"
             }
           },
-          items: [
-            {
-              value: "customerContactedRPA",
-              text: "Customer contacted the RPA"
-            },
-            {
-              value: "evidenceDidNotMatch",
-              text: "Evidence did not match customer's data"
-            }
-          ]
+          items: issueDiscoveryItems
         }) }}
 
         {{ govukTextarea({
