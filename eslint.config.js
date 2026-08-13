@@ -1,7 +1,7 @@
 import neostandard from "neostandard";
 import eslintConfigPrettier from "eslint-config-prettier/flat";
 import importPlugin from "eslint-plugin-import";
-import noCommentedCode from "eslint-plugin-no-commented-code";
+import sonarjs from "eslint-plugin-sonarjs";
 
 export default [
   ...neostandard({
@@ -16,9 +16,9 @@ export default [
     },
   },
   {
-    plugins: { "no-commented-code": noCommentedCode },
+    plugins: { sonarjs },
     rules: {
-      "no-commented-code/no-commented-code": "error",
+      "sonarjs/no-commented-code": "error",
     },
   },
 ];
