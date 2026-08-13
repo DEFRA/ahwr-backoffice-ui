@@ -42,6 +42,13 @@ jobs:
           npm run lint:knip
           ./scripts/test
 
+      - name: Verify committed pact matches generated contract
+        run: |
+          if [ -n "$(git status --porcelain pacts/)" ]; then
+            echo "::error::Committed pact is stale - rerun the contract test and commit the regenerated pacts/*.json"
+            exit 1
+          fi
+
       - name: SonarCloud Scan
         if: github.actor != 'dependabot[bot]'
         uses: SonarSource/sonarqube-scan-action@v5.3.1 #  (or check latest version on https://github.com/marketplace/actions/official-sonarqube-scan)

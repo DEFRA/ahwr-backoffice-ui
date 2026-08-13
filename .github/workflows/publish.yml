@@ -32,6 +32,13 @@ jobs:
           npm install -g npm@11.10.0
           ./scripts/test
 
+      - name: Verify committed pact matches generated contract
+        run: |
+          if [ -n "$(git status --porcelain pacts/)" ]; then
+            echo "::error::Committed pact is stale - rerun the contract test and commit the regenerated pacts/*.json"
+            exit 1
+          fi
+
       - name: Build and Publish
         uses: DEFRA/cdp-build-action/build@main
         with:

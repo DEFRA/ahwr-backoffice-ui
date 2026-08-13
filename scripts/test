@@ -75,6 +75,16 @@ compose() {
   mkdir -p test-output
   chmod -R 777 test-output
 
+  # Create pacts folder - Docker would otherwise auto-create it as root on first
+  # bind-mount on a fresh checkout, leaving the container's non-root user unable to write
+  # the generated pact file. pacts/*.json is committed, so chmod it directly rather than
+  # recursively - a recursive chmod 777 would also grant the execute bit to the committed
+  # JSON file, which git tracks as a permission change even though the content is untouched,
+  # causing the "is the committed pact stale" check to false-positive on every run.
+  mkdir -p pacts
+  chmod 777 pacts
+  chmod 666 pacts/*.json 2>/dev/null || true
+
   # Guarantee clean environment
   compose down -v
 

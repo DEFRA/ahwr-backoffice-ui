@@ -1,0 +1,739 @@
+{
+  "consumer": {
+    "name": "ahwr-backoffice-ui"
+  },
+  "interactions": [
+    {
+      "description": "a request for advanced search for claims with no filters applied",
+      "providerStates": [
+        {
+          "name": "7 claims exist: livestock and poultry each with a not-flagged application, a flagged application, and no matching application, plus a livestock claim with a resolving application but no herd",
+          "params": {
+            "livestockOrphanedClaim": {
+              "applicationReference": "IAHW-9999-NOPE",
+              "reference": "REBC-9999-ORPH"
+            },
+            "poultryOrphanedClaim": {
+              "applicationReference": "POUL-9999-NOPE",
+              "reference": "PORE-9999-ORPH"
+            }
+          }
+        }
+      ],
+      "request": {
+        "body": {
+          "limit": 20,
+          "offset": 0,
+          "search": {
+            "text": "",
+            "type": ""
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json",
+          "x-api-key": "pact-test-api-key"
+        },
+        "matchingRules": {
+          "header": {
+            "x-api-key": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "method": "POST",
+        "path": "/claims/search"
+      },
+      "response": {
+        "body": {
+          "claims": [
+            {
+              "application": {
+                "flags": [],
+                "organisation": {
+                  "sbi": "106821850"
+                }
+              },
+              "createdAt": "2026-08-05T10:55:12.634Z",
+              "data": {
+                "typeOfLivestock": "beef"
+              },
+              "herd": {
+                "cph": "11/222/3333",
+                "name": "Unflagged cattle herd"
+              },
+              "reference": "REBC-DN1M-HS6D",
+              "status": "IN_CHECK",
+              "type": "REVIEW"
+            },
+            {
+              "application": {
+                "flags": [
+                  {
+                    "deleted": false,
+                    "id": "278872ee-ecfa-4d5e-8087-0c0fd7c16ed8"
+                  }
+                ],
+                "organisation": {
+                  "sbi": "106821851"
+                }
+              },
+              "createdAt": "2026-08-04T10:55:12.634Z",
+              "data": {
+                "typeOfLivestock": "beef"
+              },
+              "herd": {
+                "cph": "11/222/3233",
+                "name": "Flagged cattle herd"
+              },
+              "reference": "REBC-DN1M-HS7D",
+              "status": "IN_CHECK",
+              "type": "REVIEW"
+            },
+            {
+              "application": {
+                "flags": [],
+                "organisation": {
+                  "sbi": "106821852"
+                }
+              },
+              "createdAt": "2026-08-03T10:55:12.634Z",
+              "data": {
+                "typeOfLivestock": "beef"
+              },
+              "herd": {},
+              "reference": "REBC-DN1M-HS8D",
+              "status": "IN_CHECK",
+              "type": "REVIEW"
+            },
+            {
+              "application": {
+                "flags": [],
+                "organisation": {
+                  "sbi": "107234561"
+                }
+              },
+              "createdAt": "2026-08-02T14:20:10.742Z",
+              "data": {
+                "typesOfPoultry": [
+                  "ducks"
+                ]
+              },
+              "herd": {
+                "cph": "12/345/6712",
+                "name": "Unflagged Farm"
+              },
+              "reference": "PORE-DJVR-7BJB",
+              "status": "IN_CHECK",
+              "type": "REVIEW"
+            },
+            {
+              "application": {
+                "flags": [
+                  {
+                    "deleted": false,
+                    "id": "278872ee-ecfa-4d5e-8087-0c0fd7c16ed8"
+                  }
+                ],
+                "organisation": {
+                  "sbi": "107234562"
+                }
+              },
+              "createdAt": "2026-08-01T14:20:10.742Z",
+              "data": {
+                "typesOfPoultry": [
+                  "geese"
+                ]
+              },
+              "herd": {
+                "cph": "12/345/6812",
+                "name": "Flagged Farm"
+              },
+              "reference": "PORE-DJVR-6BJB",
+              "status": "IN_CHECK",
+              "type": "REVIEW"
+            }
+          ],
+          "total": 7
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.claims[0].application": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[0].application.organisation": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[0].application.organisation.sbi": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[0].createdAt": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[0].data": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[0].data.typeOfLivestock": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[0].herd": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[0].herd.cph": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[0].herd.name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[0].reference": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[0].status": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[0].type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[1].application": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[1].application.flags": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.claims[1].application.flags[*].deleted": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[1].application.flags[*].id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[1].application.organisation": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[1].application.organisation.sbi": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[1].createdAt": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[1].data": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[1].data.typeOfLivestock": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[1].herd": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[1].herd.cph": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[1].herd.name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[1].reference": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[1].status": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[1].type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[2].application": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[2].application.organisation": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[2].application.organisation.sbi": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[2].createdAt": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[2].data": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[2].data.typeOfLivestock": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[2].herd": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[2].reference": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[2].status": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[2].type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[3].application": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[3].application.organisation": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[3].application.organisation.sbi": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[3].createdAt": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[3].data": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[3].data.typesOfPoultry": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.claims[3].data.typesOfPoultry[*]": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[3].herd": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[3].herd.cph": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[3].herd.name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[3].reference": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[3].status": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[3].type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[4].application": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[4].application.flags": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.claims[4].application.flags[*].deleted": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[4].application.flags[*].id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[4].application.organisation": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[4].application.organisation.sbi": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[4].createdAt": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[4].data": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[4].data.typesOfPoultry": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$.claims[4].data.typesOfPoultry[*]": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[4].herd": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[4].herd.cph": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[4].herd.name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[4].reference": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[4].status": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.claims[4].type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.total": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "equality"
+                }
+              ]
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    }
+  ],
+  "metadata": {
+    "pact-js": {
+      "version": "17.0.1"
+    },
+    "pactRust": {
+      "ffi": "0.5.4",
+      "models": "1.3.11"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "ahwr-application-backend"
+  }
+}
