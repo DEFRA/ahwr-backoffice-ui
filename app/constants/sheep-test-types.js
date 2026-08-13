@@ -46,7 +46,6 @@ const sheepTestResultsType = {
     text: "Lamb nutrition status",
     resultType: problem,
   },
-  // lameness : { value: "lameness",  text: "Lameness", resultType: clinicalSymptoms }, //seemingly never used
   liverFluke: { value: "liverFluke", text: "Liver fluke", resultType: clinicalSymptoms },
   loupingIll: { value: "loupingIll", text: "Louping ill", resultType: clinicalSymptoms },
   mastitis: { value: "mastitis", text: "Mastitis", resultType: clinicalSymptoms },
