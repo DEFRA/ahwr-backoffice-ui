@@ -1,6 +1,5 @@
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { getCrumbs } from "../../../utils/get-crumbs.js";
 import { permissions } from "../../../../app/auth/permissions.js";
 import { getAllFlags, createFlag, deleteFlag } from "../../../../app/api/flags.js";
@@ -76,7 +75,7 @@ describe("Flags tests", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toContain("Flags");
       expect($("title").text()).toContain("AHWR Flags");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("the flags table has no 'Flagged due to multiple herds' column", async () => {
@@ -111,7 +110,7 @@ describe("Flags tests", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toContain("Flags");
       expect($("title").text()).toContain("AHWR Flags");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("it does not handle errors from the url", async () => {
@@ -135,7 +134,7 @@ describe("Flags tests", () => {
       expect($("title").text()).toContain("AHWR Flags");
 
       expect($(".govuk-error-summary__title").html()).toBeFalsy();
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("the create form links to the flags endpoint", async () => {
@@ -154,7 +153,7 @@ describe("Flags tests", () => {
       expect($("title").text()).toContain("AHWR Flags");
 
       expect($(".ahwr-update-form").attr("action")).toBe("/flags");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("the create form shows only the reference and note, with no multiple herds question or copy", async () => {
@@ -170,10 +169,10 @@ describe("Flags tests", () => {
       expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
 
-      expect($('input[name="appRef"]').length).toBe(1);
-      expect($('textarea[name="note"]').length).toBe(1);
+      expect($('input[name="appRef"]')).toHaveLength(1);
+      expect($('textarea[name="note"]')).toHaveLength(1);
 
-      expect($('input[name="appliesToMh"]').length).toBe(0);
+      expect($('input[name="appliesToMh"]')).toHaveLength(0);
       expect(res.payload).not.toContain("Is the flag because the owner");
       expect(res.payload).not.toContain("maximum of 2 flags");
       expect(res.payload).not.toContain("they will not see the multiple herds pages");
@@ -201,7 +200,7 @@ describe("Flags tests", () => {
       );
       expect(res.payload).not.toContain("multiple herds");
       expect(res.payload).not.toContain("non-MH");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("the create form is not shown when user isn't an administrator", async () => {
@@ -225,8 +224,8 @@ describe("Flags tests", () => {
       expect($("h1.govuk-heading-l").text()).toContain("Flags");
       expect($("title").text()).toContain("AHWR Flags");
 
-      expect($(".ahwr-update-form").length).toBe(0);
-      phaseBannerOk($);
+      expect($(".ahwr-update-form")).toHaveLength(0);
+      expect($).toShowPhaseBanner();
     });
 
     test("the delete form is not shown when user isn't an administrator", async () => {
@@ -250,8 +249,8 @@ describe("Flags tests", () => {
       expect($("h1.govuk-heading-l").text()).toContain("Flags");
       expect($("title").text()).toContain("AHWR Flags");
 
-      expect($(".ahwr-update-form").length).toBe(0);
-      phaseBannerOk($);
+      expect($(".ahwr-update-form")).toHaveLength(0);
+      expect($).toShowPhaseBanner();
     });
   });
 
@@ -310,7 +309,7 @@ describe("Flags tests", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toContain("Flags");
       expect($("title").text()).toContain("AHWR Flags");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("redirects the user to the flags page when the flag has happily been deleted", async () => {
@@ -330,7 +329,7 @@ describe("Flags tests", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toContain("Flags");
       expect($("title").text()).toContain("AHWR Flags");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("renders errors when the user has not provided a deleted note value", async () => {
@@ -359,7 +358,7 @@ describe("Flags tests", () => {
       expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
         "Enter a note to explain the reason for removing this flag",
       );
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("renders errors when the user has not provided a long enough deleted note value", async () => {
@@ -387,7 +386,7 @@ describe("Flags tests", () => {
       expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
         "Enter a note of at least 2 characters in length",
       );
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("it does not handle errors from the url", async () => {
@@ -411,7 +410,7 @@ describe("Flags tests", () => {
       expect($("title").text()).toContain("AHWR Flags");
 
       expect($(".govuk-error-summary__title").html()).toBeFalsy();
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
   });
 
@@ -510,7 +509,7 @@ describe("Flags tests", () => {
       expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
         "Enter a valid agreement reference.",
       );
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("renders errors when the user has not provided the proper note value", async () => {
@@ -538,7 +537,7 @@ describe("Flags tests", () => {
       expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
         "Enter a note to explain the reason for creating the flag.",
       );
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("renders the reworded error when the agreement already has an active flag", async () => {
@@ -581,7 +580,7 @@ describe("Flags tests", () => {
         "This agreement already has an active flag.",
       );
       expect(res.payload).not.toContain("multiple herds");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("renders an error when the user is trying to create a flag with a reference that doesnt exist", async () => {
@@ -623,7 +622,7 @@ describe("Flags tests", () => {
       expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
         "Agreement reference does not exist.",
       );
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("renders an error when the user is trying to create a flag for an agreement that is redacted", async () => {
@@ -668,7 +667,7 @@ describe("Flags tests", () => {
       expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
         "Flag not created - agreement is redacted.",
       );
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
   });
 });

@@ -5,7 +5,6 @@ import { getPagination, getPagingData } from "../../../../app/pagination.js";
 import { createServer } from "../../../../app/server.js";
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { claims } from "../../../data/claims.js";
 import { getClaimSearch, setClaimSearch } from "../../../../app/session/index.js";
 import { AGREEMENT_TYPE, CLAIM_TYPE, FLAG, SPECIES } from "../../../../app/constants/index.js";
@@ -69,7 +68,7 @@ describe("Claims tests", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Claims");
       expect($("title").text()).toContain("AHWR Claims");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("shows total search results in bold above the table", async () => {

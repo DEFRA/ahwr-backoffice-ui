@@ -1,6 +1,5 @@
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { upperFirstLetter } from "../../../../app/lib/display-helper.js";
 import { permissions } from "../../../../app/auth/permissions.js";
 import { createServer } from "../../../../app/server.js";
@@ -55,7 +54,7 @@ describe("Account page test", () => {
       expect(await axe(response.payload)).toHaveNoViolations();
 
       const $ = cheerio.load(response.payload);
-      expect($(".govuk-summary-list__row").length).toEqual(3);
+      expect($(".govuk-summary-list__row")).toHaveLength(3);
       expect($(".govuk-summary-list__key").eq(0).text()).toMatch("User");
       expect($(".govuk-summary-list__value").eq(0).text()).toMatch(user);
       expect($(".govuk-summary-list__key").eq(1).text()).toMatch("Username");
@@ -65,7 +64,7 @@ describe("Account page test", () => {
         roles.map((x) => upperFirstLetter(x)).join(", "),
       );
 
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
   });
 });

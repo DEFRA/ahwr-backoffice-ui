@@ -1,6 +1,5 @@
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { getApplication, getOldWorldApplicationHistory } from "../../../../app/api/applications.js";
 import { permissions } from "../../../../app/auth/permissions.js";
 import { oldWorldApplication } from "../../../data/ow-application.js";
@@ -81,7 +80,7 @@ describe("View Application test with Date of Testing enabled", () => {
       expect($("h1.govuk-caption-l").text()).toContain(`Agreement number: ${reference}`);
       expect($("h2.govuk-heading-l").text()).toContain(status);
       expect($("title").text()).toContain("Administration: User Agreement");
-      expect($("#organisation-details .govuk-summary-list__row").length).toEqual(5);
+      expect($("#organisation-details .govuk-summary-list__row")).toHaveLength(5);
       expect($(".govuk-summary-list__key").eq(0).text()).toMatch("Agreement holder");
       expect($(".govuk-summary-list__value").eq(0).text()).toMatch(organisation.farmerName);
 
@@ -130,12 +129,12 @@ describe("View Application test with Date of Testing enabled", () => {
         oldWorldApplication.data.urnResult,
       );
 
-      expect($("a.govuk-link").length).toBe(1);
+      expect($("a.govuk-link")).toHaveLength(1);
       expect($("a.govuk-link").text()).toContain(`Change`);
 
       expectWithdrawLink($, reference, false);
 
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("returns 200 application claim - change links hidden when user not admin", async () => {
@@ -162,7 +161,7 @@ describe("View Application test with Date of Testing enabled", () => {
       expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-caption-l").text()).toContain(`Agreement number: ${reference}`);
-      expect($("a.govuk-link").length).toBe(0);
+      expect($("a.govuk-link")).toHaveLength(0);
     });
   });
 });

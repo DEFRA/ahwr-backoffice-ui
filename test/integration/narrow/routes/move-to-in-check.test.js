@@ -1,5 +1,4 @@
 import * as cheerio from "cheerio";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { permissions } from "../../../../app/auth/permissions.js";
 import { getCrumbs } from "../../../utils/get-crumbs.js";
 import { createServer } from "../../../../app/server.js";
@@ -71,7 +70,7 @@ describe("Reject On Hold (move to In Check) Application test", () => {
       expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("403 - Forbidden");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("returns 403 when duplicate submission - $crumb", async () => {
@@ -106,7 +105,7 @@ describe("Reject On Hold (move to In Check) Application test", () => {
       const res2 = await server.inject(options);
       expect(res2.statusCode).toBe(StatusCodes.FORBIDDEN);
       const $ = cheerio.load(res2.payload);
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
       expect($(".govuk-heading-l").text()).toEqual("403 - Forbidden");
       preSubmissionHandler.mockImplementation((_arg, h) => h.continue);
     });

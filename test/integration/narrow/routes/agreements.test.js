@@ -1,6 +1,5 @@
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { getCrumbs } from "../../../utils/get-crumbs.js";
 import { permissions } from "../../../../app/auth/permissions.js";
 import { getAppSearch, setAppSearch } from "../../../../app/session/index.js";
@@ -63,7 +62,7 @@ describe("Applications test", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
       expect($("title").text()).toContain("AHWR Agreements");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     describe.each([
@@ -90,7 +89,7 @@ describe("Applications test", () => {
       test("has phase banner", async () => {
         const res = await server.inject(options);
         const $ = cheerio.load(res.payload);
-        phaseBannerOk($);
+        expect($).toShowPhaseBanner();
       });
 
       test.each([
@@ -232,13 +231,13 @@ describe("Applications test", () => {
         url: "/agreements/sort/SBI/descending",
         auth,
       };
-      let res = await server.inject(options);
+      await server.inject(options);
       options = {
         method: "GET",
         url: `${url}?page=2`,
         auth,
       };
-      res = await server.inject(options);
+      const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
@@ -252,7 +251,7 @@ describe("Applications test", () => {
         limit: 20,
         page: 1,
       });
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
 
     test("shows total search results in bold above the table", async () => {
