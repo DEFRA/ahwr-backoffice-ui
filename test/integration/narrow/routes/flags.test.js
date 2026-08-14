@@ -8,6 +8,7 @@ import { flags } from "../../../data/flags.js";
 import { StatusCodes } from "http-status-codes";
 import { mapAuth } from "../../../../app/auth/map-auth.js";
 import { createServer } from "../../../../app/server.js";
+import { doubleClickProtectionOk } from "../../../utils/double-click-protection-expect.js";
 
 const { administrator, user } = permissions;
 
@@ -252,6 +253,32 @@ describe("Flags tests", () => {
 
       expect($(".ahwr-update-form").length).toBe(0);
       phaseBannerOk($);
+    });
+
+    test("the create flag form prevents an accidental double click", async () => {
+      const options = {
+        method: "GET",
+        url: "/flags?createFlag=true",
+        auth,
+        headers: { cookie: `crumb=${crumb}` },
+      };
+
+      const res = await server.inject(options);
+
+      doubleClickProtectionOk(cheerio.load(res.payload), 1);
+    });
+
+    test("the delete flag form prevents an accidental double click", async () => {
+      const options = {
+        method: "GET",
+        url: "/flags?deleteFlag=abc123",
+        auth,
+        headers: { cookie: `crumb=${crumb}` },
+      };
+
+      const res = await server.inject(options);
+
+      doubleClickProtectionOk(cheerio.load(res.payload), 1);
     });
   });
 

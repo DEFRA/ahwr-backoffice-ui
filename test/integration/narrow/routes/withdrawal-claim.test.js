@@ -6,6 +6,7 @@ import { StatusCodes } from "http-status-codes";
 import { config } from "../../../../app/config/index.js";
 import { getClaim, withdrawClaim } from "../../../../app/api/claims.js";
 import { getApplication } from "../../../../app/api/applications.js";
+import { doubleClickProtectionOk } from "../../../utils/double-click-protection-expect.js";
 
 const SUPER_ADMIN_USERNAME = "superadmin@test";
 
@@ -101,6 +102,16 @@ describe("Withdrawal claim page", () => {
       expect($("form").attr("action")).toBe(`/withdraw-claim/${reference}`);
       expect($(".govuk-button--secondary").attr("href")).toBe(viewClaimUrl);
       expect($(".govuk-back-link").attr("href")).toBe(viewClaimUrl);
+    });
+
+    test("the withdrawal form prevents an accidental double click", async () => {
+      const res = await server.inject({
+        method: "GET",
+        url: `/withdraw-claim/${reference}?page=2&returnPage=claims`,
+        auth: adminAuth,
+      });
+
+      doubleClickProtectionOk(cheerio.load(res.payload), 1);
     });
 
     test("forbids a non-administrator", async () => {
