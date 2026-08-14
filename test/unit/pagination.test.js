@@ -8,15 +8,15 @@ describe("Pagination", () => {
   });
   test("getPagination test for first page", () => {
     const result = getPagination(1, 20);
-    expect(result.pages).toBe(undefined);
-    expect(result.previous).toBe(undefined);
-    expect(result.next).toBe(undefined);
+    expect(result.pages).toBeUndefined();
+    expect(result.previous).toBeUndefined();
+    expect(result.next).toBeUndefined();
   });
   test("getPagination test for first page without parameter", () => {
     const result = getPagination();
-    expect(result.pages).toBe(undefined);
-    expect(result.previous).toBe(undefined);
-    expect(result.next).toBe(undefined);
+    expect(result.pages).toBeUndefined();
+    expect(result.previous).toBeUndefined();
+    expect(result.next).toBeUndefined();
   });
   test("getPagingData test", () => {
     const totalPages = 100;

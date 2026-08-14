@@ -25,7 +25,7 @@ const validStatus = [
   "hold",
   "on hold",
 ];
-const sbiRegEx = /^[0-9]{9}$/i;
+const sbiRegEx = /^\d{9}$/i;
 
 const validSpecies = (searchText) => {
   const species = {
