@@ -137,7 +137,6 @@ export const claimsDataRoutes = [
         const { name } = request.auth.credentials.account;
         const {
           claimOrAgreement,
-          form,
           page,
           note,
           returnPage,
@@ -149,9 +148,6 @@ export const claimsDataRoutes = [
           reference,
           dateOfVisit,
         } = request.payload;
-
-        // TODO - look at removing setBindings here
-        request.logger.setBindings({ form });
 
         const newDateString =
           day && month && year
