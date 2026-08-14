@@ -434,7 +434,7 @@ describe("View claim test", () => {
         { key: "Test result", value: "Positive" },
       ];
       // Summary list rows expect
-      expect($(".govuk-summary-list__row").length).toEqual(31);
+      expect($(".govuk-summary-list__row")).toHaveLength(31);
       // Application summary details expects
       for (const expected of expectedContent) {
         expect($(".govuk-summary-list__key").text()).toMatch(expected.key);
@@ -502,7 +502,7 @@ describe("View claim test", () => {
       ];
 
       // Summary list rows expect
-      expect($(".govuk-summary-list__row").length).toEqual(34);
+      expect($(".govuk-summary-list__row")).toHaveLength(34);
       // Claim summary details expected
       for (const expected of expectedContent) {
         expect($(".govuk-summary-list__key").text()).toMatch(expected.key);
@@ -547,8 +547,8 @@ describe("View claim test", () => {
 
       expect(res.statusCode).toBe(StatusCodes.OK);
       expect(await axe(res.payload)).toHaveNoViolations();
-      expect($(".govuk-summary-list__row").length).toEqual(34);
-      expect($(".govuk-summary-list__actions").length).toEqual(0);
+      expect($(".govuk-summary-list__row")).toHaveLength(34);
+      expect($(".govuk-summary-list__actions")).toHaveLength(0);
     });
 
     test("the back link should go to agreement details if the user is coming from agreement details page", async () => {
@@ -877,7 +877,7 @@ describe("View claim test", () => {
         { key: "Test result", value: "Positive" },
       ];
       // Summary list rows expect
-      expect($(".govuk-summary-list__row").length).toEqual(31);
+      expect($(".govuk-summary-list__row")).toHaveLength(31);
       // Application summary details expects
       for (const expected of expectedContent) {
         expect($(".govuk-summary-list__key").text()).toMatch(expected.key);
