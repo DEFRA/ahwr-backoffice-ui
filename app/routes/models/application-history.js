@@ -31,7 +31,6 @@ const getAction = (updatedProperty, newValue, oldValue) => {
     [PAID]: "Paid",
   };
 
-  // TODO - make sure updated property in this data is no longer statusId as it doesnt exist anymore
   if (updatedProperty === "status") {
     return statuses[newValue];
   }
