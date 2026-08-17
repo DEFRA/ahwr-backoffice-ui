@@ -86,13 +86,9 @@ export const buildViewClaim = async (
   const claim = await getClaim(reference, request.logger);
   const { data, reference: claimReference, applicationReference, status: claimStatus } = claim;
 
-  // TODO - look at removing setBindings here
-  request.logger.setBindings({ applicationReference, claimReference });
-
   const application = await getApplication(applicationReference, request.logger);
   const { organisation } = application;
 
-  // TODO - look at removing setBindings here
   request.logger.setBindings({ sbi: organisation.sbi });
 
   const { historyRecords } = await getClaimHistory(claimReference, request.logger);

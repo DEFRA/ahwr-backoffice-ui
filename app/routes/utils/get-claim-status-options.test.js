@@ -1,0 +1,30 @@
+import { STATUS } from "ffc-ahwr-common-library";
+import { SEARCH_STATUS, getClaimStatusOptions } from "./get-claim-status-options.js";
+
+describe("getStatusOptions", () => {
+  test("returns the claim status options in order", () => {
+    const options = getClaimStatusOptions(SEARCH_STATUS.ALL);
+
+    expect(options).toEqual([
+      { value: SEARCH_STATUS.ALL, text: "All statuses", selected: true },
+      { value: STATUS.ON_HOLD, text: "On hold", selected: false },
+      { value: STATUS.IN_CHECK, text: "In check", selected: false },
+      { value: STATUS.RECOMMENDED_TO_PAY, text: "Recommended to pay", selected: false },
+      { value: STATUS.RECOMMENDED_TO_REJECT, text: "Recommended to reject", selected: false },
+      { value: STATUS.READY_TO_PAY, text: "Ready to pay", selected: false },
+      { value: STATUS.REJECTED, text: "Rejected", selected: false },
+      { value: STATUS.PAID, text: "Paid", selected: false },
+      { value: STATUS.WITHDRAWN, text: "Withdrawn", selected: false },
+    ]);
+  });
+
+  test("marks the given agreement type as selected", () => {
+    const options = getClaimStatusOptions(STATUS.ON_HOLD);
+
+    expect(options.find((option) => option.selected)).toEqual({
+      value: STATUS.ON_HOLD,
+      text: "On hold",
+      selected: true,
+    });
+  });
+});

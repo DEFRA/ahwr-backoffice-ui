@@ -1,6 +1,5 @@
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
 
@@ -24,6 +23,6 @@ describe("Privacy Policy", () => {
     expect($("h1.govuk-heading-l").text()).toEqual(
       "Privacy policy statement for Administration of the health and welfare of your livestock service",
     );
-    phaseBannerOk($);
+    expect($).toShowPhaseBanner();
   });
 });

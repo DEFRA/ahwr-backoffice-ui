@@ -1,6 +1,5 @@
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
 
@@ -39,11 +38,11 @@ describe("Base layout (GOV.UK Frontend v6)", () => {
   });
 
   test("renders the footer with the accessibility and privacy links", () => {
-    expect($('.govuk-footer a[href="/accessibility"]').length).toBe(1);
-    expect($('.govuk-footer a[href="/privacy-policy"]').length).toBe(1);
+    expect($('.govuk-footer a[href="/accessibility"]')).toHaveLength(1);
+    expect($('.govuk-footer a[href="/privacy-policy"]')).toHaveLength(1);
   });
 
   test("renders the beta phase banner", () => {
-    phaseBannerOk($);
+    expect($).toShowPhaseBanner();
   });
 });

@@ -25,15 +25,14 @@ export const updateClaimHandler = async (request, h, status) => {
   const { page, reference, returnPage, note } = request.payload;
   const { name } = request.auth.credentials.account;
 
-  // TODO - look at removing setBindings here
-  request.logger.setBindings({ reference });
+  const logger = request.logger.child({ reference });
 
   await generateNewCrumb(request, h);
 
   const query = new URLSearchParams({ page });
   query.append("returnPage", returnPage);
 
-  await updateClaimStatus(reference, name, status, request.logger, note);
+  await updateClaimStatus(reference, name, status, logger, note);
 
   return h.redirect(`/view-claim/${reference}?${query.toString()}`);
 };

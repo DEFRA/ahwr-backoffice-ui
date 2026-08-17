@@ -1,6 +1,5 @@
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { permissions } from "../../../../app/auth/permissions.js";
 import { getPagination, getPagingData } from "../../../../app/pagination.js";
 import { getApplications } from "../../../../app/api/applications.js";
@@ -75,7 +74,7 @@ describe("Applications Filter test", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("Agreements");
       expect($("title").text()).toContain("AHWR Agreements");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
   });
 
@@ -108,7 +107,7 @@ describe("Applications Filter test", () => {
         "agreementType",
         AGREEMENT_TYPE.ALL,
       );
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
     });
   });
 

@@ -251,7 +251,8 @@ describe("Withdrawal claim page", () => {
         "#withdrawalDetails",
       ],
     ])("fails validation when %s is missing", async (missingField, message, href) => {
-      const { [missingField]: _removed, ...payload } = validPayload;
+      // eslint-disable-next-line sonarjs/no-unused-vars
+      const { [missingField]: _, ...payload } = validPayload;
       const res = await postWithdrawal(payload);
       const $ = cheerio.load(res.payload);
 

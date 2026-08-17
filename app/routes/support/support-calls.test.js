@@ -1,3 +1,7 @@
+/* eslint-disable sonarjs/no-clear-text-protocols */
+// This is being disable because for local development
+// we are using http, not https
+
 import wreck from "@hapi/wreck";
 import Boom from "@hapi/boom";
 import {

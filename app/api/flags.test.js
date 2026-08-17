@@ -1,0 +1,136 @@
+import wreck from "@hapi/wreck";
+import { getAllFlags, deleteFlag, createFlag } from "./flags.js";
+import { flags } from "../../test/data/flags.js";
+import { config } from "../config/index.js";
+import { metricsCounter } from "../lib/metrics.js";
+
+const { applicationApiUri } = config;
+
+jest.mock("@hapi/wreck");
+jest.mock("../config");
+jest.mock("../lib/metrics.js");
+
+const { apiKeys } = config;
+
+const mockLogger = {
+  error: jest.fn(),
+};
+
+describe("Flags API", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe("getAllFlags", () => {
+    test("returns the payload provided", async () => {
+      const wreckResponse = {
+        payload: flags,
+        res: {
+          statusCode: 200,
+        },
+        json: true,
+      };
+
+      wreck.get = jest.fn().mockResolvedValueOnce(wreckResponse);
+
+      const response = await getAllFlags(mockLogger);
+
+      expect(response).toEqual(wreckResponse.payload);
+      expect(mockLogger.error).not.toHaveBeenCalled();
+    });
+
+    test("getAllFlags throws an error if the get call errors", async () => {
+      wreck.get = jest.fn().mockImplementationOnce(() => {
+        throw new Error("test error");
+      });
+
+      await expect(async () => await getAllFlags(mockLogger)).rejects.toThrow("test error");
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+  });
+
+  describe("deleteFlag", () => {
+    test("uses the provided flagId in the params of the request, and the user in the payload", async () => {
+      const wreckResponse = {
+        payload: {},
+        res: {
+          statusCode: 200,
+        },
+        json: true,
+      };
+
+      wreck.patch = jest.fn().mockResolvedValueOnce(wreckResponse);
+
+      const username = "Tom the deleter";
+      const flagId = "abc123";
+      const deletedNote = "Remove flag";
+
+      await deleteFlag({ flagId, deletedNote }, username, mockLogger);
+
+      expect(wreck.patch).toHaveBeenCalledWith(`${applicationApiUri}/flags/${flagId}/delete`, {
+        json: true,
+        payload: {
+          user: username,
+          deletedNote,
+        },
+        headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+      });
+      expect(mockLogger.error).not.toHaveBeenCalled();
+      expect(metricsCounter).toHaveBeenCalledWith("flag_deleted");
+    });
+
+    test("throws an error if the patch call errors", async () => {
+      wreck.patch = jest.fn().mockImplementationOnce(() => {
+        throw new Error("test error");
+      });
+
+      await expect(async () => await deleteFlag("", "", mockLogger)).rejects.toThrow("test error");
+      expect(mockLogger.error).toHaveBeenCalled();
+      expect(metricsCounter).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("createFlag", () => {
+    test("posts the agreement reference and payload, always sending appliesToMh false", async () => {
+      const wreckResponse = {
+        payload: {},
+        res: {
+          statusCode: 201,
+        },
+        json: true,
+      };
+
+      wreck.post = jest.fn().mockResolvedValueOnce(wreckResponse);
+
+      const applicationReference = "IAHW-TEST-REFR";
+      const payload = {
+        user: "Tom",
+        note: "I flagged this",
+      };
+
+      await createFlag(payload, applicationReference, mockLogger);
+
+      expect(wreck.post).toHaveBeenCalledWith(
+        `${applicationApiUri}/applications/${applicationReference}/flag`,
+        {
+          json: true,
+          payload: { ...payload, appliesToMh: false },
+          headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+        },
+      );
+
+      expect(mockLogger.error).not.toHaveBeenCalled();
+      expect(metricsCounter).toHaveBeenCalledWith("flag_created");
+    });
+
+    test("throws an error if the post call errors", async () => {
+      wreck.post = jest.fn().mockImplementationOnce(() => {
+        throw new Error("test error");
+      });
+
+      await expect(async () => await createFlag({}, "", mockLogger)).rejects.toThrow("test error");
+      expect(mockLogger.error).toHaveBeenCalled();
+      expect(metricsCounter).not.toHaveBeenCalled();
+    });
+  });
+});

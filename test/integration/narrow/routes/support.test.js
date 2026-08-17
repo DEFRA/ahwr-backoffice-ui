@@ -60,29 +60,21 @@ describe("support-routes", () => {
         expect($("h1.govuk-heading-xl").text()).toContain("Support");
       });
 
-      it("shows the application form", async () => {
+      it.each([
+        {
+          name: "application",
+          formClass: "ahwr-application-search-form",
+          inputId: "application-reference",
+        },
+        { name: "claim", formClass: "ahwr-claim-search-form", inputId: "claim-reference" },
+        { name: "herd", formClass: "ahwr-herd-search-form", inputId: "herd-id" },
+      ])("shows the $name form", async ({ formClass, inputId }) => {
         expect(response.statusCode).toBe(StatusCodes.OK);
         const $ = cheerio.load(response.payload);
 
-        expect($("form.ahwr-application-search-form").length).toBe(1);
-        expect($("form.ahwr-application-search-form").attr("action")).toBe("/support");
-        expect($("#application-reference").length).toBe(1);
-      });
-
-      it("shows the claim form", async () => {
-        expect(response.statusCode).toBe(StatusCodes.OK);
-        const $ = cheerio.load(response.payload);
-        expect($("form.ahwr-claim-search-form").length).toBe(1);
-        expect($("form.ahwr-claim-search-form").attr("action")).toBe("/support");
-        expect($("#claim-reference").length).toBe(1);
-      });
-
-      it("shows the herd form", async () => {
-        expect(response.statusCode).toBe(StatusCodes.OK);
-        const $ = cheerio.load(response.payload);
-        expect($("form.ahwr-herd-search-form").length).toBe(1);
-        expect($("form.ahwr-herd-search-form").attr("action")).toBe("/support");
-        expect($("#herd-id").length).toBe(1);
+        expect($(`form.${formClass}`)).toHaveLength(1);
+        expect($(`form.${formClass}`).attr("action")).toBe("/support");
+        expect($(`#${inputId}`)).toHaveLength(1);
       });
     });
 
@@ -112,7 +104,7 @@ describe("support-routes", () => {
 
       expect(response.statusCode).toBe(StatusCodes.FORBIDDEN);
       const $ = cheerio.load(response.payload);
-      expect($("#_403").length).toBe(1);
+      expect($("#_403")).toHaveLength(1);
     });
   });
 
@@ -120,16 +112,21 @@ describe("support-routes", () => {
   // those calls will be made with wreck
   // Therefore we will need to mock wreck.
   describe("post", () => {
+    const applicationReference = "someReference";
+
+    // builds the POST options shared by every support call,
+    // injecting the crumb and merging in only the payload changes
+    const postOptions = (payload) => ({
+      method: "POST",
+      url: "/support",
+      auth: supportAuth,
+      headers: { cookie: `crumb=${crumb}` },
+      payload: { crumb, ...payload },
+    });
+
     describe("non existing action", () => {
       it("returns not found", async () => {
-        const applicationReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, applicationReference, action: "delete" },
-        };
+        const options = postOptions({ applicationReference, action: "delete" });
 
         const response = await server.inject(options);
 
@@ -144,13 +141,7 @@ describe("support-routes", () => {
 
     describe("search application", () => {
       it("throws error if no application reference passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, action: "searchApplication" },
-        };
+        const options = postOptions({ action: "searchApplication" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -161,17 +152,11 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Application reference missing.",
         );
-        expect($("#applicationDocument").length).toBe(0);
+        expect($("#applicationDocument")).toHaveLength(0);
       });
 
       it("throws error if only spaces passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, applicationReference: "   ", action: "searchApplication" },
-        };
+        const options = postOptions({ applicationReference: "   ", action: "searchApplication" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -182,61 +167,36 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Application reference missing.",
         );
-        expect($("#applicationDocument").length).toBe(0);
+        expect($("#applicationDocument")).toHaveLength(0);
       });
 
       it("shows application information when requested", async () => {
         getApplicationDocument.mockResolvedValue({ document: { some: "value", another: "entry" } });
 
-        const applicationReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, applicationReference, action: "searchApplication" },
-        };
+        const options = postOptions({ applicationReference, action: "searchApplication" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#applicationDocument").length).toBe(1);
-        expect($("#applicationDocument").text()).toContain("entry");
+        expect(response).toShow("#applicationDocument");
       });
 
       it("shows application information when requested removing spaces", async () => {
         getApplicationDocument.mockResolvedValue({ document: { some: "value", another: "entry" } });
 
-        const applicationReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: {
-            crumb,
-            applicationReference: `  ${applicationReference}  `,
-            action: "searchApplication",
-          },
-        };
+        const options = postOptions({
+          applicationReference: `  ${applicationReference}  `,
+          action: "searchApplication",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#applicationDocument").length).toBe(1);
-        expect($("#applicationDocument").text()).toContain("entry");
+        expect(response).toShow("#applicationDocument");
       });
     });
 
     describe("search claim", () => {
       it("throws error if no claim reference passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, action: "searchClaim" },
-        };
+        const options = postOptions({ action: "searchClaim" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -247,17 +207,11 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Claim reference missing.",
         );
-        expect($("#claimDocument").length).toBe(0);
+        expect($("#claimDocument")).toHaveLength(0);
       });
 
       it("throws error if only spaces passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, claimReference: "   ", action: "searchClaim" },
-        };
+        const options = postOptions({ claimReference: "   ", action: "searchClaim" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -268,61 +222,38 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Claim reference missing.",
         );
-        expect($("#claimDocument").length).toBe(0);
+        expect($("#claimDocument")).toHaveLength(0);
       });
 
       it("shows claim information when requested", async () => {
         getClaimDocument.mockResolvedValue({ document: { some: "value", another: "entry" } });
 
         const claimReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, claimReference, action: "searchClaim" },
-        };
+        const options = postOptions({ claimReference, action: "searchClaim" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#claimDocument").length).toBe(1);
-        expect($("#claimDocument").text()).toContain("entry");
+        expect(response).toShow("#claimDocument");
       });
 
       it("shows claim information when requested removing spaces", async () => {
         getClaimDocument.mockResolvedValue({ document: { some: "value", another: "entry" } });
 
         const claimReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: {
-            crumb,
-            claimReference: `  ${claimReference}  `,
-            action: "searchClaim",
-          },
-        };
+        const options = postOptions({
+          claimReference: `  ${claimReference}  `,
+          action: "searchClaim",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#claimDocument").length).toBe(1);
-        expect($("#claimDocument").text()).toContain("entry");
+        expect(response).toShow("#claimDocument");
       });
     });
 
     describe("search herd", () => {
       it("throws error if no herd reference passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, action: "searchHerd" },
-        };
+        const options = postOptions({ action: "searchHerd" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -331,17 +262,11 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Herd id missing.",
         );
-        expect($("#herdDocument").length).toBe(0);
+        expect($("#herdDocument")).toHaveLength(0);
       });
 
       it("throws error if only spaces passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, HerdId: "   ", action: "searchHerd" },
-        };
+        const options = postOptions({ HerdId: "   ", action: "searchHerd" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -350,61 +275,38 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Herd id missing.",
         );
-        expect($("#applicationDocument").length).toBe(0);
+        expect($("#applicationDocument")).toHaveLength(0);
       });
 
       it("shows herd information when requested", async () => {
         getHerdDocument.mockResolvedValue({ document: { some: "value", another: "entry" } });
 
         const herdId = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, herdId, action: "searchHerd" },
-        };
+        const options = postOptions({ herdId, action: "searchHerd" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#herdDocument").length).toBe(1);
-        expect($("#herdDocument").text()).toContain("entry");
+        expect(response).toShow("#herdDocument");
       });
 
       it("shows herd information when requested removing spaces", async () => {
         getHerdDocument.mockResolvedValue({ document: { some: "value", another: "entry" } });
 
         const herdId = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: {
-            crumb,
-            herdId: `  ${herdId}  `,
-            action: "searchHerd",
-          },
-        };
+        const options = postOptions({
+          herdId: `  ${herdId}  `,
+          action: "searchHerd",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#herdDocument").length).toBe(1);
-        expect($("#herdDocument").text()).toContain("entry");
+        expect(response).toShow("#herdDocument");
       });
     });
 
     describe("search payment status", () => {
       it("throws error if no payment reference passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, action: "searchPaymentStatus" },
-        };
+        const options = postOptions({ action: "searchPaymentStatus" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -415,17 +317,14 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Payment status reference missing.",
         );
-        expect($("#paymentStatus").length).toBe(0);
+        expect($("#paymentStatus")).toHaveLength(0);
       });
 
       it("throws error if only spaces passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, paymentStatusReference: "   ", action: "searchPaymentStatus" },
-        };
+        const options = postOptions({
+          paymentStatusReference: "   ",
+          action: "searchPaymentStatus",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -436,7 +335,7 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Payment status reference missing.",
         );
-        expect($("#paymentStatus").length).toBe(0);
+        expect($("#paymentStatus")).toHaveLength(0);
       });
 
       it("shows payment information when requested", async () => {
@@ -445,19 +344,11 @@ describe("support-routes", () => {
         });
 
         const paymentStatusReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, paymentStatusReference, action: "searchPaymentStatus" },
-        };
+        const options = postOptions({ paymentStatusReference, action: "searchPaymentStatus" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#paymentStatus").length).toBe(1);
-        expect($("#paymentStatus").text()).toContain("entry");
+        expect(response).toShow("#paymentStatus");
       });
 
       it("shows payment information when requested removing spaces", async () => {
@@ -466,35 +357,20 @@ describe("support-routes", () => {
         });
 
         const paymentStatusReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: {
-            crumb,
-            paymentStatusReference: `  ${paymentStatusReference}  `,
-            action: "searchPaymentStatus",
-          },
-        };
+        const options = postOptions({
+          paymentStatusReference: `  ${paymentStatusReference}  `,
+          action: "searchPaymentStatus",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#paymentStatus").length).toBe(1);
-        expect($("#paymentStatus").text()).toContain("entry");
+        expect(response).toShow("#paymentStatus");
       });
     });
 
     describe("search payment document", () => {
       it("throws error if no payment reference passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, action: "searchPayment" },
-        };
+        const options = postOptions({ action: "searchPayment" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -505,17 +381,11 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Payment reference missing.",
         );
-        expect($("#paymentDocument").length).toBe(0);
+        expect($("#paymentDocument")).toHaveLength(0);
       });
 
       it("throws error if only spaces passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, paymentReference: "   ", action: "searchPayment" },
-        };
+        const options = postOptions({ paymentReference: "   ", action: "searchPayment" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -526,61 +396,38 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Payment reference missing.",
         );
-        expect($("#paymentDocument").length).toBe(0);
+        expect($("#paymentDocument")).toHaveLength(0);
       });
 
       it("shows payment information when requested", async () => {
         getPaymentDocument.mockResolvedValue({ document: { some: "value", another: "entry" } });
 
         const paymentReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, paymentReference, action: "searchPayment" },
-        };
+        const options = postOptions({ paymentReference, action: "searchPayment" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#paymentDocument").length).toBe(1);
-        expect($("#paymentDocument").text()).toContain("entry");
+        expect(response).toShow("#paymentDocument");
       });
 
       it("shows payment information when requested removing spaces", async () => {
         getPaymentDocument.mockResolvedValue({ document: { some: "value", another: "entry" } });
 
         const paymentReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: {
-            crumb,
-            paymentReference: `  ${paymentReference}  `,
-            action: "searchPayment",
-          },
-        };
+        const options = postOptions({
+          paymentReference: `  ${paymentReference}  `,
+          action: "searchPayment",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#paymentDocument").length).toBe(1);
-        expect($("#paymentDocument").text()).toContain("entry");
+        expect(response).toShow("#paymentDocument");
       });
     });
 
     describe("search agreement messages", () => {
       it("throws error if no agreement reference passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, action: "searchAgreementMessages" },
-        };
+        const options = postOptions({ action: "searchAgreementMessages" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -591,17 +438,14 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Agreement reference missing.",
         );
-        expect($("#agreementMessagesDocument").length).toBe(0);
+        expect($("#agreementMessagesDocument")).toHaveLength(0);
       });
 
       it("throws error if only spaces passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, agreementMessageReference: "   ", action: "searchAgreementMessages" },
-        };
+        const options = postOptions({
+          agreementMessageReference: "   ",
+          action: "searchAgreementMessages",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -612,7 +456,7 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Agreement reference missing.",
         );
-        expect($("#agreementMessagesDocument").length).toBe(0);
+        expect($("#agreementMessagesDocument")).toHaveLength(0);
       });
 
       it("shows agreement information when requested", async () => {
@@ -621,19 +465,14 @@ describe("support-routes", () => {
         });
 
         const agreementMessagesReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, agreementMessagesReference, action: "searchAgreementMessages" },
-        };
+        const options = postOptions({
+          agreementMessagesReference,
+          action: "searchAgreementMessages",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#agreementMessagesDocument").length).toBe(1);
-        expect($("#agreementMessagesDocument").text()).toContain("entry");
+        expect(response).toShow("#agreementMessagesDocument");
       });
 
       it("shows agreement information when requested removing spaces", async () => {
@@ -642,35 +481,20 @@ describe("support-routes", () => {
         });
 
         const agreementMessagesReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: {
-            crumb,
-            agreementMessagesReference: `  ${agreementMessagesReference}  `,
-            action: "searchAgreementMessages",
-          },
-        };
+        const options = postOptions({
+          agreementMessagesReference: `  ${agreementMessagesReference}  `,
+          action: "searchAgreementMessages",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#agreementMessagesDocument").length).toBe(1);
-        expect($("#agreementMessagesDocument").text()).toContain("entry");
+        expect(response).toShow("#agreementMessagesDocument");
       });
     });
 
     describe("search claim messages", () => {
       it("throws error if no claim reference passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, action: "searchClaimMessages" },
-        };
+        const options = postOptions({ action: "searchClaimMessages" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -681,17 +505,14 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Claim reference missing.",
         );
-        expect($("#claimMessagesDocument").length).toBe(0);
+        expect($("#claimMessagesDocument")).toHaveLength(0);
       });
 
       it("throws error if only spaces passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, claimMessageReference: "   ", action: "searchClaimMessages" },
-        };
+        const options = postOptions({
+          claimMessageReference: "   ",
+          action: "searchClaimMessages",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -702,7 +523,7 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Claim reference missing.",
         );
-        expect($("#claimMessagesDocument").length).toBe(0);
+        expect($("#claimMessagesDocument")).toHaveLength(0);
       });
 
       it("shows claim information when requested", async () => {
@@ -711,19 +532,11 @@ describe("support-routes", () => {
         });
 
         const claimMessagesReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, claimMessagesReference, action: "searchClaimMessages" },
-        };
+        const options = postOptions({ claimMessagesReference, action: "searchClaimMessages" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#claimMessagesDocument").length).toBe(1);
-        expect($("#claimMessagesDocument").text()).toContain("entry");
+        expect(response).toShow("#claimMessagesDocument");
       });
 
       it("shows claim information when requested removing spaces", async () => {
@@ -732,35 +545,20 @@ describe("support-routes", () => {
         });
 
         const claimMessagesReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: {
-            crumb,
-            claimMessagesReference: `  ${claimMessagesReference}  `,
-            action: "searchClaimMessages",
-          },
-        };
+        const options = postOptions({
+          claimMessagesReference: `  ${claimMessagesReference}  `,
+          action: "searchClaimMessages",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#claimMessagesDocument").length).toBe(1);
-        expect($("#claimMessagesDocument").text()).toContain("entry");
+        expect(response).toShow("#claimMessagesDocument");
       });
     });
 
     describe("search agreement document logs", () => {
       it("throws error if no agreement reference passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, action: "searchAgreementLogs" },
-        };
+        const options = postOptions({ action: "searchAgreementLogs" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -771,17 +569,14 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Agreement reference missing.",
         );
-        expect($("#agreementLogsDocument").length).toBe(0);
+        expect($("#agreementLogsDocument")).toHaveLength(0);
       });
 
       it("throws error if only spaces passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, agreementLogReference: "   ", action: "searchAgreementLogs" },
-        };
+        const options = postOptions({
+          agreementLogReference: "   ",
+          action: "searchAgreementLogs",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -792,7 +587,7 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Agreement reference missing.",
         );
-        expect($("#agreementLogsDocument").length).toBe(0);
+        expect($("#agreementLogsDocument")).toHaveLength(0);
       });
 
       it("shows document information when requested", async () => {
@@ -801,31 +596,17 @@ describe("support-routes", () => {
         });
 
         const agreementLogReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, agreementLogReference, action: "searchAgreementLogs" },
-        };
+        const options = postOptions({ agreementLogReference, action: "searchAgreementLogs" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#agreementLogsDocument").length).toBe(1);
-        expect($("#agreementLogsDocument").text()).toContain("entry");
+        expect(response).toShow("#agreementLogsDocument");
       });
     });
 
     describe("search agreement comms", () => {
       it("throws error if no agreement reference passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, action: "searchAgreementComms" },
-        };
+        const options = postOptions({ action: "searchAgreementComms" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -836,17 +617,14 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Agreement reference missing.",
         );
-        expect($("#agreementCommsDocument").length).toBe(0);
+        expect($("#agreementCommsDocument")).toHaveLength(0);
       });
 
       it("throws error if only spaces passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, agreementCommsReference: "   ", action: "searchAgreementComms" },
-        };
+        const options = postOptions({
+          agreementCommsReference: "   ",
+          action: "searchAgreementComms",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -857,7 +635,7 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Agreement reference missing.",
         );
-        expect($("#agreementCommsDocument").length).toBe(0);
+        expect($("#agreementCommsDocument")).toHaveLength(0);
       });
 
       it("shows agreement information when requested", async () => {
@@ -866,19 +644,11 @@ describe("support-routes", () => {
         });
 
         const agreementCommsReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, agreementCommsReference, action: "searchAgreementComms" },
-        };
+        const options = postOptions({ agreementCommsReference, action: "searchAgreementComms" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#agreementCommsDocument").length).toBe(1);
-        expect($("#agreementCommsDocument").text()).toContain("entry");
+        expect(response).toShow("#agreementCommsDocument");
       });
 
       it("shows agreement information when requested removing spaces", async () => {
@@ -887,35 +657,20 @@ describe("support-routes", () => {
         });
 
         const agreementCommsReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: {
-            crumb,
-            agreementCommsReference: `  ${agreementCommsReference}  `,
-            action: "searchAgreementComms",
-          },
-        };
+        const options = postOptions({
+          agreementCommsReference: `  ${agreementCommsReference}  `,
+          action: "searchAgreementComms",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#agreementCommsDocument").length).toBe(1);
-        expect($("#agreementCommsDocument").text()).toContain("entry");
+        expect(response).toShow("#agreementCommsDocument");
       });
     });
 
     describe("search claim comms", () => {
       it("throws error if no claim reference passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, action: "searchClaimComms" },
-        };
+        const options = postOptions({ action: "searchClaimComms" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -926,17 +681,11 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Claim reference missing.",
         );
-        expect($("#claimCommsDocument").length).toBe(0);
+        expect($("#claimCommsDocument")).toHaveLength(0);
       });
 
       it("throws error if only spaces passed", async () => {
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, claimCommsReference: "   ", action: "searchClaimComms" },
-        };
+        const options = postOptions({ claimCommsReference: "   ", action: "searchClaimComms" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
@@ -947,7 +696,7 @@ describe("support-routes", () => {
         expect($(".govuk-error-summary__list li:first-child a").text()).toContain(
           "Claim reference missing.",
         );
-        expect($("#claimCommsDocument").length).toBe(0);
+        expect($("#claimCommsDocument")).toHaveLength(0);
       });
 
       it("shows claim information when requested", async () => {
@@ -956,19 +705,11 @@ describe("support-routes", () => {
         });
 
         const claimCommsReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: { crumb, claimCommsReference, action: "searchClaimComms" },
-        };
+        const options = postOptions({ claimCommsReference, action: "searchClaimComms" });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#claimCommsDocument").length).toBe(1);
-        expect($("#claimCommsDocument").text()).toContain("entry");
+        expect(response).toShow("#claimCommsDocument");
       });
 
       it("shows claim information when requested removing spaces", async () => {
@@ -977,23 +718,14 @@ describe("support-routes", () => {
         });
 
         const claimCommsReference = "someReference";
-        const options = {
-          method: "POST",
-          url: "/support",
-          auth: supportAuth,
-          headers: { cookie: `crumb=${crumb}` },
-          payload: {
-            crumb,
-            claimCommsReference: `  ${claimCommsReference}  `,
-            action: "searchClaimComms",
-          },
-        };
+        const options = postOptions({
+          claimCommsReference: `  ${claimCommsReference}  `,
+          action: "searchClaimComms",
+        });
         const response = await server.inject(options);
         expect(response.statusCode).toBe(StatusCodes.OK);
 
-        const $ = cheerio.load(response.payload);
-        expect($("#claimCommsDocument").length).toBe(1);
-        expect($("#claimCommsDocument").text()).toContain("entry");
+        expect(response).toShow("#claimCommsDocument");
       });
     });
   });

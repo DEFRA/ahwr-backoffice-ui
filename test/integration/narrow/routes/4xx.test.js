@@ -1,4 +1,3 @@
-import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { createServer } from "../../../../app/server.js";
 import * as cheerio from "cheerio";
 
@@ -21,6 +20,6 @@ describe("4xx error pages", () => {
     const $ = cheerio.load(res.payload);
     expect($(".govuk-heading-l").text()).toEqual("404 - Not Found");
     expect($("#_404 div p").text()).toEqual("Not Found");
-    phaseBannerOk($);
+    expect($).toShowPhaseBanner();
   });
 });

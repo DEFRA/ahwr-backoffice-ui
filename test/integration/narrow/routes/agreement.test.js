@@ -1,6 +1,5 @@
 import * as cheerio from "cheerio";
 import { axe } from "../../../helpers/axe-helper.js";
-import { phaseBannerOk } from "../../../utils/phase-banner-expect.js";
 import { permissions } from "../../../../app/auth/permissions.js";
 import { applicationsData } from "../../../data/applications.js";
 import { getApplication } from "../../../../app/api/applications.js";
@@ -118,7 +117,7 @@ describe("Claims test", () => {
       expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("title").text()).toContain("Administration - My Farm");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
 
       expect($("th[aria-sort]")[0].attribs["aria-sort"]).toEqual("none");
       expect($("th[aria-sort]")[0].attribs["data-url"]).toContain("claim number");
@@ -130,7 +129,7 @@ describe("Claims test", () => {
       expect($("th[aria-sort]")[3].attribs["data-url"]).toContain("claims/sort/status");
 
       const actions = $(".govuk-summary-list__actions");
-      expect(actions.find("a.govuk-link").length).toBe(1);
+      expect(actions.find("a.govuk-link")).toHaveLength(1);
       expect(actions.find("a.govuk-link").text()).toBe("Change");
       expect(actions.find("a.govuk-link").attr("href")).toContain(
         "/agreement/123/claims?page=1&updateEligiblePiiRedaction=true",
@@ -161,7 +160,7 @@ describe("Claims test", () => {
       const $ = cheerio.load(res.payload);
 
       const actions = $(".govuk-summary-list__actions");
-      expect(actions.find("a.govuk-link").length).toBe(0);
+      expect(actions.find("a.govuk-link")).toHaveLength(0);
     });
 
     test("returns 200 and hides actions when user not super admin", async () => {
@@ -186,7 +185,7 @@ describe("Claims test", () => {
       const $ = cheerio.load(res.payload);
 
       const actions = $(".govuk-summary-list__actions");
-      expect(actions.find("a.govuk-link").length).toBe(0);
+      expect(actions.find("a.govuk-link")).toHaveLength(0);
     });
 
     test("displays eligible for automated data redaction as Yes when the value is true", async () => {
@@ -230,7 +229,7 @@ describe("Claims test", () => {
       expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("title").text()).toContain("Administration - My Farm");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
 
       expect($("th[aria-sort]")[0].attribs["aria-sort"]).toEqual("ascending");
       expect($("th[aria-sort]")[0].attribs["data-url"]).toContain("claim number");
@@ -269,7 +268,7 @@ describe("Claims test", () => {
         expect(await axe(res.payload)).toHaveNoViolations();
         const $ = cheerio.load(res.payload);
         expect($("title").text()).toContain("Administration - My Farm");
-        phaseBannerOk($);
+        expect($).toShowPhaseBanner();
       },
     );
 
@@ -296,7 +295,7 @@ describe("Claims test", () => {
       expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("title").text()).toContain("Administration - My Farm");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
 
       expect($(".govuk-back-link").attr("href")).toEqual("/view-claim/REDC-6179-D9D3?page=1");
     });
@@ -314,7 +313,7 @@ describe("Claims test", () => {
       expect(await axe(res.payload)).toHaveNoViolations();
       const $ = cheerio.load(res.payload);
       expect($("title").text()).toContain("Administration - My Farm");
-      phaseBannerOk($);
+      expect($).toShowPhaseBanner();
 
       expect($(".govuk-back-link").attr("href")).toEqual("/agreements?page=1");
     });

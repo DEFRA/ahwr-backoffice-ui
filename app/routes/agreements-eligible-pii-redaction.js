@@ -52,9 +52,6 @@ export const updateEligiblePiiRedactionRoute = {
       const { name } = request.auth.credentials.account;
       const { page, note, reference, eligiblePiiRedaction } = request.payload;
 
-      // TODO - look at removing setBindings here
-      request.logger.setBindings({ reference });
-
       await generateNewCrumb(request, h);
       const query = new URLSearchParams({ page });
 

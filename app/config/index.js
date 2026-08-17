@@ -5,8 +5,6 @@ const SECONDS_PER_HOUR = 3600;
 const MILLISECONDS_PER_SECOND = 1000;
 const HOURS_PER_HALF_DAY = 12;
 
-const defaultApiKey = "c19fcb0d-a6d2-4d9e-9325-16d44ddc0724";
-
 const getConfigSchema = () =>
   joi.object({
     cache: {
@@ -77,12 +75,11 @@ const buildConfig = () => {
       cookieNameSession: "ffc_ahwr_backoffice_session",
       isSameSite: "Lax",
       isSecure: process.env.NODE_ENV === "production",
-      password:
-        process.env.COOKIE_PASSWORD ?? "set_a_secure_cookie_password_of_at_least_32_characters",
+      password: process.env.COOKIE_PASSWORD, // set a secure cookie password of at least 32 characters"
       ttl: MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_HALF_DAY,
     },
     apiKeys: {
-      backofficeUiApiKey: process.env.BACKOFFICE_UI_API_KEY || defaultApiKey,
+      backofficeUiApiKey: process.env.BACKOFFICE_UI_API_KEY,
     },
     env: process.env.NODE_ENV,
     isDev: process.env.NODE_ENV === "development",
