@@ -6,6 +6,7 @@ import { getApplication } from "../../../../app/api/applications.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
 import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states.js";
+import { doubleClickProtectionOk } from "../../../utils/double-click-protection-expect.js";
 const { administrator } = permissions;
 
 jest.mock("../../../../app/routes/utils/get-claim-view-states");
@@ -883,6 +884,32 @@ describe("View claim test", () => {
         expect($(".govuk-summary-list__key").text()).toMatch(expected.key);
         expect($(".govuk-summary-list__value").text()).toMatch(expected.value);
       }
+    });
+
+    test("every state-changing form prevents an accidental double click", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/AHWR-0000-4444`,
+        auth,
+      };
+      getClaim.mockReturnValue(claims[1]);
+      getClaims.mockReturnValue({ claims });
+      getApplication.mockReturnValue(application);
+      getClaimViewStates.mockReturnValueOnce({
+        moveToInCheckForm: true,
+        recommendToPayForm: true,
+        recommendToRejectForm: true,
+        authoriseForm: true,
+        rejectForm: true,
+        updateStatusForm: true,
+        updateVetsNameForm: true,
+        updateVetRCVSNumberForm: true,
+        updateDateOfVisitForm: true,
+      });
+
+      const res = await server.inject(options);
+
+      doubleClickProtectionOk(cheerio.load(res.payload), 9);
     });
   });
 

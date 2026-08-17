@@ -41,7 +41,8 @@
       }) }}
 
     {{ govukButton({
-      text: "Create flag"
+      text: "Create flag",
+      preventDoubleClick: true
     }) }}
     <input type="hidden" name="crumb" value="{{ crumb }}"/>
     <input type="hidden" name="action" value="create"/>

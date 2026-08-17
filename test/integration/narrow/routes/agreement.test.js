@@ -12,6 +12,7 @@ import { getClaimSearch } from "../../../../app/session/index.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
 import { getApplicationStates } from "../../../../app/routes/utils/get-application-states.js";
+import { doubleClickProtectionOk } from "../../../utils/double-click-protection-expect.js";
 
 const { administrator } = permissions;
 
@@ -141,6 +142,26 @@ describe("Claims test", () => {
         )
         .first();
       expect(redactionRow.find(".govuk-summary-list__value p").text().trim()).toBe("No");
+    });
+
+    test("the eligible for PII redaction form prevents an accidental double click", async () => {
+      getApplicationStates.mockReturnValueOnce({
+        updateEligiblePiiRedactionAction: true,
+        updateEligiblePiiRedactionForm: true,
+      });
+      getApplication.mockReturnValue({
+        ...applicationsData.applications[0],
+        redacted: false,
+      });
+      const options = {
+        method: "GET",
+        url: `${url}?page=1`,
+        auth,
+      };
+
+      const res = await server.inject(options);
+
+      doubleClickProtectionOk(cheerio.load(res.payload), 1);
     });
 
     test("returns 200 and hides actions when agreement is redacted", async () => {

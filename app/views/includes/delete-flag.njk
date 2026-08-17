@@ -28,7 +28,8 @@
   
     {{ govukButton({
       text: "Delete flag",
-      classes: "govuk-button--warning"
+      classes: "govuk-button--warning",
+      preventDoubleClick: true
     }) }}
     <input type="hidden" name="crumb" value="{{ crumb }}"/>
     <input type="hidden" name="flagId" value="{{model.flagIdToDelete}}"/>

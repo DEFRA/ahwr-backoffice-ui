@@ -22,7 +22,8 @@
       errorMessage: errorMessages.note
     }) }}
     {{ govukButton({
-      text: "Confirm and continue"
+      text: "Confirm and continue",
+      preventDoubleClick: true
     }) }}
     <input type="hidden" name="reference" value="{{ reference }}" />
     <input type="hidden" name="page" value="{{ page }}" />
