@@ -49,6 +49,31 @@ expect.extend({
             `but found ${banner.length} banner(s) with text "${text}"`,
     };
   },
+
+  /**
+   * Asserts every form that mutates an agreement, claim or flag renders a submit
+   * button guarded against accidental double clicks.
+   *
+   * @param {import("cheerio").CheerioAPI} $ - a loaded cheerio document
+   * @param {number} expectedFormCount - how many update forms the page should render
+   * @returns {{ pass: boolean, message: () => string }}
+   * @example
+   * expect(cheerio.load(response.payload)).toPreventDoubleClicks(9);
+   */
+  toPreventDoubleClicks($, expectedFormCount) {
+    const protection = $("form.ahwr-update-form button[type='submit']")
+      .map((_, button) => $(button).attr("data-prevent-double-click") ?? "unprotected")
+      .get();
+    const pass = this.equals(protection, Array(expectedFormCount).fill("true"));
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `expected the update forms not to prevent double clicks`
+          : `expected ${expectedFormCount} update form submit button(s) to prevent double clicks, ` +
+            `but found [${protection.join(", ")}]`,
+    };
+  },
 });
 
 if (typeof document !== "undefined") {
