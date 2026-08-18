@@ -225,7 +225,7 @@ const statusWasSetByAnotherUser = (currentStatusEvent, name) => {
   return currentStatusEvent && name !== currentStatusEvent.updatedBy;
 };
 
-const CLAIM_DATA_EDITABLE_STATUSES = [STATUS.IN_CHECK, STATUS.PAID, STATUS.REJECTED];
+const CLAIM_DATA_EDITABLE_STATUSES = new Set([STATUS.IN_CHECK, STATUS.PAID, STATUS.REJECTED]);
 
 const superAdminActionsAvailable = (isSuperAdmin, claimStatus, isFlagged, updateFlags) => {
   const { updateStatus, updateVetsName, updateVetRCVSNumber, updateDateOfVisit } = updateFlags;
@@ -236,7 +236,7 @@ const superAdminActionsAvailable = (isSuperAdmin, claimStatus, isFlagged, update
 
   const canChangeClaimData =
     canChangeClaimStatus &&
-    (claimStatus === undefined || CLAIM_DATA_EDITABLE_STATUSES.includes(claimStatus));
+    (claimStatus === undefined || CLAIM_DATA_EDITABLE_STATUSES.has(claimStatus));
 
   const withdrawAction = canWithdrawClaim({ isSuperAdmin, status: claimStatus, isFlagged });
 
