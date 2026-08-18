@@ -556,9 +556,60 @@ describe("getClaimViewStates", () => {
 
       const state = getClaimViewStates({ request, claimStatus: status.READY_TO_PAY });
 
-      expect(state).toEqual({
-        ...noPermissions,
-        ...changeDataActions,
+      expect(state).toEqual(noPermissions);
+    });
+
+    describe.each([
+      ["in check", status.IN_CHECK],
+      ["paid", status.PAID],
+      ["rejected", status.REJECTED],
+    ])("claimStatus: %s", (_, claimStatus) => {
+      test("vet name, RCVS number and date of visit changes are available", () => {
+        const request = buildRequest({
+          scope: administrator,
+          username: "currentUser@test",
+        });
+
+        const state = getClaimViewStates({ request, claimStatus });
+
+        expect(state.updateVetsNameAction).toBe(true);
+        expect(state.updateVetRCVSNumberAction).toBe(true);
+        expect(state.updateDateOfVisitAction).toBe(true);
+      });
+    });
+
+    describe.each([
+      ["agreed", status.AGREED],
+      ["not agreed", status.NOT_AGREED],
+      ["on hold", status.ON_HOLD],
+      ["ready to pay", status.READY_TO_PAY],
+      ["recommended to pay", status.RECOMMENDED_TO_PAY],
+      ["recommended to reject", status.RECOMMENDED_TO_REJECT],
+    ])("claimStatus: %s", (_, claimStatus) => {
+      test("vet name, RCVS number and date of visit changes are not available", () => {
+        const request = buildRequest({
+          scope: administrator,
+          username: "currentUser@test",
+        });
+
+        const state = getClaimViewStates({ request, claimStatus });
+
+        expect(state.updateVetsNameAction).toBe(false);
+        expect(state.updateVetRCVSNumberAction).toBe(false);
+        expect(state.updateDateOfVisitAction).toBe(false);
+      });
+
+      test("status change remains available (unaffected by data-edit restriction)", () => {
+        const request = buildRequest({
+          scope: administrator,
+          username: "currentUser@test",
+        });
+
+        const state = getClaimViewStates({ request, claimStatus });
+
+        expect(state.updateStatusAction).toBe(
+          ![status.READY_TO_PAY, status.PAID].includes(claimStatus),
+        );
       });
     });
   });
