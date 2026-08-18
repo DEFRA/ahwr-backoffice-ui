@@ -235,8 +235,7 @@ const superAdminActionsAvailable = (isSuperAdmin, claimStatus, isFlagged, update
   const canChangeClaimStatus = ![STATUS.WITHDRAWN].includes(claimStatus) && isSuperAdmin;
 
   const canChangeClaimData =
-    canChangeClaimStatus &&
-    (claimStatus === undefined || CLAIM_DATA_EDITABLE_STATUSES.has(claimStatus));
+    isSuperAdmin && (claimStatus === undefined || CLAIM_DATA_EDITABLE_STATUSES.has(claimStatus));
 
   const withdrawAction = canWithdrawClaim({ isSuperAdmin, status: claimStatus, isFlagged });
 
