@@ -225,17 +225,23 @@ const statusWasSetByAnotherUser = (currentStatusEvent, name) => {
   return currentStatusEvent && name !== currentStatusEvent.updatedBy;
 };
 
+const CLAIM_DATA_EDITABLE_STATUSES = new Set([STATUS.IN_CHECK, STATUS.PAID, STATUS.REJECTED]);
+
 const superAdminActionsAvailable = (isSuperAdmin, claimStatus, isFlagged, updateFlags) => {
   const { updateStatus, updateVetsName, updateVetRCVSNumber, updateDateOfVisit } = updateFlags;
 
   const claimIsntPaidOrReadyToPay = ![STATUS.READY_TO_PAY, STATUS.PAID].includes(claimStatus);
 
-  const canChangeClaimData = ![STATUS.WITHDRAWN].includes(claimStatus) && isSuperAdmin;
+  const canChangeClaimStatus = ![STATUS.WITHDRAWN].includes(claimStatus) && isSuperAdmin;
+
+  const canChangeClaimData =
+    isSuperAdmin && (claimStatus === undefined || CLAIM_DATA_EDITABLE_STATUSES.has(claimStatus));
 
   const withdrawAction = canWithdrawClaim({ isSuperAdmin, status: claimStatus, isFlagged });
 
-  const updateStatusAction = canChangeClaimData && claimIsntPaidOrReadyToPay;
-  const updateStatusForm = canChangeClaimData && updateStatus === true && claimIsntPaidOrReadyToPay;
+  const updateStatusAction = canChangeClaimStatus && claimIsntPaidOrReadyToPay;
+  const updateStatusForm =
+    canChangeClaimStatus && updateStatus === true && claimIsntPaidOrReadyToPay;
 
   const updateVetsNameAction = canChangeClaimData;
   const updateVetsNameForm = canChangeClaimData && updateVetsName === true;
