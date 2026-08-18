@@ -1,9 +1,13 @@
+import { STATUS } from "ffc-ahwr-common-library";
+
+const isNotWithdrawn = (claim) => claim.status !== STATUS.WITHDRAWN;
+
 export const getHerdBreakdown = (claims) => {
   const initialBreakdown = { beef: 0, sheep: 0, dairy: 0, pigs: 0 };
   const countedHerdIds = new Set();
   const countedSpeciesWithoutHerd = new Set();
 
-  for (const claim of claims) {
+  for (const claim of claims.filter(isNotWithdrawn)) {
     if (claim.herd?.id) {
       const { id: herdId } = claim.herd;
       const species = claim.data.typeOfLivestock;
@@ -28,7 +32,7 @@ export const getHerdBreakdown = (claims) => {
 export const getSiteBreakdown = (claims) => {
   const siteIds = new Set();
 
-  for (const claim of claims) {
+  for (const claim of claims.filter(isNotWithdrawn)) {
     if (claim.herd?.id) {
       siteIds.add(claim.herd.id);
     }

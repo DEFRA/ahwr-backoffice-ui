@@ -1141,6 +1141,58 @@ describe("View claim test", () => {
       // Same herd id used 3 times should only count as 1
       expect(sheepRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
     });
+
+    test("excludes herds that only appear in withdrawn claims", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/AHWR-0000-4444`,
+        auth,
+      };
+
+      const claimsWithWithdrawnHerd = [
+        {
+          ...claims[0],
+          data: { ...claims[0].data, typeOfLivestock: "sheep" },
+          herd: { id: "herd-sheep-live" },
+        },
+        {
+          ...claims[0],
+          status: "WITHDRAWN",
+          data: { ...claims[0].data, typeOfLivestock: "sheep" },
+          herd: { id: "herd-sheep-withdrawn" },
+        },
+        {
+          ...claims[0],
+          status: "WITHDRAWN",
+          data: { ...claims[0].data, typeOfLivestock: "pigs" },
+          herd: { id: "herd-pigs-withdrawn" },
+        },
+      ];
+
+      getClaim.mockReturnValue(claims[0]);
+      getClaims.mockReturnValue({ claims: claimsWithWithdrawnHerd });
+      getApplication.mockReturnValue(application);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const herdBreakdownRows = $(
+        ".govuk-summary-list .govuk-summary-list .govuk-summary-list__row",
+      );
+
+      const sheepRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Sheep"),
+      );
+      const pigsRow = herdBreakdownRows.filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Pigs"),
+      );
+
+      // Only the sheep herd with a live claim is counted
+      expect(sheepRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
+      expect(pigsRow.find(".govuk-summary-list__value").text().trim()).toBe("0");
+    });
   });
 
   describe("poultry site breakdown display", () => {
@@ -1242,6 +1294,33 @@ describe("View claim test", () => {
         $(el).find(".govuk-summary-list__key").text().includes("Number of sites"),
       );
       expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("2");
+    });
+
+    test("excludes sites that only appear in withdrawn claims", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/PORE-1111-6666`,
+        auth,
+      };
+
+      const poultryClaimsWithWithdrawnSite = [
+        { ...poultryClaim, herd: { id: "site-1-id" } },
+        { ...poultryClaim, status: "WITHDRAWN", herd: { id: "site-2-id" } },
+      ];
+
+      getClaim.mockReturnValue(poultryClaim);
+      getClaims.mockReturnValue({ claims: poultryClaimsWithWithdrawnSite });
+      getApplication.mockReturnValue(poultryApplication);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const sitesRow = $(".govuk-summary-list__row").filter((_, el) =>
+        $(el).find(".govuk-summary-list__key").text().includes("Number of sites"),
+      );
+      expect(sitesRow.find(".govuk-summary-list__value").text().trim()).toBe("1");
     });
 
     test("displays zero sites when no poultry claims have herd", async () => {
