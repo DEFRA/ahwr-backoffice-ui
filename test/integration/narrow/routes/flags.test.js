@@ -7,7 +7,6 @@ import { flags } from "../../../data/flags.js";
 import { StatusCodes } from "http-status-codes";
 import { mapAuth } from "../../../../app/auth/map-auth.js";
 import { createServer } from "../../../../app/server.js";
-import { doubleClickProtectionOk } from "../../../utils/double-click-protection-expect.js";
 
 const { administrator, user } = permissions;
 
@@ -264,7 +263,7 @@ describe("Flags tests", () => {
 
       const res = await server.inject(options);
 
-      doubleClickProtectionOk(cheerio.load(res.payload), 1);
+      expect(cheerio.load(res.payload)).toPreventDoubleClicks(1);
     });
 
     test("the delete flag form prevents an accidental double click", async () => {
@@ -277,7 +276,7 @@ describe("Flags tests", () => {
 
       const res = await server.inject(options);
 
-      doubleClickProtectionOk(cheerio.load(res.payload), 1);
+      expect(cheerio.load(res.payload)).toPreventDoubleClicks(1);
     });
   });
 

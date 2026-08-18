@@ -12,7 +12,6 @@ import { getClaimSearch } from "../../../../app/session/index.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
 import { getApplicationStates } from "../../../../app/routes/utils/get-application-states.js";
-import { doubleClickProtectionOk } from "../../../utils/double-click-protection-expect.js";
 
 const { administrator } = permissions;
 
@@ -161,7 +160,7 @@ describe("Claims test", () => {
 
       const res = await server.inject(options);
 
-      doubleClickProtectionOk(cheerio.load(res.payload), 1);
+      expect(cheerio.load(res.payload)).toPreventDoubleClicks(1);
     });
 
     test("returns 200 and hides actions when agreement is redacted", async () => {

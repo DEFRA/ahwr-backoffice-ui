@@ -3,7 +3,6 @@ import { getFormFlags } from "../utils/get-form-flags.js";
 import { buildViewClaim } from "../view-claim.js";
 import { generateNewCrumb } from "../utils/crumb-cache.js";
 import { updateClaimStatus } from "../../api/claims.js";
-import { preSubmissionHandler } from "../utils/pre-submission-handler.js";
 import Joi from "joi";
 
 export const updateClaimFailAction = async (request, h, error, errorHref, searchParam) => {
@@ -49,7 +48,6 @@ export const buildUpdateClaimRoute = ({
   path,
   options: {
     auth: { scope: permissions },
-    pre: [{ method: preSubmissionHandler }],
     validate: {
       payload: Joi.object({
         confirm: Joi.array()

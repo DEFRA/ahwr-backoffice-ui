@@ -6,7 +6,6 @@ import { StatusCodes } from "http-status-codes";
 import { config } from "../../../../app/config/index.js";
 import { getClaim, withdrawClaim } from "../../../../app/api/claims.js";
 import { getApplication } from "../../../../app/api/applications.js";
-import { doubleClickProtectionOk } from "../../../utils/double-click-protection-expect.js";
 
 const SUPER_ADMIN_USERNAME = "superadmin@test";
 
@@ -111,7 +110,7 @@ describe("Withdrawal claim page", () => {
         auth: adminAuth,
       });
 
-      doubleClickProtectionOk(cheerio.load(res.payload), 1);
+      expect(cheerio.load(res.payload)).toPreventDoubleClicks(1);
     });
 
     test("forbids a non-administrator", async () => {

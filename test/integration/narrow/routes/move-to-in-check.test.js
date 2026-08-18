@@ -4,18 +4,14 @@ import { getCrumbs } from "../../../utils/get-crumbs.js";
 import { createServer } from "../../../../app/server.js";
 import { updateApplicationStatus } from "../../../../app/api/applications.js";
 import { StatusCodes } from "http-status-codes";
-import { preSubmissionHandler } from "../../../../app/routes/utils/pre-submission-handler.js";
-import boom from "@hapi/boom";
 import { updateClaimStatus } from "../../../../app/api/claims.js";
 import { setupViewClaimRender } from "../../../utils/view-claim-render-fixtures.js";
 
 jest.mock("../../../../app/auth");
 jest.mock("../../../../app/api/applications");
 jest.mock("../../../../app/api/claims");
-jest.mock("../../../../app/routes/utils/pre-submission-handler");
 jest.mock("../../../../app/routes/utils/get-claim-view-states");
 
-preSubmissionHandler.mockImplementation((_arg, h) => h.continue);
 updateApplicationStatus.mockResolvedValue(true);
 
 const reference = "AHWR-555A-FD4C";
@@ -71,43 +67,6 @@ describe("Reject On Hold (move to In Check) Application test", () => {
       const $ = cheerio.load(res.payload);
       expect($("h1.govuk-heading-l").text()).toEqual("403 - Forbidden");
       expect($).toShowPhaseBanner();
-    });
-
-    test("returns 403 when duplicate submission - $crumb", async () => {
-      jest.resetAllMocks();
-      preSubmissionHandler.mockImplementationOnce((_arg, h) => h.continue);
-      preSubmissionHandler.mockImplementationOnce(() => {
-        return boom.forbidden("Duplicate submission");
-      });
-
-      auth = {
-        strategy: "session-auth",
-        credentials: {
-          scope: [administrator],
-          account: { homeAccountId: "testId", name: "admin" },
-        },
-      };
-      const testCrumb = await getCrumbs(server);
-      const options = {
-        auth,
-        method: "POST",
-        url,
-        payload: {
-          reference,
-          confirm: ["recommendToMoveOnHoldClaim", "updateIssuesLog"],
-          page: 1,
-          crumb: testCrumb,
-        },
-        headers: { cookie: `crumb=${testCrumb}` },
-      };
-      const res1 = await server.inject(options);
-      expect(res1.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      const res2 = await server.inject(options);
-      expect(res2.statusCode).toBe(StatusCodes.FORBIDDEN);
-      const $ = cheerio.load(res2.payload);
-      expect($).toShowPhaseBanner();
-      expect($(".govuk-heading-l").text()).toEqual("403 - Forbidden");
-      preSubmissionHandler.mockImplementation((_arg, h) => h.continue);
     });
 
     test.each([authoriser, administrator, recommender])("Reject claim processed", async (scope) => {

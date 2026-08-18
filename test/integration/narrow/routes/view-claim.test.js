@@ -6,7 +6,7 @@ import { getApplication } from "../../../../app/api/applications.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
 import { getClaimViewStates } from "../../../../app/routes/utils/get-claim-view-states.js";
-import { doubleClickProtectionOk } from "../../../utils/double-click-protection-expect.js";
+
 const { administrator } = permissions;
 
 jest.mock("../../../../app/routes/utils/get-claim-view-states");
@@ -909,7 +909,7 @@ describe("View claim test", () => {
 
       const res = await server.inject(options);
 
-      doubleClickProtectionOk(cheerio.load(res.payload), 9);
+      expect(cheerio.load(res.payload)).toPreventDoubleClicks(9);
     });
   });
 
