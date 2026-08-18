@@ -1,6 +1,5 @@
 import joi from "joi";
 import boom from "@hapi/boom";
-import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { permissions } from "../auth/permissions.js";
 import { getApplication } from "../api/applications.js";
 import { formattedDateToUk, upperFirstLetter } from "../lib/display-helper.js";
@@ -109,7 +108,6 @@ export const buildAgreement = async (
 ) => {
   const applicationReference = reference;
 
-  await generateNewCrumb(request, h);
   const application = await getApplication(applicationReference, request.logger);
   const contactHistory = await getContactHistory(applicationReference, request.logger);
   const contactHistoryDetails = displayContactHistory(contactHistory);

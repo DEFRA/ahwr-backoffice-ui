@@ -1,5 +1,4 @@
 import joi from "joi";
-import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { permissions } from "../auth/permissions.js";
 import { updateClaimData } from "../api/claims.js";
 import { updateApplicationData } from "../api/applications.js";
@@ -173,7 +172,6 @@ export const claimsDataRoutes = [
           return renderErrAtView(request, h, err);
         }
 
-        await generateNewCrumb(request, h);
         const query = new URLSearchParams({ page });
 
         if (claimOrAgreement === "claim") {

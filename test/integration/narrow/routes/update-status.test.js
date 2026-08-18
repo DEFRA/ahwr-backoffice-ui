@@ -11,7 +11,6 @@ const { administrator } = permissions;
 
 jest.mock("../../../../app/api/applications");
 jest.mock("../../../../app/api/claims");
-jest.mock("../../../../app/routes/utils/crumb-cache");
 jest.mock("../../../../app/routes/utils/get-claim-view-states");
 jest.mock("../../../../app/auth");
 

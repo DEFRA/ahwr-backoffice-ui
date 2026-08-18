@@ -1,6 +1,5 @@
 import Joi from "joi";
 import { permissions } from "../auth/permissions.js";
-import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { createFlagsTableData } from "./models/flags-list.js";
 import { deleteFlag as deleteFlagApiCall, createFlag as createFlagApiCall } from "../api/flags.js";
 import { StatusCodes } from "http-status-codes";
@@ -27,7 +26,6 @@ const ERRORS = {
 };
 
 const createView = async (request, h, deleteFlagId, createFlag, errors) => {
-  await generateNewCrumb(request, h);
   const { isAdministrator, isSuperAdmin } = mapAuth(request);
 
   // check if user is allowed to create/delete flags
