@@ -1,4 +1,7 @@
+import { STATUS } from "ffc-ahwr-common-library";
 import { getHerdBreakdown, getSiteBreakdown } from "./get-claim-breakdown.js";
+
+const withdrawn = (claim) => ({ ...claim, status: STATUS.WITHDRAWN });
 
 const sheepClaimOneWithSheepiesHerd = {
   id: "4e62d9cb-0046-421e-8296-7051a584723b",
@@ -228,6 +231,16 @@ describe("getSiteBreakdown", () => {
     const result = getSiteBreakdown([]);
     expect(result).toEqual({ poultryBreakdown: { amount: 0 } });
   });
+
+  test("does not count a site only referenced by withdrawn claims", () => {
+    const result = getSiteBreakdown([withdrawn(poultryClaim), secondPoultryClaim]);
+    expect(result).toEqual({ poultryBreakdown: { amount: 1 } });
+  });
+
+  test("counts a site referenced by both a withdrawn and a live claim", () => {
+    const result = getSiteBreakdown([withdrawn(poultryClaim), repeatedSitePoultryClaim]);
+    expect(result).toEqual({ poultryBreakdown: { amount: 1 } });
+  });
 });
 
 describe("getHerdBreakdown", () => {
@@ -289,6 +302,55 @@ describe("getHerdBreakdown", () => {
 
     expect(result).toEqual({
       herdBreakdown: { beef: 2, dairy: 0, pigs: 1, sheep: 1 },
+    });
+  });
+
+  test("it does not count a herd only referenced by withdrawn claims", () => {
+    const strippedDownClaims = [
+      withdrawn(sheepClaimOneWithSheepiesHerd),
+      pigsClaimWithHerd,
+      beefClaimWithHerd,
+    ];
+    const result = getHerdBreakdown(strippedDownClaims);
+
+    expect(result).toEqual({
+      herdBreakdown: { beef: 1, dairy: 0, pigs: 1, sheep: 0 },
+    });
+  });
+
+  test("it counts a herd referenced by both a withdrawn and a live claim", () => {
+    const strippedDownClaims = [
+      withdrawn(sheepClaimOneWithSheepiesHerd),
+      sheepClaimTwoWithSheepiesHerd,
+      pigsClaimWithHerd,
+    ];
+    const result = getHerdBreakdown(strippedDownClaims);
+
+    expect(result).toEqual({
+      herdBreakdown: { beef: 0, dairy: 0, pigs: 1, sheep: 1 },
+    });
+  });
+
+  test("it does not count an unnamed herd whose only claim is withdrawn", () => {
+    const strippedDownClaims = [withdrawn(beefClaimNoHerd), pigsClaimWithNoHerd];
+    const result = getHerdBreakdown(strippedDownClaims);
+
+    expect(result).toEqual({
+      herdBreakdown: { beef: 0, dairy: 0, pigs: 1, sheep: 0 },
+    });
+  });
+
+  test("it returns an empty breakdown when every claim is withdrawn", () => {
+    const strippedDownClaims = [
+      withdrawn(sheepClaimOneWithSheepiesHerd),
+      withdrawn(pigsClaimWithHerd),
+      withdrawn(beefClaimWithHerd),
+      withdrawn(beefClaimNoHerd),
+    ];
+    const result = getHerdBreakdown(strippedDownClaims);
+
+    expect(result).toEqual({
+      herdBreakdown: { beef: 0, dairy: 0, pigs: 0, sheep: 0 },
     });
   });
 });
