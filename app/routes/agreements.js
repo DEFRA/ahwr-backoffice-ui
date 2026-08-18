@@ -6,7 +6,6 @@ import { sessionKeys } from "../session/keys.js";
 import { viewModel } from "./models/application-list.js";
 import { searchValidation } from "../lib/search-validation.js";
 import { extractDateRangeParts, emptyDateParts } from "./utils/date-filter.js";
-import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../constants/index.js";
 import { StatusCodes } from "http-status-codes";
 
@@ -30,7 +29,6 @@ export const agreementsRoutes = [
         }),
       },
       handler: async (request, h) => {
-        await generateNewCrumb(request, h);
         const viewModelDetails = await viewModel(request);
         return h.view(viewTemplate, viewModelDetails);
       },

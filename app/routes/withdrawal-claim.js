@@ -2,7 +2,6 @@ import joi from "joi";
 import boom from "@hapi/boom";
 import { StatusCodes } from "http-status-codes";
 import { permissions } from "../auth/permissions.js";
-import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { getErrorMessagesByKey } from "./utils/get-error-messages-by-key.js";
 import { canWithdrawClaim } from "./utils/can-withdraw-claim.js";
 import { mapAuth } from "../auth/map-auth.js";
@@ -137,7 +136,6 @@ export const withdrawalClaimPostRoute = {
         { reasonForWithdrawal, issueDiscovery, withdrawalDetails },
         request.logger,
       );
-      await generateNewCrumb(request, h);
       return h.redirect(viewClaimLink(reference, page, returnPage));
     },
   },

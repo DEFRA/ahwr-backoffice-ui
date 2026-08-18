@@ -1,5 +1,4 @@
 import joi from "joi";
-import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { permissions } from "../auth/permissions.js";
 import { updateEligiblePiiRedaction } from "../api/applications.js";
 import { formatErrorsForUI } from "./utils/format-errors-for-ui.js";
@@ -52,7 +51,6 @@ export const updateEligiblePiiRedactionRoute = {
       const { name } = request.auth.credentials.account;
       const { page, note, reference, eligiblePiiRedaction } = request.payload;
 
-      await generateNewCrumb(request, h);
       const query = new URLSearchParams({ page });
 
       const agreementData = {

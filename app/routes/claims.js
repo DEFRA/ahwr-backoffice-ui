@@ -1,7 +1,6 @@
 import joi from "joi";
 import { getClaimSearch, setClaimSearch } from "../session/index.js";
 import { sessionKeys } from "../session/keys.js";
-import { generateNewCrumb } from "./utils/crumb-cache.js";
 import { config } from "../config/index.js";
 import { getClaims } from "../api/claims.js";
 import { getPagination, getPagingData } from "../pagination.js";
@@ -130,7 +129,6 @@ export const claimsRoutes = [
       },
       handler: async (request, h) => {
         try {
-          await generateNewCrumb(request, h);
           const viewData = await getViewData(request);
           return h.view("claims", viewData);
         } catch (err) {
@@ -175,7 +173,6 @@ export const claimsRoutes = [
       },
       handler: async (request, h) => {
         try {
-          await generateNewCrumb(request, h);
           setClaimSearch(request, claimSearch.searchText, "");
           setClaimSearch(request, claimSearch.searchType, "");
           setClaimSearch(request, claimSearch.agreementType, AGREEMENT_TYPE.ALL);

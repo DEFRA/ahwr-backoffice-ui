@@ -1,7 +1,6 @@
 import { formatErrorsForUI } from "../utils/format-errors-for-ui.js";
 import { getFormFlags } from "../utils/get-form-flags.js";
 import { buildViewClaim } from "../view-claim.js";
-import { generateNewCrumb } from "../utils/crumb-cache.js";
 import { updateClaimStatus } from "../../api/claims.js";
 import Joi from "joi";
 
@@ -25,8 +24,6 @@ export const updateClaimHandler = async (request, h, status) => {
   const { name } = request.auth.credentials.account;
 
   const logger = request.logger.child({ reference });
-
-  await generateNewCrumb(request, h);
 
   const query = new URLSearchParams({ page });
   query.append("returnPage", returnPage);

@@ -1,6 +1,5 @@
 import { StatusCodes } from "http-status-codes";
 import { permissions } from "../../../../app/auth/permissions.js";
-import { generateNewCrumb } from "../../../../app/routes/utils/crumb-cache.js";
 import { createServer } from "../../../../app/server.js";
 import { getCrumbs } from "../../../utils/get-crumbs.js";
 import { setupViewClaimRender } from "../../../utils/view-claim-render-fixtures.js";
@@ -9,7 +8,6 @@ const { administrator, recommender } = permissions;
 
 jest.mock("../../../../app/api/applications");
 jest.mock("../../../../app/api/claims");
-jest.mock("../../../../app/routes/utils/crumb-cache");
 jest.mock("../../../../app/routes/utils/get-claim-view-states");
 jest.mock("../../../../app/auth");
 
@@ -94,7 +92,6 @@ describe("Recommended To Reject test", () => {
       };
       const res = await server.inject(options);
       expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
-      expect(generateNewCrumb).toHaveBeenCalledTimes(1);
       expect(res.headers.location).toEqual(`/view-claim/${reference}?page=1&returnPage=claims`);
     });
   });
