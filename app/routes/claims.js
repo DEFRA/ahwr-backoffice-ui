@@ -22,7 +22,7 @@ import { getClaimTypeOptions } from "./utils/get-claim-type-options.js";
 import { getClaimFlagOptions } from "./utils/get-claim-flag-options.js";
 
 const { administrator, authoriser, processor, recommender, user } = permissions;
-const { displayPageSize } = config;
+const displayPageSize = config.get("displayPageSize");
 const { claimSearch } = sessionKeys;
 const viewTemplate = "claims";
 const currentPath = `/${viewTemplate}`;

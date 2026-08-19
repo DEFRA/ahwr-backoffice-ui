@@ -23,12 +23,12 @@ describe("auth index", () => {
   });
   describe("initAuth", () => {
     it("calls realAuth.init when auth is enabled", async () => {
-      config.auth.enabled = true;
+      config.set("auth.enabled", true);
       authIndex.initAuth();
       expect(init).toHaveBeenCalled();
     });
     it("does not call realAuth.init when auth is not enabled", async () => {
-      config.auth.enabled = false;
+      config.set("auth.enabled", false);
       authIndex.initAuth();
       expect(init).not.toHaveBeenCalled();
     });
@@ -37,10 +37,10 @@ describe("auth index", () => {
   describe("authenticate", () => {
     beforeEach(() => {
       authIndex.initAuth();
-      config.perfTestEnabled = false;
+      config.set("perfTestEnabled", false);
     });
     it("when auth is enabled calls realAuth authenticate", async () => {
-      config.auth.enabled = true;
+      config.set("auth.enabled", true);
       const mockAuth = {};
       const mockCookieAuth = {};
       await authIndex.authenticate("code", mockAuth, mockCookieAuth);
@@ -48,7 +48,7 @@ describe("auth index", () => {
       expect(devAuth.authenticate).not.toHaveBeenCalled();
     });
     it("when auth is disabled calls devAuth authenticate", async () => {
-      config.auth.enabled = false;
+      config.set("auth.enabled", false);
       const mockAuth = {};
       const mockCookieAuth = {};
       await authIndex.authenticate("code", mockAuth, mockCookieAuth);
@@ -60,16 +60,16 @@ describe("auth index", () => {
   describe("getAuthenticationUrl", () => {
     beforeEach(() => {
       authIndex.initAuth(mockServer);
-      config.perfTestEnabled = false;
+      config.set("perfTestEnabled", false);
     });
     it("when auth is enabled calls realAuth getAuthenticationUrl", async () => {
-      config.auth.enabled = true;
+      config.set("auth.enabled", true);
       await authIndex.getAuthenticationUrl();
       expect(realAuth.getAuthenticationUrl).toHaveBeenCalled();
       expect(devAuth.getAuthenticationUrl).not.toHaveBeenCalled();
     });
     it("when auth is disabled calls devAuth getAuthenticationUrl", async () => {
-      config.auth.enabled = false;
+      config.set("auth.enabled", false);
       const userId = "test-user";
       await authIndex.getAuthenticationUrl(userId);
       expect(devAuth.getAuthenticationUrl).toHaveBeenCalledWith(userId);
@@ -80,17 +80,17 @@ describe("auth index", () => {
   describe("logout", () => {
     beforeEach(() => {
       authIndex.initAuth();
-      config.perfTestEnabled = false;
+      config.set("perfTestEnabled", false);
     });
     it("when auth is enabled calls realAuth logout", async () => {
-      config.auth.enabled = true;
+      config.set("auth.enabled", true);
       const mockAccount = {};
       await authIndex.logout(mockAccount);
       expect(realAuth.logout).toHaveBeenCalledWith(mockAccount);
       expect(devAuth.logout).not.toHaveBeenCalled();
     });
     it("when auth is disabled calls devAuth logout", async () => {
-      config.auth.enabled = false;
+      config.set("auth.enabled", false);
       const mockAccount = {};
       await authIndex.logout(mockAccount);
       expect(devAuth.logout).toHaveBeenCalledWith(mockAccount);

@@ -3,7 +3,8 @@ import { config } from "../config/index.js";
 import { contactHistory } from "./../constants/contact-history.js";
 
 const { fieldsNames, labels, notAvailable } = contactHistory;
-const { applicationApiUri, apiKeys } = config;
+const applicationApiUri = config.get("applicationApiUri");
+const apiKeys = config.get("apiKeys");
 
 export async function getContactHistory(reference, logger) {
   const endpoint = `${applicationApiUri}/applications/contact-history/${reference}`;

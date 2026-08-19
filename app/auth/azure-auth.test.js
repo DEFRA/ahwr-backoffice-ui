@@ -16,21 +16,17 @@ jest.mock("@defra/hapi-auth-oidc", () => ({
   WebIdentityTokenProvider: jest.fn(),
 }));
 jest.mock("../config/index.js", () => {
-  const actual = jest.requireActual("../config/index.js");
-
-  return {
-    ...actual,
-    config: {
-      ...actual.config,
-      auth: {
-        clientId: "test-client-id",
-        authority: "https://test-authority",
-        redirectUrl: "https://test-redirect",
-      },
-      isProd: true,
-      isTest: false,
-    },
+  const { asConvict } = require("../../test/helpers/mock-config.js");
+  const values = jest.requireActual("../config/index.js").config.getProperties();
+  values.auth = {
+    ...values.auth,
+    clientId: "test-client-id",
+    authority: "https://test-authority",
+    redirectUrl: "https://test-redirect",
   };
+  values.isProd = true;
+  values.isTest = false;
+  return { config: asConvict(values) };
 });
 
 const mockLogger = {
@@ -103,8 +99,8 @@ describe("Azure auth test", () => {
     expect(ConfidentialClientApplication).toHaveBeenCalledWith(
       expect.objectContaining({
         auth: expect.objectContaining({
-          clientId: config.auth.clientId,
-          authority: config.auth.authority,
+          clientId: config.get("auth.clientId"),
+          authority: config.get("auth.authority"),
           clientAssertion: expect.any(Function),
         }),
       }),

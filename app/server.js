@@ -20,7 +20,7 @@ export async function createServer(options) {
   const { testPort } = options ?? {};
   const server = Hapi.server({
     cache: [getCacheEngine()],
-    port: testPort ?? config.port,
+    port: testPort ?? config.get("port"),
     routes: {
       validate: {
         options: {

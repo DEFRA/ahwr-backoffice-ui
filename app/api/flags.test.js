@@ -4,13 +4,18 @@ import { flags } from "../../test/data/flags.js";
 import { config } from "../config/index.js";
 import { metricsCounter } from "../lib/metrics.js";
 
-const { applicationApiUri } = config;
+const applicationApiUri = config.get("applicationApiUri");
 
 jest.mock("@hapi/wreck");
-jest.mock("../config");
+jest.mock("../config", () => ({
+  config: require("../../test/helpers/mock-config.js").asConvict({
+    applicationApiUri: "https://application-backend",
+    apiKeys: { backofficeUiApiKey: "test-api-key" },
+  }),
+}));
 jest.mock("../lib/metrics.js");
 
-const { apiKeys } = config;
+const apiKeys = config.get("apiKeys");
 
 const mockLogger = {
   error: jest.fn(),

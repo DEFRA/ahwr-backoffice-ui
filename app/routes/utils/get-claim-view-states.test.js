@@ -5,10 +5,10 @@ import { config } from "../../config/index.js";
 const { administrator, recommender, authoriser, user } = permissions;
 
 jest.mock("../../config", () => ({
-  config: {
+  config: require("../../../test/helpers/mock-config.js").asConvict({
     superAdmins: ["currentuser@test"],
     withdrawClaimEnabled: true,
-  },
+  }),
 }));
 
 const currentUser = "testUser";
@@ -623,7 +623,7 @@ describe("withdraw button", () => {
   });
 
   afterEach(() => {
-    config.withdrawClaimEnabled = true;
+    config.set("withdrawClaimEnabled", true);
   });
 
   test("withdrawAction: true when super admin, status in check and toggle enabled", () => {
@@ -636,7 +636,7 @@ describe("withdraw button", () => {
   });
 
   test("withdrawAction: false when toggle disabled", () => {
-    config.withdrawClaimEnabled = false;
+    config.set("withdrawClaimEnabled", false);
 
     const state = getClaimViewStates({
       request: inCheckSuperAdminRequest,

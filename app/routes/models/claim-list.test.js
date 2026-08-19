@@ -1,9 +1,9 @@
 import { getClaimTableHeader, getClaimTableRows } from "./claim-list.js";
 
 jest.mock("../../config/index.js", () => ({
-  config: {
+  config: require("../../../test/helpers/mock-config.js").asConvict({
     serviceUri: "test-uri",
-  },
+  }),
 }));
 
 describe("getClaimTableHeader", () => {

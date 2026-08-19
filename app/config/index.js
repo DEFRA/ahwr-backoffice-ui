@@ -1,126 +1,279 @@
-import joi from "joi";
-import { authConfig } from "./auth.js";
+import convict from "convict";
+import { convictValidateUri } from "./convict/validate-uri.js";
+import { convictValidateCookiePassword } from "./convict/validate-cookie-password.js";
+
+convict.addFormat(convictValidateUri);
+convict.addFormat(convictValidateCookiePassword);
 
 const SECONDS_PER_HOUR = 3600;
 const MILLISECONDS_PER_SECOND = 1000;
 const HOURS_PER_HALF_DAY = 12;
+const halfDayInMs = MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_HALF_DAY;
 
-const getConfigSchema = () =>
-  joi.object({
-    cache: {
-      expiresIn: joi.number().required(),
-      name: joi.string().required(),
-      options: {
-        host: joi.string(),
-        keyPrefix: joi.string(),
-        username: joi.string().allow(""),
-        password: joi.string().allow(""),
-        useSingleInstanceCache: joi.boolean(),
-        useTLS: joi.boolean(),
+const isProduction = process.env.NODE_ENV === "production";
+
+const config = convict({
+  cache: {
+    expiresIn: {
+      doc: "Session cache TTL in milliseconds",
+      format: Number,
+      default: halfDayInMs,
+    },
+    name: {
+      doc: "Cache segment name",
+      format: String,
+      default: "session",
+    },
+    options: {
+      host: {
+        doc: "Redis host",
+        format: String,
+        default: "redis-hostname.default",
+        env: "REDIS_HOST",
+      },
+      keyPrefix: {
+        doc: "Redis key prefix",
+        format: String,
+        default: "ahwr-backoffice-ui:",
+        env: "REDIS_KEY_PREFIX",
+      },
+      username: {
+        doc: "Redis username",
+        format: String,
+        nullable: true,
+        default: null,
+        env: "REDIS_USERNAME",
+      },
+      password: {
+        doc: "Redis password",
+        format: String,
+        nullable: true,
+        default: null,
+        sensitive: true,
+        env: "REDIS_PASSWORD",
+      },
+      useSingleInstanceCache: {
+        doc: "Use a single Redis instance rather than a cluster",
+        format: Boolean,
+        default: !isProduction,
+      },
+      useTLS: {
+        doc: "Connect to Redis over TLS",
+        format: Boolean,
+        default: isProduction,
       },
     },
-    apiKeys: {
-      backofficeUiApiKey: joi.string().required(),
+  },
+  apiKeys: {
+    backofficeUiApiKey: {
+      doc: "Api key for the backoffice ui",
+      format: String,
+      default: null,
+      sensitive: true,
+      env: "BACKOFFICE_UI_API_KEY",
     },
-    cookie: {
-      cookieNameCookiePolicy: joi.string().required(),
-      cookieNameAuth: joi.string().required(),
-      cookieNameSession: joi.string().required(),
-      isSameSite: joi.string().required(),
-      isSecure: joi.boolean().required(),
-      password: joi.string().min(32).required(),
-      ttl: joi.number().required(),
+  },
+  cookie: {
+    cookieNameCookiePolicy: {
+      doc: "Cookie policy cookie name",
+      format: String,
+      default: "ffc_ahwr_backoffice_cookie_policy",
     },
-    env: joi.string().valid("development", "test", "production").required(),
-    isDev: joi.boolean().required(),
-    isProd: joi.boolean().required(),
-    isTest: joi.boolean().required(),
-    isMetricsEnabled: joi.boolean().required(),
-    port: joi.number().required(),
-    serviceUri: joi.string().uri().required(),
-    useRedis: joi.boolean().required(),
-    applicationApiUri: joi.string().uri().required(),
-    paymentProxyApiUri: joi.string().uri().required(),
-    messageGeneratorApiUri: joi.string().uri().required(),
-    documentGeneratorApiUri: joi.string().uri().required(),
-    commsProxyApiUri: joi.string().uri().required(),
-    displayPageSize: joi.number().required(),
-    superAdmins: joi.array().items(joi.string()).required(),
-    proxy: joi.string().optional(),
-    serviceVersion: joi.string().required(),
-    name: joi.string().required(),
-    logLevel: joi.string().required(),
-    logFormat: joi.string().required(),
-    logRedact: joi.array().items(joi.string()),
-    withdrawClaimEnabled: joi.bool().optional().default(false),
-  });
-
-const buildConfig = () => {
-  const conf = {
-    cache: {
-      expiresIn: MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_HALF_DAY,
-      name: "session",
-      options: {
-        host: process.env.REDIS_HOST || "redis-hostname.default",
-        keyPrefix: process.env.REDIS_KEY_PREFIX || "ahwr-backoffice-ui:",
-        username: process.env.REDIS_USERNAME,
-        password: process.env.REDIS_PASSWORD,
-        useSingleInstanceCache: process.env.NODE_ENV !== "production",
-        useTLS: process.env.NODE_ENV === "production",
-      },
+    cookieNameAuth: {
+      doc: "Auth cookie name",
+      format: String,
+      default: "ffc_ahwr_backoffice_auth",
     },
-    cookie: {
-      cookieNameCookiePolicy: "ffc_ahwr_backoffice_cookie_policy",
-      cookieNameAuth: "ffc_ahwr_backoffice_auth",
-      cookieNameSession: "ffc_ahwr_backoffice_session",
-      isSameSite: "Lax",
-      isSecure: process.env.NODE_ENV === "production",
-      password: process.env.COOKIE_PASSWORD, // set a secure cookie password of at least 32 characters"
-      ttl: MILLISECONDS_PER_SECOND * SECONDS_PER_HOUR * HOURS_PER_HALF_DAY,
+    cookieNameSession: {
+      doc: "Session cookie name",
+      format: String,
+      default: "ffc_ahwr_backoffice_session",
     },
-    apiKeys: {
-      backofficeUiApiKey: process.env.BACKOFFICE_UI_API_KEY,
+    isSameSite: {
+      doc: "SameSite cookie attribute",
+      format: String,
+      default: "Lax",
     },
-    env: process.env.NODE_ENV,
-    isDev: process.env.NODE_ENV === "development",
-    isProd: process.env.NODE_ENV === "production",
-    isTest: process.env.NODE_ENV === "test",
-    isMetricsEnabled: process.env.NODE_ENV === "production",
-    port: process.env.PORT,
-    serviceUri: process.env.AHWR_SERVICE_URI,
-    useRedis: process.env.NODE_ENV !== "test",
-    applicationApiUri: process.env.AHWR_APPLICATION_BACKEND_URL,
-    paymentProxyApiUri: process.env.AHWR_PAYMENT_PROXY_URL,
-    messageGeneratorApiUri: process.env.AHWR_MESSAGE_GENERATOR_URL,
-    documentGeneratorApiUri: process.env.AHWR_DOCUMENT_GENERATOR_URL,
-    commsProxyApiUri: process.env.AHWR_COMMS_PROXY_URL,
-    displayPageSize: Number(process.env.DISPLAY_PAGE_SIZE ?? "20"),
-    superAdmins: process.env.SUPER_ADMINS
+    isSecure: {
+      doc: "Set the Secure flag on cookies",
+      format: Boolean,
+      default: isProduction,
+    },
+    password: {
+      doc: "Cookie encryption password (min 32 chars)",
+      format: "cookie-password",
+      default: null,
+      sensitive: true,
+      env: "COOKIE_PASSWORD",
+    },
+    ttl: {
+      doc: "Session cookie TTL in milliseconds",
+      format: Number,
+      default: halfDayInMs,
+    },
+  },
+  env: {
+    doc: "The Node environment",
+    format: ["development", "test", "production"],
+    default: "development",
+    env: "NODE_ENV",
+  },
+  isDev: {
+    doc: "Running in development",
+    format: Boolean,
+    default: process.env.NODE_ENV === "development",
+  },
+  isProd: {
+    doc: "Running in production",
+    format: Boolean,
+    default: isProduction,
+  },
+  isTest: {
+    doc: "Running under test",
+    format: Boolean,
+    default: process.env.NODE_ENV === "test",
+  },
+  isMetricsEnabled: {
+    doc: "Enable metrics reporting",
+    format: Boolean,
+    default: isProduction,
+  },
+  port: {
+    doc: "The port to bind",
+    format: Number,
+    default: null,
+    env: "PORT",
+  },
+  serviceUri: {
+    doc: "Backoffice service URI",
+    format: "uri",
+    default: null,
+    env: "AHWR_SERVICE_URI",
+  },
+  useRedis: {
+    doc: "Use Redis for the session cache",
+    format: Boolean,
+    default: process.env.NODE_ENV !== "test",
+  },
+  applicationApiUri: {
+    doc: "Application backend API URI",
+    format: "uri",
+    default: null,
+    env: "AHWR_APPLICATION_BACKEND_URL",
+  },
+  paymentProxyApiUri: {
+    doc: "Payment proxy API URI",
+    format: "uri",
+    default: null,
+    env: "AHWR_PAYMENT_PROXY_URL",
+  },
+  messageGeneratorApiUri: {
+    doc: "Message generator API URI",
+    format: "uri",
+    default: null,
+    env: "AHWR_MESSAGE_GENERATOR_URL",
+  },
+  documentGeneratorApiUri: {
+    doc: "Document generator API URI",
+    format: "uri",
+    default: null,
+    env: "AHWR_DOCUMENT_GENERATOR_URL",
+  },
+  commsProxyApiUri: {
+    doc: "Comms proxy API URI",
+    format: "uri",
+    default: null,
+    env: "AHWR_COMMS_PROXY_URL",
+  },
+  displayPageSize: {
+    doc: "Number of items to display per page",
+    format: Number,
+    default: 20,
+    env: "DISPLAY_PAGE_SIZE",
+  },
+  superAdmins: {
+    doc: "Super admin usernames",
+    format: Array,
+    default: process.env.SUPER_ADMINS
       ? process.env.SUPER_ADMINS.split(",").map((user) => user.trim().toLowerCase())
       : [],
-    proxy: process.env.HTTP_PROXY,
-    serviceVersion: process.env.SERVICE_VERSION,
-    name: process.env.SERVICE_NAME ?? "ahwr-backoffice-ui",
-    logLevel: process.env.LOG_LEVEL ?? (process.env.NODE_ENV === "test" ? "silent" : "info"),
-    logFormat: process.env.USE_PRETTY_PRINT === "true" ? "pino-pretty" : "ecs",
-    logRedact: process.env.LOG_REDACT
+  },
+  proxy: {
+    doc: "HTTP proxy URL",
+    format: String,
+    nullable: true,
+    default: null,
+    env: "HTTP_PROXY",
+  },
+  serviceVersion: {
+    doc: "Service version",
+    format: String,
+    default: null,
+    env: "SERVICE_VERSION",
+  },
+  name: {
+    doc: "Application name",
+    format: String,
+    default: "ahwr-backoffice-ui",
+    env: "SERVICE_NAME",
+  },
+  logLevel: {
+    doc: "Logging level",
+    format: String,
+    default: process.env.NODE_ENV === "test" ? "silent" : "info",
+    env: "LOG_LEVEL",
+  },
+  logFormat: {
+    doc: "Log output format",
+    format: String,
+    default: process.env.USE_PRETTY_PRINT === "true" ? "pino-pretty" : "ecs",
+  },
+  logRedact: {
+    doc: "Log paths to redact",
+    format: Array,
+    default: process.env.LOG_REDACT
       ? process.env.LOG_REDACT.split(",")
       : ["req.headers", "res.headers"],
-    withdrawClaimEnabled: process.env.WITHDRAW_CLAIM_ENABLED === "true",
-  };
+  },
+  withdrawClaimEnabled: {
+    doc: "Enable claim withdrawal",
+    format: Boolean,
+    default: process.env.WITHDRAW_CLAIM_ENABLED === "true",
+  },
+  perfTestEnabled: {
+    doc: "Enable performance-test auth bypass",
+    format: Boolean,
+    default: process.env.PERF_TEST_ENABLED === "true",
+  },
+  auth: {
+    enabled: {
+      doc: "Enable Azure AD authentication",
+      format: Boolean,
+      default: process.env.AADAR_ENABLED === "true",
+    },
+    clientId: {
+      doc: "Azure AD client id",
+      format: String,
+      default: null,
+      env: "AADAR_CLIENT_ID",
+    },
+    authority: {
+      doc: "Azure AD authority URL",
+      format: "uri",
+      default: null,
+      env: "AADAR_AUTHORITY_URL",
+    },
+    redirectUrl: {
+      doc: "Azure AD redirect URL",
+      format: "uri",
+      default: null,
+      env: "AADAR_REDIRECT_URL",
+    },
+  },
+});
 
-  if (process.env.NODE_ENV === "test") {
-    return { ...conf, auth: authConfig };
-  }
+if (process.env.NODE_ENV !== "test") {
+  config.validate({ allowed: "strict" });
+}
 
-  const schema = getConfigSchema();
-  const { error } = schema.validate(conf, { abortEarly: false });
-
-  if (error) {
-    throw new Error(`The server config is invalid. ${error.message}`);
-  }
-
-  return { ...conf, auth: authConfig };
-};
-
-export const config = buildConfig();
+export { config };

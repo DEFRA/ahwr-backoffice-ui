@@ -4,9 +4,9 @@ import { permissions } from "./permissions.js";
 const { administrator, processor, user, recommender, authoriser } = permissions;
 
 jest.mock("../config", () => ({
-  config: {
+  config: require("../../test/helpers/mock-config.js").asConvict({
     superAdmins: ["superadmin@test"],
-  },
+  }),
 }));
 
 test("roles in scope", () => {

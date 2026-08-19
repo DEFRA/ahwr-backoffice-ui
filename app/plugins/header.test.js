@@ -20,7 +20,7 @@ describe("security headers", () => {
   test.each([
     ["x-frame-options", "deny"],
     ["x-content-type-options", "nosniff"],
-    ["access-control-allow-origin", config.serviceUri],
+    ["access-control-allow-origin", config.get("serviceUri")],
     ["cross-origin-opener-policy", "same-origin"],
     ["cross-origin-embedder-policy", "require-corp"],
     ["x-robots-tag", "noindex, nofollow"],

@@ -1,6 +1,6 @@
 import { config } from "./config/index.js";
 
-export function getPagination(page = 1, limit = config.displayPageSize) {
+export function getPagination(page = 1, limit = config.get("displayPageSize")) {
   const offset = page === 1 ? 0 : (page - 1) * Number(limit);
   return { limit, offset };
 }

@@ -25,14 +25,14 @@ import { StatusCodes } from "http-status-codes";
 
 jest.mock("@hapi/wreck");
 jest.mock("../../../app/config", () => ({
-  config: {
+  config: require("../../../test/helpers/mock-config.js").asConvict({
     apiKeys: { backofficeUiApiKey: "something" },
     applicationApiUri: "http://ahwr-application-backend:3001/api",
     paymentProxyApiUri: "http://ahwr-payment-proxy:3001/api",
     messageGeneratorApiUri: "http://ahwr-message-generator:3001/api",
     documentGeneratorApiUri: "http://ahwr-document-generator:3001/api",
     commsProxyApiUri: "http://ahwr-sfd-comms-proxy:3001/api",
-  },
+  }),
 }));
 
 const mockLogger = {

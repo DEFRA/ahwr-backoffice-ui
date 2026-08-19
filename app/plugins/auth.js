@@ -10,9 +10,9 @@ export const authPlugin = {
       await server.register(authCookie);
 
       const sessionCache = server.cache({
-        cache: config.cache.name,
+        cache: config.get("cache.name"),
         segment: SESSION_AUTH,
-        expiresIn: config.cache.expiresIn,
+        expiresIn: config.get("cache.expiresIn"),
       });
       const saveSession = async (id, data) => sessionCache.set(id, data);
       const getSession = async (id) => sessionCache.get(id);
@@ -20,10 +20,10 @@ export const authPlugin = {
       server.auth.strategy(SESSION_AUTH, "cookie", {
         cookie: {
           name: SESSION_AUTH,
-          password: config.cookie.password,
-          ttl: config.cookie.ttl,
+          password: config.get("cookie.password"),
+          ttl: config.get("cookie.ttl"),
           path: "/",
-          isSecure: config.isProd,
+          isSecure: config.get("isProd"),
           isSameSite: "Lax", // Needed for the post authentication redirect
         },
         keepAlive: false,

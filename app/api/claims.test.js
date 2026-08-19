@@ -15,10 +15,16 @@ import { AGREEMENT_TYPE, CLAIM_TYPE, FLAG, SPECIES } from "../constants/index.js
 import { SEARCH_STATUS } from "../routes/utils/get-claim-status-options.js";
 
 jest.mock("@hapi/wreck");
-jest.mock("../config");
+jest.mock("../config", () => ({
+  config: require("../../test/helpers/mock-config.js").asConvict({
+    applicationApiUri: "https://application-backend",
+    apiKeys: { backofficeUiApiKey: "test-api-key" },
+  }),
+}));
 jest.mock("../lib/metrics.js");
 
-const { apiKeys, applicationApiUri } = config;
+const apiKeys = config.get("apiKeys");
+const applicationApiUri = config.get("applicationApiUri");
 
 describe("Claims API", () => {
   const applicationReference = "AHWR-1234-APP1";

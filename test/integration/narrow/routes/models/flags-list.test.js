@@ -3,7 +3,7 @@ import { createFlagsTableData } from "../../../../../app/routes/models/flags-lis
 import { flags } from "../../../../data/flags.js";
 import { config } from "../../../../../app/config/index.js";
 
-const { serviceUri } = config;
+const serviceUri = config.get("serviceUri");
 
 jest.mock("../../../../../app/api/flags");
 

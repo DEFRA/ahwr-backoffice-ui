@@ -10,15 +10,11 @@ const { administrator } = permissions;
 const SUPER_ADMIN_USERNAME = "superadmin@test";
 
 jest.mock("../../../../app/config/index.js", () => {
-  const actual = jest.requireActual("../../../../app/config/index.js");
-  return {
-    ...actual,
-    config: {
-      ...actual.config,
-      superAdmins: ["superadmin@test"],
-      withdrawClaimEnabled: true,
-    },
-  };
+  const { asConvict } = require("../../../helpers/mock-config.js");
+  const values = jest.requireActual("../../../../app/config/index.js").config.getProperties();
+  values.superAdmins = ["superadmin@test"];
+  values.withdrawClaimEnabled = true;
+  return { config: asConvict(values) };
 });
 jest.mock("../../../../app/auth");
 jest.mock("../../../../app/session");
@@ -84,7 +80,7 @@ describe("Withdraw claim button", () => {
   });
 
   beforeEach(() => {
-    config.withdrawClaimEnabled = true;
+    config.set("withdrawClaimEnabled", true);
     getClaim.mockReturnValue(claim);
     getClaims.mockReturnValue({ claims: [claim] });
     getApplication.mockReturnValue(application);
@@ -111,7 +107,7 @@ describe("Withdraw claim button", () => {
   });
 
   test("hides the button when the toggle is disabled", async () => {
-    config.withdrawClaimEnabled = false;
+    config.set("withdrawClaimEnabled", false);
 
     const res = await injectViewClaim(server, superAdminAuth);
 

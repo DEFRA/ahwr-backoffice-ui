@@ -4,7 +4,8 @@ import { metricsCounter } from "../lib/metrics.js";
 import { AGREEMENT_TYPE, CLAIM_TYPE, FLAG, SPECIES } from "../constants/index.js";
 import { SEARCH_STATUS } from "../routes/utils/get-claim-status-options.js";
 
-const { applicationApiUri, apiKeys } = config;
+const applicationApiUri = config.get("applicationApiUri");
+const apiKeys = config.get("apiKeys");
 
 export async function getClaim(reference, logger) {
   const endpoint = `${applicationApiUri}/claims/${reference}`;

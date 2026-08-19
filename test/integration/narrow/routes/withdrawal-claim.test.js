@@ -10,15 +10,11 @@ import { getApplication } from "../../../../app/api/applications.js";
 const SUPER_ADMIN_USERNAME = "superadmin@test";
 
 jest.mock("../../../../app/config/index.js", () => {
-  const actual = jest.requireActual("../../../../app/config/index.js");
-  return {
-    ...actual,
-    config: {
-      ...actual.config,
-      superAdmins: ["superadmin@test"],
-      withdrawClaimEnabled: true,
-    },
-  };
+  const { asConvict } = require("../../../helpers/mock-config.js");
+  const values = jest.requireActual("../../../../app/config/index.js").config.getProperties();
+  values.superAdmins = ["superadmin@test"];
+  values.withdrawClaimEnabled = true;
+  return { config: asConvict(values) };
 });
 jest.mock("../../../../app/auth");
 jest.mock("../../../../app/api/claims");
@@ -59,7 +55,7 @@ describe("Withdrawal claim page", () => {
   });
 
   beforeEach(() => {
-    config.withdrawClaimEnabled = true;
+    config.set("withdrawClaimEnabled", true);
     getClaim.mockResolvedValue(claim);
     getApplication.mockResolvedValue(application);
   });
@@ -157,7 +153,7 @@ describe("Withdrawal claim page", () => {
     });
 
     test("forbids when the withdraw claim toggle is disabled", async () => {
-      config.withdrawClaimEnabled = false;
+      config.set("withdrawClaimEnabled", false);
 
       const res = await getWithdrawalPage();
 
