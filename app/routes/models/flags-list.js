@@ -1,7 +1,7 @@
 import { getAllFlags } from "../../api/flags.js";
 import { config } from "../../config/index.js";
 
-const { serviceUri } = config;
+const serviceUri = config.get("serviceUri");
 
 const formatDate = (dateInput) => {
   const date = new Date(dateInput); // parses with timezone offset preserved

@@ -10,7 +10,7 @@ import { FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../constants/index.js";
 import { StatusCodes } from "http-status-codes";
 
 const { administrator, processor, user, recommender, authoriser } = permissions;
-const { displayPageSize } = config;
+const displayPageSize = config.get("displayPageSize");
 const viewTemplate = "agreements";
 const currentPath = `/${viewTemplate}`;
 

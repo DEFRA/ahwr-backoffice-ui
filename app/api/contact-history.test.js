@@ -2,7 +2,12 @@ import { getContactHistory, displayContactHistory } from "./contact-history.js";
 import wreck from "@hapi/wreck";
 
 jest.mock("@hapi/wreck");
-jest.mock("../config");
+jest.mock("../config", () => ({
+  config: require("../../test/helpers/mock-config.js").asConvict({
+    applicationApiUri: "https://application-backend",
+    apiKeys: { backofficeUiApiKey: "test-api-key" },
+  }),
+}));
 
 describe("contact-history", () => {
   describe("getContactHistory", () => {

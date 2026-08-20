@@ -12,9 +12,15 @@ import {
 } from "./applications.js";
 
 jest.mock("@hapi/wreck");
-jest.mock("../config");
+jest.mock("../config", () => ({
+  config: require("../../test/helpers/mock-config.js").asConvict({
+    applicationApiUri: "https://application-backend",
+    apiKeys: { backofficeUiApiKey: "test-api-key" },
+  }),
+}));
 
-const { applicationApiUri, apiKeys } = config;
+const applicationApiUri = config.get("applicationApiUri");
+const apiKeys = config.get("apiKeys");
 const appRef = "ABC-1234";
 const limit = 20;
 const offset = 0;

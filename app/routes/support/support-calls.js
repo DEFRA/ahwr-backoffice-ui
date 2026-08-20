@@ -2,14 +2,12 @@ import wreck from "@hapi/wreck";
 import { config } from "../../config/index.js";
 import { StatusCodes } from "http-status-codes";
 
-const {
-  applicationApiUri,
-  apiKeys,
-  paymentProxyApiUri,
-  messageGeneratorApiUri,
-  documentGeneratorApiUri,
-  commsProxyApiUri,
-} = config;
+const applicationApiUri = config.get("applicationApiUri");
+const apiKeys = config.get("apiKeys");
+const paymentProxyApiUri = config.get("paymentProxyApiUri");
+const messageGeneratorApiUri = config.get("messageGeneratorApiUri");
+const documentGeneratorApiUri = config.get("documentGeneratorApiUri");
+const commsProxyApiUri = config.get("commsProxyApiUri");
 
 const makeGetCall = async (url, notFoundMessage, logger) => {
   try {

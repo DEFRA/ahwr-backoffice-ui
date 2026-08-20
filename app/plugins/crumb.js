@@ -1,7 +1,7 @@
 import { config } from "../config/index.js";
 import crumb from "@hapi/crumb";
 
-const { cookie: cookieConfig } = config;
+const cookieConfig = config.get("cookie");
 
 export const crumbPlugin = {
   plugin: crumb,

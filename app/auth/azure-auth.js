@@ -12,7 +12,7 @@ const wrapLoggerForPino = (logger) => ({
 });
 
 export const getMsalLoggingSetup = () => {
-  if (config.isProd || config.isTest) {
+  if (config.get("isProd") || config.get("isTest")) {
     return {
       loggerCallback(loglevel, message, _containsPii) {
         const logger = getLogger();
@@ -42,8 +42,8 @@ export const init = () => {
 
   msalApplication = new ConfidentialClientApplication({
     auth: {
-      clientId: config.auth.clientId,
-      authority: config.auth.authority,
+      clientId: config.get("auth.clientId"),
+      authority: config.get("auth.authority"),
       clientAssertion: async () => authProvider.getCredentials(wrapLoggerForPino(getLogger())),
     },
     system: { loggerOptions: msalLogging, customAgentOptions: { keepAlive: false } },
@@ -53,7 +53,7 @@ export const init = () => {
 export const getAuthenticationUrl = () => {
   const authCodeUrlParameters = {
     prompt: "select_account", // Force the MS account select dialog
-    redirectUri: config.auth.redirectUrl,
+    redirectUri: config.get("auth.redirectUrl"),
     responseMode: ResponseMode.FORM_POST,
   };
 
@@ -63,7 +63,7 @@ export const getAuthenticationUrl = () => {
 export const authenticate = async (redirectCode, auth, cookieAuth) => {
   const token = await msalApplication.acquireTokenByCode({
     code: redirectCode,
-    redirectUri: config.auth.redirectUrl,
+    redirectUri: config.get("auth.redirectUrl"),
   });
 
   const sessionId = await auth.createSession(token.account, token.idTokenClaims.roles);

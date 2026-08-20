@@ -18,14 +18,11 @@ const { like, equal, reify } = MatchersV3;
 // Babel hoists this call above all imports, so the port must be a literal here, kept
 // in sync with MOCK_PACT_PORT in provider/claims-search-endpoint.js rather than shared via import.
 jest.mock("../../../../app/config/index.js", () => {
-  const actual = jest.requireActual("../../../../app/config/index.js");
-  return {
-    config: {
-      ...actual.config,
-      applicationApiUri: "http://127.0.0.1:8992",
-      apiKeys: { ...actual.config.apiKeys, backofficeUiApiKey: "pact-test-api-key" },
-    },
-  };
+  const { asConvict } = require("../../../helpers/mock-config.js");
+  const values = jest.requireActual("../../../../app/config/index.js").config.getProperties();
+  values.applicationApiUri = "http://127.0.0.1:8992";
+  values.apiKeys = { ...values.apiKeys, backofficeUiApiKey: "pact-test-api-key" };
+  return { config: asConvict(values) };
 });
 
 describe("getClaims contract with ahwr-application-backend", () => {

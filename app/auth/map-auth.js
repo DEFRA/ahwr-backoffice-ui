@@ -2,7 +2,7 @@ import { permissions } from "./permissions.js";
 import { config } from "../config/index.js";
 
 const { administrator, processor, user, recommender, authoriser } = permissions;
-const { superAdmins } = config;
+const superAdmins = config.get("superAdmins");
 
 export const mapAuth = (request) => {
   const { isAuthenticated, credentials } = request.auth;

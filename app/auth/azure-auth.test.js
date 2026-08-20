@@ -1,4 +1,10 @@
-import { getMsalLoggingSetup, getAuthenticationUrl, init } from "./azure-auth.js";
+import {
+  getMsalLoggingSetup,
+  getAuthenticationUrl,
+  init,
+  authenticate,
+  logout,
+} from "./azure-auth.js";
 import { getLogger } from "../logging/logger.js";
 import { ConfidentialClientApplication, LogLevel, ResponseMode } from "@azure/msal-node";
 import { config } from "../config/index.js";
@@ -16,21 +22,17 @@ jest.mock("@defra/hapi-auth-oidc", () => ({
   WebIdentityTokenProvider: jest.fn(),
 }));
 jest.mock("../config/index.js", () => {
-  const actual = jest.requireActual("../config/index.js");
-
-  return {
-    ...actual,
-    config: {
-      ...actual.config,
-      auth: {
-        clientId: "test-client-id",
-        authority: "https://test-authority",
-        redirectUrl: "https://test-redirect",
-      },
-      isProd: true,
-      isTest: false,
-    },
+  const { asConvict } = require("../../test/helpers/mock-config.js");
+  const values = jest.requireActual("../config/index.js").config.getProperties();
+  values.auth = {
+    ...values.auth,
+    clientId: "test-client-id",
+    authority: "https://test-authority",
+    redirectUrl: "https://test-redirect",
   };
+  values.isProd = true;
+  values.isTest = false;
+  return { config: asConvict(values) };
 });
 
 const mockLogger = {
@@ -103,8 +105,8 @@ describe("Azure auth test", () => {
     expect(ConfidentialClientApplication).toHaveBeenCalledWith(
       expect.objectContaining({
         auth: expect.objectContaining({
-          clientId: config.auth.clientId,
-          authority: config.auth.authority,
+          clientId: config.get("auth.clientId"),
+          authority: config.get("auth.authority"),
           clientAssertion: expect.any(Function),
         }),
       }),
@@ -152,6 +154,67 @@ describe("Azure auth test", () => {
     test("passes through error calls that are not (string, Error) unchanged", () => {
       wrappedLogger.error("plain error message");
       expect(mockLogger.error).toHaveBeenCalledWith("plain error message", undefined);
+    });
+  });
+
+  test("getMsalLoggingSetup returns no logging config outside prod and test", () => {
+    config.set("isProd", false);
+    config.set("isTest", false);
+
+    expect(getMsalLoggingSetup()).toEqual({});
+
+    config.set("isProd", true);
+    config.set("isTest", false);
+  });
+
+  describe("authenticate", () => {
+    it("acquires a token, creates a session and returns username and roles", async () => {
+      const acquireTokenByCode = jest.fn().mockResolvedValue({
+        account: { username: "user@test" },
+        idTokenClaims: { roles: ["administrator"] },
+      });
+      ConfidentialClientApplication.mockImplementation(() => ({ acquireTokenByCode }));
+      init();
+
+      const auth = { createSession: jest.fn().mockResolvedValue("session-id") };
+      const cookieAuth = { set: jest.fn() };
+
+      const result = await authenticate("redirect-code", auth, cookieAuth);
+
+      expect(acquireTokenByCode).toHaveBeenCalledWith({
+        code: "redirect-code",
+        redirectUri: config.get("auth.redirectUrl"),
+      });
+      expect(auth.createSession).toHaveBeenCalledWith({ username: "user@test" }, ["administrator"]);
+      expect(cookieAuth.set).toHaveBeenCalledWith({ id: "session-id" });
+      expect(result).toEqual(["user@test", ["administrator"]]);
+    });
+  });
+
+  describe("logout", () => {
+    it("removes the account from the token cache", async () => {
+      const removeAccount = jest.fn().mockResolvedValue(undefined);
+      ConfidentialClientApplication.mockImplementation(() => ({
+        getTokenCache: () => ({ removeAccount }),
+      }));
+      init();
+
+      const account = { username: "user@test" };
+      await logout(account);
+
+      expect(removeAccount).toHaveBeenCalledWith(account);
+    });
+
+    it("logs when the account cannot be removed", async () => {
+      const error = new Error("cache failure");
+      ConfidentialClientApplication.mockImplementation(() => ({
+        getTokenCache: () => ({ removeAccount: jest.fn().mockRejectedValue(error) }),
+      }));
+      init();
+
+      await logout({ username: "user@test" });
+
+      expect(mockLogger.error).toHaveBeenCalledWith({ error }, "Unable to end session");
     });
   });
 });

@@ -3,9 +3,9 @@ import { permissions } from "../../auth/permissions.js";
 const { administrator } = permissions;
 
 jest.mock("../../config", () => ({
-  config: {
+  config: require("../../../test/helpers/mock-config.js").asConvict({
     superAdmins: ["currentuser@test"],
-  },
+  }),
 }));
 
 const currentUser = "testUser";

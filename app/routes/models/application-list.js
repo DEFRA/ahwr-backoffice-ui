@@ -14,7 +14,7 @@ import {
   getFlagOptions,
 } from "../utils/get-agreement-type-options.js";
 
-const { serviceUri } = config;
+const serviceUri = config.get("serviceUri");
 
 // date and status are retired from agreements basic search; recognise them and return no results
 const RETIRED_SEARCH_TYPES = ["date", "status"];

@@ -2,7 +2,7 @@ import { Cluster, Redis } from "ioredis";
 import { config } from "../config/index.js";
 import { getLogger } from "../logging/logger.js";
 
-const redisConfig = config.cache.options;
+const redisConfig = config.get("cache.options");
 
 export const buildRedisClient = () => {
   const port = 6379;

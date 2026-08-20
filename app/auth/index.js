@@ -4,7 +4,7 @@ import { config } from "../config/index.js";
 import { mapAuth } from "./map-auth.js";
 
 const getAuth = async () => {
-  if (config.auth.enabled) {
+  if (config.get("auth.enabled")) {
     return realAuth;
   } else {
     return devAuth;
@@ -12,7 +12,7 @@ const getAuth = async () => {
 };
 
 const initAuth = () => {
-  if (config.auth.enabled) {
+  if (config.get("auth.enabled")) {
     realAuth.init();
   }
 };

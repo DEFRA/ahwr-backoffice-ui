@@ -2,7 +2,8 @@ import wreck from "@hapi/wreck";
 import { config } from "../config/index.js";
 import { metricsCounter } from "../lib/metrics.js";
 
-const { applicationApiUri, apiKeys } = config;
+const applicationApiUri = config.get("applicationApiUri");
+const apiKeys = config.get("apiKeys");
 
 export async function getAllFlags(logger) {
   const endpoint = `${applicationApiUri}/flags`;

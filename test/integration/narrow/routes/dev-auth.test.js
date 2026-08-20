@@ -12,7 +12,7 @@ describe("Authentication route tests", () => {
   const url = "/dev-auth";
 
   beforeAll(async () => {
-    config.auth.enabled = false;
+    config.set("auth.enabled", false);
     server = await createServer();
     jest.clearAllMocks();
   });

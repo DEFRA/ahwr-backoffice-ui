@@ -2,7 +2,8 @@ import wreck from "@hapi/wreck";
 import { config } from "../config/index.js";
 import { FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../constants/index.js";
 
-const { applicationApiUri, apiKeys } = config;
+const applicationApiUri = config.get("applicationApiUri");
+const apiKeys = config.get("apiKeys");
 
 export async function getApplication(applicationReference, logger) {
   const endpoint = `${applicationApiUri}/applications/${applicationReference}`;

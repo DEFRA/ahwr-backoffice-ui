@@ -8,7 +8,7 @@ import {
 import { FLAG_EMOJI } from "../utils/ui-constants.js";
 import { config } from "../../config/index.js";
 
-const { serviceUri } = config;
+const serviceUri = config.get("serviceUri");
 
 const respText = "responsive-text";
 const col6RespText = `col-6 ${respText}`;
