@@ -112,17 +112,6 @@ const config = convict({
       default: halfDayInMs,
     },
   },
-  env: {
-    doc: "The Node environment",
-    format: ["development", "test", "production"],
-    default: "development",
-    env: "NODE_ENV",
-  },
-  isDev: {
-    doc: "Running in development",
-    format: Boolean,
-    default: process.env.NODE_ENV === "development",
-  },
   isProd: {
     doc: "Running in production",
     format: Boolean,
@@ -197,13 +186,6 @@ const config = convict({
     default: process.env.SUPER_ADMINS
       ? process.env.SUPER_ADMINS.split(",").map((user) => user.trim().toLowerCase())
       : [],
-  },
-  proxy: {
-    doc: "HTTP proxy URL",
-    format: String,
-    nullable: true,
-    default: null,
-    env: "HTTP_PROXY",
   },
   serviceVersion: {
     doc: "Service version",
