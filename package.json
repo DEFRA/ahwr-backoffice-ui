@@ -95,13 +95,6 @@
     "webpack": "5.109.2",
     "webpack-cli": "4.10.0"
   },
-  "overrides": {
-    "@azure/msal-node": {
-      "jsonwebtoken": "9.0.3"
-    },
-    "brace-expansion": "2.0.2",
-    "fast-xml-parser": "5.8.0"
-  },
   "nodemonConfig": {
     "ignore": [
       "**/test-output/**"
