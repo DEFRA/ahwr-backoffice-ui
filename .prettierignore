@@ -1,7 +1,4 @@
 test-output
 app/frontend/dist
 pacts
-snyk-cli
-snyk_report.html
-snyk-result.json
 .claude
