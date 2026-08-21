@@ -67,13 +67,7 @@ export function preparePoultryClaimDisplayRows(data, claimInformation, urlParame
   const { biosecurity, biosecurityUsefulness, changesInBiosecurity, costOfChanges } =
     createBiosecurityQuestions(data);
 
-  const interview = buildKeyValueJson(
-    "Evaluation interview",
-    upperFirstLetter(data?.interview),
-    true,
-  );
-
-  return [
+  const rows = [
     status,
     claimNumber,
     claimDate,
@@ -88,8 +82,19 @@ export function preparePoultryClaimDisplayRows(data, claimInformation, urlParame
     biosecurityUsefulness,
     changesInBiosecurity,
     costOfChanges,
-    interview,
   ];
+
+  if (data?.biosecurityImprovements) {
+    rows.push(
+      buildKeyValueJson(
+        "Biosecurity improvements identified",
+        upperFirstLetter(data.biosecurityImprovements),
+        true,
+      ),
+    );
+  }
+
+  return rows;
 }
 
 function createBiosecurityQuestions(data) {

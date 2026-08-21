@@ -1381,13 +1381,94 @@ describe("View claim test", () => {
         { key: "Biosecurity usefulness", value: "Somewhat useful" },
         { key: "Biosecurity recommended changes", value: "Bird movements, and flock management" },
         { key: "Expected cost for biosecurity changes", value: "£3,000 to £4,500" },
-        { key: "Evaluation interview", value: "Yes" },
       ];
 
       for (const expected of expectedContent) {
         expect($(".govuk-summary-list__key").text()).toMatch(expected.key);
         expect($(".govuk-summary-list__value").text()).toMatch(expected.value);
       }
+
+      expect($(".govuk-summary-list__key").text()).not.toContain("Evaluation interview");
+    });
+
+    test("displays biosecurity improvements when recorded as yes", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/PORE-1111-6666`,
+        auth,
+      };
+
+      const claimWithImprovements = {
+        ...poultryClaim,
+        data: { ...poultryClaim.data, biosecurityImprovements: "yes" },
+      };
+
+      getClaim.mockReturnValue(claimWithImprovements);
+      getClaims.mockReturnValue({ claims: [claimWithImprovements] });
+      getApplication.mockReturnValue(poultryApplication);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const improvementsRow = $(".govuk-summary-list__row").filter((_, el) =>
+        $(el)
+          .find(".govuk-summary-list__key")
+          .text()
+          .includes("Biosecurity improvements identified"),
+      );
+      expect(improvementsRow.find(".govuk-summary-list__value").text().trim()).toBe("Yes");
+    });
+
+    test("displays biosecurity improvements when recorded as no", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/PORE-1111-6666`,
+        auth,
+      };
+
+      const claimWithImprovements = {
+        ...poultryClaim,
+        data: { ...poultryClaim.data, biosecurityImprovements: "no" },
+      };
+
+      getClaim.mockReturnValue(claimWithImprovements);
+      getClaims.mockReturnValue({ claims: [claimWithImprovements] });
+      getApplication.mockReturnValue(poultryApplication);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+
+      const improvementsRow = $(".govuk-summary-list__row").filter((_, el) =>
+        $(el)
+          .find(".govuk-summary-list__key")
+          .text()
+          .includes("Biosecurity improvements identified"),
+      );
+      expect(improvementsRow.find(".govuk-summary-list__value").text().trim()).toBe("No");
+    });
+
+    test("does not display biosecurity improvements when not recorded", async () => {
+      const options = {
+        method: "GET",
+        url: `${url}/PORE-1111-6666`,
+        auth,
+      };
+
+      getClaim.mockReturnValue(poultryClaim);
+      getClaims.mockReturnValue({ claims: [poultryClaim] });
+      getApplication.mockReturnValue(poultryApplication);
+
+      const res = await server.inject(options);
+      const $ = cheerio.load(res.payload);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect($(".govuk-summary-list__key").text()).not.toContain(
+        "Biosecurity improvements identified",
+      );
     });
   });
 });
