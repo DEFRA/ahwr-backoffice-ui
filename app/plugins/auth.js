@@ -28,14 +28,14 @@ export const authPlugin = {
         },
         keepAlive: false,
         redirectTo: "/login",
-        validateFunc: async (_request, session) => {
+        validate: async (_request, session) => {
           const sessionFromCache = await getSession(session.id);
           if (!sessionFromCache) {
-            return { valid: false };
+            return { isValid: false };
           }
 
           return {
-            valid: true,
+            isValid: true,
             credentials: {
               account: sessionFromCache.account,
               scope: sessionFromCache.scope,
