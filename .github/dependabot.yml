@@ -48,6 +48,12 @@ updates:
 
     versioning-strategy: increase
 
+    ignore:
+      # sass-loader pinned to 12.x: 16+ switched to the modern Sass API, which breaks the current @import-based SCSS build (deferred migration)
+      - dependency-name: sass-loader
+        update-types:
+          - version-update:semver-major
+
   # Update GitHub Actions
   - package-ecosystem: github-actions
     directory: /
