@@ -53,6 +53,10 @@ updates:
       - dependency-name: sass-loader
         update-types:
           - version-update:semver-major
+      # ioredis pinned to 5.x: @hapi/catbox-redis 7.0.2 peers ioredis ^5; revisit when catbox-redis accepts ^6
+      - dependency-name: ioredis
+        update-types:
+          - version-update:semver-major
 
   # Update GitHub Actions
   - package-ecosystem: github-actions
