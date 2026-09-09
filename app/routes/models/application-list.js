@@ -8,11 +8,7 @@ import { FLAG_EMOJI } from "../utils/ui-constants.js";
 import { config } from "../../config/index.js";
 import { buildDateFilter, resolveDateRange } from "../utils/date-filter.js";
 import { FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../constants/index.js";
-import {
-  getAgreementTypeOptions,
-  getStatusOptions,
-  getFlagOptions,
-} from "../utils/get-agreement-type-options.js";
+import { getAgreementTypeOptions, getFlagOptions } from "../utils/get-agreement-type-options.js";
 
 const serviceUri = config.get("serviceUri");
 
@@ -24,7 +20,6 @@ const emptyModel = ({
   agreementTypeOptions,
   agreementDateFrom,
   agreementDateTo,
-  statusOptions,
   flagOptions,
 }) => ({
   applications: [],
@@ -34,7 +29,6 @@ const emptyModel = ({
   agreementTypeOptions,
   agreementDateFrom,
   agreementDateTo,
-  statusOptions,
   flagOptions,
 });
 
@@ -161,7 +155,6 @@ export async function createModel(request, page) {
   const flag = getAppSearch(request, sessionKeys.appSearch.flag) ?? FLAG.ALL;
 
   const agreementTypeOptions = getAgreementTypeOptions(agreementType);
-  const statusOptions = getStatusOptions(status);
   const flagOptions = getFlagOptions(flag);
 
   const dateFromFilter = buildDateFilter(getAppSearch(request, sessionKeys.appSearch.dateFrom));
@@ -175,7 +168,6 @@ export async function createModel(request, page) {
       agreementTypeOptions,
       agreementDateFrom: dateFromFilter.items,
       agreementDateTo: dateToFilter.items,
-      statusOptions,
       flagOptions,
     });
   }
@@ -212,7 +204,6 @@ export async function createModel(request, page) {
       agreementTypeOptions,
       agreementDateFrom: dateFromFilter.items,
       agreementDateTo: dateToFilter.items,
-      statusOptions,
       flagOptions,
     };
   }
@@ -222,7 +213,6 @@ export async function createModel(request, page) {
     agreementTypeOptions,
     agreementDateFrom: dateFromFilter.items,
     agreementDateTo: dateToFilter.items,
-    statusOptions,
     flagOptions,
   });
 }

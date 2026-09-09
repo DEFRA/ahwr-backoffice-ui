@@ -6,10 +6,9 @@ import { applicationsData } from "../../../../data/applications.js";
 import { getApplications } from "../../../../../app/api/applications.js";
 import {
   getAgreementTypeOptions,
-  getStatusOptions,
   getFlagOptions,
 } from "../../../../../app/routes/utils/get-agreement-type-options.js";
-import { FLAG, AGREEMENT_STATUS, AGREEMENT_TYPE } from "../../../../../app/constants/index.js";
+import { FLAG, AGREEMENT_TYPE } from "../../../../../app/constants/index.js";
 import { permissions } from "../../../../../app/auth/permissions.js";
 
 jest.mock("../../../../../app/api/applications");
@@ -194,7 +193,6 @@ describe("Application-list createModel", () => {
         agreementTypeOptions: getAgreementTypeOptions(AGREEMENT_TYPE.ALL),
         agreementDateFrom: emptyDateItems,
         agreementDateTo: emptyDateItems,
-        statusOptions: getStatusOptions(AGREEMENT_STATUS.ALL),
         flagOptions: getFlagOptions(FLAG.ALL),
       });
       expect(getApplications).not.toHaveBeenCalled();

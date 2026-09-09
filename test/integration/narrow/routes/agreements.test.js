@@ -186,15 +186,6 @@ describe("Applications test", () => {
         expect(optionTexts).toEqual(["All flags", "Flagged", "Not flagged"]);
       });
 
-      test("flag dropdown appears to the left of the status dropdown", async () => {
-        const res = await server.inject(options);
-        const $ = cheerio.load(res.payload);
-        const selectIds = $("select")
-          .map((_, el) => $(el).attr("id"))
-          .get();
-        expect(selectIds.indexOf("flag")).toBeLessThan(selectIds.indexOf("status"));
-      });
-
       test("has a clear all filters link", async () => {
         const res = await server.inject(options);
         const $ = cheerio.load(res.payload);
