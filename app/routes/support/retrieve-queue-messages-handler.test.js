@@ -5,6 +5,7 @@ import {
   getMessageGeneratorQueueMessages,
   getPaymentProxyQueueMessages,
   getSfdCommsProxyQueueMessages,
+  getApplicationQueueIsDlq,
 } from "./support-calls.js";
 
 jest.mock("./support-calls");
@@ -63,6 +64,34 @@ describe("retrieveQueueMessages.handler", () => {
       scrollTo: "queueMessages",
     });
     expect(request.logger.error).not.toHaveBeenCalled();
+  });
+
+  it("renders the per-message action form when the queue is a dead-letter queue", async () => {
+    getApplicationQueueMessages.mockResolvedValueOnce(messages);
+    getApplicationQueueIsDlq.mockResolvedValueOnce(true);
+
+    await retrieveQueueMessages.handler(request, h);
+
+    expect(h.view).toHaveBeenCalledWith("support", {
+      dlqMessages: messages,
+      queueUrl: "queue-url",
+      service: "ahwr-application-backend",
+      isDlq: true,
+      scrollTo: "queueMessages",
+    });
+    expect(request.logger.error).not.toHaveBeenCalled();
+  });
+
+  it("falls back to the plain view when a dead-letter queue has no messages", async () => {
+    getApplicationQueueMessages.mockResolvedValueOnce([]);
+    getApplicationQueueIsDlq.mockResolvedValueOnce(true);
+
+    await retrieveQueueMessages.handler(request, h);
+
+    expect(h.view).toHaveBeenCalledWith("support", {
+      queueMessages: JSON.stringify([]),
+      scrollTo: "queueMessages",
+    });
   });
 
   it("should return empty array when no messages", async () => {

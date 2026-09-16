@@ -15,6 +15,11 @@ import {
   getPaymentDocumentWithRefresh,
   getClaimCommsDocument,
   getAgreementCommsDocument,
+  getApplicationQueueMessages,
+  getApplicationQueueIsDlq,
+  getPaymentProxyQueueMessages,
+  getPaymentProxyQueueIsDlq,
+  applyPaymentProxyQueueActions,
 } from "../../../../app/routes/support/support-calls.js";
 
 const { administrator, user, processor, recommender, authoriser, support } = permissions;
@@ -726,6 +731,72 @@ describe("support-routes", () => {
         expect(response.statusCode).toBe(StatusCodes.OK);
 
         expect(response).toShow("#claimCommsDocument");
+      });
+    });
+
+    describe("retrieve queue messages", () => {
+      it("shows the plain messages inset for a queue that is not a dead-letter queue", async () => {
+        getApplicationQueueMessages.mockResolvedValue([{ id: "1", body: "a-message" }]);
+        getApplicationQueueIsDlq.mockResolvedValue(false);
+
+        const options = postOptions({
+          service: "ahwr-application-backend",
+          queueUrl: "some-queue",
+          messageCount: 1,
+          action: "retrieveQueueMessages",
+        });
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        expect(response).toShow("#queueMessages", "a-message");
+        const $ = cheerio.load(response.payload);
+        expect($("form.ahwr-apply-queue-actions-form")).toHaveLength(0);
+      });
+
+      it("shows a per-message action form when the queue is a dead-letter queue", async () => {
+        getPaymentProxyQueueMessages.mockResolvedValue([
+          { id: "msg-1", body: "first" },
+          { id: "msg-2", body: "second" },
+        ]);
+        getPaymentProxyQueueIsDlq.mockResolvedValue(true);
+
+        const options = postOptions({
+          service: "ahwr-payment-proxy",
+          queueUrl: "some-queue-dlq",
+          messageCount: 2,
+          action: "retrieveQueueMessages",
+        });
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        const $ = cheerio.load(response.payload);
+        expect($("form.ahwr-apply-queue-actions-form")).toHaveLength(1);
+        expect($("#action-msg-1")).toHaveLength(1);
+        expect($("#action-msg-2")).toHaveLength(1);
+      });
+    });
+
+    describe("apply queue actions", () => {
+      it("applies the selected actions and shows the result", async () => {
+        applyPaymentProxyQueueActions.mockResolvedValue([
+          { id: "msg-1", action: "delete", status: "done" },
+        ]);
+
+        const options = postOptions({
+          service: "ahwr-payment-proxy",
+          queueUrl: "some-queue-dlq",
+          action: "applyQueueActions",
+          "action-msg-1": "delete",
+        });
+        const response = await server.inject(options);
+        expect(response.statusCode).toBe(StatusCodes.OK);
+
+        expect(applyPaymentProxyQueueActions).toHaveBeenCalledWith(
+          "some-queue-dlq",
+          [{ id: "msg-1", action: "delete" }],
+          expect.anything(),
+        );
+        expect(response).toShow("#applyResult", "done");
       });
     });
   });
