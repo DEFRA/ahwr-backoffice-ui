@@ -41,8 +41,10 @@ export const retrieveQueueMessages = {
     const logger = request.logger;
 
     try {
-      const result = await peekByService.get(service)(queueUrl, messageCount, logger);
-      const isDlq = await isDlqByService.get(service)(queueUrl, logger);
+      const [result, isDlq] = await Promise.all([
+        peekByService.get(service)(queueUrl, messageCount, logger),
+        isDlqByService.get(service)(queueUrl, logger),
+      ]);
 
       if (isDlq && Array.isArray(result) && result.length > 0) {
         return h.view("support", {
