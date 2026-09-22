@@ -12,6 +12,7 @@ import { searchAgreementLogs } from "./search-agreement-logs-handler.js";
 import { searchAgreementComms } from "./search-agreement-comms-handler.js";
 import { searchClaimComms } from "./search-claim-comms-handler.js";
 import { retrieveQueueMessages } from "./retrieve-queue-messages-handler.js";
+import { applyQueueActions } from "./apply-queue-actions-handler.js";
 
 const { support } = permissions;
 
@@ -44,6 +45,7 @@ const actions = [
   searchAgreementComms,
   searchClaimComms,
   retrieveQueueMessages,
+  applyQueueActions,
 ];
 
 const actionHandlers = actions.reduce((acc, { action, handler }) => {

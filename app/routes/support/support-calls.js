@@ -191,3 +191,129 @@ export const getSfdCommsProxyQueueMessages = async (queueUrl, limit, logger) => 
     logger,
   );
 };
+
+const makeIsDlqCall = async (url, logger) => {
+  try {
+    logger.info(`Checking if dead-letter queue: ${url}`);
+    const { payload } = await wreck.get(`${url}`, {
+      json: true,
+      headers: { "x-api-key": apiKeys.backofficeUiApiKey },
+    });
+
+    return Boolean(payload?.isDlq);
+  } catch (error) {
+    // A 404 means the service has not implemented the endpoint (or the queue is
+    // unknown) — either way we treat the queue as not a dead-letter queue.
+    if (error.data?.res?.statusCode === StatusCodes.NOT_FOUND) {
+      return false;
+    }
+
+    logger.error({ error, url });
+
+    throw error;
+  }
+};
+
+export const getApplicationQueueIsDlq = async (queueUrl, logger) => {
+  return makeIsDlqCall(
+    `${applicationApiUri}/support/queue-messages/is-dlq?queueUrl=${queueUrl}`,
+    logger,
+  );
+};
+
+export const getDocumentGeneratorQueueIsDlq = async (queueUrl, logger) => {
+  return makeIsDlqCall(
+    `${documentGeneratorApiUri}/support/queue-messages/is-dlq?queueUrl=${queueUrl}`,
+    logger,
+  );
+};
+
+export const getMessageGeneratorQueueIsDlq = async (queueUrl, logger) => {
+  return makeIsDlqCall(
+    `${messageGeneratorApiUri}/support/queue-messages/is-dlq?queueUrl=${queueUrl}`,
+    logger,
+  );
+};
+
+export const getPaymentProxyQueueIsDlq = async (queueUrl, logger) => {
+  return makeIsDlqCall(
+    `${paymentProxyApiUri}/support/queue-messages/is-dlq?queueUrl=${queueUrl}`,
+    logger,
+  );
+};
+
+export const getSfdCommsProxyQueueIsDlq = async (queueUrl, logger) => {
+  return makeIsDlqCall(
+    `${commsProxyApiUri}/support/queue-messages/is-dlq?queueUrl=${queueUrl}`,
+    logger,
+  );
+};
+
+const makeApplyQueueActionsCall = async (url, queueUrl, actions, logger) => {
+  try {
+    logger.info(`Applying queue actions: ${url}`);
+    const { payload } = await wreck.post(`${url}`, {
+      json: true,
+      headers: {
+        "x-api-key": apiKeys.backofficeUiApiKey,
+        "content-type": "application/json",
+      },
+      payload: JSON.stringify({ queueUrl, actions }),
+    });
+
+    return payload;
+  } catch (error) {
+    if (error.data?.res?.statusCode === StatusCodes.NOT_FOUND) {
+      return "Queue not found";
+    }
+
+    logger.error({ error, url });
+
+    throw error;
+  }
+};
+
+export const applyApplicationQueueActions = async (queueUrl, actions, logger) => {
+  return makeApplyQueueActionsCall(
+    `${applicationApiUri}/support/queue-messages/actions`,
+    queueUrl,
+    actions,
+    logger,
+  );
+};
+
+export const applyDocumentGeneratorQueueActions = async (queueUrl, actions, logger) => {
+  return makeApplyQueueActionsCall(
+    `${documentGeneratorApiUri}/support/queue-messages/actions`,
+    queueUrl,
+    actions,
+    logger,
+  );
+};
+
+export const applyMessageGeneratorQueueActions = async (queueUrl, actions, logger) => {
+  return makeApplyQueueActionsCall(
+    `${messageGeneratorApiUri}/support/queue-messages/actions`,
+    queueUrl,
+    actions,
+    logger,
+  );
+};
+
+export const applyPaymentProxyQueueActions = async (queueUrl, actions, logger) => {
+  return makeApplyQueueActionsCall(
+    `${paymentProxyApiUri}/support/queue-messages/actions`,
+    queueUrl,
+    actions,
+    logger,
+  );
+};
+
+export const applySfdCommsProxyQueueActions = async (queueUrl, actions, logger) => {
+  return makeApplyQueueActionsCall(
+    `${commsProxyApiUri}/support/queue-messages/actions`,
+    queueUrl,
+    actions,
+    logger,
+  );
+};

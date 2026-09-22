@@ -20,6 +20,16 @@ import {
   getPaymentDocumentWithRefresh,
   getPaymentProxyQueueMessages,
   getSfdCommsProxyQueueMessages,
+  getApplicationQueueIsDlq,
+  getDocumentGeneratorQueueIsDlq,
+  getMessageGeneratorQueueIsDlq,
+  getPaymentProxyQueueIsDlq,
+  getSfdCommsProxyQueueIsDlq,
+  applyApplicationQueueActions,
+  applyDocumentGeneratorQueueActions,
+  applyMessageGeneratorQueueActions,
+  applyPaymentProxyQueueActions,
+  applySfdCommsProxyQueueActions,
 } from "./support-calls.js";
 import { StatusCodes } from "http-status-codes";
 
@@ -938,5 +948,135 @@ describe("getSfdCommsProxyQueueMessages", () => {
       error: mockError,
       url: "http://ahwr-sfd-comms-proxy:3001/api/support/queue-messages?queueUrl=localhost:4566&limit=10",
     });
+  });
+});
+
+describe("queue is-dlq calls", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it.each([
+    {
+      fn: getApplicationQueueIsDlq,
+      url: "http://ahwr-application-backend:3001/api/support/queue-messages/is-dlq?queueUrl=localhost:4566",
+    },
+    {
+      fn: getDocumentGeneratorQueueIsDlq,
+      url: "http://ahwr-document-generator:3001/api/support/queue-messages/is-dlq?queueUrl=localhost:4566",
+    },
+    {
+      fn: getMessageGeneratorQueueIsDlq,
+      url: "http://ahwr-message-generator:3001/api/support/queue-messages/is-dlq?queueUrl=localhost:4566",
+    },
+    {
+      fn: getPaymentProxyQueueIsDlq,
+      url: "http://ahwr-payment-proxy:3001/api/support/queue-messages/is-dlq?queueUrl=localhost:4566",
+    },
+    {
+      fn: getSfdCommsProxyQueueIsDlq,
+      url: "http://ahwr-sfd-comms-proxy:3001/api/support/queue-messages/is-dlq?queueUrl=localhost:4566",
+    },
+  ])("calls the expected url and returns the isDlq flag", async ({ fn, url }) => {
+    wreck.get = jest
+      .fn()
+      .mockResolvedValueOnce({ payload: { isDlq: true }, res: { statusCode: 200 } });
+
+    const result = await fn("localhost:4566", mockLogger);
+
+    expect(wreck.get).toHaveBeenCalledWith(url, {
+      json: true,
+      headers: { "x-api-key": "something" },
+    });
+    expect(result).toBe(true);
+  });
+
+  it("returns false when the service reports the queue is not a dlq", async () => {
+    wreck.get = jest
+      .fn()
+      .mockResolvedValueOnce({ payload: { isDlq: false }, res: { statusCode: 200 } });
+
+    expect(await getPaymentProxyQueueIsDlq("localhost:4566", mockLogger)).toBe(false);
+  });
+
+  it("treats a 404 (endpoint not implemented / unknown queue) as not a dlq", async () => {
+    wreck.get = jest.fn().mockImplementation(() => {
+      throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
+    });
+
+    expect(await getPaymentProxyQueueIsDlq("localhost:4566", mockLogger)).toBe(false);
+  });
+
+  it("logs and throws on other errors", async () => {
+    const mockError = new Error("Request failed");
+    wreck.get = jest.fn().mockRejectedValue(mockError);
+
+    await expect(getPaymentProxyQueueIsDlq("localhost:4566", mockLogger)).rejects.toThrow(
+      "Request failed",
+    );
+    expect(mockLogger.error).toHaveBeenCalled();
+  });
+});
+
+describe("queue apply-actions calls", () => {
+  const actions = [{ id: "1", action: "delete" }];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it.each([
+    {
+      fn: applyApplicationQueueActions,
+      url: "http://ahwr-application-backend:3001/api/support/queue-messages/actions",
+    },
+    {
+      fn: applyDocumentGeneratorQueueActions,
+      url: "http://ahwr-document-generator:3001/api/support/queue-messages/actions",
+    },
+    {
+      fn: applyMessageGeneratorQueueActions,
+      url: "http://ahwr-message-generator:3001/api/support/queue-messages/actions",
+    },
+    {
+      fn: applyPaymentProxyQueueActions,
+      url: "http://ahwr-payment-proxy:3001/api/support/queue-messages/actions",
+    },
+    {
+      fn: applySfdCommsProxyQueueActions,
+      url: "http://ahwr-sfd-comms-proxy:3001/api/support/queue-messages/actions",
+    },
+  ])("posts to the expected url and returns the result", async ({ fn, url }) => {
+    const result = [{ id: "1", action: "delete", status: "done" }];
+    wreck.post = jest.fn().mockResolvedValueOnce({ payload: result, res: { statusCode: 200 } });
+
+    const returned = await fn("localhost:4566", actions, mockLogger);
+
+    expect(wreck.post).toHaveBeenCalledWith(url, {
+      json: true,
+      headers: { "x-api-key": "something", "content-type": "application/json" },
+      payload: JSON.stringify({ queueUrl: "localhost:4566", actions }),
+    });
+    expect(returned).toStrictEqual(result);
+  });
+
+  it("returns not found message when service returns 404", async () => {
+    wreck.post = jest.fn().mockImplementation(() => {
+      throw Boom.notFound("error", { res: { statusCode: StatusCodes.NOT_FOUND } });
+    });
+
+    expect(await applyPaymentProxyQueueActions("localhost:4566", actions, mockLogger)).toBe(
+      "Queue not found",
+    );
+  });
+
+  it("logs and throws on other errors", async () => {
+    const mockError = new Error("Request failed");
+    wreck.post = jest.fn().mockRejectedValue(mockError);
+
+    await expect(
+      applyPaymentProxyQueueActions("localhost:4566", actions, mockLogger),
+    ).rejects.toThrow("Request failed");
+    expect(mockLogger.error).toHaveBeenCalled();
   });
 });

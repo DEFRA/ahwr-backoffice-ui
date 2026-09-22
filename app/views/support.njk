@@ -464,7 +464,58 @@
   <input type="hidden" name="action" value="retrieveQueueMessages"/>
 </form>
 
-{% if queueMessages %}
+{% if applyResult %}
+{{ govukInsetText({
+  text: applyResult,
+  id: "applyResult"
+}) }}
+{% endif %}
+
+{% if isDlq %}
+<form method="POST" action="/support" class="ahwr-apply-queue-actions-form" id="queueMessages">
+  {% call govukFieldset({
+    legend: {
+      text: "Dead-letter queue messages",
+      classes: "govuk-fieldset__legend--m",
+      isPageHeading: false
+    }
+  }) %}
+  {% for message in dlqMessages %}
+    <details class="govuk-details">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">{{ message.id }}</span>
+      </summary>
+      <div class="govuk-details__text">
+        <pre>{% if message.body is string %}{{ message.body }}{% else %}{{ message.body | dump }}{% endif %}</pre>
+      </div>
+    </details>
+    {{ govukSelect({
+      id: "action-" + message.id,
+      name: "action-" + message.id,
+      label: {
+        text: "Action for " + message.id
+      },
+      classes: "govuk-!-margin-bottom-6",
+      items: [
+        { value: "nothing", text: "Do nothing", selected: true },
+        { value: "delete", text: "Delete" },
+        { value: "reapply", text: "Reapply" }
+      ]
+    }) }}
+  {% endfor %}
+  {% endcall %}
+
+  {{ govukButton({
+    text: "Apply",
+    classes: "govuk-button--warning",
+    preventDoubleClick: true
+  }) }}
+  <input type="hidden" name="crumb" value="{{ crumb }}"/>
+  <input type="hidden" name="action" value="applyQueueActions"/>
+  <input type="hidden" name="queueUrl" value="{{ queueUrl }}"/>
+  <input type="hidden" name="service" value="{{ service }}"/>
+</form>
+{% elif queueMessages %}
 {{ govukInsetText({
   text: queueMessages,
   id: "queueMessages"
