@@ -116,7 +116,10 @@
       "chokidar": "4.0.3"
     },
     "@defra/hapi-auth-oidc": {
-      "joi": "18.2.9"
+      "joi": "18.2.9",
+      "@hapi/jwt": {
+        "joi": "17.13.8"
+      }
     }
   }
 }
