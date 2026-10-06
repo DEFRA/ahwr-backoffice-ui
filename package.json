@@ -49,7 +49,7 @@
     "aws-embedded-metrics": "4.2.1",
     "blankie": "5.0.0",
     "convict": "6.2.5",
-    "ffc-ahwr-common-library": "3.11.0",
+    "ffc-ahwr-common-library": "3.11.1",
     "govuk-frontend": "6.5.1",
     "hapi-pino": "13.0.0",
     "http-status-codes": "2.3.0",
@@ -107,5 +107,19 @@
     "*.{json,md}": [
       "prettier --write"
     ]
+  },
+  "overrides": {
+    "@hapi/catbox-redis": {
+      "joi": "17.13.8"
+    },
+    "nunjucks": {
+      "chokidar": "4.0.3"
+    },
+    "@defra/hapi-auth-oidc": {
+      "joi": "18.2.9",
+      "@hapi/jwt": {
+        "joi": "17.13.8"
+      }
+    }
   }
 }
