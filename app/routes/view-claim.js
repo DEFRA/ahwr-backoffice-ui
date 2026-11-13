@@ -104,6 +104,7 @@ export const buildViewClaim = async (
         currentStatusEvent,
         formFlags,
         isFlagged,
+        isWithdrawalRequested: claim.isWithdrawalRequested === true,
       });
 
   const scheme = getScheme(applicationReference);
