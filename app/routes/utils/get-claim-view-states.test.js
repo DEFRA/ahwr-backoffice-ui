@@ -2,7 +2,7 @@ import { getClaimViewStates } from "./get-claim-view-states.js";
 import { STATUS as status } from "ffc-ahwr-common-library";
 import { permissions } from "../../auth/permissions.js";
 import { config } from "../../config/index.js";
-const { administrator, recommender, authoriser, user } = permissions;
+const { administrator, recommender, processor, authoriser, user } = permissions;
 
 jest.mock("../../config", () => ({
   config: require("../../../test/helpers/mock-config.js").asConvict({
@@ -89,6 +89,7 @@ describe("getClaimViewStates", () => {
 
       expect(state).toEqual({
         ...noPermissions,
+        withdrawAction: true,
         recommendAction: true,
       });
     });
@@ -99,6 +100,7 @@ describe("getClaimViewStates", () => {
 
       expect(state).toEqual({
         ...noPermissions,
+        withdrawAction: true,
         recommendToPayForm: true,
       });
     });
@@ -107,7 +109,11 @@ describe("getClaimViewStates", () => {
       const request = buildRequest({ scope: administrator, query: { recommendToReject: true } });
       const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
-      expect(state).toEqual({ ...noPermissions, recommendToRejectForm: true });
+      expect(state).toEqual({
+        ...noPermissions,
+        withdrawAction: true,
+        recommendToRejectForm: true,
+      });
     });
 
     test("status: in recommended to pay, recommender: different person", () => {
@@ -279,6 +285,7 @@ describe("getClaimViewStates", () => {
 
       expect(state).toEqual({
         ...noPermissions,
+        withdrawAction: true,
         recommendAction: true,
       });
     });
@@ -287,7 +294,7 @@ describe("getClaimViewStates", () => {
       const request = buildRequest({ scope: recommender, query: { recommendToPay: true } });
       const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
-      expect(state).toEqual({ ...noPermissions, recommendToPayForm: true });
+      expect(state).toEqual({ ...noPermissions, withdrawAction: true, recommendToPayForm: true });
     });
 
     test("status: in check, query: recommendToReject", () => {
@@ -296,6 +303,7 @@ describe("getClaimViewStates", () => {
 
       expect(state).toEqual({
         ...noPermissions,
+        withdrawAction: true,
         recommendToRejectForm: true,
       });
     });
@@ -616,19 +624,59 @@ describe("getClaimViewStates", () => {
 });
 
 describe("withdraw button", () => {
-  const inCheckSuperAdminRequest = buildRequest({
-    scope: administrator,
-    query: { recommendToPay: false, recommendToReject: false },
-    username: "currentUser@test",
-  });
+  const buildInCheckRequest = (scope, username = "someone@test") =>
+    buildRequest({
+      scope,
+      query: { recommendToPay: false, recommendToReject: false },
+      username,
+    });
 
   afterEach(() => {
     config.set("withdrawClaimEnabled", true);
   });
 
-  test("withdrawAction: true when super admin, status in check and toggle enabled", () => {
+  test("withdrawAction: true for recommender, status in check and toggle enabled", () => {
     const state = getClaimViewStates({
-      request: inCheckSuperAdminRequest,
+      request: buildInCheckRequest(recommender),
+      claimStatus: status.IN_CHECK,
+    });
+
+    expect(state.withdrawAction).toBe(true);
+  });
+
+  test.each([
+    ["recommender", recommender],
+    ["processor", processor],
+  ])("withdrawAction: true for a case officer (%s)", (_label, scope) => {
+    const state = getClaimViewStates({
+      request: buildInCheckRequest(scope),
+      claimStatus: status.IN_CHECK,
+    });
+
+    expect(state.withdrawAction).toBe(true);
+  });
+
+  test("withdrawAction: false for an authoriser", () => {
+    const state = getClaimViewStates({
+      request: buildInCheckRequest(authoriser),
+      claimStatus: status.IN_CHECK,
+    });
+
+    expect(state.withdrawAction).toBe(false);
+  });
+
+  test("withdrawAction: false for a user with no update role", () => {
+    const state = getClaimViewStates({
+      request: buildInCheckRequest(user),
+      claimStatus: status.IN_CHECK,
+    });
+
+    expect(state.withdrawAction).toBe(false);
+  });
+
+  test("withdrawAction: true for an administrator or super admin", () => {
+    const state = getClaimViewStates({
+      request: buildInCheckRequest(administrator, "currentUser@test"),
       claimStatus: status.IN_CHECK,
     });
 
@@ -639,16 +687,16 @@ describe("withdraw button", () => {
     config.set("withdrawClaimEnabled", false);
 
     const state = getClaimViewStates({
-      request: inCheckSuperAdminRequest,
+      request: buildInCheckRequest(recommender),
       claimStatus: status.IN_CHECK,
     });
 
     expect(state.withdrawAction).toBe(false);
   });
 
-  test("withdrawAction: false when super admin but status is not in check", () => {
+  test("withdrawAction: false when status is not in check", () => {
     const state = getClaimViewStates({
-      request: inCheckSuperAdminRequest,
+      request: buildInCheckRequest(recommender),
       claimStatus: status.READY_TO_PAY,
     });
 
@@ -656,27 +704,21 @@ describe("withdraw button", () => {
   });
 
   test("withdrawAction: false when the application is flagged", () => {
-    const isFlagged = true;
-
     const state = getClaimViewStates({
-      request: inCheckSuperAdminRequest,
+      request: buildInCheckRequest(recommender),
       claimStatus: status.IN_CHECK,
-      currentStatusEvent: undefined,
-      formFlags: inCheckSuperAdminRequest.query,
-      isFlagged,
+      isFlagged: true,
     });
 
     expect(state.withdrawAction).toBe(false);
   });
 
-  test("withdrawAction: false when status in check but user is not a super admin", () => {
-    const request = buildRequest({
-      scope: administrator,
-      query: { recommendToPay: false, recommendToReject: false },
-      username: "notSuperAdmin@test",
+  test("withdrawAction: false when a withdrawal request is already pending", () => {
+    const state = getClaimViewStates({
+      request: buildInCheckRequest(recommender),
+      claimStatus: status.IN_CHECK,
+      isWithdrawalRequested: true,
     });
-
-    const state = getClaimViewStates({ request, claimStatus: status.IN_CHECK });
 
     expect(state.withdrawAction).toBe(false);
   });

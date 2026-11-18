@@ -4,7 +4,7 @@ import { getCrumbs } from "../../../utils/get-crumbs.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
 import { config } from "../../../../app/config/index.js";
-import { getClaim, withdrawClaim } from "../../../../app/api/claims.js";
+import { getClaim, getClaimHistory, withdrawClaim } from "../../../../app/api/claims.js";
 import { getApplication } from "../../../../app/api/applications.js";
 
 const SUPER_ADMIN_USERNAME = "superadmin@test";
@@ -20,7 +20,7 @@ jest.mock("../../../../app/auth");
 jest.mock("../../../../app/api/claims");
 jest.mock("../../../../app/api/applications");
 
-const { administrator, user } = permissions;
+const { administrator, recommender, processor, authoriser, user } = permissions;
 
 const reference = "REBC-D9H7-BJGX";
 
@@ -36,6 +36,22 @@ const application = {
 };
 
 const adminAuth = {
+  strategy: "session-auth",
+  credentials: {
+    scope: [recommender],
+    account: { name: "Case Officer", username: "caseofficer@test" },
+  },
+};
+
+const adminOnlyAuth = {
+  strategy: "session-auth",
+  credentials: {
+    scope: [administrator],
+    account: { name: "Plain Admin", username: "notsuperadmin@test" },
+  },
+};
+
+const superAdminAuth = {
   strategy: "session-auth",
   credentials: {
     scope: [administrator],
@@ -58,6 +74,7 @@ describe("Withdrawal claim page", () => {
     config.set("withdrawClaimEnabled", true);
     getClaim.mockResolvedValue(claim);
     getApplication.mockResolvedValue(application);
+    getClaimHistory.mockResolvedValue({ historyRecords: [] });
   });
 
   afterEach(() => {
@@ -109,7 +126,7 @@ describe("Withdrawal claim page", () => {
       expect(cheerio.load(res.payload)).toPreventDoubleClicks(1);
     });
 
-    test("forbids a non-administrator", async () => {
+    test("forbids a user with no withdrawal role", async () => {
       const res = await server.inject({
         method: "GET",
         url: `/withdraw-claim/${reference}`,
@@ -124,14 +141,39 @@ describe("Withdrawal claim page", () => {
     const getWithdrawalPage = (auth = adminAuth) =>
       server.inject({ method: "GET", url: `/withdraw-claim/${reference}`, auth });
 
-    test("forbids an administrator who is not a super admin", async () => {
-      const res = await getWithdrawalPage({
-        strategy: "session-auth",
-        credentials: {
-          scope: [administrator],
-          account: { name: "Plain Admin", username: "notsuperadmin@test" },
-        },
-      });
+    test.each([
+      ["administrator", adminOnlyAuth],
+      ["super admin", superAdminAuth],
+    ])("allows an %s", async (_label, auth) => {
+      const res = await getWithdrawalPage(auth);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+    });
+
+    const authFor = (scope) => ({
+      strategy: "session-auth",
+      credentials: { scope: [scope], account: { name: "Some One", username: "someone@test" } },
+    });
+
+    test.each([
+      ["recommender", recommender],
+      ["processor", processor],
+    ])("allows a case officer (%s)", async (_label, scope) => {
+      const res = await getWithdrawalPage(authFor(scope));
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+    });
+
+    test("forbids an authoriser", async () => {
+      const res = await getWithdrawalPage(authFor(authoriser));
+
+      expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
+    });
+
+    test("forbids when a withdrawal request is already pending", async () => {
+      getClaim.mockResolvedValue({ ...claim, isWithdrawalRequested: true });
+
+      const res = await getWithdrawalPage();
 
       expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
     });
@@ -208,10 +250,10 @@ describe("Withdrawal claim page", () => {
         res = await postWithdrawal(validPayload);
       });
 
-      test("withdraws the claim via the backend", () => {
+      test("submits the withdrawal request via the backend", () => {
         expect(withdrawClaim).toHaveBeenCalledWith(
           reference,
-          "Super Admin",
+          "Case Officer",
           {
             reasonForWithdrawal: "unintentionalTypingError",
             issueDiscovery: "customerContactedRPA",
@@ -221,7 +263,7 @@ describe("Withdrawal claim page", () => {
         );
       });
 
-      test("redirects back to the view-claim page we came from", () => {
+      test("redirects back to the claim", () => {
         expect(res.statusCode).toBe(StatusCodes.MOVED_TEMPORARILY);
         expect(res.headers.location).toBe(`/view-claim/${reference}?page=2&returnPage=claims`);
       });

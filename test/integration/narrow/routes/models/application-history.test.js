@@ -232,3 +232,30 @@ test("escapes html in the withdrawal details free text", () => {
       "&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; &amp; more",
   );
 });
+
+test("shows a pending withdrawal request in the change log with its details", () => {
+  const historyRecords = [
+    {
+      eventType: "withdrawal-requested",
+      updatedProperty: "withdrawalRequest",
+      newValue: "Pending",
+      updatedBy: "Tester, A",
+      updatedAt: "2025-03-11T15:07:08.488Z",
+      withdrawal: {
+        reasonForWithdrawal: "unintentionalTypingError",
+        issueDiscovery: "customerContactedRPA",
+        withdrawalDetails: "Typo in the date",
+      },
+    },
+  ];
+
+  const historyData = getHistoryDetails(historyRecords);
+
+  expect(historyData.rows[0][2]).toEqual({
+    html:
+      "Withdrawal requested (Pending)<br>" +
+      "<strong>Reason for withdrawal:</strong> Data contained an unintentional typing error<br>" +
+      "<strong>How the issue was discovered:</strong> Customer contacted the RPA<br>" +
+      "<strong>Enter details for why this claim should be withdrawn:</strong> Typo in the date",
+  });
+});
