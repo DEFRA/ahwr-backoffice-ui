@@ -119,6 +119,7 @@ describe("Withdraw claim button", () => {
   test.each([
     ["recommender", recommender],
     ["processor", processor],
+    ["user", user],
   ])("shows the button for a case officer (%s)", async (_label, scope) => {
     const res = await injectViewClaim(server, buildAuth(scope, "Some One", "someone@test"));
 
@@ -128,13 +129,6 @@ describe("Withdraw claim button", () => {
 
   test("hides the button for an authoriser", async () => {
     const res = await injectViewClaim(server, buildAuth(authoriser, "Some One", "someone@test"));
-
-    expect(res.statusCode).toBe(StatusCodes.OK);
-    expect(res.payload).not.toContain("Withdraw claim");
-  });
-
-  test("hides the button for a user without an update role", async () => {
-    const res = await injectViewClaim(server, buildAuth(user, "Read Only", "readonly@test"));
 
     expect(res.statusCode).toBe(StatusCodes.OK);
     expect(res.payload).not.toContain("Withdraw claim");

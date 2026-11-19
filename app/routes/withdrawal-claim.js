@@ -9,14 +9,14 @@ import { getClaim, withdrawClaim } from "../api/claims.js";
 import { getApplication } from "../api/applications.js";
 import { WITHDRAWAL_REASONS, WITHDRAWAL_ISSUE_DISCOVERIES } from "../constants/withdrawal.js";
 
-const { administrator, recommender, processor } = permissions;
+const { administrator, recommender, processor, user } = permissions;
 
 // Gate both routes with the same rules that reveal the withdraw button on view-claim
 const ensureClaimIsWithdrawable = async (request, h) => {
   const { reference } = request.params;
   const claim = await getClaim(reference, request.logger);
   const application = await getApplication(claim.applicationReference, request.logger);
-  const { isAdministrator, isRecommender, isProcessor } = mapAuth(request);
+  const { isAdministrator, isRecommender, isProcessor, isUser } = mapAuth(request);
   const isFlagged = application.flags.length > 0;
 
   if (
@@ -24,6 +24,7 @@ const ensureClaimIsWithdrawable = async (request, h) => {
       isAdministrator,
       isRecommender,
       isProcessor,
+      isUser,
       status: claim.status,
       isFlagged,
       isWithdrawalRequested: claim.isWithdrawalRequested === true,
@@ -36,7 +37,7 @@ const ensureClaimIsWithdrawable = async (request, h) => {
 };
 
 const withdrawalRouteGuards = {
-  auth: { scope: [administrator, recommender, processor] },
+  auth: { scope: [administrator, recommender, processor, user] },
   ext: {
     onPostAuth: { method: ensureClaimIsWithdrawable },
   },

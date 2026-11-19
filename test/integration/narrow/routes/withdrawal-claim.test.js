@@ -126,14 +126,17 @@ describe("Withdrawal claim page", () => {
       expect(cheerio.load(res.payload)).toPreventDoubleClicks(1);
     });
 
-    test("forbids a user with no withdrawal role", async () => {
+    test("allows the user role to open the withdrawal page", async () => {
       const res = await server.inject({
         method: "GET",
         url: `/withdraw-claim/${reference}`,
-        auth: { strategy: "session-auth", credentials: { scope: [user] } },
+        auth: {
+          strategy: "session-auth",
+          credentials: { scope: [user], account: { name: "User", username: "user@test" } },
+        },
       });
 
-      expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
+      expect(res.statusCode).toBe(StatusCodes.OK);
     });
   });
 

@@ -194,7 +194,7 @@ export const getClaimViewStates = ({
   } = formFlags;
   const { name } = request.auth.credentials.account;
 
-  const { isAdministrator, isRecommender, isAuthoriser, isSuperAdmin, isProcessor } =
+  const { isAdministrator, isRecommender, isAuthoriser, isSuperAdmin, isProcessor, isUser } =
     mapAuth(request);
 
   const adminActions = getAdminActionsAvailable({
@@ -222,6 +222,7 @@ export const getClaimViewStates = ({
     isAdministrator,
     isRecommender,
     isProcessor,
+    isUser,
     status: claimStatus,
     isFlagged,
     isWithdrawalRequested,
