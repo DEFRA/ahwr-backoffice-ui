@@ -125,6 +125,7 @@
     "@hapi/joi": "npm:joi@17.13.9",
     "ffc-ahwr-common-library": {
       "joi": "18.3.2"
-    }
+    },
+    "fast-xml-parser": "5.12.1"
   }
 }
