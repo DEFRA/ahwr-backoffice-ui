@@ -19,6 +19,8 @@ export default [
   {
     rules: {
       "sonarjs/no-commented-code": "error",
+      // Matches the SonarCloud threshold (max 5 conditional operators per expression)
+      "sonarjs/expression-complexity": ["error", { max: 5 }],
     },
   },
 ];

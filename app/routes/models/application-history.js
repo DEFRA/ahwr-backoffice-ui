@@ -31,6 +31,10 @@ const getAction = (updatedProperty, newValue, oldValue) => {
     [PAID]: "Paid",
   };
 
+  if (updatedProperty === "withdrawalRequest") {
+    return "Withdrawal requested (Pending)";
+  }
+
   if (updatedProperty === "status") {
     return statuses[newValue];
   }

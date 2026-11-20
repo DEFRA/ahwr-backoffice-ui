@@ -6,7 +6,7 @@ import { config } from "../../../../app/config/index.js";
 import { createServer } from "../../../../app/server.js";
 import { StatusCodes } from "http-status-codes";
 
-const { administrator } = permissions;
+const { administrator, recommender, processor, authoriser, user } = permissions;
 const SUPER_ADMIN_USERNAME = "superadmin@test";
 
 jest.mock("../../../../app/config/index.js", () => {
@@ -61,13 +61,14 @@ const claim = {
   status: "IN_CHECK",
 };
 
-const superAdminAuth = {
+const buildAuth = (scope, name, username) => ({
   strategy: "session-auth",
-  credentials: {
-    scope: [administrator],
-    account: { name: "Super Admin", username: SUPER_ADMIN_USERNAME },
-  },
-};
+  credentials: { scope: [scope], account: { name, username } },
+});
+
+const withdrawerAuth = buildAuth(recommender, "Case Officer", "caseofficer@test");
+const adminOnlyAuth = buildAuth(administrator, "Plain Admin", "notsuperadmin@test");
+const superAdminAuth = buildAuth(administrator, "Super Admin", SUPER_ADMIN_USERNAME);
 
 const injectViewClaim = (server, auth) =>
   server.inject({ method: "GET", url: "/view-claim/REPI-1111-6666", auth });
@@ -91,8 +92,8 @@ describe("Withdraw claim button", () => {
     jest.clearAllMocks();
   });
 
-  test("shows the button for a super admin on an in check claim when the toggle is enabled", async () => {
-    const res = await injectViewClaim(server, superAdminAuth);
+  test("shows the button for a case officer on an in check claim when the toggle is enabled", async () => {
+    const res = await injectViewClaim(server, withdrawerAuth);
     const $ = cheerio.load(res.payload);
 
     expect(res.statusCode).toBe(StatusCodes.OK);
@@ -100,7 +101,7 @@ describe("Withdraw claim button", () => {
   });
 
   test("the button links to the withdrawal page for the claim", async () => {
-    const res = await injectViewClaim(server, superAdminAuth);
+    const res = await injectViewClaim(server, withdrawerAuth);
     const $ = cheerio.load(res.payload);
 
     expect($(".govuk-button--warning").attr("href")).toBe("/withdraw-claim/REPI-1111-6666?page=1");
@@ -109,22 +110,44 @@ describe("Withdraw claim button", () => {
   test("hides the button when the toggle is disabled", async () => {
     config.set("withdrawClaimEnabled", false);
 
-    const res = await injectViewClaim(server, superAdminAuth);
+    const res = await injectViewClaim(server, withdrawerAuth);
 
     expect(res.statusCode).toBe(StatusCodes.OK);
     expect(res.payload).not.toContain("Withdraw claim");
   });
 
-  test("hides the button for an administrator who is not a super admin", async () => {
-    const auth = {
-      strategy: "session-auth",
-      credentials: {
-        scope: [administrator],
-        account: { name: "Plain Admin", username: "notsuperadmin@test" },
-      },
-    };
+  test.each([
+    ["recommender", recommender],
+    ["processor", processor],
+    ["user", user],
+  ])("shows the button for a case officer (%s)", async (_label, scope) => {
+    const res = await injectViewClaim(server, buildAuth(scope, "Some One", "someone@test"));
 
+    expect(res.statusCode).toBe(StatusCodes.OK);
+    expect(cheerio.load(res.payload)(".govuk-button--warning").text()).toMatch("Withdraw claim");
+  });
+
+  test("hides the button for an authoriser", async () => {
+    const res = await injectViewClaim(server, buildAuth(authoriser, "Some One", "someone@test"));
+
+    expect(res.statusCode).toBe(StatusCodes.OK);
+    expect(res.payload).not.toContain("Withdraw claim");
+  });
+
+  test.each([
+    ["administrator", adminOnlyAuth],
+    ["super admin", superAdminAuth],
+  ])("shows the button for an %s", async (_label, auth) => {
     const res = await injectViewClaim(server, auth);
+
+    expect(res.statusCode).toBe(StatusCodes.OK);
+    expect(cheerio.load(res.payload)(".govuk-button--warning").text()).toMatch("Withdraw claim");
+  });
+
+  test("hides the button when a withdrawal request is already pending", async () => {
+    getClaim.mockReturnValue({ ...claim, isWithdrawalRequested: true });
+
+    const res = await injectViewClaim(server, withdrawerAuth);
 
     expect(res.statusCode).toBe(StatusCodes.OK);
     expect(res.payload).not.toContain("Withdraw claim");
@@ -133,7 +156,7 @@ describe("Withdraw claim button", () => {
   test("hides the button when the claim is not in check", async () => {
     getClaim.mockReturnValue({ ...claim, status: "PAID" });
 
-    const res = await injectViewClaim(server, superAdminAuth);
+    const res = await injectViewClaim(server, withdrawerAuth);
 
     expect(res.statusCode).toBe(StatusCodes.OK);
     expect(res.payload).not.toContain("Withdraw claim");
@@ -142,7 +165,7 @@ describe("Withdraw claim button", () => {
   test("hides the button when the application is flagged", async () => {
     getApplication.mockReturnValue({ ...application, flags: [{ id: "flag-1" }] });
 
-    const res = await injectViewClaim(server, superAdminAuth);
+    const res = await injectViewClaim(server, withdrawerAuth);
 
     expect(res.statusCode).toBe(StatusCodes.OK);
     expect(res.payload).not.toContain("Withdraw claim");

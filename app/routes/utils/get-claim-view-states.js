@@ -169,6 +169,7 @@ export const DEFAULT_FORM_FLAGS = {
  * @param {object} [params.formFlags=request.query] - booleans for which inline form is
  *   open; see {@link DEFAULT_FORM_FLAGS}.
  * @param {boolean} [params.isFlagged=false] - whether the application is flagged; blocks withdrawal.
+ * @param {boolean} [params.isWithdrawalRequested=false] - a withdrawal request is already pending; blocks a second one.
  * @returns {Object<string, boolean>} the view-state flags (e.g. `moveToInCheckAction`,
  *   `authoriseForm`, `withdrawAction`, `updateVetsNameForm`) consumed by the templates.
  */
@@ -178,6 +179,7 @@ export const getClaimViewStates = ({
   currentStatusEvent,
   formFlags = request.query,
   isFlagged = false,
+  isWithdrawalRequested = false,
 }) => {
   const {
     moveToInCheck,
@@ -192,7 +194,8 @@ export const getClaimViewStates = ({
   } = formFlags;
   const { name } = request.auth.credentials.account;
 
-  const { isAdministrator, isRecommender, isAuthoriser, isSuperAdmin } = mapAuth(request);
+  const { isAdministrator, isRecommender, isAuthoriser, isSuperAdmin, isProcessor, isUser } =
+    mapAuth(request);
 
   const adminActions = getAdminActionsAvailable({
     isAdministrator,
@@ -208,16 +211,27 @@ export const getClaimViewStates = ({
     name,
   });
 
-  const superAdminActions = superAdminActionsAvailable(isSuperAdmin, claimStatus, isFlagged, {
+  const superAdminActions = superAdminActionsAvailable(isSuperAdmin, claimStatus, {
     updateStatus,
     updateVetsName,
     updateVetRCVSNumber,
     updateDateOfVisit,
   });
 
+  const withdrawAction = canWithdrawClaim({
+    isAdministrator,
+    isRecommender,
+    isProcessor,
+    isUser,
+    status: claimStatus,
+    isFlagged,
+    isWithdrawalRequested,
+  });
+
   return {
     ...adminActions,
     ...superAdminActions,
+    withdrawAction,
   };
 };
 
@@ -227,7 +241,7 @@ const statusWasSetByAnotherUser = (currentStatusEvent, name) => {
 
 const CLAIM_DATA_EDITABLE_STATUSES = new Set([STATUS.IN_CHECK, STATUS.PAID, STATUS.REJECTED]);
 
-const superAdminActionsAvailable = (isSuperAdmin, claimStatus, isFlagged, updateFlags) => {
+const superAdminActionsAvailable = (isSuperAdmin, claimStatus, updateFlags) => {
   const { updateStatus, updateVetsName, updateVetRCVSNumber, updateDateOfVisit } = updateFlags;
 
   const claimIsntPaidOrReadyToPay = ![STATUS.READY_TO_PAY, STATUS.PAID].includes(claimStatus);
@@ -236,8 +250,6 @@ const superAdminActionsAvailable = (isSuperAdmin, claimStatus, isFlagged, update
 
   const canChangeClaimData =
     isSuperAdmin && (claimStatus === undefined || CLAIM_DATA_EDITABLE_STATUSES.has(claimStatus));
-
-  const withdrawAction = canWithdrawClaim({ isSuperAdmin, status: claimStatus, isFlagged });
 
   const updateStatusAction = canChangeClaimStatus && claimIsntPaidOrReadyToPay;
   const updateStatusForm =
@@ -253,7 +265,6 @@ const superAdminActionsAvailable = (isSuperAdmin, claimStatus, isFlagged, update
   const updateDateOfVisitForm = canChangeClaimData && updateDateOfVisit === true;
 
   return {
-    withdrawAction,
     updateStatusAction,
     updateStatusForm,
     updateVetsNameAction,
