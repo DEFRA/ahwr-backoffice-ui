@@ -665,13 +665,13 @@ describe("withdraw button", () => {
     expect(state.withdrawAction).toBe(false);
   });
 
-  test("withdrawAction: false for a user with no update role", () => {
+  test("withdrawAction: true for a user (case officer role)", () => {
     const state = getClaimViewStates({
       request: buildInCheckRequest(user),
       claimStatus: status.IN_CHECK,
     });
 
-    expect(state.withdrawAction).toBe(false);
+    expect(state.withdrawAction).toBe(true);
   });
 
   test("withdrawAction: true for an administrator or super admin", () => {
