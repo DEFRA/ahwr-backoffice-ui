@@ -67,7 +67,13 @@ export const getPigTestResultRows = (data, type) => {
   return pigTestResultRows;
 };
 
-export function prepareLivestockClaimDisplayRows(data, claimInformation, urlParameters, actions) {
+export function prepareLivestockClaimDisplayRows(
+  data,
+  claimInformation,
+  urlParameters,
+  actions,
+  showWithdrawalRequested,
+) {
   const { isBeef, isDairy, isPigs, isSheep } = getLivestockTypes(data?.typeOfLivestock);
   const { isReview, isEndemicsFollowUp } = getReviewType(claimInformation.type);
 
@@ -86,6 +92,7 @@ export function prepareLivestockClaimDisplayRows(data, claimInformation, urlPara
     isSheep,
     testRows.reviewTestResults,
     urlParameters,
+    showWithdrawalRequested,
   );
 
   if (isBeef || isDairy) {
@@ -288,6 +295,7 @@ function createCommonRows(
   isSheep,
   reviewTestResults,
   urlParameters,
+  showWithdrawalRequested,
 ) {
   const statusActions = getAction(
     updateStatusAction,
@@ -297,7 +305,7 @@ function createCommonRows(
     urlParameters,
   );
 
-  const status = createStatusRow(claimStatus, statusActions);
+  const status = createStatusRow(claimStatus, statusActions, showWithdrawalRequested);
 
   const claimDate = buildKeyValueJson("Claim date", formattedDateToUk(createdAt), true);
 

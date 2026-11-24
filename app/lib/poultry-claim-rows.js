@@ -13,7 +13,13 @@ import {
 import { formattedDateToUk, upperFirstLetter } from "./display-helper.js";
 import { buildKeyValueJson } from "./row-helper.js";
 
-export function preparePoultryClaimDisplayRows(data, claimInformation, urlParameters, actions) {
+export function preparePoultryClaimDisplayRows(
+  data,
+  claimInformation,
+  urlParameters,
+  actions,
+  showWithdrawalRequested,
+) {
   const { claimStatus, createdAt, herd } = claimInformation;
 
   const statusActions = getAction(
@@ -24,7 +30,7 @@ export function preparePoultryClaimDisplayRows(data, claimInformation, urlParame
     urlParameters,
   );
 
-  const status = createStatusRow(claimStatus, statusActions);
+  const status = createStatusRow(claimStatus, statusActions, showWithdrawalRequested);
 
   const claimNumber = buildKeyValueJson("Claim number", urlParameters.claimReference, true);
 

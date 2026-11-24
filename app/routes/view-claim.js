@@ -1,4 +1,5 @@
 import joi from "joi";
+import { STATUS } from "ffc-ahwr-common-library";
 import { getClaim, getClaimHistory, getClaims } from "../api/claims.js";
 import { getHistoryDetails } from "./models/application-history.js";
 import { getStyleClassByStatus } from "../constants/status.js";
@@ -50,6 +51,8 @@ const prepareClaimSummaryRows = (scheme, claim, organisation, { page, returnPage
   const rowPreparation =
     scheme === POULTRY_SCHEME ? preparePoultryClaimDisplayRows : prepareLivestockClaimDisplayRows;
 
+  const showWithdrawalRequested = claimStatus === STATUS.IN_CHECK && claim.isWithdrawalRequested;
+
   const rows = rowPreparation(
     data,
     { type, claimStatus, createdAt, organisation, herd },
@@ -60,6 +63,7 @@ const prepareClaimSummaryRows = (scheme, claim, organisation, { page, returnPage
       updateVetsNameAction: viewStates.updateVetsNameAction,
       updateVetRCVSNumberAction: viewStates.updateVetRCVSNumberAction,
     },
+    showWithdrawalRequested,
   );
 
   return rows.filter((row) => row?.value?.html);
@@ -141,7 +145,7 @@ export const buildViewClaim = async (
     historyDetails: getHistoryDetails(historyRecords),
     statusOptions: getStatusUpdateOptions(claimStatus),
     errorMessages: getErrorMessagesByKey(errors),
-    showWithdrawalRequested: claimStatus === "IN_CHECK" && isWithdrawalRequested,
+    showWithdrawalRequested: claimStatus === STATUS.IN_CHECK && isWithdrawalRequested,
     withdrawnStatus: {
       normalType: upperFirstLetter("WITHDRAWN".replaceAll("_", " ").toLowerCase()),
       tagClass: getStyleClassByStatus("WITHDRAWN".replaceAll("_", " ")),
