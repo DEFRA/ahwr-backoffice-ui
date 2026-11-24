@@ -84,7 +84,13 @@ export const buildViewClaim = async (
   { reference, page, returnPage, formFlags, errors = [] },
 ) => {
   const claim = await getClaim(reference, request.logger);
-  const { data, reference: claimReference, applicationReference, status: claimStatus } = claim;
+  const {
+    data,
+    reference: claimReference,
+    applicationReference,
+    status: claimStatus,
+    isWithdrawalRequested,
+  } = claim;
 
   const application = await getApplication(applicationReference, request.logger);
   const { organisation } = application;
@@ -104,7 +110,7 @@ export const buildViewClaim = async (
         currentStatusEvent,
         formFlags,
         isFlagged,
-        isWithdrawalRequested: claim.isWithdrawalRequested === true,
+        isWithdrawalRequested,
       });
 
   const scheme = getScheme(applicationReference);
@@ -135,6 +141,11 @@ export const buildViewClaim = async (
     historyDetails: getHistoryDetails(historyRecords),
     statusOptions: getStatusUpdateOptions(claimStatus),
     errorMessages: getErrorMessagesByKey(errors),
+    showWithdrawalRequested: claimStatus === "IN_CHECK" && isWithdrawalRequested,
+    withdrawnStatus: {
+      normalType: upperFirstLetter("WITHDRAWN".replaceAll("_", " ").toLowerCase()),
+      tagClass: getStyleClassByStatus("WITHDRAWN".replaceAll("_", " ")),
+    },
     errors,
     ...viewStates,
     ...(await loadClaimsBreakdown(scheme, applicationReference, request.logger)),

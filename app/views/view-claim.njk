@@ -1,5 +1,6 @@
 {% extends './layouts/layout.njk' %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
 {% block pageTitle %}
   Administration - View Claim
@@ -20,9 +21,32 @@
       <h1 class="govuk-caption-l">Claim by <a class="govuk-link" href="/agreement/{{ applicationReference }}/claims?page={{ page }}&returnPage=view-claim&reference={{ reference }}">{{ title }}</a></h1>
     </div>
     <div class="govuk-grid-column-one-third govuk-!-text-align-right">
-      <span class="app-long-tag"><div class="govuk-tag govuk-!-margin-top-1 govuk-!-margin-bottom-3 govuk-!-text-align-left {{ status.tagClass }}">{{ status.normalType }}</div></span>
+      {% if not showWithdrawalRequested %}
+        <span class="app-long-tag"><div class="govuk-tag govuk-!-margin-top-1 govuk-!-margin-bottom-3 govuk-!-text-align-left {{ status.tagClass }}">{{ status.normalType }}</div></span>
+      {% endif %}
     </div>
   </div>
+
+  {% if showWithdrawalRequested %}
+    <div class="govuk-grid-row govuk-!-padding-top-3 govuk-!-padding-bottom-3">
+      <div class="govuk-grid-column-two-thirds govuk-!-margin-bottom-1">
+        {{ 
+          govukNotificationBanner({
+            html: "<span class=\"govuk-heading-s govuk-!-margin-bottom-1\">Changes pending approval.</span>The claim status shown to the customer will be 'In check' until the changes are approved."
+          })
+        }}
+      </div>
+
+      <div class="govuk-grid-column-two-thirds">
+        <span class="govuk-heading-s govuk-!-margin-bottom-1">Change to:</span>
+        <div class="govuk-tag govuk-!-margin-top-0 govuk-!-margin-bottom-4 govuk-!-text-align-left {{ withdrawnStatus.tagClass }}">{{ withdrawnStatus.normalType }}</div>
+
+        <span class="govuk-heading-s govuk-!-margin-bottom-1">Change from:</span>
+        <div class="govuk-tag govuk-!-margin-top-0 govuk-!-margin-bottom-4 govuk-!-text-align-left {{ status.tagClass }}">{{ status.normalType }}</div>
+      </div>
+    </div>
+  {% endif %}
+
   <hr>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
