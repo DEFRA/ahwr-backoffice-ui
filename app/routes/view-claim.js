@@ -1,10 +1,9 @@
 import joi from "joi";
-import { STATUS } from "ffc-ahwr-common-library";
 import { getClaim, getClaimHistory, getClaims } from "../api/claims.js";
 import { getHistoryDetails } from "./models/application-history.js";
 import { getStyleClassByStatus } from "../constants/status.js";
 import { upperFirstLetter, formattedDateToUk } from "../lib/display-helper.js";
-import { getScheme, POULTRY_SCHEME } from "ffc-ahwr-common-library";
+import { getScheme, POULTRY_SCHEME, STATUS } from "ffc-ahwr-common-library";
 import { permissions } from "../auth/permissions.js";
 import { getCurrentStatusEvent } from "./utils/get-current-status-event.js";
 import { getClaimViewStates } from "./utils/get-claim-view-states.js";
