@@ -86,13 +86,12 @@ export function prepareLivestockClaimDisplayRows(
   // There are more common rows than this, but the ordering matters and things get more complicated after these
   const { commonRows, commonCowRows } = createCommonRows(
     data,
-    claimInformation,
+    { ...claimInformation, showWithdrawalRequested },
     isReview,
     actions,
     isSheep,
     testRows.reviewTestResults,
     urlParameters,
-    showWithdrawalRequested,
   );
 
   if (isBeef || isDairy) {
@@ -289,13 +288,12 @@ function createTestResultsRow(data) {
 
 function createCommonRows(
   data,
-  { claimStatus, createdAt, organisation, herd },
+  { claimStatus, createdAt, organisation, herd, showWithdrawalRequested },
   isReview,
   { updateStatusAction, updateDateOfVisitAction },
   isSheep,
   reviewTestResults,
   urlParameters,
-  showWithdrawalRequested,
 ) {
   const statusActions = getAction(
     updateStatusAction,
