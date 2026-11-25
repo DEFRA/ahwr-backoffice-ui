@@ -1,4 +1,5 @@
 import joi from "joi";
+import { config } from "../config/index.js";
 import { getClaim, getClaimHistory, getClaims } from "../api/claims.js";
 import { getHistoryDetails } from "./models/application-history.js";
 import { getStyleClassByStatus } from "../constants/status.js";
@@ -45,12 +46,17 @@ const buildClaimApplicationSummary = (application, applicationReference) => {
   ];
 };
 
-const prepareClaimSummaryRows = (scheme, claim, organisation, { page, returnPage }, viewStates) => {
+const prepareClaimSummaryRows = (
+  scheme,
+  claim,
+  organisation,
+  { page, returnPage },
+  viewStates,
+  showWithdrawalRequested,
+) => {
   const { data, reference: claimReference, type, status: claimStatus, createdAt, herd } = claim;
   const rowPreparation =
     scheme === POULTRY_SCHEME ? preparePoultryClaimDisplayRows : prepareLivestockClaimDisplayRows;
-
-  const showWithdrawalRequested = claimStatus === STATUS.IN_CHECK && claim.isWithdrawalRequested;
 
   const rows = rowPreparation(
     data,
@@ -118,6 +124,11 @@ export const buildViewClaim = async (
 
   const scheme = getScheme(applicationReference);
 
+  const showWithdrawalRequested =
+    !!config.get("withdrawClaimEnabled") &&
+    claim.status === STATUS.IN_CHECK &&
+    isWithdrawalRequested;
+
   return h.view("view-claim", {
     page,
     backLink: backLink(applicationReference, returnPage, page),
@@ -135,6 +146,7 @@ export const buildViewClaim = async (
       organisation,
       { page, returnPage },
       viewStates,
+      showWithdrawalRequested,
     ),
     status: {
       normalType: upperFirstLetter(claim.status.replaceAll("_", " ").toLowerCase()),
@@ -144,7 +156,7 @@ export const buildViewClaim = async (
     historyDetails: getHistoryDetails(historyRecords),
     statusOptions: getStatusUpdateOptions(claimStatus),
     errorMessages: getErrorMessagesByKey(errors),
-    showWithdrawalRequested: claimStatus === STATUS.IN_CHECK && isWithdrawalRequested,
+    showWithdrawalRequested,
     withdrawnStatus: {
       normalType: upperFirstLetter("WITHDRAWN".replaceAll("_", " ").toLowerCase()),
       tagClass: getStyleClassByStatus("WITHDRAWN".replaceAll("_", " ")),

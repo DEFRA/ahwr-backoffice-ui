@@ -222,6 +222,11 @@ const config = convict({
     format: Boolean,
     default: process.env.WITHDRAW_CLAIM_ENABLED === "true",
   },
+  withdrawalRequestEnabled: {
+    doc: "AHWR-2298: submitting a withdrawal...",
+    format: Boolean,
+    default: process.env.WITHDRAWAL_REQUEST_ENABLED === "true",
+  },
   perfTestEnabled: {
     doc: "Enable performance-test auth bypass",
     format: Boolean,
