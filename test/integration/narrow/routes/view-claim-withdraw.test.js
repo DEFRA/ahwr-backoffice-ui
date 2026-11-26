@@ -253,46 +253,32 @@ describe("Withdraw claim without authorization flow", () => {
     expect(res.statusCode).toBe(StatusCodes.OK);
     expect($("h2.govuk-notification-banner__title").text()).toMatch("");
     expect($("span.govuk-heading-s").text()).toMatch("");
+
+    let BASE_TAG = "main#main-content > div:nth-child(3) > div:nth-child(1) > div";
+
     expect(
       $(
-        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > span:nth-child(1).govuk-heading-s",
+        BASE_TAG + " > div.govuk-notification-banner__header > h2.govuk-notification-banner__title",
       ).text(),
     ).toMatch("");
     expect(
-      $(
-        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > div:nth-child(2).govuk-tag",
-      ).text(),
+      $(BASE_TAG + " > div.govuk-notification-banner__content > span.govuk-heading-s").text(),
     ).toMatch("");
-    expect(
-      $(
-        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > span:nth-child(3).govuk-heading-s",
-      ).text(),
-    ).toMatch("");
-    expect(
-      $(
-        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > div:nth-child(4).govuk-tag",
-      ).text(),
-    ).toMatch("");
-    expect(
-      $(
-        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > span:nth-child(1).govuk-heading-s",
-      ).text(),
-    ).toMatch("");
-    expect(
-      $(
-        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > div:nth-child(2).govuk-tag",
-      ).text(),
-    ).toMatch("");
-    expect(
-      $(
-        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > span:nth-child(3).govuk-heading-s",
-      ).text(),
-    ).toMatch("");
-    expect(
-      $(
-        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > div:nth-child(4).govuk-tag",
-      ).text(),
-    ).toMatch("");
+
+    BASE_TAG = "main#main-content > div:nth-child(3) > div:nth-child(2)";
+
+    expect($(BASE_TAG + " > span:nth-child(1).govuk-heading-s").text()).toMatch("");
+    expect($(BASE_TAG + " > div:nth-child(2).govuk-tag").text()).toMatch("");
+    expect($(BASE_TAG + " > span:nth-child(3).govuk-heading-s").text()).toMatch("");
+    expect($(BASE_TAG + " > div:nth-child(4).govuk-tag").text()).toMatch("");
+
+    BASE_TAG =
+      "main#main-content > div:nth-child(5) > div:nth-child(2) > div:nth-child(1) > div:nth-child(3) > dl:nth-child(2) > div:nth-child(1) > dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds";
+
+    expect($(BASE_TAG + " > span:nth-child(1).govuk-heading-s").text()).toMatch("");
+    expect($(BASE_TAG + " > div:nth-child(2).govuk-tag").text()).toMatch("");
+    expect($(BASE_TAG + " > span:nth-child(3).govuk-heading-s").text()).toMatch("");
+    expect($(BASE_TAG + " > div:nth-child(4).govuk-tag").text()).toMatch("");
   });
 });
 
@@ -321,8 +307,16 @@ describe("Withdraw claim with authorization workflow: Claim page - withdrawal re
     const $ = cheerio.load(res.payload);
 
     expect(res.statusCode).toBe(StatusCodes.OK);
-    expect($("h2.govuk-notification-banner__title").text()).toMatch("Important");
-    expect($("span.govuk-heading-s").text()).toMatch("Changes pending approval.");
+    const BASE_TAG = "main#main-content > div:nth-child(3) > div:nth-child(1) > div";
+
+    expect(
+      $(
+        BASE_TAG + " > div.govuk-notification-banner__header > h2.govuk-notification-banner__title",
+      ).text(),
+    ).toMatch("Important");
+    expect(
+      $(BASE_TAG + " > div.govuk-notification-banner__content > span.govuk-heading-s").text(),
+    ).toMatch("Changes pending approval.");
   });
 
   test("show [Change to: Withdrawn] & [Change from: In check] texts and icons below claim number", async () => {
@@ -330,26 +324,12 @@ describe("Withdraw claim with authorization workflow: Claim page - withdrawal re
     const $ = cheerio.load(res.payload);
 
     expect(res.statusCode).toBe(StatusCodes.OK);
-    expect(
-      $(
-        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > span:nth-child(1).govuk-heading-s",
-      ).text(),
-    ).toMatch("Change to:");
-    expect(
-      $(
-        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > div:nth-child(2).govuk-tag",
-      ).text(),
-    ).toMatch("Withdrawn");
-    expect(
-      $(
-        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > span:nth-child(3).govuk-heading-s",
-      ).text(),
-    ).toMatch("Change from:");
-    expect(
-      $(
-        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > div:nth-child(4).govuk-tag",
-      ).text(),
-    ).toMatch("In check");
+    const BASE_TAG = "main#main-content > div:nth-child(3) > div:nth-child(2)";
+
+    expect($(BASE_TAG + " > span:nth-child(1).govuk-heading-s").text()).toMatch("Change to:");
+    expect($(BASE_TAG + " > div:nth-child(2).govuk-tag").text()).toMatch("Withdrawn");
+    expect($(BASE_TAG + " > span:nth-child(3).govuk-heading-s").text()).toMatch("Change from:");
+    expect($(BASE_TAG + " > div:nth-child(4).govuk-tag").text()).toMatch("In check");
   });
 
   test("show [Change to: Withdrawn] & [Change from: In check] texts and icons in Claim details status", async () => {
@@ -357,25 +337,45 @@ describe("Withdraw claim with authorization workflow: Claim page - withdrawal re
     const $ = cheerio.load(res.payload);
 
     expect(res.statusCode).toBe(StatusCodes.OK);
+    const BASE_TAG =
+      "main#main-content > div:nth-child(5) > div:nth-child(2) > div:nth-child(1) > div:nth-child(3) > dl:nth-child(2) > div:nth-child(1) > dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds";
+
+    expect($(BASE_TAG + " > span:nth-child(1).govuk-heading-s").text()).toMatch("Change to:");
+    expect($(BASE_TAG + " > div:nth-child(2).govuk-tag").text()).toMatch("Withdrawn");
+    expect($(BASE_TAG + " > span:nth-child(3).govuk-heading-s").text()).toMatch("Change from:");
+    expect($(BASE_TAG + " > div:nth-child(4).govuk-tag").text()).toMatch("In check");
+  });
+
+  test("should not show pending claim info when 'withdrawClaimEnabled' flag is off", async () => {
+    const res = await injectViewClaim(server, withdrawerAuth);
+    const $ = cheerio.load(res.payload);
+
+    expect(res.statusCode).toBe(StatusCodes.OK);
+
+    let BASE_TAG = "main#main-content > div:nth-child(3) > div:nth-child(1) > div";
+
     expect(
       $(
-        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > span:nth-child(1).govuk-heading-s",
+        BASE_TAG + " > div.govuk-notification-banner__header > h2.govuk-notification-banner__title",
       ).text(),
-    ).toMatch("Change to:");
+    ).toMatch("");
     expect(
-      $(
-        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > div:nth-child(2).govuk-tag",
-      ).text(),
-    ).toMatch("Withdrawn");
-    expect(
-      $(
-        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > span:nth-child(3).govuk-heading-s",
-      ).text(),
-    ).toMatch("Change from:");
-    expect(
-      $(
-        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > div:nth-child(4).govuk-tag",
-      ).text(),
-    ).toMatch("In check");
+      $(BASE_TAG + " > div.govuk-notification-banner__content > span.govuk-heading-s").text(),
+    ).toMatch("");
+
+    BASE_TAG = "main#main-content > div:nth-child(3) > div:nth-child(2)";
+
+    expect($(BASE_TAG + " > span:nth-child(1).govuk-heading-s").text()).toMatch("");
+    expect($(BASE_TAG + " > div:nth-child(2).govuk-tag").text()).toMatch("");
+    expect($(BASE_TAG + " > span:nth-child(3).govuk-heading-s").text()).toMatch("");
+    expect($(BASE_TAG + " > div:nth-child(4).govuk-tag").text()).toMatch("");
+
+    BASE_TAG =
+      "main#main-content > div:nth-child(5) > div:nth-child(2) > div:nth-child(1) > div:nth-child(3) > dl:nth-child(2) > div:nth-child(1) > dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds";
+
+    expect($(BASE_TAG + " > span:nth-child(1).govuk-heading-s").text()).toMatch("");
+    expect($(BASE_TAG + " > div:nth-child(2).govuk-tag").text()).toMatch("");
+    expect($(BASE_TAG + " > span:nth-child(3).govuk-heading-s").text()).toMatch("");
+    expect($(BASE_TAG + " > div:nth-child(4).govuk-tag").text()).toMatch("");
   });
 });
