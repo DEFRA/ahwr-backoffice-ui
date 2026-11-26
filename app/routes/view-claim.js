@@ -126,6 +126,7 @@ export const buildViewClaim = async (
 
   const showWithdrawalRequested =
     !!config.get("withdrawClaimEnabled") &&
+    !!config.get("withdrawalRequestEnabled") &&
     claim.status === STATUS.IN_CHECK &&
     isWithdrawalRequested;
 
