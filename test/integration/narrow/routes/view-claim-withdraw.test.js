@@ -172,7 +172,7 @@ describe("Withdraw claim button", () => {
   });
 });
 
-describe("Claim page - withdrawal requested, pending approval", () => {
+describe("Withdraw claim without authorization flow", () => {
   let server;
 
   beforeAll(async () => {
@@ -181,6 +181,131 @@ describe("Claim page - withdrawal requested, pending approval", () => {
 
   beforeEach(() => {
     config.set("withdrawClaimEnabled", true);
+    config.set("withdrawalRequestEnabled", false);
+    getClaims.mockReturnValue({ claims: [claim] });
+    getApplication.mockReturnValue(application);
+    getClaimHistory.mockResolvedValue({ historyRecords: [] });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("when 'isWithdrawalRequested' not set, show the correct claim status", async () => {
+    getClaim.mockReturnValue({ ...claim, status: "Withdrawn" });
+    const res = await injectViewClaim(server, withdrawerAuth);
+    const $ = cheerio.load(res.payload);
+
+    expect(res.statusCode).toBe(StatusCodes.OK);
+    expect(
+      $(
+        "main#main-content > div:nth-child(2).govuk-grid-row > div:nth-child(2) > span > div",
+      ).text(),
+    ).toMatch("Withdrawn");
+    expect(
+      $(
+        "main#main-content > div:nth-child(4).govuk-grid-row > div:nth-child(2) > div:nth-child(1) > div:nth-child(3) > dl:nth-child(2) > div:nth-child(1) > dd:nth-child(2) > span > span",
+      ).text(),
+    ).toMatch("Withdrawn");
+  });
+
+  test("when 'isWithdrawalRequested' = true, show the correct claim status", async () => {
+    getClaim.mockReturnValue({ ...claim, status: "Withdrawn", isWithdrawalRequested: true });
+    const res = await injectViewClaim(server, withdrawerAuth);
+    const $ = cheerio.load(res.payload);
+
+    expect(res.statusCode).toBe(StatusCodes.OK);
+    expect(
+      $(
+        "main#main-content > div:nth-child(2).govuk-grid-row > div:nth-child(2) > span > div",
+      ).text(),
+    ).toMatch("Withdrawn");
+    expect(
+      $(
+        "main#main-content > div:nth-child(4).govuk-grid-row > div:nth-child(2) > div:nth-child(1) > div:nth-child(3) > dl:nth-child(2) > div:nth-child(1) > dd:nth-child(2) > span > span",
+      ).text(),
+    ).toMatch("Withdrawn");
+  });
+
+  test("when 'isWithdrawalRequested' = false, show the correct claim status", async () => {
+    getClaim.mockReturnValue({ ...claim, status: "Withdrawn", isWithdrawalRequested: false });
+    const res = await injectViewClaim(server, withdrawerAuth);
+    const $ = cheerio.load(res.payload);
+
+    expect(res.statusCode).toBe(StatusCodes.OK);
+    expect(
+      $(
+        "main#main-content > div:nth-child(2).govuk-grid-row > div:nth-child(2) > span > div",
+      ).text(),
+    ).toMatch("Withdrawn");
+    expect(
+      $(
+        "main#main-content > div:nth-child(4).govuk-grid-row > div:nth-child(2) > div:nth-child(1) > div:nth-child(3) > dl:nth-child(2) > div:nth-child(1) > dd:nth-child(2) > span > span",
+      ).text(),
+    ).toMatch("Withdrawn");
+  });
+
+  test("should not show [Changes pending approval] information, withdrawal requested", async () => {
+    getClaim.mockReturnValue({ ...claim, status: "Withdrawn", isWithdrawalRequested: true });
+    const res = await injectViewClaim(server, withdrawerAuth);
+    const $ = cheerio.load(res.payload);
+
+    expect(res.statusCode).toBe(StatusCodes.OK);
+    expect($("h2.govuk-notification-banner__title").text()).toMatch("");
+    expect($("span.govuk-heading-s").text()).toMatch("");
+    expect(
+      $(
+        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > span:nth-child(1).govuk-heading-s",
+      ).text(),
+    ).toMatch("");
+    expect(
+      $(
+        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > div:nth-child(2).govuk-tag",
+      ).text(),
+    ).toMatch("");
+    expect(
+      $(
+        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > span:nth-child(3).govuk-heading-s",
+      ).text(),
+    ).toMatch("");
+    expect(
+      $(
+        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > div:nth-child(4).govuk-tag",
+      ).text(),
+    ).toMatch("");
+    expect(
+      $(
+        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > span:nth-child(1).govuk-heading-s",
+      ).text(),
+    ).toMatch("");
+    expect(
+      $(
+        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > div:nth-child(2).govuk-tag",
+      ).text(),
+    ).toMatch("");
+    expect(
+      $(
+        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > span:nth-child(3).govuk-heading-s",
+      ).text(),
+    ).toMatch("");
+    expect(
+      $(
+        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > div:nth-child(4).govuk-tag",
+      ).text(),
+    ).toMatch("");
+  });
+});
+
+describe("Withdraw claim with authorization workflow: Claim page - withdrawal requested, pending approval", () => {
+  let server;
+
+  beforeAll(async () => {
+    server = await createServer();
+  });
+
+  beforeEach(() => {
+    config.set("withdrawClaimEnabled", true);
+    config.set("withdrawalRequestEnabled", true);
     getClaim.mockReturnValue({ ...claim, isWithdrawalRequested: true });
     getClaims.mockReturnValue({ claims: [claim] });
     getApplication.mockReturnValue(application);
