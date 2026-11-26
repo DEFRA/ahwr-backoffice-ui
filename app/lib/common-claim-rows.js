@@ -2,11 +2,21 @@ import { getStyleClassByStatus } from "../constants/status.js";
 import { formattedDateToUk, upperFirstLetter } from "./display-helper.js";
 import { buildKeyValueJson } from "./row-helper.js";
 
-export function createStatusRow(claimStatus, statusActions) {
+export function createStatusRow(claimStatus, statusActions, showWithdrawalRequested) {
+  const html = showWithdrawalRequested
+    ? `<div class="govuk-grid-column-two-thirds govuk-!-padding-left-0">
+  <span class="govuk-heading-s govuk-!-margin-bottom-1">Change to:</span>
+  <div class="govuk-tag govuk-!-margin-top-0 govuk-!-margin-bottom-4 govuk-!-text-align-left govuk-tag--grey">Withdrawn</div>
+  
+  <span class="govuk-heading-s govuk-!-margin-bottom-1">Change from:</span>
+  <div class="govuk-tag govuk-!-margin-top-0 govuk-!-margin-bottom-4 govuk-!-text-align-left govuk-tag--orange">In check</div>
+  </div>`
+    : `<span class='app-long-tag'><span class='govuk-tag responsive-text ${getStyleClassByStatus(claimStatus.replaceAll("_", " "))}'> ${upperFirstLetter(claimStatus.replaceAll("_", " ").toLowerCase())} </span></span>`;
+
   return {
     key: { text: "Status" },
     value: {
-      html: `<span class='app-long-tag'><span class='govuk-tag responsive-text ${getStyleClassByStatus(claimStatus.replaceAll("_", " "))}'> ${upperFirstLetter(claimStatus.replaceAll("_", " ").toLowerCase())} </span></span>`,
+      html,
     },
     actions: statusActions,
   };

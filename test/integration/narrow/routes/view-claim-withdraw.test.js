@@ -171,3 +171,86 @@ describe("Withdraw claim button", () => {
     expect(res.payload).not.toContain("Withdraw claim");
   });
 });
+
+describe("Claim page - withdrawal requested, pending approval", () => {
+  let server;
+
+  beforeAll(async () => {
+    server = await createServer();
+  });
+
+  beforeEach(() => {
+    config.set("withdrawClaimEnabled", true);
+    getClaim.mockReturnValue({ ...claim, isWithdrawalRequested: true });
+    getClaims.mockReturnValue({ claims: [claim] });
+    getApplication.mockReturnValue(application);
+    getClaimHistory.mockResolvedValue({ historyRecords: [] });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("show [Changes pending approval] message panel", async () => {
+    const res = await injectViewClaim(server, withdrawerAuth);
+    const $ = cheerio.load(res.payload);
+
+    expect(res.statusCode).toBe(StatusCodes.OK);
+    expect($("h2.govuk-notification-banner__title").text()).toMatch("Important");
+    expect($("span.govuk-heading-s").text()).toMatch("Changes pending approval.");
+  });
+
+  test("show [Change to: Withdrawn] & [Change from: In check] texts and icons below claim number", async () => {
+    const res = await injectViewClaim(server, withdrawerAuth);
+    const $ = cheerio.load(res.payload);
+
+    expect(res.statusCode).toBe(StatusCodes.OK);
+    expect(
+      $(
+        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > span:nth-child(1).govuk-heading-s",
+      ).text(),
+    ).toMatch("Change to:");
+    expect(
+      $(
+        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > div:nth-child(2).govuk-tag",
+      ).text(),
+    ).toMatch("Withdrawn");
+    expect(
+      $(
+        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > span:nth-child(3).govuk-heading-s",
+      ).text(),
+    ).toMatch("Change from:");
+    expect(
+      $(
+        "div.govuk-grid-row > div:nth-child(2).govuk-grid-column-two-thirds > div:nth-child(4).govuk-tag",
+      ).text(),
+    ).toMatch("In check");
+  });
+
+  test("show [Change to: Withdrawn] & [Change from: In check] texts and icons in Claim details status", async () => {
+    const res = await injectViewClaim(server, withdrawerAuth);
+    const $ = cheerio.load(res.payload);
+
+    expect(res.statusCode).toBe(StatusCodes.OK);
+    expect(
+      $(
+        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > span:nth-child(1).govuk-heading-s",
+      ).text(),
+    ).toMatch("Change to:");
+    expect(
+      $(
+        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > div:nth-child(2).govuk-tag",
+      ).text(),
+    ).toMatch("Withdrawn");
+    expect(
+      $(
+        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > span:nth-child(3).govuk-heading-s",
+      ).text(),
+    ).toMatch("Change from:");
+    expect(
+      $(
+        "dd.govuk-summary-list__value > div:nth-child(1).govuk-grid-column-two-thirds > div:nth-child(4).govuk-tag",
+      ).text(),
+    ).toMatch("In check");
+  });
+});

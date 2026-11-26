@@ -67,7 +67,13 @@ export const getPigTestResultRows = (data, type) => {
   return pigTestResultRows;
 };
 
-export function prepareLivestockClaimDisplayRows(data, claimInformation, urlParameters, actions) {
+export function prepareLivestockClaimDisplayRows(
+  data,
+  claimInformation,
+  urlParameters,
+  actions,
+  showWithdrawalRequested,
+) {
   const { isBeef, isDairy, isPigs, isSheep } = getLivestockTypes(data?.typeOfLivestock);
   const { isReview, isEndemicsFollowUp } = getReviewType(claimInformation.type);
 
@@ -80,7 +86,7 @@ export function prepareLivestockClaimDisplayRows(data, claimInformation, urlPara
   // There are more common rows than this, but the ordering matters and things get more complicated after these
   const { commonRows, commonCowRows } = createCommonRows(
     data,
-    claimInformation,
+    { ...claimInformation, showWithdrawalRequested },
     isReview,
     actions,
     isSheep,
@@ -282,7 +288,7 @@ function createTestResultsRow(data) {
 
 function createCommonRows(
   data,
-  { claimStatus, createdAt, organisation, herd },
+  { claimStatus, createdAt, organisation, herd, showWithdrawalRequested },
   isReview,
   { updateStatusAction, updateDateOfVisitAction },
   isSheep,
@@ -297,7 +303,7 @@ function createCommonRows(
     urlParameters,
   );
 
-  const status = createStatusRow(claimStatus, statusActions);
+  const status = createStatusRow(claimStatus, statusActions, showWithdrawalRequested);
 
   const claimDate = buildKeyValueJson("Claim date", formattedDateToUk(createdAt), true);
 
