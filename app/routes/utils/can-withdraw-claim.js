@@ -6,7 +6,10 @@ import { config } from "../../config/index.js";
 const hasWithdrawRole = ({ isAdministrator, isRecommender, isProcessor, isUser }) =>
   isAdministrator || isRecommender || isProcessor || isUser;
 
+// AHWR-2298 is behind withdrawalRequestEnabled. When off this is the original rule: only a super
+// admin can withdraw an in-check, unflagged claim.
 export const canWithdrawClaim = ({
+  isSuperAdmin = false,
   isAdministrator,
   isRecommender,
   isProcessor,
@@ -14,9 +17,17 @@ export const canWithdrawClaim = ({
   status,
   isFlagged,
   isWithdrawalRequested = false,
-}) =>
-  hasWithdrawRole({ isAdministrator, isRecommender, isProcessor, isUser }) &&
-  status === STATUS.IN_CHECK &&
-  config.get("withdrawClaimEnabled") &&
-  !isFlagged &&
-  !isWithdrawalRequested;
+}) => {
+  if (!config.get("withdrawClaimEnabled") || status !== STATUS.IN_CHECK || isFlagged) {
+    return false;
+  }
+
+  if (!config.get("withdrawalRequestEnabled")) {
+    return isSuperAdmin;
+  }
+
+  return (
+    hasWithdrawRole({ isAdministrator, isRecommender, isProcessor, isUser }) &&
+    !isWithdrawalRequested
+  );
+};

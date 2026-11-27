@@ -14,6 +14,7 @@ jest.mock("../../../../app/config/index.js", () => {
   const values = jest.requireActual("../../../../app/config/index.js").config.getProperties();
   values.superAdmins = ["superadmin@test"];
   values.withdrawClaimEnabled = true;
+  values.withdrawalRequestEnabled = true;
   return { config: asConvict(values) };
 });
 jest.mock("../../../../app/auth");
@@ -82,6 +83,7 @@ describe("Withdraw claim button", () => {
 
   beforeEach(() => {
     config.set("withdrawClaimEnabled", true);
+    config.set("withdrawalRequestEnabled", true);
     getClaim.mockReturnValue(claim);
     getClaims.mockReturnValue({ claims: [claim] });
     getApplication.mockReturnValue(application);
@@ -169,6 +171,38 @@ describe("Withdraw claim button", () => {
 
     expect(res.statusCode).toBe(StatusCodes.OK);
     expect(res.payload).not.toContain("Withdraw claim");
+  });
+
+  describe("when withdrawalRequestEnabled is off (pre AHWR-2298 behaviour)", () => {
+    beforeEach(() => {
+      config.set("withdrawalRequestEnabled", false);
+    });
+
+    test("shows the button for a super admin", async () => {
+      const res = await injectViewClaim(server, superAdminAuth);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(cheerio.load(res.payload)(".govuk-button--warning").text()).toMatch("Withdraw claim");
+    });
+
+    test.each([
+      ["case officer (recommender)", withdrawerAuth],
+      ["administrator who is not a super admin", adminOnlyAuth],
+      ["user", buildAuth(user, "Some One", "someone@test")],
+    ])("hides the button for a %s", async (_label, auth) => {
+      const res = await injectViewClaim(server, auth);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+      expect(res.payload).not.toContain("Withdraw claim");
+    });
+
+    test("ignores a pending withdrawal request flag on the claim", async () => {
+      getClaim.mockReturnValue({ ...claim, isWithdrawalRequested: true });
+
+      const res = await injectViewClaim(server, superAdminAuth);
+
+      expect(cheerio.load(res.payload)(".govuk-button--warning").text()).toMatch("Withdraw claim");
+    });
   });
 });
 

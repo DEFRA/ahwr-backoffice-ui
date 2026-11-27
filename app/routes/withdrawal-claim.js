@@ -16,11 +16,12 @@ const ensureClaimIsWithdrawable = async (request, h) => {
   const { reference } = request.params;
   const claim = await getClaim(reference, request.logger);
   const application = await getApplication(claim.applicationReference, request.logger);
-  const { isAdministrator, isRecommender, isProcessor, isUser } = mapAuth(request);
+  const { isSuperAdmin, isAdministrator, isRecommender, isProcessor, isUser } = mapAuth(request);
   const isFlagged = application.flags.length > 0;
 
   if (
     !canWithdrawClaim({
+      isSuperAdmin,
       isAdministrator,
       isRecommender,
       isProcessor,
@@ -36,6 +37,9 @@ const ensureClaimIsWithdrawable = async (request, h) => {
   return h.continue;
 };
 
+// Route scope is fixed when routes are registered, so it allows every role that can submit a request
+// (withdrawalRequestEnabled on). With the flag off, ensureClaimIsWithdrawable (canWithdrawClaim)
+// still limits it to super admins and answers 403, as before.
 const withdrawalRouteGuards = {
   auth: { scope: [administrator, recommender, processor, user] },
   ext: {

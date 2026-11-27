@@ -219,6 +219,7 @@ export const getClaimViewStates = ({
   });
 
   const withdrawAction = canWithdrawClaim({
+    isSuperAdmin,
     isAdministrator,
     isRecommender,
     isProcessor,

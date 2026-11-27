@@ -1,6 +1,7 @@
 import nunjucks from "nunjucks";
 import { STATUS } from "ffc-ahwr-common-library";
 import { formattedDateToUk } from "../../lib/display-helper.js";
+import { config } from "../../config/index.js";
 import {
   WITHDRAWAL_REASONS,
   WITHDRAWAL_ISSUE_DISCOVERIES,
@@ -110,7 +111,13 @@ const getHistoryTableRows = (historyRecords) =>
     ];
   });
 
+// AHWR-2298: the pending withdrawal request row only shows when withdrawalRequestEnabled is on.
+const visibleHistoryRecords = (historyRecords) =>
+  config.get("withdrawalRequestEnabled")
+    ? historyRecords
+    : historyRecords.filter(({ updatedProperty }) => updatedProperty !== "withdrawalRequest");
+
 export const getHistoryDetails = (historyRecords) => ({
   header: getHistoryTableHeader(),
-  rows: getHistoryTableRows(historyRecords),
+  rows: getHistoryTableRows(visibleHistoryRecords(historyRecords)),
 });

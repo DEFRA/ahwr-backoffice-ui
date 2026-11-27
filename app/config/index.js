@@ -223,7 +223,7 @@ const config = convict({
     default: process.env.WITHDRAW_CLAIM_ENABLED === "true",
   },
   withdrawalRequestEnabled: {
-    doc: "AHWR-2298: submitting a withdrawal...",
+    doc: "AHWR-2298: submitting a withdrawal creates a pending request that case officers and administrators can raise, and hides the button once one is pending. When false, only super admins can withdraw, as before AHWR-2298. Enable after WITHDRAWAL_REQUEST_ENABLED is on in the application backend; disable before turning it off there.",
     format: Boolean,
     default: process.env.WITHDRAWAL_REQUEST_ENABLED === "true",
   },
