@@ -8,6 +8,7 @@ jest.mock("../../config", () => ({
   config: require("../../../test/helpers/mock-config.js").asConvict({
     superAdmins: ["currentuser@test"],
     withdrawClaimEnabled: true,
+    withdrawalRequestEnabled: true,
   }),
 }));
 
@@ -633,6 +634,7 @@ describe("withdraw button", () => {
 
   afterEach(() => {
     config.set("withdrawClaimEnabled", true);
+    config.set("withdrawalRequestEnabled", true);
   });
 
   test("withdrawAction: true for recommender, status in check and toggle enabled", () => {
@@ -721,5 +723,76 @@ describe("withdraw button", () => {
     });
 
     expect(state.withdrawAction).toBe(false);
+  });
+
+  describe("when withdrawalRequestEnabled is off (pre AHWR-2298 behaviour)", () => {
+    beforeEach(() => {
+      config.set("withdrawalRequestEnabled", false);
+    });
+
+    test.each([
+      ["recommender", recommender],
+      ["processor", processor],
+      ["user", user],
+      ["authoriser", authoriser],
+    ])("withdrawAction: false for a %s", (_label, scope) => {
+      const state = getClaimViewStates({
+        request: buildInCheckRequest(scope),
+        claimStatus: status.IN_CHECK,
+      });
+
+      expect(state.withdrawAction).toBe(false);
+    });
+
+    test("withdrawAction: false for an administrator who is not a super admin", () => {
+      const state = getClaimViewStates({
+        request: buildInCheckRequest(administrator, "notsuperadmin@test"),
+        claimStatus: status.IN_CHECK,
+      });
+
+      expect(state.withdrawAction).toBe(false);
+    });
+
+    test("withdrawAction: true for a super admin on an in check, unflagged claim", () => {
+      const state = getClaimViewStates({
+        request: buildInCheckRequest(administrator, "currentUser@test"),
+        claimStatus: status.IN_CHECK,
+      });
+
+      expect(state.withdrawAction).toBe(true);
+    });
+
+    test("withdrawAction: still true for a super admin when a withdrawal request flag is set (flag ignored)", () => {
+      const state = getClaimViewStates({
+        request: buildInCheckRequest(administrator, "currentUser@test"),
+        claimStatus: status.IN_CHECK,
+        isWithdrawalRequested: true,
+      });
+
+      expect(state.withdrawAction).toBe(true);
+    });
+
+    test.each([
+      ["not in check", { claimStatus: status.READY_TO_PAY }],
+      ["flagged", { claimStatus: status.IN_CHECK, isFlagged: true }],
+    ])("withdrawAction: false for a super admin when the claim is %s", (_label, extra) => {
+      const state = getClaimViewStates({
+        request: buildInCheckRequest(administrator, "currentUser@test"),
+        ...extra,
+      });
+
+      expect(state.withdrawAction).toBe(false);
+    });
+
+    test("withdrawAction: false when the withdraw claim toggle is disabled", () => {
+      config.set("withdrawClaimEnabled", false);
+
+      const state = getClaimViewStates({
+        request: buildInCheckRequest(administrator, "currentUser@test"),
+        claimStatus: status.IN_CHECK,
+      });
+
+      expect(state.withdrawAction).toBe(false);
+    });
   });
 });

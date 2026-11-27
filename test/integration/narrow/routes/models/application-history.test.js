@@ -1,4 +1,15 @@
 import { getHistoryDetails } from "../../../../../app/routes/models/application-history.js";
+import { config } from "../../../../../app/config/index.js";
+
+jest.mock("../../../../../app/config/index.js", () => ({
+  config: require("../../../../helpers/mock-config.js").asConvict({
+    withdrawalRequestEnabled: true,
+  }),
+}));
+
+afterEach(() => {
+  config.set("withdrawalRequestEnabled", true);
+});
 
 test("renders table", () => {
   const historyRecords = [
@@ -258,4 +269,34 @@ test("shows a pending withdrawal request in the change log with its details", ()
       "<strong>How the issue was discovered:</strong> Customer contacted the RPA<br>" +
       "<strong>Enter details for why this claim should be withdrawn:</strong> Typo in the date",
   });
+});
+
+test("hides the pending withdrawal request from the change log when withdrawalRequestEnabled is off", () => {
+  config.set("withdrawalRequestEnabled", false);
+  const historyRecords = [
+    {
+      eventType: "status-updated",
+      updatedProperty: "status",
+      newValue: "IN_CHECK",
+      updatedBy: "Tester, A",
+      updatedAt: "2025-03-11T15:00:00.000Z",
+    },
+    {
+      eventType: "withdrawal-requested",
+      updatedProperty: "withdrawalRequest",
+      newValue: "Pending",
+      updatedBy: "Tester, A",
+      updatedAt: "2025-03-11T15:07:08.488Z",
+      withdrawal: {
+        reasonForWithdrawal: "unintentionalTypingError",
+        issueDiscovery: "customerContactedRPA",
+        withdrawalDetails: "Typo in the date",
+      },
+    },
+  ];
+
+  const { rows } = getHistoryDetails(historyRecords);
+
+  expect(rows).toHaveLength(1);
+  expect(JSON.stringify(rows)).not.toContain("Withdrawal requested (Pending)");
 });

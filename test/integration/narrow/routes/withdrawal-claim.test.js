@@ -14,6 +14,7 @@ jest.mock("../../../../app/config/index.js", () => {
   const values = jest.requireActual("../../../../app/config/index.js").config.getProperties();
   values.superAdmins = ["superadmin@test"];
   values.withdrawClaimEnabled = true;
+  values.withdrawalRequestEnabled = true;
   return { config: asConvict(values) };
 });
 jest.mock("../../../../app/auth");
@@ -72,6 +73,7 @@ describe("Withdrawal claim page", () => {
 
   beforeEach(() => {
     config.set("withdrawClaimEnabled", true);
+    config.set("withdrawalRequestEnabled", true);
     getClaim.mockResolvedValue(claim);
     getApplication.mockResolvedValue(application);
     getClaimHistory.mockResolvedValue({ historyRecords: [] });
@@ -325,6 +327,66 @@ describe("Withdrawal claim page", () => {
       expect($("input[name='issueDiscovery'][value='customerContactedRPA']").is(":checked")).toBe(
         true,
       );
+    });
+  });
+
+  describe("when withdrawalRequestEnabled is off (pre AHWR-2298 behaviour)", () => {
+    beforeEach(() => {
+      config.set("withdrawalRequestEnabled", false);
+    });
+
+    const authFor = (scope, username) => ({
+      strategy: "session-auth",
+      credentials: { scope: [scope], account: { name: "Some One", username } },
+    });
+
+    const getPage = (auth) =>
+      server.inject({ method: "GET", url: `/withdraw-claim/${reference}`, auth });
+
+    test("allows a super admin", async () => {
+      const res = await getPage(superAdminAuth);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+    });
+
+    test.each([
+      ["case officer (recommender)", authFor(recommender, "caseofficer@test")],
+      ["case officer (processor)", authFor(processor, "someone@test")],
+      ["user", authFor(user, "someone@test")],
+      ["administrator who is not a super admin", adminOnlyAuth],
+    ])("forbids a %s", async (_label, auth) => {
+      const res = await getPage(auth);
+
+      expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
+    });
+
+    test("ignores a pending withdrawal request flag on the claim", async () => {
+      getClaim.mockResolvedValue({ ...claim, isWithdrawalRequested: true });
+
+      const res = await getPage(superAdminAuth);
+
+      expect(res.statusCode).toBe(StatusCodes.OK);
+    });
+
+    test("forbids submitting as a case officer and does not call the backend", async () => {
+      const crumb = await getCrumbs(server);
+
+      const res = await server.inject({
+        method: "POST",
+        url: `/withdraw-claim/${reference}`,
+        auth: authFor(recommender, "caseofficer@test"),
+        payload: {
+          page: "1",
+          reasonForWithdrawal: "unintentionalTypingError",
+          issueDiscovery: "customerContactedRPA",
+          withdrawalDetails: "Wrong date entered",
+          crumb,
+        },
+        headers: { cookie: `crumb=${crumb}` },
+      });
+
+      expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
+      expect(withdrawClaim).not.toHaveBeenCalled();
     });
   });
 });
