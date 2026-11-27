@@ -1,9 +1,10 @@
 import joi from "joi";
+import { config } from "../config/index.js";
 import { getClaim, getClaimHistory, getClaims } from "../api/claims.js";
 import { getHistoryDetails } from "./models/application-history.js";
 import { getStyleClassByStatus } from "../constants/status.js";
 import { upperFirstLetter, formattedDateToUk } from "../lib/display-helper.js";
-import { getScheme, POULTRY_SCHEME } from "ffc-ahwr-common-library";
+import { getScheme, POULTRY_SCHEME, STATUS } from "ffc-ahwr-common-library";
 import { permissions } from "../auth/permissions.js";
 import { getCurrentStatusEvent } from "./utils/get-current-status-event.js";
 import { getClaimViewStates } from "./utils/get-claim-view-states.js";
@@ -45,7 +46,14 @@ const buildClaimApplicationSummary = (application, applicationReference) => {
   ];
 };
 
-const prepareClaimSummaryRows = (scheme, claim, organisation, { page, returnPage }, viewStates) => {
+const prepareClaimSummaryRows = (
+  scheme,
+  claim,
+  organisation,
+  { page, returnPage },
+  viewStates,
+  showWithdrawalRequested,
+) => {
   const { data, reference: claimReference, type, status: claimStatus, createdAt, herd } = claim;
   const rowPreparation =
     scheme === POULTRY_SCHEME ? preparePoultryClaimDisplayRows : prepareLivestockClaimDisplayRows;
@@ -60,6 +68,7 @@ const prepareClaimSummaryRows = (scheme, claim, organisation, { page, returnPage
       updateVetsNameAction: viewStates.updateVetsNameAction,
       updateVetRCVSNumberAction: viewStates.updateVetRCVSNumberAction,
     },
+    showWithdrawalRequested,
   );
 
   return rows.filter((row) => row?.value?.html);
@@ -84,7 +93,13 @@ export const buildViewClaim = async (
   { reference, page, returnPage, formFlags, errors = [] },
 ) => {
   const claim = await getClaim(reference, request.logger);
-  const { data, reference: claimReference, applicationReference, status: claimStatus } = claim;
+  const {
+    data,
+    reference: claimReference,
+    applicationReference,
+    status: claimStatus,
+    isWithdrawalRequested,
+  } = claim;
 
   const application = await getApplication(applicationReference, request.logger);
   const { organisation } = application;
@@ -104,10 +119,16 @@ export const buildViewClaim = async (
         currentStatusEvent,
         formFlags,
         isFlagged,
-        isWithdrawalRequested: claim.isWithdrawalRequested === true,
+        isWithdrawalRequested,
       });
 
   const scheme = getScheme(applicationReference);
+
+  const showWithdrawalRequested =
+    !!config.get("withdrawClaimEnabled") &&
+    !!config.get("withdrawalRequestEnabled") &&
+    claim.status === STATUS.IN_CHECK &&
+    isWithdrawalRequested;
 
   return h.view("view-claim", {
     page,
@@ -126,6 +147,7 @@ export const buildViewClaim = async (
       organisation,
       { page, returnPage },
       viewStates,
+      showWithdrawalRequested,
     ),
     status: {
       normalType: upperFirstLetter(claim.status.replaceAll("_", " ").toLowerCase()),
@@ -135,6 +157,11 @@ export const buildViewClaim = async (
     historyDetails: getHistoryDetails(historyRecords),
     statusOptions: getStatusUpdateOptions(claimStatus),
     errorMessages: getErrorMessagesByKey(errors),
+    showWithdrawalRequested,
+    withdrawnStatus: {
+      normalType: upperFirstLetter("WITHDRAWN".replaceAll("_", " ").toLowerCase()),
+      tagClass: getStyleClassByStatus("WITHDRAWN".replaceAll("_", " ")),
+    },
     errors,
     ...viewStates,
     ...(await loadClaimsBreakdown(scheme, applicationReference, request.logger)),
